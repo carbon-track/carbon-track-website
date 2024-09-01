@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>CarbonTrack校园碳账户</title>
+  <link rel="icon" href="/img/team.jpg" type="image/JPG">
+  <!-- 引入Bootstrap和jQuery的CDN链接 -->
+  <script src="js/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="./css/bootstrap.min.css">
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/nav.js"></script>
+
+  <link rel="stylesheet" href="./css/index.css">
+  <style>
+    body, html {
+      padding: 0;
+      margin: 0;
+    }
+
+    .alert-heading {
+      text-align: center;
+    }
+
+    .text-container {
+      width: 90%; /* 文字内容占用80%宽度 */
+      margin: 0 auto; /* 上下边距为0，左右自动，使内容水平居中 */
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap; /* 允许多行 */
+      align-items: stretch; /* 使卡片高度相等 */
+    }
+
+    .card-body {
+      min-height: 250px; /* 示例最小高度，根据需要调整 */
+    }
+
+    .container, .container-fluid {
+      max-width: 100%; /* 或者其他更大的固定值，如'1400px' */
+    }
+
+    .card1 {
+      background-color: rgb(246, 192, 70); /* 设置卡片背景颜色 */
+    }
+
+    .card2 {
+      background-color: #6c8bb4 /* 设置卡片背景颜色 */
+    }
+
+    .card3 {
+      background-color: #d9d9d9; /* 设置卡片背景颜色 */
+
+    }
+
+    .card4 {
+      background-color: rgb(35, 74, 133); /* 设置卡片背景颜色 */
+    }
+
+
+    .card-title {
+      font-size: 24px;
+      letter-spacing: 2px;
+    }
+
+    /* 确保容器使用Bootstrap栅格系统进行响应式布局 */
+
+
+    .col-md-3 {
+      position: relative;
+      width: 100%;
+      padding-right: 15px;
+      padding-left: 15px;
+    }
+
+    /* 确保轮播图容器宽度为100% */
+    .carousel {
+      width: 100% !important;
+      max-width: 100%; /* 防止超出视口宽度 */
+      margin: 0 auto; /* 居中显示 */
+    }
+
+    /* 确保轮播图图片宽度自适应并填满容器 */
+    .carousel-inner img {
+      width: 100%; /* 确保图片宽度占满容器 */
+      height: auto; /* 保持图片原始宽高比 */
+      object-fit: cover; /* 覆盖整个容器，可能会裁剪图片 */
+    }
+
+    .floating-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 100;
+    }
+  </style>
+</head>
+<body>
+<!-- 导航栏 -->
+<nav class="navbar navbar-expand-sm navbar-dark">
+
+  <div class="container">
+    <a class="navbar-brand" href="index.html">校园碳账户 |</a>
+    <a class="navbar-brand" href="index.html">
+      <img src="/img/team.png" alt="CarbonTrack校园碳账户" style="height: 100px;"></a>
+    <a class="navbar-brand" href="index.html">CarbonTrack</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+          <span id="userStatus" class="navbar-text mr-3"></span>
+        </li>
+        <!--
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">联系我们</a>
+                            </li>-->
+
+        <li class="nav-item">
+          <a class="nav-link" href="#" data-toggle="modal" data-target="#registerModal">注册</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" data-toggle="modal" data-target="#loginModal">登录</a>
+        </li>
+        <li class="nav-item">
+          <button id="logoutButton" class=" logoutControl btn btn-sm btn-danger" onclick="logout()"
+                  style="display:none;">注销
+          </button>
+        </li>
+        <li class="nav-item active">
+          <a class="nav-link" href="#">首页</a>
+        </li>
+        <li class="nav-item">
+          <a class="logoutControl nav-link " href="#" data-toggle="modal" data-target="#messagesModal"><i
+              class="logoutControl fas fa-envelope" style="font-size: 24px;"></i></a>
+          <div class="badge-container">
+            <span id="unreadMessagesCount" class="badge badge-danger" style="display: none;">0</span>
+          </div>
+        </li>
+        <li class="nav-item">
+          <a id="logoutButton logoutControl" class=" logoutControl nav-link" href="calculate.html">碳减排核算入口</a>
+        </li>
+
+        <li class="nav-item">
+          <a id="logoutControl" class=" logoutControl nav-link" href="CStore.html">碳积分商城入口</a>
+        </li>
+        <li class="nav-item">
+          <a id=" logoutControl" class="logoutControl nav-link" href="center.html">用户中心</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="about.html">关于我们</a>
+        </li>
+
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- 轮播图 -->
+<div class="container-fluid">
+  <div id="carousel" class="carousel slide" data-ride="carousel">
+    <ol class="carousel-indicators">
+      <li data-target="#carousel" data-slide-to="0" class="active"></li>
+      <li data-target="#carousel" data-slide-to="1"></li>
+      <li data-target="#carousel" data-slide-to="2"></li>
+      <li data-target="#carousel" data-slide-to="3"></li>
+      <li data-target="#carousel" data-slide-to="4"></li>
+    </ol>
+    <div class="carousel-inner">
+      <div class="carousel-item active">
+        <img src="img/eg1.jpeg" alt="第一张">
+      </div>
+      <div class="carousel-item">
+        <img src="img/eg2.jpeg" alt="第二张">
+      </div>
+      <div class="carousel-item">
+        <img src="img/eg3.jpeg" alt="第三张">
+      </div>
+      <div class="carousel-item">
+        <img src="img/eg4.jpeg" alt="第四张">
+      </div>
+      <div class="carousel-item">
+        <img src="img/eg5.jpeg" alt="第五张">
+      </div>
+    </div>
+    <a class="carousel-control-prev" href="#carousel" role="button" data-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="sr-only">上一张</span>
+    </a>
+    <a class="carousel-control-next" href="#carousel" role="button" data-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="sr-only">下一张</span>
+    </a>
+  </div>
+</div>
+<div class="container mt-4">
+  <div class="alert alert-info" role="alert">
+    <h4 class="alert-heading">欢迎来到我们的碳账户平台！</h4>
+    <div class="text-container">
+      <p>以下是一些重要的公告和提示，希望您仔细阅读：</p>
+    </div>
+    <hr>
+    <div class="text-container">
+      <ul>
+        <li>请不要恶意刷数据以获取碳积分。我们致力于建立一个公正的碳减排平台，恶意刷数据将损害平台的公正性和可信度。</li>
+        <li>我们非常欢迎您提供建议或提出任何疑问。如果您有任何意见或想法，敬请发送邮件至：<a
+            href="mailto:carbontrack666@gmail.com">carbontrack666@gmail.com</a>。我们将尽快回复您，并感激您的积极参与。
+        </li>
+        <li>
+          一旦您在碳减排方面取得显著成就，我们将为您发送奖状、徽章和感谢信等奖励。这是对您积极参与减少碳排放的认可和鼓励，也是我们对环保事业的共同努力的感激之情。
+        </li>
+        <li>
+          尽管我们的碳账户主要服务于学生群体，但我们也非常欢迎成年人的加入。无论您是学生还是成年人，只要您关心环保、减少碳足迹，我们都欢迎您成为我们碳账户平台的一员。
+        </li>
+        <li>
+          感谢您一直以来对我们碳账户平台的支持。您的参与是推动碳减排事业向前发展的动力。希望您可以持续使用我们的网页，共同努力为环保事业做出更大的贡献。
+        </li>
+      </ul>
+
+      <p class="mb-0">谢谢您的阅读和支持！如果您有任何疑问或需要帮助，请随时联系我们。</p>
+    </div>
+  </div>
+</div>
+<button id="calculateButton" class="btn btn-primary floating-button">碳减排核算入口</button>
+<!-- 内容区域 -->
+<div class="container">
+  <div class="row">
+    <div class="col-md-3 col-sm-6">
+      <div class="card3">
+        <!--<img src="/img/1.png" class="card-img-top" alt="Card image">-->
+        <div class="card-body">
+          <h5 class="card-title" style="color:rgb(87,117,167);">碳账户是什么？</h5>
+          <p class="card-text" style="color:rgb(87,117,167);">
+            碳账户是一种记录个人或组织的碳排放和碳减排的工具，它可以帮助我们更好地了解自己的碳足迹，从而采取更环保的行动。</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+      <div class="card2">
+        <!--<img src="/img/2.jpg" class="card-img-top" alt="Card image">-->
+        <div class="card-body">
+          <h5 class="card-title" style="color:#fff">如何使用碳账户？</h5>
+          <p class="card-text" style="color:#fff">
+            使用碳账户很简单，您只需要注册一个账号，点击“碳减排核算入口”，记录碳减排行为和频次，即可获得碳积分。您可以在“用户中心”查看您的行为累计减少的碳减排量和碳积分，以及参与各种碳减排活动和挑战，赢取奖励和荣誉。</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+      <div class="card3">
+        <!--<img src="/img/3.jpg" class="card-img-top" alt="Card image">-->
+        <div class="card-body">
+          <h5 class="card-title" style="color:rgb(87,117,167);">碳账户有什么好处？</h5>
+          <p class="card-text" style="color:rgb(87,117,167);">
+            碳账户帮助我们追踪我们环保行为减少的碳排放量，具像化对环境的正向影响；记录学生群体在生活中的碳足迹，培养和帮助提升青少年的节能减排意识和参与度。</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+      <div class="card4">
+        <!--<img src="/img/4.png" class="card-img-top" alt="Card image">-->
+        <div class="card-body">
+          <h5 class="card-title" style="color:#fff">加入我们的团队</h5>
+          <p class="card-text" style="color:#fff">
+            我们欢迎每一位对环保有热情的朋友加入我们的团队，一起为减少碳排放贡献力量。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div> <!-- 结束行 -->
+
+<!-- 页脚 -->
+<div id="footer-placeholder"></div>
+<!-- 登录模态框 -->
+<div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="loginModalLabel">用户登录</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <label for="username">账号/用户名</label>
+            <input type="text" class="form-control" id="username" placeholder="请输入用户名或邮箱地址">
+          </div>
+          <div class="form-group">
+            <label for="password">密码</label>
+            <input type="password" class="form-control" id="password" placeholder="请输入密码">
+          </div>
+          <button type="submit" class="btn btn-login btn-block">登录</button>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <div class="alert alert-warning" role="alert" id="refreshAlert" style="display: none; cursor: pointer;">
+          如果登录/注册失败，请尝试刷新页面或<a href="#" onclick="location.reload();">点此</a>以重新通过Cloudflare防火墙。
+        </div>
+        <a class="nav-link mr-right" href="iforgot.html">忘记密码?</a>
+        <a class="nav-link" href="#" data-toggle="modal" data-target="#registerModal">注册账号</a>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="registerModalLabel">注册账户</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <label for="username">用户名</label>
+            <input type="text" class="form-control required-input" id="regusername" placeholder="请输入用户名">
+          </div>
+          <div class="form-group">
+            <label for="password">密码</label>
+            <input type="password" class="form-control required-input" id="regpassword" placeholder="请输入密码">
+          </div>
+          <div class="form-group">
+            <label for="email">邮箱:</label>
+            <input type="email" class="form-control required-input" id="email" name="email" required>
+            <!-- 添加发送验证码按钮 -->
+            <button type="button" class="btn btn-secondary" id="sendVerificationCode">发送验证码</button>
+            <!-- 在注册模态框的表单中添加一个字段 -->
+            <div class="form-group">
+              <label for="verificationCode">验证码</label>
+              <input type="text" class="form-control" id="verificationCode" placeholder="请输入验证码" required>
+              <small id="emailHelp" class="form-text text-muted"
+                     style="display: none;">我们已向您的邮箱发送了一个验证码。</small>
+            </div>
+
+          </div>
+          <button type="submit" class="btn btn-login btn-block">注册</button>
+          <div id="registerError" style="display:none;" class="alert alert-danger"></div>
+        </form>
+        <div class="modal-footer">
+          <div class="alert alert-warning" role="alert" id="refreshAlert" style="display: none; cursor: pointer;">
+            如果登录/注册失败，请尝试刷新页面或<a href="#" onclick="location.reload();">点此</a>以重新通过Cloudflare防火墙。
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 站内信模态框 -->
+<div class="modal fade" id="messagesModal" tabindex="-1" role="dialog" aria-labelledby="messagesModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="messagesModalLabel">站内信</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-4" id="conversationList">
+            <!-- 对话列表将在这里动态加载 -->
+          </div>
+          <div class="col-8">
+            <div id="messageList" style="height: 400px; overflow-y: auto;">
+              <!-- 消息列表将在这里动态加载 -->
+            </div>
+            <div class="input-group mt-3">
+              <input type="text" class="form-control" id="messageInput" placeholder="输入消息...">
+              <div class="input-group-append">
+                <button class="btn btn-primary" type="button" id="sendMessage">发送</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  // 页面加载时检查登录状态
+  $(document).ready(function () {
+    var loggedIn = sessionStorage.getItem('loggedIn')
+    var expiration = sessionStorage.getItem('expiration')
+    var now = new Date()
+
+    if (loggedIn && expiration && now.getTime() < expiration) {
+      var username = sessionStorage.getItem('username')
+      updateLoginStatus()
+      $('[data-target="#loginModal"]').hide()
+      $('[data-target="#registerModal"]').hide()
+      $('#logoutButton').show()
+      $('a[href="center.html"]').show()
+      $('a[href="calculate.html"]').show()
+      $('a[href="CStore.html"]').show()
+    } else {
+      logout() // 如果过期或未登录，执行注销操作
+      $('#userStatus').text('请登录或注册账号')
+      // 显示登录和注册按钮，隐藏注销和用户中心按钮
+      $('[data-target="#loginModal"]').show()
+      $('[data-target="#registerModal"]').show()
+      $('#logoutButton').hide()
+      $('a[href="center.html"]').hide()
+      $('a[href="calculate.html"]').hide()
+      $('a[href="CStore.html"]').hide()
+
+    }
+    updateButtonForRemainingTime()
+  })
+  document.getElementById('calculateButton').addEventListener('click', function () {
+    window.location.href = 'calculate.html' // 指定要跳转的页面
+  })
+</script>
+</body>
+</html>

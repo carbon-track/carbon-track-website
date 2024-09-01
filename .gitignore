@@ -1,0 +1,6 @@
+# MacOS
+.DS_Store
+
+# Environment variables
+db.php
+login.php

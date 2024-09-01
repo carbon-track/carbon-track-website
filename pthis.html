@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>碳减排核算记录</title>
+  <link rel="icon" href="/img/team.jpg" type="image/JPG">
+  <!-- 引入Bootstrap和jQuery的CDN链接 -->
+  <link rel="stylesheet" href="./css/bootstrap.min.css">
+  <script src="js/jquery.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/nav.js"></script>
+  <link rel="stylesheet" href="./css/index.css">
+  <!-- 省略其他链接和样式 -->
+  <style>
+    .auth-status {
+      display: inline-block;
+      padding: 0.25em 0.5em;
+      border-radius: 5px;
+      color: white;
+      font-weight: bold;
+      text-align: center;
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .auth-yes {
+      background-color: #28a745;
+      color: black;
+    }
+
+    .auth-no {
+      background-color: #dc3545;
+      color: black;
+    }
+
+    .auth-non {
+      background-color: #ffc107;
+      color: black;
+    }</style>
+</head>
+<body>
+<div id="loading">
+  <div class="loader"></div>
+</div>
+
+<nav class="navbar navbar-expand-sm navbar-dark">
+
+  <div class="container">
+    <a class="navbar-brand" href="index.html">校园碳账户 |</a>
+    <a class="navbar-brand" href="index.html">
+      <img src="/img/team.png" alt="CarbonTrack校园碳账户" style="height: 100px;"></a>
+    <a class="navbar-brand" href="index.html">CarbonTrack</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+          <span id="userStatus" class="navbar-text mr-3"></span>
+        </li>
+        <!--
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">联系我们</a>
+                            </li>-->
+        <li class="nav-item">
+          <a class="nav-link" href="#" data-toggle="modal" data-target="#registerModal">注册</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" data-toggle="modal" data-target="#loginModal">登录</a>
+        </li>
+        <li class="nav-item">
+          <button id="logoutButton" class=" logoutControl btn btn-sm btn-danger" onclick="logout()"
+                  style="display:none;">注销
+          </button>
+        </li>
+        <li class="nav-item active">
+          <a class="nav-link" href="#">首页</a>
+        </li>
+        <li class="nav-item">
+          <a class="logoutControl nav-link " href="#" data-toggle="modal" data-target="#messagesModal">站内信</a>
+          <div class="badge-container">
+            <span id="unreadMessagesCount" class="badge badge-danger" style="display: none;">0</span>
+          </div>
+        </li>
+        <li class="nav-item">
+          <a id="logoutButton logoutControl" class=" logoutControl nav-link" href="calculate.html">碳减排核算入口</a>
+        </li>
+
+        <li class="nav-item">
+          <a id="logoutControl" class=" logoutControl nav-link" href="CStore.html">碳积分商城入口</a>
+        </li>
+        <li class="nav-item">
+          <a id=" logoutControl" class="logoutControl nav-link" href="center.html">用户中心</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="about.html">关于我们</a>
+        </li>
+
+      </ul>
+    </div>
+  </div>
+</nav>
+<div class="container">
+  <h3>碳积分交易记录</h3><br>
+  <label>当前用户：</label><span id="email">加载中...</span>
+  <div id="records" class="row">
+    <!-- 交易记录将在这里动态生成 -->
+  </div>
+</div>
+
+<script>
+  $(document).ready(function () {
+    fetchTransactions()
+  })
+  var token = sessionStorage.getItem('token')
+  if (token) {
+  } else {
+    $('#email').text('未登录')
+    alert('请先登录。')
+    window.location.href = 'index.html'
+  }
+
+  function fetchTransactions() {
+    var token = sessionStorage.getItem('token')
+    if (!token) {
+      alert('请先登录。')
+      window.location.href = 'index.html'
+      return // 如果没有token，停止执行
+    }
+    $('#email').text(sessionStorage.getItem('email'))
+    $('#loading').show() // 显示加载动画
+    $.ajax({
+      type: 'POST', // 确保请求类型与PHP脚本接收的一致
+      data: { token: token },
+      url: 'getpthis.php', // 替换为您的PHP脚本路径
+      dataType: 'json',
+      success: function (response) {
+        $('#loading').hide() // 隐藏加载动画
+        if (response.success) {
+          const recordsContainer = $('#records')
+          // 使用sort方法和比较函数对数组进行排序
+          response.data.sort(function (a, b) {
+            return a.id - b.id // 升序排序
+          })
+          response.data.forEach(record => {
+            const authClass = getAuthClass(record.auth)
+            const authStatus = getAuthStatus(record.auth)
+            const card = `
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <img class="card-img-top" src="${record.img}" alt="User Image">
+                        <div class="card-body">
+                            <h5 class="card-title">${record.username}</h5>
+                            <div class="card-text-row">核算ID: ${record.id}</div>
+                            <div class="card-text-row">邮箱: ${record.email}</div>
+                            <div class="card-text-row">提交时间: ${record.time}</div>
+                            <div class="card-text-row">新增分数: ${record.points}</div>
+                            <div class="card-text-row">原始数据: ${record.raw}</div>
+                            <div class="card-text-row">减排行为: ${record.act}</div>
+                            <div class="card-text-row auth-status ${authClass}">${authStatus}</div>
+                        </div>
+                    </div>
+                </div>
+            `
+            recordsContainer.append(card)
+          })
+        } else {
+          // 处理错误消息
+          alert('错误: ' + response.message)
+        }
+      },
+
+      error: function (jqXHR, textStatus, errorThrown) {
+        $('#loading').hide() // 隐藏加载动画
+        console.error('AJAX error: ' + textStatus + ' - ' + errorThrown)
+        alert('请求失败: ' + textStatus)
+      },
+    })
+  }
+
+
+  function getAuthClass(auth) {
+    switch (auth) {
+      case 'yes':
+        return 'auth-yes'
+      case 'no':
+        return 'auth-no'
+      case 'non':
+        return 'auth-non'
+      default:
+        return ''
+    }
+  }
+
+  function getAuthStatus(auth) {
+    switch (auth) {
+      case 'yes':
+        return '已批准'
+      case 'no':
+        return '未批准'
+      case 'non':
+        return '审核队列中'
+      default:
+        return '未知状态'
+    }
+  }
+</script>
+
+<!-- 省略页脚 -->
+<div id="footer-placeholder"></div>
+</body>
+
+</html>

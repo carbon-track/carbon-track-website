@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>发送日历邮件（样例，一次只支持1个收信人）</title>
+  <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://cdn.staticfile.org/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdn.staticfile.org/twitter-bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <style>
+    /* 样式保持与上面提供的代码一致 */
+    body {
+      background-color: #f0f0f0;
+      font-family: "Microsoft YaHei", sans-serif;
+    }
+
+    .navbar {
+      background-color: #007bff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar-brand {
+      color: white;
+      font-weight: bold;
+    }
+
+    .navbar-nav .nav-link {
+      color: white;
+    }
+
+    .container {
+      margin-top: 20px;
+    }
+
+    .card {
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-img-top {
+      height: 200px;
+      object-fit: cover;
+    }
+
+    .card-body {
+      padding: 15px;
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .card-text {
+      font-size: 14px;
+      color: #666;
+    }
+
+    .footer {
+      background-color: #f8f9fa;
+      padding: 15px;
+      text-align: center;
+      color: #666;
+      margin-top: 20px;
+    }
+
+    .exchangeable {
+      color: green;
+      font-weight: bold;
+    }
+
+    .non-exchangeable {
+      color: grey;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <!-- 导航栏内容 -->
+</nav>
+
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-6">
+      <h2>添加邮件</h2>
+      <form id="addProductForm">
+        <div class="form-group">
+          <label for="addName">收件人:</label>
+          <input type="text" class="form-control" id="receiver" required>
+        </div>
+        <div class="form-group">
+          <label for="addDescription">描述:</label>
+          <input type="text" class="form-control" id="desc" required>
+        </div>
+        <div class="form-group">
+          <label for="addPrice">总结:</label>
+          <input type="text" class="form-control" id="sum" required>
+        </div>
+        <div class="form-group">
+          <label for="addPrice">开始时间:</label>
+          <input type="ntext" class="form-control" id="start" required>
+        </div>
+        <div class="form-group">
+          <label for="addPrice">结束时间:</label>
+          <input type="text" class="form-control" id="end" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary">发送</button>
+      </form>
+    </div>
+
+  </div>
+</div>
+<script>
+  $(document).ready(function () {
+    $('#addProductForm').submit(function (e) {
+      e.preventDefault()
+      var receiver = $('#receiver').val()
+      console.log(reveiver)
+      var desc = $('#desc').val()
+      var start = $('#start').val()
+      var end = $('#end').val()
+      var sum = $('#sum').val()
+      $.ajax({
+        type: 'POST',
+        url: 'ics.php',
+        data: {
+          recv: receiver,
+          desc: desc,
+          sum: sum,
+          start: start,
+          end: end,
+        },
+        success: function (response) {
+          alert(response.success ? '邮件发送成功' : '邮件发送失败: ' + response.message)
+        },
+        error: function (xhr) {
+          alert('请求失败，请重试。')
+          alert(xhr.responseText)
+        },
+      })
+    })
+  })
+
+</script>
+
+<!-- 页脚内容 -->
+
+</body>
+</html>

@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>碳积分兑换商城</title>
+  <link rel="icon" href="/img/team.jpg" type="image/JPG">
+  <link rel="stylesheet" href="./css/bootstrap.min.css">
+  <script src="js/jquery.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+  <script src="js/nav.js"></script>
+  <link rel="stylesheet" href="/css/index.css">
+  <script>
+    $(document).ready(function () {
+      var token = sessionStorage.getItem('token')
+      if (token) {
+      } else {
+        $('#userPoints').text('未登录')
+        alert('请先登录。')
+        window.location.href = 'index.html'
+      }
+      // 获取用户积分
+      fetchUserPoints()
+
+      // 从PHP接口获取商品数据
+      fetchProducts()
+
+      // 兑换商品
+      $('#productsList').on('click', '.exchange-btn', function () {
+        var productId = $(this).data('id')
+        var token = sessionStorage.getItem('token')
+        exchangeProduct(productId, token)
+      })
+    })
+
+    function fetchProducts() {
+      $('#loading').show() // 显示加载动画
+      $.ajax({
+        type: 'GET',
+        url: 'product.php',
+        dataType: 'json',
+        success: function (response) {
+          $('#loading').hide() // 隐藏加载动画
+          if (response.success) {
+            renderProducts(response.products)
+          } else {
+            console.error('获取商品信息失败: ' + response.error)
+          }
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          $('#loading').hide() // 隐藏加载动画
+          console.error('AJAX error: ' + textStatus + ', ' + errorThrown)
+        },
+      })
+    }
+
+    function fetchUserPoints() {
+      var token = sessionStorage.getItem('token')
+      $.ajax({
+        type: 'POST',
+        url: 'get_user_points.php',
+        data: { token: token },
+        dataType: 'json',
+        success: function (response) {
+          if (response.success) {
+            $('#pointsBalance').text(response.userPoints)
+          } else {
+            alert('获取积分失败: ' + response.error)
+          }
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          console.error('AJAX error: ' + textStatus + ', ' + errorThrown)
+        },
+      })
+    }
+
+    function renderProducts(products) {
+      $('#productsList').empty() // 清空现有商品列表
+      var userPoints = parseInt($('#pointsBalance').text())
+      products.forEach(function (product) {
+        /*var exchangeClass = userPoints >= product.points_required ? 'exchangeable' : 'non-exchangeable';
+        var exchangeText = userPoints >= product.points_required ? '可兑换' : '积分不足';*/
+        if (userPoints >= product.points_required) {
+          var exchangeText = '可兑换'
+          var exchangeClass = 'exchangeable'
+        } else {
+          var exchangeText = '积分不足'
+          var exchangeClass = 'non-exchangeable'
+        }
+        $('#productsList').append(
+          '<div class="col-md-4">' +
+          '<div class="card">' +
+          '<img class="card-img-top" src="' + product.image_path + '" alt="' + product.name + '">' +
+          '<div class="card-body">' +
+          '<h5 class="card-title">' + product.name + '</h5>' +
+          '<p class="card-text">' + product.description + '</p>' +
+          '<p class="card-text">所需积分: ' + product.points_required + '</p>' +
+          '<button class="btn exchange-btn ' + exchangeClass + '" data-id="' + product.product_id + '">' + exchangeText + '</button>' +
+          '</div>' +
+          '</div>' +
+          '</div>',
+        )
+      })
+    }
+
+
+    function exchangeProduct(productId, token) {
+      $.ajax({
+        type: 'POST',
+        url: 'exchange_product.php',
+        contentType: 'application/json',
+        data: JSON.stringify({ productId: productId, token: token }),
+        dataType: 'json',
+        success: function (response) {
+          if (response.success) {
+            alert('商品兑换申请成功！我们将在3个工作日内完成审批您的兑换申请。')
+            fetchUserPoints() // Refresh user points
+          } else {
+            alert('兑换失败: ' + response.error)
+          }
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          console.error('AJAX error: ' + textStatus + ', ' + errorThrown)
+        },
+      })
+    }
+
+  </script>
+</head>
+<body>
+<nav class="navbar navbar-expand-sm navbar-dark">
+
+  <div class="container">
+    <a class="navbar-brand" href="index.html">校园碳账户 |</a>
+    <a class="navbar-brand" href="index.html">
+      <img src="/img/team.png" alt="CarbonTrack校园碳账户" style="height: 100px;"></a>
+    <a class="navbar-brand" href="index.html">CarbonTrack</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+          <span id="userStatus" class="navbar-text mr-3"></span>
+        </li>
+        <!--
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">联系我们</a>
+                            </li>-->
+        <li class="nav-item">
+          <a class="nav-link" href="#" data-toggle="modal" data-target="#registerModal">注册</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" data-toggle="modal" data-target="#loginModal">登录</a>
+        </li>
+        <li class="nav-item">
+          <button id="logoutButton" class=" logoutControl btn btn-sm btn-danger" onclick="logout()"
+                  style="display:none;">注销
+          </button>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="index.html">首页</a>
+        </li>
+        <li class="nav-item">
+          <a class="logoutControl nav-link " href="#" data-toggle="modal" data-target="#messagesModal"><i
+              class="logoutControl fas fa-envelope" style="color: rgba(255, 255, 255, .5);font-size: 24px;"></i></a>
+          <div class="badge-container">
+            <span id="unreadMessagesCount" class="badge badge-danger" style="display: none;">0</span>
+          </div>
+        </li>
+        <li class="nav-item">
+          <a id="logoutButton logoutControl" class=" logoutControl nav-link" href="calculate.html">碳减排核算入口</a>
+        </li>
+
+        <li class="nav-item">
+          <a id="logoutControl" class=" logoutControl nav-link" href="CStore.html">碳积分商城入口</a>
+        </li>
+        <li class="nav-item">
+          <a id=" logoutControl" class="logoutControl nav-link" href="center.html">用户中心</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="about.html">关于我们</a>
+        </li>
+
+      </ul>
+    </div>
+  </div>
+</nav>
+<div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="loginModalLabel">用户登录</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <label for="username">账号/用户名</label>
+            <input type="text" class="form-control" id="username" placeholder="请输入用户名或邮箱地址">
+          </div>
+          <div class="form-group">
+            <label for="password">密码</label>
+            <input type="password" class="form-control" id="password" placeholder="请输入密码">
+          </div>
+          <button type="submit" class="btn btn-login btn-block">登录</button>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <div class="alert alert-warning" role="alert" id="refreshAlert" style="display: none; cursor: pointer;">
+          如果登录/注册失败，请尝试刷新页面或<a href="#" onclick="location.reload();">点此</a>以重新通过Cloudflare防火墙。
+        </div>
+        <a class="nav-link mr-right" href="iforgot.html">忘记密码?</a>
+        <a class="nav-link" href="#" data-toggle="modal" data-target="#registerModal">注册账号</a>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="registerModalLabel">注册账户</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <label for="username">用户名</label>
+            <input type="text" class="form-control required-input" id="regusername" placeholder="请输入用户名">
+          </div>
+          <div class="form-group">
+            <label for="password">密码</label>
+            <input type="password" class="form-control required-input" id="regpassword" placeholder="请输入密码">
+          </div>
+          <div class="form-group">
+            <label for="email">邮箱:</label>
+            <input type="email" class="form-control required-input" id="email" name="email" required>
+            <!-- 添加发送验证码按钮 -->
+            <button type="button" class="btn btn-secondary" id="sendVerificationCode">发送验证码</button>
+            <!-- 在注册模态框的表单中添加一个字段 -->
+            <div class="form-group">
+              <label for="verificationCode">验证码</label>
+              <input type="text" class="form-control" id="verificationCode" placeholder="请输入验证码" required>
+              <small id="emailHelp" class="form-text text-muted"
+                     style="display: none;">我们已向您的邮箱发送了一个验证码。</small>
+            </div>
+
+          </div>
+          <button type="submit" class="btn btn-login btn-block">注册</button>
+          <div id="registerError" style="display:none;" class="alert alert-danger"></div>
+        </form>
+        <div class="modal-footer">
+          <div class="alert alert-warning" role="alert" id="refreshAlert" style="display: none; cursor: pointer;">
+            如果登录/注册失败，请尝试刷新页面或<a href="#" onclick="location.reload();">点此</a>以重新通过Cloudflare防火墙。
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 站内信模态框 -->
+<div class="modal fade" id="messagesModal" tabindex="-1" role="dialog" aria-labelledby="messagesModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="messagesModalLabel">站内信</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-4" id="conversationList">
+            <!-- 对话列表将在这里动态加载 -->
+          </div>
+          <div class="col-8">
+            <div id="messageList" style="height: 400px; overflow-y: auto;">
+              <!-- 消息列表将在这里动态加载 -->
+            </div>
+            <div class="input-group mt-3">
+              <input type="text" class="form-control" id="messageInput" placeholder="输入消息...">
+              <div class="input-group-append">
+                <button class="btn btn-primary" type="button" id="sendMessage">发送</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="container mt-4">
+  <div class="alert alert-info" role="alert">
+    <h4 class="alert-heading">我们的奖励机制！</h4>
+    <p>以下是一些重要的公告和提示，希望您仔细阅读：</p>
+    <hr>
+    <ul>
+      <li>我们在用户达成5kg，20kg和50kg的减排目标后会分别使用户升级，并发放奖章，奖状与感谢信（通过邮件）！</li>
+      <li>我们会设立排行榜，让所有使用本网页的用户都可以相互看到！</li>
+      <li>我们会定期在主页展示一些优秀的减排证据，并公示出来！</li>
+      <li>我们在不久的将来会设置实物奖励，用碳积分兑换，敬请期待！</li>
+    </ul>
+    <p class="mb-0">谢谢您的阅读和支持！如果您有任何疑问或需要帮助，请随时联系我们。</p>
+  </div>
+</div>
+<div class="container">
+  <h3>您的碳积分余额：<span id="pointsBalance">0</span></h3>
+  <div id="productsList" class="row">
+    <div id="loading">
+      <div class="loader"></div>
+    </div>
+    <!-- 商品列表将在这里动态生成 -->
+  </div>
+</div>
+<div id="footer-placeholder"></div>
+<!-- 页脚内容省略，与上面一致 -->
+</body>
+</html>
