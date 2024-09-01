@@ -1,6 +1,9 @@
 # MacOS
 .DS_Store
 
+# User uploaded files
+uploads/
+
 # Environment variables
 db.php
 login.php
