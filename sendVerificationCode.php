@@ -43,8 +43,8 @@ try {
 
     // 邮件内容设置
     $mail->isHTML(true);
-    $mail->Subject = '您的注册验证码';
-    $mail->Body    = '您的注册验证码是：' . $verificationCode;
+    $mail->Subject = 'CarbonTrack - Verification Code 您的注册验证码';
+    $mail->Body    = 'Thank you for your support. Your registration verification code is: ' . $verificationCode;
 
     $mail->send();
     echo json_encode(['success' => true]);
