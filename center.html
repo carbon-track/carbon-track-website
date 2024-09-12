@@ -223,7 +223,7 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="editUserModalLabel">Edit my profile</h5>
+        <h5 class="modal-title" id="editUserModalLabel">Edit My Profile</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -509,7 +509,7 @@
         $.each(data, function (index, school) {
           schoolOptions += '<option value="' + school.id + '">' + school.name + '</option>'
         })
-        schoolOptions += '<option value="other">其他（自行输入）</option>' // 添加一个“其他”选项
+        schoolOptions += '<option value="other">其他Other（自行输入Enter new）</option>' // 添加一个“其他”选项
         $('#userSchoolSelect').html(schoolOptions)
       },
       error: function (xhr, status, error) {
