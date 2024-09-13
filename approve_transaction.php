@@ -15,11 +15,11 @@ function opensslDecrypt($data, $key)
 
 function sendmsg($pdo, $sender_id, $receiver_id)
 {
-    $content = "<p>尊敬的用户，</p>
-                    <p>我们很高兴地通知您，您提交的碳减排记录已经成功通过我们的审核流程。相应的积分已经添加到您的账户中，您现在可以查看更新后的积分余额。</p>
-                    <p>我们真诚地感谢您对碳减排事业的贡献，以及您对我们小程序的使用和支持。您的每一项努力都对促进环境的可持续发展起到了积极作用。请继续与我们一起，为打造更加绿色的未来而努力。</p>
-                    <p>再次感谢，期待您继续参与我们的活动，并享受更多小程序带来的便利和乐趣。</p>
-                    <p>诚挚的问候，<br>Carbon Track团队</p>";
+    $content = "<p>尊敬的用户，Dear user,</p>
+                    <p>我们很高兴地通知您，您提交的碳减排记录已经成功通过我们的审核流程。相应的积分已经添加到您的账户中，您现在可以查看更新后的积分余额。We are pleased to inform you that the carbon reduction record you submitted has successfully passed our review process. The corresponding credits have been added to your account and you can now view the updated points balance.</p>
+                    <p>我们真诚地感谢您对碳减排事业的贡献，以及您对我们小程序的使用和支持。您的每一项努力都对促进环境的可持续发展起到了积极作用。请继续与我们一起，为打造更加绿色的未来而努力。We sincerely thank you for your contribution to the cause of carbon reduction, as well as your use and support of our platform. Each of your efforts plays a positive role in promoting environmental sustainability. Please continue to work with us for a greener future.</p>
+                    <p>再次感谢，期待您继续参与我们的活动，并享受更多小程序带来的便利和乐趣。Thank you again and look forward to your continuing participation in our activities and enjoying the convenience and fun brought by the greener lifestyle.</p>
+                    <p>诚挚的问候，Sincere regards,<br>CarbonTrack</p>";
     try {
         $pdo->beginTransaction();
         $sql = "INSERT INTO `messages` (`sender_id`, `receiver_id`, `content`, `send_time`, `is_read`) VALUES (?, ?, ?, NOW(), '0')";
