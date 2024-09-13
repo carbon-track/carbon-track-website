@@ -25,7 +25,7 @@ try {
 
     // 邮件内容设置
     $mail->isHTML(true);
-$mail->Subject = '账号注册成功通知 Account Registration Success Notification';
+$mail->Subject = '[CarbonTrack]账号注册成功通知 Account Registration Success Notification';
 $mail->Body = "<p>尊敬的用户，Dear user, </p>
 <p>感谢您选择注册我们的小程序！我们很高兴地通知您，您的账号已成功注册。Thank you for choosing our platform! We are thrilled to inform you that your account has been successfully registered.</p>
 <p>您现在可以开始享受我们小程序提供的各种功能和服务。我们致力于为您提供优质的体验，并不断改进和更新我们的功能，以满足您的需求。You can now start enjoying the various functions and services offered by our platform. We are committed to providing you with a quality experience and are constantly improving and updating our features to meet your needs.</p>
