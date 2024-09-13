@@ -218,7 +218,7 @@ function updateLoginStatus() {
     var username = sessionStorage.getItem('username');
     if (username) {
         // 根据您的页面结构，这里可能需要调整
-        $('#userStatus').text('欢迎, ' + username);
+        $('#userStatus').text('Welcome, ' + username);
         $('a[href="calculate.html"]').show();
         // 显示注销按钮，隐藏登录按钮
         $('#logoutButton').show();
