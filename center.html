@@ -407,7 +407,7 @@
         // 从下拉列表中获取学校名称
         schoolName = $('#userSchoolSelect option:selected').text()
       }
-      if (schoolName == '请选择学校') {
+      if (schoolName == '请选择学校Select school') {
         schoolName = undefined
       }
       var state = $('#userStateSelect').val()
@@ -503,7 +503,7 @@
       dataType: 'json',
       data: { token: token }, // 将 token 作为请求参数发送
       success: function (data) {
-        var schoolOptions = '<option value="">请选择学校</option>'
+        var schoolOptions = '<option value="">请选择学校Select school</option>'
         $.each(data, function (index, school) {
           schoolOptions += '<option value="' + school.id + '">' + school.name + '</option>'
         })
