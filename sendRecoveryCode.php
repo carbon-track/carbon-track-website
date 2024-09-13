@@ -55,8 +55,8 @@ $mail->CharSet = "UTF-8";
 
     // 设置邮件格式和内容
     $mail->isHTML(true);
-    $mail->Subject = '密码恢复验证码';
-    $mail->Body    = "你的密码恢复验证码是：{$verificationCode}";
+    $mail->Subject = '[CarbonTrack]密码恢复验证码 Password Recovery Verification Code';
+    $mail->Body    = "你的密码恢复验证码是 Your password recovery verification code is：{$verificationCode}";
 
     // 发送邮件
     $mail->send();
