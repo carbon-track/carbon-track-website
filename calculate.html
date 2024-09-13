@@ -58,7 +58,7 @@
           },
           success: function (response) {
             if (response.success) {
-              alert('提交成功: ' + response.message + '预计新增积分:' + response.points)
+              alert('提交成功Success: ' + response.message + '预计新增积分expected new credits: ' + response.points)
               window.location.href = 'center.html'
               sendEmail(token)
 
@@ -144,7 +144,7 @@
 
       // 确保输入是一个有效的数字
       if (isNaN(dataInput)) {
-        $('#carbonReductionPreview').text('请输入有效的数字！')
+        $('#carbonReductionPreview').text('Please enter a valid number!')
         return // 如果输入无效，显示错误消息并退出函数
       }
 
@@ -403,13 +403,13 @@
     <!-- 活动小类选项将根据大类动态生成 -->
   </select>
 
-  <input type="number" id="dataInput" step="0.01" placeholder="输入次数/频率/量">
+  <input type="number" id="dataInput" step="0.01" placeholder="输入次数/频率/量/frequency/amount">
   <input type="file" id="imageUpload" name="image" accept="image/*">
   <div class="progress">
     <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0"
          aria-valuemax="100"></div>
   </div>
-  <p>预计碳减排量: <span id="carbonReductionPreview">0 kg CO2</span></p>
+  <p>Estimated Carbon-Reduction: <span id="carbonReductionPreview">0 kg CO2</span></p>
   <button type="button" class="btn btn-primary btn-tutorial" data-toggle="modal" data-target="#tutorialModal"
           style="margin-bottom: 20px;">
     汗流浃背了？点我查看提交指南！
