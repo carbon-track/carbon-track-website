@@ -119,12 +119,12 @@
 
     function updateActivityOptions(category) {
       var options = {
-        '衣': ['旧衣回收1kg / Recycle 1kg old clothes', '二手交易1次', '衣物租赁1次'],
-        '食': ['光盘行动1次', '减少肉类消费1kg'],
-        //'住': ['节约用电1度', '居家回收利用', '节约用水1L','垃圾分类1次'],
-        //'住': [ '居家回收利用', '垃圾分类1次'],
-        '行': ['公交出行1km', '地铁出行1km', '步行1km', '骑行1km', '拼车1km'],
-        '习': ['上网课1h', '提交电子作业1次'],
+        '衣': ['旧衣回收1kg / Recycle 1kg old clothes', '二手交易1次 / Second-hand transaction 1 time', '衣物租赁1次 / Clothing rental service 1 time'],
+        '食': ['光盘行动1次 / Finish everything on your plate 1 time', '减少肉类消费1kg / Reduce meat consumption 1kg'],
+          //'住': ['节约用电1度', '居家回收利用', '节约用水1L','垃圾分类1次'],
+          //'住': [ '居家回收利用', '垃圾分类1次'],
+        '行': ['公交出行1km / Bus transport 1km', '地铁出行1km / Subway travel 1km', '步行1km / Walk 1km', '骑行1km / Cycle 1km', '拼车1km / Carpool 1km'],
+        '习': ['上网课1h / Online class 1h', '提交电子作业1次 / Write assignment electronically 1 time'],
         // 其他大类的小类选项...
       }
       $('#activity').empty() // 清空活动选项
@@ -151,22 +151,22 @@
       var carbonReduction = 0
       // 根据活动类型计算碳减排量
       switch (activity) {
-        case '旧衣回收1kg':
+        case '旧衣回收1kg / Recycle 1kg old clothes':
           carbonReduction = dataInput * 3.6
           break
-        case '二手交易1次':
+        case '二手交易1次 / Second-hand transaction 1 time':
           carbonReduction = dataInput * 10 + 4
           break
-        case '衣物租赁1次':
+        case '衣物租赁1次 / Clothing rental service 1 time':
           carbonReduction = dataInput * 10 + 4
           break
-        case '减少肉类消费1kg':
+        case '减少肉类消费1kg / Reduce meat consumption 1kg':
           carbonReduction = dataInput * 15.54
           break
         case '节约用电1度':
           carbonReduction = dataInput * 0.638
           break
-        case '光盘行动1次':
+        case '光盘行动1次 / Finish everything on your plate 1 time':
           carbonReduction = dataInput * 0.0329041095890411
           break
         case '居家回收利用':
@@ -175,32 +175,32 @@
         case '节约用水1L':
           carbonReduction = dataInput * 0.194
           break
-        case '公交出行1km':
+        case '公交出行1km / Bus transport 1km':
           carbonReduction = dataInput * 0.741
           break
-        case '步行1km':
+        case '步行1km / Walk 1km':
           carbonReduction = dataInput * 0.135
           break
-        case '地铁出行1km':
+        case '地铁出行1km / Subway travel 1km':
           carbonReduction = dataInput * 0.089
           break
-        case '骑行1km':
+        case '骑行1km / Cycle 1km':
           carbonReduction = dataInput * 0.05
           break
-        case '拼车1km':
+        case '拼车1km / Carpool 1km':
           carbonReduction = dataInput * 0.0675
           break
-        case '上网课1h':
+        case '上网课1h / Online class 1h':
           carbonReduction = dataInput * 0.15
           break
-        case '提交电子作业1次':
+        case '提交电子作业1次 / Write assignment electronically 1 time':
           carbonReduction = dataInput * 0.05
           break
         default:
           $('#carbonReductionPreview').text(114514 + ' kg CO2')
       }
       if (carbonReduction === 0 && dataInput !== 0) {
-        $('#carbonReductionPreview').text('输入数据不合法！')
+        $('#carbonReductionPreview').text('输入数据不合法！Illegal input!')
       } else {
         // 显示计算结果
         $('#carbonReductionPreview').text(carbonReduction.toFixed(2) + ' kg CO2')
