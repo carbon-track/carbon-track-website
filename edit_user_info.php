@@ -30,7 +30,7 @@ $params = [];
 
 // 检查是否有学校信息传入
 if (isset($_POST['school']) && !empty(trim($_POST['school']))) {
-    if ($_POST['school'] != '请选择学校') {
+    if ($_POST['school'] != '请选择学校Select school') {
         $updateFields[] = "school = :school";
         $params[':school'] = $_POST['school'];
 
