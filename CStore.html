@@ -146,7 +146,7 @@
         </li>
         <!--
                             <li class="nav-item">
-                                <a class="nav-link" href="#">联系我们</a>
+                                <a class="nav-link" href="#">Contact Us</a>
                             </li>-->
         <li class="nav-item">
           <a class="nav-link" href="#" data-toggle="modal" data-target="#registerModal">Register</a>
@@ -180,7 +180,7 @@
           <a id=" logoutControl" class="logoutControl nav-link" href="center.html">User Center</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="about.html">About us</a>
+          <a class="nav-link" href="about.html">About Us</a>
         </li>
 
       </ul>
@@ -201,18 +201,18 @@
         <form>
           <div class="form-group">
             <label for="username">Account/Username</label>
-            <input type="text" class="form-control" id="username" placeholder="请输入用户名或邮箱地址">
+            <input type="text" class="form-control" id="username" placeholder="Please enter your Username or Email Address">
           </div>
           <div class="form-group">
             <label for="password">Password</label>
-            <input type="password" class="form-control" id="password" placeholder="请输入密码">
+            <input type="password" class="form-control" id="password" placeholder="Please enter your Password">
           </div>
           <button type="submit" class="btn btn-login btn-block">Log-in</button>
         </form>
       </div>
       <div class="modal-footer">
         <div class="alert alert-warning" role="alert" id="refreshAlert" style="display: none; cursor: pointer;">
-          If failed, please try reload the page or press<a href="#" onclick="location.reload();">here</a>.
+          If failed, please try reload the page or press<a href="#" onclick="location.reload();">here</a>以重新通过Cloudflare防火墙。
         </div>
         <a class="nav-link mr-right" href="iforgot.html">Forgot password?</a>
         <a class="nav-link" href="#" data-toggle="modal" data-target="#registerModal">Register an account</a>
@@ -225,7 +225,7 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="registerModalLabel">Register an account</h5>
+        <h5 class="modal-title" id="registerModalLabel">Register new account</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -234,11 +234,11 @@
         <form>
           <div class="form-group">
             <label for="username">Username</label>
-            <input type="text" class="form-control required-input" id="regusername" placeholder="请输入用户名">
+            <input type="text" class="form-control required-input" id="regusername" placeholder="Please set your Username">
           </div>
           <div class="form-group">
             <label for="password">Password</label>
-            <input type="password" class="form-control required-input" id="regpassword" placeholder="请输入密码">
+            <input type="password" class="form-control required-input" id="regpassword" placeholder="Please set your Password">
           </div>
           <div class="form-group">
             <label for="email">Email Address:</label>
@@ -247,8 +247,8 @@
             <button type="button" class="btn btn-secondary" id="sendVerificationCode">Send verification code</button>
             <!-- 在注册模态框的表单中添加一个字段 -->
             <div class="form-group">
-              <label for="verificationCode">Verification code</label>
-              <input type="text" class="form-control" id="verificationCode" placeholder="请输入验证码" required>
+              <label for="verificationCode">Verification Code</label>
+              <input type="text" class="form-control" id="verificationCode" placeholder="Please enter the verification code you received" required>
               <small id="emailHelp" class="form-text text-muted"
                      style="display: none;">The code has been sent to your Email.</small>
             </div>
@@ -259,7 +259,7 @@
         </form>
         <div class="modal-footer">
           <div class="alert alert-warning" role="alert" id="refreshAlert" style="display: none; cursor: pointer;">
-            If failed, please try reload the page or press<a href="#" onclick="location.reload();">here</a>.
+            If failed, please try reload the page or press<a href="#" onclick="location.reload();">here</a>以重新通过Cloudflare防火墙。
           </div>
         </div>
       </div>
@@ -287,7 +287,7 @@
               <!-- 消息列表将在这里动态加载 -->
             </div>
             <div class="input-group mt-3">
-              <input type="text" class="form-control" id="messageInput" placeholder="输入消息...">
+              <input type="text" class="form-control" id="messageInput" placeholder="Enter Message...">
               <div class="input-group-append">
                 <button class="btn btn-primary" type="button" id="sendMessage">Send</button>
               </div>
