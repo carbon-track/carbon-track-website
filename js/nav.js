@@ -395,7 +395,7 @@ function buildConversationsList(data) {
 Object.values(conversations).forEach(function(conversation) {
         var partnerId = conversation.participants.find(id => id !== userId);
         //var listItem = $('<div></div>').addClass('conversation-item').text('对话 ' + partnerId);
-        var listItem = $('<div></div>').addClass('conversation-item').text('CarbonTrack User Service');
+        var listItem = $('<div></div>').addClass('conversation-item').text('CarbonTrack User-Service');
         listItem.css({
             'margin-bottom': '10px', // 增加底部外边距
             'padding': '10px', // 增加内边距
