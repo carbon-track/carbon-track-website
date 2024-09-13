@@ -231,7 +231,7 @@ function updateLoginStatus() {
         $('[data-target="#registerModal"]').hide();
     } else {
         $('.logoutControl').hide();
-        $('#userStatus').text('请登录或注册账号');
+        $('#userStatus').text('Please login or register:');
         $('#loginButton').show();
         $('[data-target="#loginModal"]').show();
         $('[data-target="#registerModal"]').show();
