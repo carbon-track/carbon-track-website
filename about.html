@@ -496,7 +496,7 @@
       dataType: 'json', // 确保预期的响应类型为 JSON
       success: function (response) {
         if (response && response.success) {
-          $('#userCount').text('最近增加了' + response.count + '人')
+          $('#userCount').text(response.count)
         } else {
           $('#userCount').text('加载失败')
         }
@@ -517,7 +517,7 @@
       success: function (response) {
         if (response && response.success) {
           $('#totalPoints').text(response.points / 10)
-          $('#totalTimes').text(response.times + '次减排记录')
+          $('#totalTimes').text(response.times)
         }
       },
       error: function (xhr, status, error) {
