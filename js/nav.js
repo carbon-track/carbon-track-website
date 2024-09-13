@@ -433,10 +433,10 @@ if (message.sender_id === currentUserId) {
         readStatus.classList.add('read-status');
         if (message.is_read) {
             readStatus.classList.add('read');
-            readStatus.textContent = '已读';
+            readStatus.textContent = '已读Read';
         } else {
             readStatus.classList.add('unread');
-            readStatus.textContent = '未读';
+            readStatus.textContent = '未读Unread';
         }
 
         messageBubble.appendChild(readStatus);
