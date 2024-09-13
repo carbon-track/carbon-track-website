@@ -66,22 +66,22 @@ $id = $_POST['id'];
 $carbonSavings = 0;
 // 根据活动类型计算碳减排克数
 switch ($activity) {
-    case '旧衣回收1kg':
+    case '旧衣回收1kg / Recycle 1kg old clothes':
         $carbonSavings = $dataInput * 3.6;
         break;
-    case '二手交易1次':
+    case '二手交易1次 / Second-hand transaction 1 time':
         $carbonSavings = $dataInput * 10 + 4;
         break;
-    case '衣物租赁1次':
+    case '衣物租赁1次 / Clothing rental service 1 time':
         $carbonSavings = $dataInput * 10 + 4;
         break;
-    case '减少肉类消费1kg':
+    case '减少肉类消费1kg / Reduce meat consumption 1kg':
         $carbonSavings = $dataInput * 15.54;
         break;/*
     case '节约用电1度':
         $carbonSavings = $dataInput * 0.638;
         break;*/
-    case '光盘行动1次':
+    case '光盘行动1次 / Finish everything on your plate 1 time':
         $carbonSavings = $dataInput * 0.0329041095890411;
         break;
     case '居家回收利用':
@@ -91,25 +91,25 @@ switch ($activity) {
 case '节约用水1L':
     $carbonSavings = $dataInput *0.194;
     break;*/
-    case '公交出行1km':
+    case '公交出行1km / Bus transport 1km':
         $carbonSavings = $dataInput * 0.094;
         break;
-    case '地铁出行1km':
+    case '地铁出行1km / Subway travel 1km':
         $carbonSavings = $dataInput * 0.089;
         break;
-    case '步行1km':
+    case '步行1km / Walk 1km':
         $carbonSavings = $dataInput * 0.135;
         break;
-    case '骑行1km':
+    case '骑行1km / Cycle 1km':
         $carbonSavings = $dataInput * 0.05;
         break;
-    case '拼车1km':
+    case '拼车1km / Carpool 1km':
         $carbonSavings = $dataInput * 0.0675;
         break;
-    case '上网课1h':
+    case '上网课1h / Online class 1h':
         $carbonSavings = $dataInput * 0.15;
         break;
-    case '提交电子作业1次':
+    case '提交电子作业1次 / Write assignment electronically 1 time':
         $carbonSavings = $dataInput * 0.05;
         break;
     default:
