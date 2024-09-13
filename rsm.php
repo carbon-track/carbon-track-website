@@ -31,7 +31,7 @@ $mail->Body = "<p>尊敬的用户，Dear user, </p>
 <p>您现在可以开始享受我们小程序提供的各种功能和服务。我们致力于为您提供优质的体验，并不断改进和更新我们的功能，以满足您的需求。You can now start enjoying the various functions and services offered by our platform. We are committed to providing you with a quality experience and are constantly improving and updating our features to meet your needs.</p>
 <p>如果您在使用过程中遇到任何问题或有任何建议，我们的团队将随时为您提供帮助和支持。请随时联系我们，我们期待为您提供最佳的用户体验。If you encounter any problems or have any suggestions during use, our team will be ready to help and support you. Please feel free to contact us and we look forward to providing you with the best user experience.</p>
 <p>再次感谢您对我们小程序的支持和信任！祝您使用愉快！Thanks again for your support and trust in our platform! Wish you a happy use!</p>
-<p>诚挚的问候，Sincerely, <br>CarbonTrack</p>";
+<p>诚挚的问候，Sincere regards,<br>CarbonTrack</p>";
 
 
     $mail->send();
