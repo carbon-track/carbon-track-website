@@ -89,13 +89,6 @@
       height: auto; /* 保持图片原始宽高比 */
       object-fit: cover; /* 覆盖整个容器，可能会裁剪图片 */
     }
-
-    .floating-button {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      z-index: 100;
-    }
   </style>
 </head>
 <body>
@@ -226,33 +219,51 @@
     </div>
   </div>
 </div>
-  
-<!--Start From Chat主页碳核算悬浮按钮-->
-<button id="calculateButton" class="btn btn-primary floating-button">
-    <img src="img/recordFloatingButton.png" alt="RECORD" style="width: 100px; height: 50px; border-radius: 50%;">
-</button>
 
-<script>
-    // 获取按钮元素
-    var button = document.getElementById('calculateButton');
-    
-    // 修改按钮的背景颜色为透明
-    button.style.backgroundColor = 'transparent';  // 设置背景颜色为透明
-    
-    // 设置边框为圆角
-    button.style.borderRadius = '50%';  // 圆形边框
-    
-    // 去除按钮的内边距以适配图像
-    button.style.padding = '0';
-    
-    // 去掉按钮的蓝色聚焦框
-    button.style.outline = 'none';  // 去除聚焦时的默认蓝色外框
-    
-    // 删除文本颜色设置，因为不再需要
-    // button.style.color = 'white';
-</script>
-<!--End From Chat-->
-  
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Floating REC Button</title>
+    <style>
+      .floating-button{
+        position:fixed;
+        bottom:20px;
+        right:20px;
+        z-index:100;
+        display:inline-block;
+        padding:10px 20px;
+        background-color:#d3f0a0;
+        color:#666;
+        text-decoration:none;
+        font-size:18px;
+        font-weight:bold;
+        border:none;
+        border-radius:40px;
+        cursor:pointer;
+        outline:none;
+      }
+      .floating-button:hover{
+        background-color:red;
+        color:#fff;
+      }
+      .floating-button:focus,
+      .floating-button:active{
+        outline:none;
+        box-shadow:none;
+      }
+      .foot{
+        margin-left:5px;
+        font-size:20px;
+      }
+    </style>
+  </head>
+  <body>
+    <button class="floating-button" oneclick="window.location.href='https://carbontrackapp.com/calculate.html'">
+      REC<span class="foot">🦶</span>
+    </button>
+  </body>
+</html>  
+
 <!-- 内容区域 -->
 <div class="container">
   <div class="row">
