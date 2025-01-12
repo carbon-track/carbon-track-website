@@ -261,6 +261,13 @@
     <button class="floating-button" oneclick="window.location.href='calculate.html'">
       REC<span class="foot">🦶</span>
     </button>
+    <script>
+      const floatBtn=document.getElementByid('floatingButton');
+      floatBtn.addEventListener('click',function(){
+        console.log('REC button clicked! Doing some logic...');
+        window.location.href='calculate.html';
+      });
+    </script>
   </body>
 </html>  
 
