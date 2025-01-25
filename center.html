@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Center - CarbonTrack</title>
+  <link rel="icon" href="/img/team.jpg" type="image/JPG">
+  <!-- 引入Bootstrap和jQuery的CDN链接 -->
+  <link rel="stylesheet" href="./css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+
+  <script src="js/jquery.min.js"></script>
+  <script src="js/nav.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="./css/index.css">
+  <!-- 保持与主页相同的样式 -->
+  <style>
+    .btn-success {
+      background-color: min-width: auto; /* 设置一个最小宽度 */
+      padding: 5px 10px; /* 减少上下内边距，适当调整左右内边距 */
+      font-size: 14px; /* 减小字体大小 */
+      white-space: nowrap; /* 防止文字换行 */
+    }
+
+    .table thead th, .table tbody td {
+      min-width: 60px; /* 根据实际需要调整最小宽度 */
+      text-align: center; /* 使文本居中对齐 */
+    }
+
+    .btn-large {
+      font-size: 20px; /* 增加字体大小 */
+      padding: 15px 30px; /* 增加内边距 */
+      border-radius: 10px; /* 可选：增加圆角大小 */
+    }
+
+    /* 特别针对含有图标的单元格，确保图标和数字整体居中 */
+    .rank-icon {
+      display: inline-block; /* 使图标作为内联块元素显示 */
+      margin-right: 4px; /* 在图标和数字之间添加一点间距 */
+    }
+  </style>
+</head>
+<body>
+<!-- 复制您主页的导航栏 -->
+<nav class="navbar navbar-expand-sm navbar-dark">
+
+  <div class="container">
+    <a class="navbar-brand" href="index.html">校园碳账户 |</a>
+    <a class="navbar-brand" href="index.html">
+      <img src="/img/team.png" alt="CarbonTrack校园碳账户" style="height: 100px;"></a>
+    <a class="navbar-brand" href="index.html">CarbonTrack</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+          <span id="userStatus" class="navbar-text mr-3"></span>
+        </li>
+        <!--
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Contact Us</a>
+                            </li>-->
+        <li class="nav-item">
+          <a class="nav-link" href="#" data-toggle="modal" data-target="#registerModal">Register</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" data-toggle="modal" data-target="#loginModal">Log-in</a>
+        </li>
+        <li class="nav-item">
+          <button id="logoutButton" class=" logoutControl btn btn-sm btn-danger" onclick="logout()"
+                  style="display:none;">Logout
+          </button>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="index.html">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="logoutControl nav-link " href="#" data-toggle="modal" data-target="#messagesModal"><i
+              class="logoutControl fas fa-envelope" style="color: rgba(255, 255, 255, .5);font-size: 24px;"></i></a>
+          <div class="badge-container">
+            <span id="unreadMessagesCount" class="badge badge-danger" style="display: none;">0</span>
+          </div>
+        </li>
+        <li class="nav-item">
+          <a id="logoutButton logoutControl" class=" logoutControl nav-link" href="calculate.html">Accounting Portal</a>
+        </li>
+
+        <li class="nav-item">
+          <a id="logoutControl" class=" logoutControl nav-link" href="CStore.html">Credits Mall</a>
+        </li>
+        <li class="nav-item">
+          <a id=" logoutControl" class="logoutControl nav-link" href="center.html">User Center</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="about.html">About Us</a>
+        </li>
+
+      </ul>
+    </div>
+  </div>
+</nav>
+<div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="loginModalLabel">User Login</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <label for="username">Account/Username</label>
+            <input type="text" class="form-control" id="username" placeholder="Please enter your Username or Email Address">
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" class="form-control" id="password" placeholder="Please enter your Password">
+          </div>
+          <button type="submit" class="btn btn-login btn-block">Log-in</button>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <div class="alert alert-warning" role="alert" id="refreshAlert" style="display: none; cursor: pointer;">
+          If failed, please try reload the page or press<a href="#" onclick="location.reload();">here</a>以重新通过Cloudflare防火墙。
+        </div>
+        <a class="nav-link mr-right" href="iforgot.html">Forgot password?</a>
+        <a class="nav-link" href="#" data-toggle="modal" data-target="#registerModal">Register an account</a>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="registerModalLabel">Register new account</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" class="form-control required-input" id="regusername" placeholder="Please set your Username">
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" class="form-control required-input" id="regpassword" placeholder="Please set your Password">
+          </div>
+          <div class="form-group">
+            <label for="email">Email Address:</label>
+            <input type="email" class="form-control required-input" id="email" name="email" required>
+            <!-- 添加发送验证码按钮 -->
+            <button type="button" class="btn btn-secondary" id="sendVerificationCode">Send verification code</button>
+            <!-- 在注册模态框的表单中添加一个字段 -->
+            <div class="form-group">
+              <label for="verificationCode">Verification Code</label>
+              <input type="text" class="form-control" id="verificationCode" placeholder="Please enter the verification code you received" required>
+              <small id="emailHelp" class="form-text text-muted"
+                     style="display: none;">The code has been sent to your Email.</small>
+            </div>
+
+          </div>
+          <button type="submit" class="btn btn-login btn-block">Register</button>
+          <div id="registerError" style="display:none;" class="alert alert-danger"></div>
+        </form>
+        <div class="modal-footer">
+          <div class="alert alert-warning" role="alert" id="refreshAlert" style="display: none; cursor: pointer;">
+            If failed, please try reload the page or press<a href="#" onclick="location.reload();">here</a>以重新通过Cloudflare防火墙。
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 站内信模态框 -->
+<div class="modal fade" id="messagesModal" tabindex="-1" role="dialog" aria-labelledby="messagesModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="messagesModalLabel">Message</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-4" id="conversationList">
+            <!-- 对话列表将在这里动态加载 -->
+          </div>
+          <div class="col-8">
+            <div id="messageList" style="height: 400px; overflow-y: auto;">
+              <!-- 消息列表将在这里动态加载 -->
+            </div>
+            <div class="input-group mt-3">
+              <input type="text" class="form-control" id="messageInput" placeholder="Enter Message...">
+              <div class="input-group-append">
+                <button class="btn btn-primary" type="button" id="sendMessage">Send</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 在HTML中添加模态框的HTML结构 -->
+<div class="modal fade" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editUserModalLabel">Edit My Profile</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="editUserForm">
+          <div class="form-group">
+            <label for="userSchool">学校School</label>
+            <select class="form-control" id="userSchoolSelect">
+              <!-- 学校选项将通过JavaScript动态加载 -->
+            </select>
+            <input type="text" class="form-control mt-2" id="userSchoolInput" placeholder="输入学校名称Enter the name of your school"
+                   style="display:none;">
+          </div>
+          <div class="form-group">
+            <label for="userLocation">地区Region</label>
+            <select class="form-control" id="userCountrySelect">
+              <!-- 国家选项将通过JavaScript动态加载 -->
+            </select>
+            <select class="form-control mt-2" id="userStateSelect">
+              <!-- 州/省选项将通过JavaScript动态加载 -->
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 用户中心内容 -->
+<div class="container">
+  <h2 class="my-4">User Center</h2>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">My School</h5>
+          <p class="card-text">Your school is: <span id="userSchool">加载中Loading...</span></p>
+          <h5 class="card-title">My Region</h5>
+          <p class="card-text">You are at: <span id="userLocation">加载中Loading...</span></p>
+          <h5 class="card-title">My Carbon Credits</h5>
+          <p class="card-text">Your current carbon credits balance is: <span id="userPoints">加载中Loading...</span></p>
+          <h5 class="card-title">My Carbon Reduction (CO₂ in kg)</h5>
+          <p class="card-text">You have saved a total of: <span id="userReduction">加载中Loading...</span></p>
+          <button type="button" class="btn btn-primary float-right" data-toggle="modal" data-target="#editUserModal">
+            Edit My Profile
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <h1 class="d-inline-block"></h1>
+      </div>
+      <div class="col">
+        <button type="button" class="btn btn-success btn-large float-right" id="navigateButton">
+          Carbon Reduction Accounting History
+        </button>
+        <script>
+          document.getElementById('navigateButton').addEventListener('click', function () {
+            window.location.href = 'pthis.html' // 指定要跳转的页面
+          })</script>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="container mt-4">
+  <h2>Carbon Credits Leaderboards</h2>
+  <!-- 排行榜切换按钮 -->
+  <div class="btn-group" role="group" aria-label="Ranking Filters">
+    <button type="button" class="btn btn-secondary" id="allRankingBtn">全服排行榜Global Leaderboard</button>
+    <button type="button" class="btn btn-secondary" id="localRankingBtn">同地区排行榜Regional Leaderboard</button>
+    <button type="button" class="btn btn-secondary" id="schoolRankingBtn">同学校排行榜School Leaderboard</button>
+  </div>
+  <table class="table table-striped table-hover mt-3">
+    <thead>
+    <tr>
+      <th>Ranking</th>
+      <th>Username</th>
+      <th>Carbon Credits</th>
+    </tr>
+    </thead>
+    <tbody id="leaderboard">
+    <!-- 排行榜数据将通过 JavaScript 动态填充 -->
+    </tbody>
+  </table>
+</div>
+
+
+<!-- 复制您主页的页脚 -->
+<div id="footer-placeholder"></div>
+<script>
+
+  $(document).ready(function () {
+    bindRankingButtons()
+    switchRanking('all')
+    var token = sessionStorage.getItem('token') // 假设用户的 token 存储在 sessionStorage
+    if (token) {
+      $.ajax({
+        type: 'POST',
+        url: 'get_user_points.php', // PHP 文件处理积分获取
+        data: { token: token },
+        dataType: 'json',
+        success: function (response) {
+          if (response.success) {
+            $('#userPoints').text(response.userPoints) // 设置用户积分
+            $('#userReduction').text(response.userPoints / 10)
+            $('#userSchool').text(response.school) // 假设你有一个ID为userSchool的元素
+            $('#userLocation').text(response.location) // 假设你有一个ID为userLocation的元素
+            // 清空排行榜表格
+            $('#leaderboard').empty()
+
+// 根据排名获取相应的行的 CSS 类
+            function getRowClass(rank) {
+              var classes = ['rank-1', 'rank-2', 'rank-3']
+              return rank <= 3 ? classes[rank - 1] : ''
+            }
+
+// 遍历排行榜数据并添加到表格中
+            $.each(response.leaderboard, function (index, user) {
+              var rank = index + 1 // 排名是索引加1
+              var rankIcon = getRankIcon(rank) // 获取排名图标
+              var rowClass = getRowClass(rank) // 获取行的 CSS 类
+              var row = $('<tr>').addClass(rowClass).append(
+                $('<td>').html(rankIcon),
+                $('<td>').text(user.username),
+                $('<td>').text(user.points),
+              )
+              $('#leaderboard').append(row)
+            })
+
+            function getRankIcon(rank) {
+              var icons = ['<i class="fas fa-crown text-warning"></i>', '<i class="fas fa-medal text-secondary"></i>', '<i class="fas fa-trophy text-success"></i>']
+              if (rank <= 3) {
+                return icons[rank - 1] + ' ' + rank // 前三名使用特殊图标
+              }
+              return rank // 其他排名只显示数字
+            }
+
+
+          } else {
+            $('#userPoints').text('无法加载积分')
+            alert('获取积分失败: ' + response.error)
+          }
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          console.log('服务器响应内容:', jqXHR.responseText) // 打印服务器响应内容
+          $('#userPoints').text('无法加载积分')
+          alert('请求积分数据失败，请稍后再试。错误信息：' + textStatus)
+        },
+      })
+    } else {
+      $('#userPoints').text('未登录')
+      alert('请先登录。')
+      window.location.href = 'index.html'
+    }
+    // 加载国家和学校数据
+    loadCountries()
+    loadSchools()
+
+    // 监听学校选择框的变化
+    $('#userSchoolSelect').change(function () {
+      if ($(this).val() == 'other') {
+        $('#userSchoolInput').show()
+      } else {
+        $('#userSchoolInput').hide()
+      }
+    })
+
+    // 监听表单提交事件
+    $('#editUserForm').submit(function (e) {
+      e.preventDefault()
+      var school = $('#userSchoolSelect').val()
+      var schoolName = '' // 用于存储学校名称
+      var isNewSchool = false
+
+      // 检查用户是否选择了“其他”选项
+      if (school === 'other') {
+        schoolName = $('#userSchoolInput').val() // 从输入框获取学校名称
+        isNewSchool = true
+      } else {
+        // 从下拉列表中获取学校名称
+        schoolName = $('#userSchoolSelect option:selected').text()
+      }
+      if (schoolName == '请选择学校Select school') {
+        schoolName = undefined
+      }
+      var state = $('#userStateSelect').val()
+      var isNewSchool = $('#userSchoolSelect').val() == 'other'
+      var token = sessionStorage.getItem('token')
+      // 提交数据到后端
+      $.ajax({
+        type: 'POST',
+        url: 'edit_user_info.php',
+        data: {
+          token: token,
+          school: schoolName ? schoolName : undefined,
+          state: state ? state : undefined,
+          new_sch: isNewSchool,
+        },
+        success: function (response) {
+          // 处理响应
+          alert('信息更新成功！')
+          $('#editUserModal').modal('hide')
+        },
+        error: function (error) {
+          alert('信息更新错误：' + error)
+        },
+      })
+    })
+  })
+
+  function logout() {
+    sessionStorage.removeItem('token') // 确保移除正确的 sessionStorage 项
+    // 更新UI为未登录状态
+    $('#userStatus').text('')
+    $('#logoutButton').hide()
+    $('#loginButton').show()
+    Redirect('index.html')
+  }
+
+  function Redirect(webpage) {
+    window.location = webpage
+  }
+
+  // Step 1: Load countries into the country select element
+  function loadCountries() {
+    fetch('./countries.json')
+      .then(response => response.json())
+      .then(data => {
+        const countrySelect = document.getElementById('userCountrySelect')
+        countrySelect.innerHTML = '' // 清空现有选项
+        data.forEach(country => {
+          const option = document.createElement('option')
+          option.value = country.code
+          option.textContent = country.name
+          countrySelect.appendChild(option)
+        })
+      })
+      .catch(error => console.error('Error loading countries:', error))
+  }
+
+  // Step 2: Listen for changes on the country select element
+  document.getElementById('userCountrySelect').addEventListener('change', function () {
+    const selectedCountryCode = this.value
+    updateStates(selectedCountryCode)
+  })
+
+  // Step 3: Populate states/provinces based on the selected country
+  function updateStates(countryCode) {
+    fetch('./countries.json')
+      .then(response => response.json())
+      .then(data => {
+        const statesSelect = document.getElementById('userStateSelect')
+        statesSelect.innerHTML = '' // Clear current states/provinces
+        const selectedCountry = data.find(country => country.code === countryCode)
+        if (selectedCountry && selectedCountry.states) {
+          selectedCountry.states.forEach(state => {
+            const option = document.createElement('option')
+            option.value = state.code
+            option.textContent = state.name
+            statesSelect.appendChild(option)
+          })
+        }
+      })
+      .catch(error => console.error('Error updating states:', error))
+  }
+
+
+  function loadSchools() {
+    // 从 sessionStorage 获取 token
+    var token = sessionStorage.getItem('token')
+
+    // 向后端发送请求，获取学校列表
+    $.ajax({
+      url: 'get_schools.php', // 假设您的后端接口URL是这个
+      type: 'POST',
+      dataType: 'json',
+      data: { token: token }, // 将 token 作为请求参数发送
+      success: function (data) {
+        var schoolOptions = '<option value="">请选择学校Select school</option>'
+        $.each(data, function (index, school) {
+          schoolOptions += '<option value="' + school.id + '">' + school.name + '</option>'
+        })
+        schoolOptions += '<option value="other">其他Other（自行输入Enter new）</option>' // 添加一个“其他”选项
+        $('#userSchoolSelect').html(schoolOptions)
+      },
+      error: function (xhr, status, error) {
+        alert('加载学校列表失败: ', error)
+      },
+    })
+  }
+
+  // 切换排行榜类型的事件处理函数
+  function switchRanking(type) {
+    var token = sessionStorage.getItem('token')
+    var userLocation = $('#userLocation').text() // 获取用户地区
+    var userSchool = $('#userSchool').text() // 获取用户学校
+    var data = {
+      token: token,
+      type: type,
+    }
+
+    // 根据排行榜类型，设置请求参数
+    if (type === 'local') {
+      data.location = userLocation
+    } else if (type === 'school') {
+      data.school = userSchool
+    }
+
+    // 向后端发送请求，获取排行榜数据
+    $.ajax({
+      url: 'get_rank.php',
+      type: 'POST',
+      dataType: 'json',
+      data: data,
+      success: function (response) {
+        if (response.success) {
+          function getRankIcon(rank) {
+            var icons = ['<i class="fas fa-crown text-warning"></i>', '<i class="fas fa-medal text-secondary"></i>', '<i class="fas fa-trophy text-success"></i>']
+            if (rank <= 3) {
+              return icons[rank - 1] + ' ' + rank // 前三名使用特殊图标
+            }
+            return rank // 其他排名只显示数字
+          }
+
+          function getRowClass(rank) {
+            var classes = ['rank-1', 'rank-2', 'rank-3']
+            return rank <= 3 ? classes[rank - 1] : ''
+          }
+
+          // 清空现有排行榜
+          $('#leaderboard').empty()
+          var currentUsername = sessionStorage.getItem('username')
+          // 遍历排行榜数据并添加到表格中
+          $.each(response.ranking, function (index, user) {
+            var rank = index + 1 // 排名是索引加1
+            var rankIcon = getRankIcon(rank) // 获取排名图标
+            var rowClass = getRowClass(rank) // 获取行的 CSS 类
+            if (user.username == currentUsername) {
+              rowClass += ' current-user' // 添加额外的类以高亮显示当前用户
+            }
+            var row = $('<tr>').addClass(rowClass).append(
+              $('<td>').html(rankIcon),
+              $('<td>').text(user.username),
+              $('<td>').text(user.points),
+            )
+            $('#leaderboard').append(row)
+          })
+        } else {
+          alert('获取排行榜失败: ' + response.error)
+        }
+      },
+      error: function () {
+        alert('请求排行榜数据失败，请稍后再试。')
+      },
+    })
+  }
+
+  function bindRankingButtons() {
+    $('#allRankingBtn').off('click').on('click', function () {
+      switchRanking('all')
+    })
+    $('#localRankingBtn').off('click').on('click', function () {
+      var userLocation = $('#userLocation').text().trim() // 使用.trim()去除可能的空白字符
+      if (userLocation) {
+        switchRanking('local', userLocation) // 如果地区信息不为空，则提交
+      } else {
+        alert('用户地区信息未加载，请稍后再试。')
+      }
+    })
+    $('#schoolRankingBtn').off('click').on('click', function () {
+      switchRanking('school')
+    })
+  }
+
+  function logout() {
+    sessionStorage.removeItem('loggedIn')
+    sessionStorage.removeItem('username')
+    sessionStorage.removeItem('expiration')
+    // 更新UI为未登录状态
+    $('#userStatus').text('')
+    $('#logoutButton').hide()
+    $('#loginButton').show()
+  }
+
+  function Redirect(webpage) {
+    window.location = webpage
+  }</script>
+</body>
+</html>

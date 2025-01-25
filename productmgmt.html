@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>产品管理系统</title>
+  <link rel="icon" href="/img/team.jpg" type="image/JPG">
+  <link rel="stylesheet" href="./css/bootstrap.min.css">
+  <script src="./js/jquery.min.js"></script>
+  <script src="https://cdn.staticfile.org/twitter-bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="js/nav.js"></script>
+  <link rel="stylesheet" href="./css/index.css">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-sm navbar-dark">
+
+  <div class="container">
+    <a class="navbar-brand" href="index.html">校园碳账户 |</a>
+    <a class="navbar-brand" href="index.html">
+      <img src="/img/team.png" alt="CarbonTrack校园碳账户" style="height: 100px;"></a>
+    <a class="navbar-brand" href="index.html">CarbonTrack</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+          <span id="userStatus" class="navbar-text mr-3"></span>
+        </li>
+        <!--
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">联系我们</a>
+                            </li>-->
+        <li class="nav-item">
+          <a class="nav-link" href="#" data-toggle="modal" data-target="#registerModal">注册</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" data-toggle="modal" data-target="#loginModal">登录</a>
+        </li>
+        <li class="nav-item">
+          <button id="logoutButton" class=" logoutControl btn btn-sm btn-danger" onclick="logout()"
+                  style="display:none;">注销
+          </button>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="index.html">首页</a>
+        </li>
+        <li class="nav-item">
+          <a class="logoutControl nav-link " href="#" data-toggle="modal" data-target="#messagesModal"><i
+              class="logoutControl fas fa-envelope" style="color: rgba(255, 255, 255, .5);font-size: 24px;"></i></a>
+          <div class="badge-container">
+            <span id="unreadMessagesCount" class="badge badge-danger" style="display: none;">0</span>
+          </div>
+        </li>
+        <li class="nav-item">
+          <a id="logoutButton logoutControl" class=" logoutControl nav-link" href="calculate.html">碳减排核算入口</a>
+        </li>
+
+        <li class="nav-item">
+          <a id="logoutControl" class=" logoutControl nav-link" href="CStore.html">碳积分商城入口</a>
+        </li>
+        <li class="nav-item">
+          <a id=" logoutControl" class="logoutControl nav-link" href="center.html">用户中心</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="about.html">关于我们</a>
+        </li>
+
+      </ul>
+    </div>
+  </div>
+</nav>
+<div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="loginModalLabel">用户登录</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <label for="username">账号/用户名</label>
+            <input type="text" class="form-control" id="username" placeholder="请输入用户名或邮箱地址">
+          </div>
+          <div class="form-group">
+            <label for="password">密码</label>
+            <input type="password" class="form-control" id="password" placeholder="请输入密码">
+          </div>
+          <button type="submit" class="btn btn-login btn-block">登录</button>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <div class="alert alert-warning" role="alert" id="refreshAlert" style="display: none; cursor: pointer;">
+          如果登录/注册失败，请尝试刷新页面或<a href="#" onclick="location.reload();">点此</a>以重新通过Cloudflare防火墙。
+        </div>
+        <a class="nav-link mr-right" href="iforgot.html">忘记密码?</a>
+        <a class="nav-link" href="#" data-toggle="modal" data-target="#registerModal">注册账号</a>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="registerModalLabel">注册账户</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <label for="username">用户名</label>
+            <input type="text" class="form-control required-input" id="regusername" placeholder="请输入用户名">
+          </div>
+          <div class="form-group">
+            <label for="password">密码</label>
+            <input type="password" class="form-control required-input" id="regpassword" placeholder="请输入密码">
+          </div>
+          <div class="form-group">
+            <label for="email">邮箱:</label>
+            <input type="email" class="form-control required-input" id="email" name="email" required>
+            <!-- 添加发送验证码按钮 -->
+            <button type="button" class="btn btn-secondary" id="sendVerificationCode">发送验证码</button>
+            <!-- 在注册模态框的表单中添加一个字段 -->
+            <div class="form-group">
+              <label for="verificationCode">验证码</label>
+              <input type="text" class="form-control" id="verificationCode" placeholder="请输入验证码" required>
+              <small id="emailHelp" class="form-text text-muted"
+                     style="display: none;">我们已向您的邮箱发送了一个验证码。</small>
+            </div>
+
+          </div>
+          <button type="submit" class="btn btn-login btn-block">注册</button>
+          <div id="registerError" style="display:none;" class="alert alert-danger"></div>
+        </form>
+        <div class="modal-footer">
+          <div class="alert alert-warning" role="alert" id="refreshAlert" style="display: none; cursor: pointer;">
+            如果登录/注册失败，请尝试刷新页面或<a href="#" onclick="location.reload();">点此</a>以重新通过Cloudflare防火墙。
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 站内信模态框 -->
+<div class="modal fade" id="messagesModal" tabindex="-1" role="dialog" aria-labelledby="messagesModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="messagesModalLabel">站内信</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-4" id="conversationList">
+            <!-- 对话列表将在这里动态加载 -->
+          </div>
+          <div class="col-8">
+            <div id="messageList" style="height: 400px; overflow-y: auto;">
+              <!-- 消息列表将在这里动态加载 -->
+            </div>
+            <div class="input-group mt-3">
+              <input type="text" class="form-control" id="messageInput" placeholder="输入消息...">
+              <div class="input-group-append">
+                <button class="btn btn-primary" type="button" id="sendMessage">发送</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-6">
+      <h2>添加产品</h2>
+      <form id="addProductForm">
+        <div class="form-group">
+          <label for="addName">名称:</label>
+          <input type="text" class="form-control" id="addName" required>
+        </div>
+        <div class="form-group">
+          <label for="addDescription">描述:</label>
+          <input type="text" class="form-control" id="addDescription" required>
+        </div>
+        <div class="form-group">
+          <label for="addPrice">价格:</label>
+          <input type="number" class="form-control" id="addPrice" required>
+        </div>
+        <div class="form-group">
+          <label for="addPrice">数量:</label>
+          <input type="number" class="form-control" id="addStock" required>
+        </div>
+        <button type="submit" class="btn btn-primary">添加</button>
+      </form>
+    </div>
+    <div class="col-md-6">
+      <h2>更新/删除产品</h2>
+      <form id="updateDeleteProductForm">
+        <div class="form-group">
+          <label for="updateProductId">产品ID:</label>
+          <input type="number" class="form-control" id="updateProductId" required>
+        </div>
+        <div class="form-group">
+          <label for="updateName">名称:</label>
+          <input type="text" class="form-control" id="updateName" required>
+        </div>
+        <div class="form-group">
+          <label for="updateDescription">描述:</label>
+          <input type="text" class="form-control" id="updateDescription" required>
+        </div>
+        <div class="form-group">
+          <label for="updatePrice">价格:</label>
+          <input type="number" class="form-control" id="updatePrice" required>
+        </div>
+        <button type="button" class="btn btn-success" onclick="updateProduct()">更新</button>
+        <button type="button" class="btn btn-danger" onclick="deleteProduct()">删除</button>
+      </form>
+    </div>
+  </div>
+</div>
+<div class="container mt-4">
+  <h2>当前商城商品</h2>
+  <div id="productList" class="row">
+    <!-- 商品信息将通过JavaScript动态插入 -->
+  </div>
+</div>
+<script>
+  $(document).ready(function () {
+    var token = sessionStorage.getItem('token') // Assume the user's token is stored in sessionStorage
+    if (!token) {
+      alert('非法访问！')
+      window.location.href = 'index.html' // Redirect to login page if token is not present
+    }
+    verifyAdmin()
+
+  })
+
+  function verifyAdmin() {
+    var token = sessionStorage.getItem('token')
+    $.ajax({
+      type: 'POST',
+      data: { token: token },
+      url: 'verify_admin.php', // 替换为您的PHP脚本路径
+      dataType: 'json',
+      success: function (response) {
+        if (response.success) {
+          fetchProducts()
+          $('#addProductForm').submit(function (e) {
+            e.preventDefault()
+            var name = $('#addName').val()
+            var description = $('#addDescription').val()
+            var price = $('#addPrice').val()
+            var stock = $('#addStock').val()
+            var token = sessionStorage.getItem('token')
+            $.ajax({
+              type: 'POST',
+              url: 'add_product.php',
+              data: {
+                name: name,
+                description: description,
+                points_required: price,
+                stock: stock,
+                token: token,
+              },
+              success: function (response) {
+                alert(response.success ? '产品添加成功' : '产品添加失败: ' + response.message)
+              },
+              error: function (xhr) {
+                alert('请求失败，请重试:' + xhr.responseText)
+              },
+            })
+          })
+        } else {
+          alert('非法访问，您不是管理员。')
+          window.location.href = 'index.html'
+        }
+      },
+      error: function () {
+        alert('验证失败，请重试。')
+        window.location.href = 'index.html'
+      },
+    })
+  }
+
+  function updateProduct() {
+    var productId = $('#updateProductId').val()
+    var name = $('#updateName').val()
+    var description = $('#updateDescription').val()
+    var price = $('#updatePrice').val()
+    var token = sessionStorage.getItem('token')
+    $.ajax({
+      type: 'POST',
+      url: 'update_product.php',
+      data: {
+        product_id: productId,
+        name: name,
+        description: description,
+        price: price,
+        token: token,
+      },
+      success: function (response) {
+        alert(response.success ? '产品更新成功' : '产品更新失败: ' + response.message)
+      },
+      error: function (xhr) {
+        alert('请求失败，请重试。')
+      },
+    })
+  }
+
+  function deleteProduct() {
+    var productId = $('#updateProductId').val()
+    var token = sessionStorage.getItem('token')
+    $.ajax({
+      type: 'POST',
+      url: 'delete_product.php',
+      data: {
+        product_id: productId,
+        token: token,
+      },
+      success: function (response) {
+        alert(response.success ? '产品删除成功' : '产品删除失败: ' + response.message)
+      },
+      error: function (xhr) {
+        alert('请求失败，请重试。')
+      },
+    })
+  }
+
+  function fetchProducts() {
+    $.ajax({
+      type: 'GET',
+      url: 'product.php', // 替换为获取商品数据的实际URL
+      dataType: 'json',
+      success: function (response) {
+        if (response.success) {
+          renderProducts(response.products)
+        } else {
+          console.error('获取商品信息失败: ' + response.message)
+        }
+      },
+      error: function () {
+        console.error('请求商品数据失败。')
+      },
+    })
+  }
+
+  function renderProducts(products) {
+    var productList = $('#productList')
+    productList.empty() // 清空现有商品列表
+    products.forEach(function (product) {
+      var productHTML = `
+      <div class="col-md-4">
+        <div class="card mb-4">
+          <img class="card-img-top" src="${product.image_path}" alt="${product.name}">
+          <div class="card-body">
+            <h5 class="card-title">${product.name}</h5>
+            <p class="card-text">编号: ${product.product_id}</p>
+            <p class="card-text">描述：${product.description}</p>
+            <p class="card-text">价格: ${product.price}</p>
+            <p class="card-text">库存: ${product.stock}</p>
+          </div>
+        </div>
+      </div>`
+      productList.append(productHTML) // 将商品添加到列表
+    })
+  }
+</script>
+<script>function logout() {
+  sessionStorage.removeItem('loggedIn')
+  sessionStorage.removeItem('username')
+  sessionStorage.removeItem('expiration')
+  // 更新UI为未登录状态
+  $('#userStatus').text('')
+  $('#logoutButton').hide()
+  $('#loginButton').show()
+}
+
+function Redirect(webpage) {
+  window.location = webpage
+}</script>
+<!-- 页脚内容 -->
+<div id="footer-placeholder"></div>
+</body>
+</html>

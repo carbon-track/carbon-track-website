@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>校园碳账户网站主页</title>
+  <link rel="icon" href="/img/team.jpg" type="image/JPG">
+  <!-- 引入Bootstrap和jQuery的CDN链接 -->
+  <link rel="stylesheet" href="./css/bootstrap.min.css">
+  <script src="js/jquery.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/nav.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="./css/index.css">
+
+</head>
+<body>
+<nav class="navbar navbar-expand-sm navbar-dark">
+
+  <div class="container">
+    <a class="navbar-brand" href="index.html">校园碳账户 |</a>
+    <a class="navbar-brand" href="index.html">
+      <img src="/img/team.png" alt="CarbonTrack校园碳账户" style="height: 100px;"></a>
+    <a class="navbar-brand" href="index.html">CarbonTrack</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+          <span id="userStatus" class="navbar-text mr-3"></span>
+        </li>
+        <!--
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">联系我们</a>
+                            </li>-->
+        <li class="nav-item">
+          <a class="nav-link" href="#" data-toggle="modal" data-target="#registerModal">注册</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" data-toggle="modal" data-target="#loginModal">登录</a>
+        </li>
+        <li class="nav-item">
+          <button id="logoutButton" class=" logoutControl btn btn-sm btn-danger" onclick="logout()"
+                  style="display:none;">注销
+          </button>
+        </li>
+        <li class="nav-item active">
+          <a class="nav-link" href="#">首页</a>
+        </li>
+        <li class="nav-item">
+          <a class="logoutControl nav-link " href="#" data-toggle="modal" data-target="#messagesModal">站内信</a>
+          <div class="badge-container">
+            <span id="unreadMessagesCount" class="badge badge-danger" style="display: none;">0</span>
+          </div>
+        </li>
+        <li class="nav-item">
+          <a id="logoutButton logoutControl" class=" logoutControl nav-link" href="calculate.html">碳减排核算入口</a>
+        </li>
+
+        <li class="nav-item">
+          <a id="logoutControl" class=" logoutControl nav-link" href="CStore.html">碳积分商城入口</a>
+        </li>
+        <li class="nav-item">
+          <a id=" logoutControl" class="logoutControl nav-link" href="center.html">用户中心</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="about.html">关于我们</a>
+        </li>
+
+      </ul>
+    </div>
+  </div>
+</nav>
+<!-- Add a Password Recovery Section -->
+<!-- Password Recovery Section -->
+<div class="container">
+  <h2>忘记密码Forgot Password</h2>
+  <form id="passwordRecoveryForm">
+    <div class="form-group">
+      <label for="recoveryEmail">邮箱地址Email Address</label>
+      <input type="email" class="form-control" id="recoveryEmail" placeholder="请输入您的邮箱地址Please enter your email registered for account" required>
+    </div>
+    <button type="button" class="btn btn-secondary" id="sendRecoveryCode">发送验证码Send Verification Code</button>
+  </form>
+</div>
+
+<!-- Password Reset Modal -->
+<div class="modal fade" id="passwordResetModal" tabindex="-1" role="dialog" aria-labelledby="passwordResetModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="passwordResetModalLabel">重置密码Reset Password</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="passwordResetForm">
+          <div class="form-group">
+            <label for="resetCode">验证码Verification Code</label>
+            <input type="text" class="form-control" id="resetCode" placeholder="请输入验证码Please enter the verification code you received" required>
+          </div>
+          <div class="form-group">
+            <label for="newPassword">新密码New Password</label>
+            <input type="password" class="form-control" id="newPassword" placeholder="请输入新密码Please enter your new Password" required>
+          </div>
+          <button type="submit" class="btn btn-login btn-block">重置密码Reset Password</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Send verification code
+  $('#sendRecoveryCode').on('click', function () {
+    var email = $('#recoveryEmail').val()
+    if (email) {
+      $.ajax({
+        type: 'POST',
+        url: 'sendRecoveryCode.php', // PHP script to send the verification code
+        data: { email: email },
+        dataType: 'json',
+        success: function (response) {
+          if (response.success) {
+            $('#passwordResetModal').modal('show') // Show the password reset modal
+          } else {
+            alert('发送验证码失败: ' + response.error)
+          }
+        },
+        error: function () {
+          alert('请求发送验证码失败，请稍后再试。')
+        },
+      })
+    } else {
+      alert('请输入邮箱地址。')
+    }
+  })
+
+  // Reset password
+  $('#passwordResetForm').submit(function (event) {
+    event.preventDefault()
+    var email = $('#recoveryEmail').val()
+    var code = $('#resetCode').val()
+    var newPassword = $('#newPassword').val()
+    $.ajax({
+      type: 'POST',
+      url: 'recovery.php', // PHP script to reset the password
+      data: {
+        email: email,
+        verificationCode: code,
+        newPassword: newPassword,
+      },
+      dataType: 'json',
+      success: function (response) {
+        if (response.success) {
+          alert('密码重置成功！')
+          $('#passwordResetModal').modal('hide')
+        } else {
+          alert('密码重置失败: ' + response.error)
+        }
+      },
+      error: function () {
+        alert('密码重置请求失败，请稍后再试。')
+      },
+    })
+  })
+</script>
+
+<div id="footer-placeholder"></div>
+
+</body>
+</html>

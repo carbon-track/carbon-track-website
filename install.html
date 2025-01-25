@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Database Setup</title>
+    <style>
+        body { font-family: sans-serif; }
+        form { width: 300px; margin: 20px auto; padding: 20px; border: 1px solid #ccc; }
+        label { display: block; margin-bottom: 5px; }
+        input[type="text"], input[type="password"] { width: 100%; padding: 8px; margin-bottom: 10px; box-sizing: border-box; }
+        button { background-color: #4CAF50; color: white; padding: 10px 15px; border: none; cursor: pointer; }
+        .success { color: green; margin-top: 10px; }
+        .error { color: red; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <form id="dbForm" action="install.php" method="post">
+        <h2>Database Setup</h2>
+        <label for="host">Host:</label>
+        <input type="text" id="host" name="host" required>
+
+        <label for="db">Database Name (Create the database fist)</label>
+        <input type="text" id="db" name="db" required>
+
+        <label for="user">Username:</label>
+        <input type="text" id="user" name="user" required>
+
+        <label for="pass">Password:</label>
+        <input type="password" id="pass" name="pass">
+
+        <button type="submit">Configure Database</button>
+    </form>
+    <div id="result"></div>
+    <script>
+        document.getElementById('dbForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var formData = new FormData(this);
+            fetch('install.php', {
+                method: 'POST',
+                body: formData
+            }).then(response => response.json())
+              .then(data => {
+                var resultDiv = document.getElementById('result');
+                if (data.success) {
+                    resultDiv.innerHTML = '<p class="success">' + data.message + '</p>';
+                } else {
+                    resultDiv.innerHTML = '<p class="error">' + data.error + '</p>';
+                }
+            }).catch(error => {
+                var resultDiv = document.getElementById('result');
+                resultDiv.innerHTML = '<p class="error">An error occurred: ' + error + '</p>';
+            });
+        });
+    </script>
+</body>
+</html>

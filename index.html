@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>CarbonTrack校园碳账户</title>
+  <link rel="icon" href="/img/team.jpg" type="image/JPG">
+  <!-- 引入Bootstrap和jQuery的CDN链接 -->
+  <script src="js/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="./css/bootstrap.min.css">
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/nav.js"></script>
+
+  <link rel="stylesheet" href="./css/index.css">
+  <style>
+    body, html {
+      padding: 0;
+      margin: 0;
+    }
+
+    .alert-heading {
+      text-align: center;
+    }
+
+    .text-container {
+      width: 90%; /* 文字内容占用80%宽度 */
+      margin: 0 auto; /* 上下边距为0，左右自动，使内容水平居中 */
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap; /* 允许多行 */
+      align-items: stretch; /* 使卡片高度相等 */
+    }
+
+    .card-body {
+      min-height: 250px; /* 示例最小高度，根据需要调整 */
+    }
+
+    .container, .container-fluid {
+      max-width: 100%; /* 或者其他更大的固定值，如'1400px' */
+    }
+
+    .card1 {
+      background-color: rgb(246, 192, 70); /* 设置卡片背景颜色 */
+    }
+
+    .card2 {
+      background-color: #6c8bb4 /* 设置卡片背景颜色 */
+    }
+
+    .card3 {
+      background-color: #d9d9d9; /* 设置卡片背景颜色 */
+
+    }
+
+    .card4 {
+      background-color: rgb(35, 74, 133); /* 设置卡片背景颜色 */
+    }
+
+
+    .card-title {
+      font-size: 24px;
+      letter-spacing: 2px;
+    }
+
+    /* 确保容器使用Bootstrap栅格系统进行响应式布局 */
+
+
+    .col-md-3 {
+      position: relative;
+      width: 100%;
+      padding-right: 15px;
+      padding-left: 15px;
+    }
+
+    /* 确保轮播图容器宽度为100% */
+    .carousel {
+      width: 100% !important;
+      max-width: 100%; /* 防止超出视口宽度 */
+      margin: 0 auto; /* 居中显示 */
+    }
+
+    /* 确保轮播图图片宽度自适应并填满容器 */
+    .carousel-inner img {
+      width: 100%; /* 确保图片宽度占满容器 */
+      height: auto; /* 保持图片原始宽高比 */
+      object-fit: cover; /* 覆盖整个容器，可能会裁剪图片 */
+    }
+
+    .floating-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 100;
+    }
+  </style>
+</head>
+<body>
+<!-- 导航栏 -->
+<nav class="navbar navbar-expand-sm navbar-dark">
+
+  <div class="container">
+    <a class="navbar-brand" href="index.html">校园碳账户 |</a>
+    <a class="navbar-brand" href="index.html">
+      <img src="/img/team.png" alt="CarbonTrack校园碳账户" style="height: 100px;"></a>
+    <a class="navbar-brand" href="index.html">CarbonTrack</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+          <span id="userStatus" class="navbar-text mr-3"></span>
+        </li>
+        <!--
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Contact Us</a>
+                            </li>-->
+
+        <li class="nav-item">
+          <a class="nav-link" href="#" data-toggle="modal" data-target="#registerModal">Register</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" data-toggle="modal" data-target="#loginModal">Log-in</a>
+        </li>
+        <li class="nav-item">
+          <button id="logoutButton" class=" logoutControl btn btn-sm btn-danger" onclick="logout()"
+                  style="display:none;">Logout
+          </button>
+        </li>
+        <li class="nav-item active">
+          <a class="nav-link" href="#">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="logoutControl nav-link " href="#" data-toggle="modal" data-target="#messagesModal"><i
+              class="logoutControl fas fa-envelope" style="font-size: 24px;"></i></a>
+          <div class="badge-container">
+            <span id="unreadMessagesCount" class="badge badge-danger" style="display: none;">0</span>
+          </div>
+        </li>
+        <li class="nav-item">
+          <a id="logoutButton logoutControl" class=" logoutControl nav-link" href="calculate.html">Accounting Portal</a>
+        </li>
+
+        <li class="nav-item">
+          <a id="logoutControl" class=" logoutControl nav-link" href="CStore.html">Credits Mall</a>
+        </li>
+        <li class="nav-item">
+          <a id=" logoutControl" class="logoutControl nav-link" href="center.html">User Center</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="about.html">About Us</a>
+        </li>
+
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- 轮播图 -->
+<div class="container-fluid">
+  <div id="carousel" class="carousel slide" data-ride="carousel">
+    <ol class="carousel-indicators">
+      <li data-target="#carousel" data-slide-to="0" class="active"></li>
+      <li data-target="#carousel" data-slide-to="1"></li>
+      <li data-target="#carousel" data-slide-to="2"></li>
+      <li data-target="#carousel" data-slide-to="3"></li>
+      <li data-target="#carousel" data-slide-to="4"></li>
+    </ol>
+    <div class="carousel-inner">
+      <div class="carousel-item active">
+        <img src="img/eg1.jpeg" alt="第一张">
+      </div>
+      <div class="carousel-item">
+        <img src="img/eg2.jpeg" alt="第二张">
+      </div>
+      <div class="carousel-item">
+        <img src="img/eg3.jpeg" alt="第三张">
+      </div>
+      <div class="carousel-item">
+        <img src="img/eg4.jpeg" alt="第四张">
+      </div>
+      <div class="carousel-item">
+        <img src="img/eg5.jpeg" alt="第五张">
+      </div>
+    </div>
+    <a class="carousel-control-prev" href="#carousel" role="button" data-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="sr-only">上一张</span>
+    </a>
+    <a class="carousel-control-next" href="#carousel" role="button" data-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="sr-only">下一张</span>
+    </a>
+  </div>
+</div>
+<div class="container mt-4">
+  <div class="alert alert-info" role="alert">
+    <h4 class="alert-heading">Welcome to our Carbon Accounting Platform!</h4>
+    <div class="text-container">
+      <p>Announcements:</p>
+    </div>
+    <hr>
+    <div class="text-container">
+      <ul>
+        <li>We need your feedbacks and suggestions! Please email us at <a
+            href="mailto:carbontrack666@gmail.com">carbontrack666@gmail.com</a>. We will respond ASAP.
+        </li>
+        <li>
+          Once you achieve significant success in carbon reduction, we will send you rewards such as certificates, badges, and thank-you letters. This is a recognition of your active participation in reducing carbon emissions and our appreciation for your efforts toward environmental protection.
+        </li>
+        <li>
+          Although our carbon account primarily serves students, we also warmly welcome adults to join. Whether you are a student or an adult, as long as you care about environmental protection and reducing your carbon footprint, we welcome you to become a member of our carbon account platform.
+        </li>
+        <li>
+          Thank you for your continued support of our carbon account platform. Your participation is the driving force behind the advancement of carbon reduction efforts. We hope you will continue using our platform and work together to make our Earth a better place!
+        </li>
+        <li>Please do not cheat to gain carbon credits. We are committed to establishing a fair carbon accounting platform, and data manipulation will harm the fairness and credibility of the platform.</li>
+      </ul>
+
+      <p class="mb-0">Thank you for your reading and support! If you have any questions or need assistance, feel free to contact us.</p>
+    </div>
+  </div>
+</div>
+  
+<!--Start From Chat主页碳核算悬浮按钮-->
+<button id="calculateButton" class="btn btn-primary floating-button">
+    <img src="img/recordFloatingButton.png" alt="RECORD" style="width: 100px; height: 50px; border-radius: 50%;">
+</button>
+
+<script>
+    // 获取按钮元素
+    var button = document.getElementById('calculateButton');
+    
+    // 修改按钮的背景颜色为透明
+    button.style.backgroundColor = 'transparent';  // 设置背景颜色为透明
+    
+    // 设置边框为圆角
+    button.style.borderRadius = '50%';  // 圆形边框
+    
+    // 去除按钮的内边距以适配图像
+    button.style.padding = '0';
+    
+    // 去掉按钮的蓝色聚焦框
+    button.style.outline = 'none';  // 去除聚焦时的默认蓝色外框
+    
+    // 删除文本颜色设置，因为不再需要
+    // button.style.color = 'white';
+</script>
+<!--End From Chat-->
+  
+<!-- 内容区域 -->
+<div class="container">
+  <div class="row">
+    <div class="col-md-3 col-sm-6">
+      <div class="card3">
+        <!--<img src="/img/1.png" class="card-img-top" alt="Card image">-->
+        <div class="card-body">
+          <h5 class="card-title" style="color:rgb(87,117,167);">What is a Carbon Account?</h5>
+          <p class="card-text" style="color:rgb(87,117,167);">A carbon account is a tool for recording the carbon emissions (CO2 in kilograms) and reductions of individuals or organizations. It helps us better understand our carbon footprint and take more environmentally friendly actions.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+      <div class="card2">
+        <!--<img src="/img/2.jpg" class="card-img-top" alt="Card image">-->
+        <div class="card-body">
+          <h5 class="card-title" style="color:#fff">How to Use the Carbon Account?</h5>
+          <p class="card-text" style="color:#fff">
+            Using a carbon account is simple. You just need to register an account, click on the “Carbon Accounting Portal,” and record your carbon reduction actions and their frequency to earn "carbon credits". You can view your accumulated carbon reduction and carbon credits in the “User Center,” and participate in various carbon reduction activities and challenges to win rewards.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+      <div class="card3">
+        <!--<img src="/img/3.jpg" class="card-img-top" alt="Card image">-->
+        <div class="card-body">
+          <h5 class="card-title" style="color:rgb(87,117,167);">What Are the Benefits of using a Carbon Account?</h5>
+          <p class="card-text" style="color:rgb(87,117,167);">
+            A carbon account helps us track the carbon emissions reduced by our daily eco-friendly actions and visualize our positive impact on the Earth. By helping students to record their carbon footprint, it can cultivate and enhance youth  awareness and engagement in energy conservation and emission reduction.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+      <div class="card4">
+        <!--<img src="/img/4.png" class="card-img-top" alt="Card image">-->
+        <div class="card-body">
+          <h5 class="card-title" style="color:#fff">Join Our Team</h5>
+          <p class="card-text" style="color:#fff">
+            We welcome everyone who's passionate about environmental protection to join our team and contribute to reducing carbon emissions together.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div> <!-- 结束行 -->
+
+<!-- 页脚 -->
+<div id="footer-placeholder"></div>
+ <!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! --> 
+<!-- 登录模态框 -->
+<div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="loginModalLabel">User Login</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <label for="username">Account/Username/Email</label>
+            <input type="text" class="form-control" id="username" placeholder="Please enter your username or Email Address">
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" class="form-control" id="password" placeholder="Please enter your Password">
+          </div>
+          <button type="submit" class="btn btn-login btn-block">Log-in</button>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <div class="alert alert-warning" role="alert" id="refreshAlert" style="display: none; cursor: pointer;">
+          If failed, please try reload the page or press <a href="#" onclick="location.reload();">here</a>.
+        </div>
+        <a class="nav-link mr-right" href="iforgot.html">Forgot password?</a>
+        <a class="nav-link" href="#" data-toggle="modal" data-target="#registerModal">Register an account</a>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="registerModalLabel">Register new account</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" class="form-control required-input" id="regusername" placeholder="Please set your Username">
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" class="form-control required-input" id="regpassword" placeholder="Please set your Password">
+          </div>
+          <div class="form-group">
+            <label for="email">Email Address:</label>
+            <input type="email" class="form-control required-input" id="email" name="email" required>
+            <!-- 添加发送验证码按钮 -->
+            <button type="button" class="btn btn-secondary" id="sendVerificationCode">Send verification code</button>
+            <!-- 在注册模态框的表单中添加一个字段 -->
+            <div class="form-group">
+              <label for="verificationCode">Verification Code</label>
+              <input type="text" class="form-control" id="verificationCode" placeholder="Please enter the verification code you recieved" required>
+              <small id="emailHelp" class="form-text text-muted"
+                     style="display: none;">The code has been sent to your Email.</small>
+            </div>
+
+          </div>
+          <button type="submit" class="btn btn-login btn-block">Register</button>
+          <div id="registerError" style="display:none;" class="alert alert-danger"></div>
+        </form>
+        <div class="modal-footer">
+          <div class="alert alert-warning" role="alert" id="refreshAlert" style="display: none; cursor: pointer;">
+            If failed, please try reload the page or press <a href="#" onclick="location.reload();">here</a>.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! --> 
+<!-- 站内信模态框 -->
+
+<div class="modal fade" id="messagesModal" tabindex="-1" role="dialog" aria-labelledby="messagesModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="messagesModalLabel">Message</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-4" id="conversationList">
+            <!-- 对话列表将在这里动态加载 -->
+          </div>
+          <div class="col-8">
+            <div id="messageList" style="height: 400px; overflow-y: auto;">
+              <!-- 消息列表将在这里动态加载 -->
+            </div>
+            <div class="input-group mt-3">
+              <input type="text" class="form-control" id="messageInput" placeholder="Enter message...">
+              <div class="input-group-append">
+                <button class="btn btn-primary" type="button" id="sendMessage">Send</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  // 页面加载时检查登录状态
+  $(document).ready(function () {
+    var loggedIn = localStorage.getItem('loggedIn')
+    var expiration = localStorage.getItem('expiration')
+    var now = new Date()
+
+    if (loggedIn && expiration && now.getTime() < expiration) {
+      var username = localStorage.getItem('username')
+      updateLoginStatus()
+      $('[data-target="#loginModal"]').hide()
+      $('[data-target="#registerModal"]').hide()
+      $('#logoutButton').show()
+      $('a[href="center.html"]').show()
+      $('a[href="calculate.html"]').show()
+      $('a[href="CStore.html"]').show()
+    } else {
+      logout() // 如果过期或未登录，执行注销操作
+      $('#userStatus').text('Please login or register:')
+      // 显示登录和注册按钮，隐藏注销和用户中心按钮
+      $('[data-target="#loginModal"]').show()
+      $('[data-target="#registerModal"]').show()
+      $('#logoutButton').hide()
+      $('a[href="center.html"]').hide()
+      $('a[href="calculate.html"]').hide()
+      $('a[href="CStore.html"]').hide()
+
+    }
+    updateButtonForRemainingTime()
+  })
+  document.getElementById('calculateButton').addEventListener('click', function () {
+    window.location.href = 'calculate.html' // 指定要跳转的页面
+  })
+</script>
+</body>
+</html>

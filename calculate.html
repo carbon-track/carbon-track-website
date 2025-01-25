@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>Accounting Portal - CarbonTrack</title>
+  <link rel="icon" href="/img/team.jpg" type="image/JPG">
+  <!-- 引入Bootstrap和jQuery的CDN链接 -->
+  <link rel="stylesheet" href="./css/bootstrap.min.css">
+  <script src="js/jquery.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+  <script src="js/nav.js"></script>
+  <link rel="stylesheet" href="./css/index.css">
+  <script>
+    $(document).ready(function () {
+      var token = sessionStorage.getItem('token')
+      if (token) {
+      } else {
+        $('#userPoints').text('未登录')
+        alert('请先登录。')
+        window.location.href = 'index.html'
+      }
+      // 初始化活动小类选项
+      updateActivityOptions($('#category').val())
+      updateActivityOptions($('#category').val())
+      calculateAndDisplayReduction() // 确保活动选项已填充
+      $('#dataInput, #activity').on('input change', calculateAndDisplayReduction)
+      $('#carbonForm').submit(function (e) {
+        e.preventDefault()
+        var uid = sessionStorage.getItem('id')
+        var formData = new FormData(this)
+        formData.append('activity', $('#activity').val())
+        formData.append('oridata', $('#dataInput').val())
+        formData.append('token', sessionStorage.getItem('token'))
+        formData.append('id', uid)
+
+        $.ajax({
+          type: 'POST',
+          url: 'calculate.php',
+          data: formData,
+          processData: false, // 不处理数据
+          contentType: false, // 不设置内容类型
+          dataType: 'json', // Ensure that jQuery treats the response as JSON
+          xhr: function () {
+            var xhr = new window.XMLHttpRequest()
+            xhr.upload.addEventListener('progress', function (evt) {
+              if (evt.lengthComputable) {
+                var percentComplete = evt.loaded / evt.total
+                percentComplete = parseInt(percentComplete * 100)
+                $('.progress-bar').width(percentComplete + '%')
+                $('.progress-bar').html(percentComplete + '%')
+              }
+            }, false)
+            return xhr
+          },
+          beforeSend: function () {
+            $('#submitButton').prop('disabled', true) // 禁用按钮
+          },
+          success: function (response) {
+            if (response.success) {
+              alert('提交成功Succeed: ' + response.message + '预计新增积分: The information has been added to the review queue; expected new credits: ' + response.points)
+              window.location.href = 'center.html'
+              sendEmail(token)
+
+            } else {
+              // If the response includes a 'token expired' message, handle it
+              if (response.message === '令牌无效或已过期。') {
+                alert('令牌无效或已过期，请重新登录。')
+                // Redirect to login page or refresh the token here
+              } else {
+                alert('提交失败: ' + response.message)
+              }
+            }
+          },
+          error: function (xhr) {
+            // Handle error response
+            var errorMsg = '提交失败，请重试。'
+            if (xhr.responseJSON && xhr.responseJSON.message) {
+              errorMsg += ' Error: ' + xhr.responseJSON.message
+            }
+            //console.log(token);
+            alert(errorMsg)
+          },
+          complete: function () {
+            $('#submitButton').prop('disabled', false) // 重新启用按钮
+            $('.progress-bar').width('0%') // 重置进度条
+
+          },
+        })
+      })
+
+      $('#category').change(function () {
+        updateActivityOptions($(this).val())
+        calculateAndDisplayReduction()
+      })
+
+    })
+
+    function sendEmail(token) {
+      fetch('stm.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'token=' + encodeURIComponent(token),
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+
+          } else {
+            alert('邮件发送失败：' + data.message)
+          }
+        })
+        .catch((error) => {
+          console.error('Error:', error)
+        })
+    }
+
+    function updateActivityOptions(category) {
+      var options = {
+        '衣': ['旧衣回收1kg / Recycle 1kg old clothes', '二手交易1次 / Second-hand transaction 1 time', '衣物租赁1次 / Clothing rental service 1 time'],
+        '食': ['光盘行动1次 / Finish everything on your plate 1 time', '减少肉类消费1kg / Reduce meat consumption 1kg'],
+          //'住': ['节约用电1度', '居家回收利用', '节约用水1L','垃圾分类1次'],
+          //'住': [ '居家回收利用', '垃圾分类1次'],
+        '行': ['公交出行1km / Bus transport 1km', '地铁出行1km / Subway travel 1km', '步行1km / Walk 1km', '骑行1km / Cycle 1km', '拼车1km / Carpool 1km'],
+        '习': ['上网课1h / Online class 1h', '提交电子作业1次 / Write assignment electronically 1 time'],
+        // 其他大类的小类选项...
+      }
+      $('#activity').empty() // 清空活动选项
+      options[category].forEach(function (activity) {
+        $('#activity').append($('<option>', { value: activity, text: activity }))
+      })
+    }
+
+
+    // 计算并显示碳减排量的函数
+    function calculateAndDisplayReduction() {
+      var activity = $('#activity').val()
+      var dataInputValue = $('#dataInput').val() // Define dataInputValue by getting the value from the input field
+      //console.log('Input value as string:', dataInputValue); // Log the string value of the input
+      var dataInput = parseFloat(dataInputValue)
+      //console.log('Parsed input value:', dataInput); // Log the parsed float value of the input
+
+      // 确保输入是一个有效的数字
+      if (isNaN(dataInput)) {
+        $('#carbonReductionPreview').text('Please enter a valid number!')
+        return // 如果输入无效，显示错误消息并退出函数
+      }
+
+      var carbonReduction = 0
+      // 根据活动类型计算碳减排量
+      switch (activity) {
+        case '旧衣回收1kg / Recycle 1kg old clothes':
+          carbonReduction = dataInput * 3.6
+          break
+        case '二手交易1次 / Second-hand transaction 1 time':
+          carbonReduction = dataInput * 10 + 4
+          break
+        case '衣物租赁1次 / Clothing rental service 1 time':
+          carbonReduction = dataInput * 10 + 4
+          break
+        case '减少肉类消费1kg / Reduce meat consumption 1kg':
+          carbonReduction = dataInput * 15.54
+          break
+        case '节约用电1度':
+          carbonReduction = dataInput * 0.638
+          break
+        case '光盘行动1次 / Finish everything on your plate 1 time':
+          carbonReduction = dataInput * 0.0329041095890411
+          break
+        case '居家回收利用':
+          carbonReduction = dataInput * 10 + 4
+          break
+        case '节约用水1L':
+          carbonReduction = dataInput * 0.194
+          break
+        case '公交出行1km / Bus transport 1km':
+          carbonReduction = dataInput * 0.741
+          break
+        case '步行1km / Walk 1km':
+          carbonReduction = dataInput * 0.135
+          break
+        case '地铁出行1km / Subway travel 1km':
+          carbonReduction = dataInput * 0.089
+          break
+        case '骑行1km / Cycle 1km':
+          carbonReduction = dataInput * 0.05
+          break
+        case '拼车1km / Carpool 1km':
+          carbonReduction = dataInput * 0.0675
+          break
+        case '上网课1h / Online class 1h':
+          carbonReduction = dataInput * 0.15
+          break
+        case '提交电子作业1次 / Write assignment electronically 1 time':
+          carbonReduction = dataInput * 0.05
+          break
+        default:
+          $('#carbonReductionPreview').text(114514 + ' kg CO2')
+      }
+      if (carbonReduction === 0 && dataInput !== 0) {
+        $('#carbonReductionPreview').text('输入数据不合法！Illegal input!')
+      } else {
+        // 显示计算结果
+        $('#carbonReductionPreview').text(carbonReduction.toFixed(2) + ' kg CO2')
+      }
+    }
+
+    $('#dataInput, #activity').on('input change', function () {
+      calculateAndDisplayReduction()
+    })
+
+  </script>
+</head>
+<body>
+<nav class="navbar navbar-expand-sm navbar-dark">
+
+  <div class="container">
+    <a class="navbar-brand" href="index.html">校园碳账户 |</a>
+    <a class="navbar-brand" href="index.html">
+      <img src="/img/team.png" alt="CarbonTrack校园碳账户" style="height: 100px;"></a>
+    <a class="navbar-brand" href="index.html">CarbonTrack</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+          <span id="userStatus" class="navbar-text mr-3"></span>
+        </li>
+        <!--
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Contact Us</a>
+                            </li>-->
+        <li class="nav-item">
+          <a class="nav-link" href="#" data-toggle="modal" data-target="#registerModal">Register</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" data-toggle="modal" data-target="#loginModal">Log-in</a>
+        </li>
+        <li class="nav-item">
+          <button id="logoutButton" class=" logoutControl btn btn-sm btn-danger" onclick="logout()"
+                  style="display:none;">Logout
+          </button>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="index.html">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="logoutControl nav-link " href="#" data-toggle="modal" data-target="#messagesModal"><i
+              class="logoutControl fas fa-envelope" style="color: rgba(255, 255, 255, .5);font-size: 24px;"></i></a>
+          <div class="badge-container">
+            <span id="unreadMessagesCount" class="badge badge-danger" style="display: none;">0</span>
+          </div>
+        </li>
+        <li class="nav-item">
+          <a id="logoutButton logoutControl" class=" logoutControl nav-link" href="calculate.html">Accounting Portal</a>
+        </li>
+
+        <li class="nav-item">
+          <a id="logoutControl" class=" logoutControl nav-link" href="CStore.html">Credits Mall</a>
+        </li>
+        <li class="nav-item">
+          <a id=" logoutControl" class="logoutControl nav-link" href="center.html">User Center</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="about.html">About Us</a>
+        </li>
+
+      </ul>
+    </div>
+  </div>
+</nav>
+<div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="loginModalLabel">User Login</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <label for="username">Account/Username</label>
+            <input type="text" class="form-control" id="username" placeholder="Please enter your Username or Email Address">
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" class="form-control" id="password" placeholder="Please enter your Password">
+          </div>
+          <button type="submit" class="btn btn-login btn-block">Log-in</button>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <div class="alert alert-warning" role="alert" id="refreshAlert" style="display: none; cursor: pointer;">
+          If failed, please try reload the page or press<a href="#" onclick="location.reload();">here</a>以重新通过Cloudflare防火墙。
+        </div>
+        <a class="nav-link mr-right" href="iforgot.html">Forgot password?</a>
+        <a class="nav-link" href="#" data-toggle="modal" data-target="#registerModal">Register an account</a>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="registerModalLabel">Register new account</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" class="form-control required-input" id="regusername" placeholder="Please set your Username">
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" class="form-control required-input" id="regpassword" placeholder="Please set your Password">
+          </div>
+          <div class="form-group">
+            <label for="email">Email Address:</label>
+            <input type="email" class="form-control required-input" id="email" name="email" required>
+            <!-- 添加发送验证码按钮 -->
+            <button type="button" class="btn btn-secondary" id="sendVerificationCode">Send verification code</button>
+            <!-- 在注册模态框的表单中添加一个字段 -->
+            <div class="form-group">
+              <label for="verificationCode">Verification Code</label>
+              <input type="text" class="form-control" id="verificationCode" placeholder="Please enter the verification code you received" required>
+              <small id="emailHelp" class="form-text text-muted"
+                     style="display: none;">The code has been sent to your Email.</small>
+            </div>
+
+          </div>
+          <button type="submit" class="btn btn-login btn-block">Register</button>
+          <div id="registerError" style="display:none;" class="alert alert-danger"></div>
+        </form>
+        <div class="modal-footer">
+          <div class="alert alert-warning" role="alert" id="refreshAlert" style="display: none; cursor: pointer;">
+            If failed, please try reload the page or press<a href="#" onclick="location.reload();">here</a>以重新通过Cloudflare防火墙。
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 站内信模态框 -->
+<div class="modal fade" id="messagesModal" tabindex="-1" role="dialog" aria-labelledby="messagesModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="messagesModalLabel">Message</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-4" id="conversationList">
+            <!-- 对话列表将在这里动态加载 -->
+          </div>
+          <div class="col-8">
+            <div id="messageList" style="height: 400px; overflow-y: auto;">
+              <!-- 消息列表将在这里动态加载 -->
+            </div>
+            <div class="input-group mt-3">
+              <input type="text" class="form-control" id="messageInput" placeholder="Enter Message...">
+              <div class="input-group-append">
+                <button class="btn btn-primary" type="button" id="sendMessage">Send</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<form id="carbonForm" enctype="multipart/form-data">
+  <p class="alert alert-info" role="alert" style="text-align: center;">
+    If you need to record activities related to “Housing,” please click here <a href="speccal.html" class="alert-link">here</a> to jump to the corresponding page.
+  </p>
+  <select id="category">
+
+    <option value="衣">衣Clothing</option>
+    <option value="食">食Eating</option>
+    <!--<option value="住">住Housing</option>-->
+    <option value="行">行Traveling</option>
+    <option value="习">习Studying</option>
+  </select>
+  <select id="activity">
+    <!-- 活动小类选项将根据大类动态生成 -->
+  </select>
+
+  <input type="number" id="dataInput" step="0.01" placeholder="输入次数/频率/量/frequency/amount">
+  <input type="file" id="imageUpload" name="image" accept="image/*">
+  <div class="progress">
+    <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0"
+         aria-valuemax="100"></div>
+  </div>
+  <p>Estimated Carbon-Reduction: <span id="carbonReductionPreview">0 kg CO2</span></p>
+  <button type="button" class="btn btn-primary btn-tutorial" data-toggle="modal" data-target="#tutorialModal"
+          style="margin-bottom: 20px;">
+    Submission guide here!
+  </button>
+  <input type="submit" value="提交Submit" id="submitButton">
+
+</form>
+
+<!-- 模态窗口 -->
+<div class="modal fade" id="tutorialModal" tabindex="-1" role="dialog" aria-labelledby="tutorialModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="tutorialModalLabel">Submission Guide</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+
+        <p class="alert alert-info" role="alert" style="text-align: center;">In the input, enter the amount/frequency corresponding to your carbon-reduction activity, and upload the photo proof. For example, if Jeffery<a
+            class="alert-link font-weight-bold text-uppercase"
+            style="color: #ff0000; text-decoration: underline;"> cycled </a><a
+            class="alert-link font-weight-bold text-uppercase"
+            style="color: #ff0000; text-decoration: underline;">4.3</a> kilometers, he would select "<a
+            class="alert-link font-weight-bold text-uppercase"
+            style="color: #ff0000; text-decoration: underline;">Cycle 1km</a>", input <a
+            class="alert-link font-weight-bold text-uppercase"
+            style="color: #ff0000; text-decoration: underline;">4.3</a>, and upload a screenshot of his <a
+            class="alert-link font-weight-bold text-uppercase"
+            style="color: #ff0000; text-decoration: underline;">travel details.</a> The platform <a
+            class="font-weight-bold">trusts</a> every user; most records will be transformed into carbon credits immediately, and verification will be completed within 3 working days.
+          <br>
+          <a>e.g.<img src="img/eg.png" class="card-img-top responsive-img"></a>
+          <br>
+          <a>行程截图Travel Screenshot<img src="img/teg.png" class="card-img-top responsive-img"></a>
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  function logout() {
+    sessionStorage.removeItem('loggedIn')
+    sessionStorage.removeItem('username')
+    sessionStorage.removeItem('expiration')
+    // 更新UI为未登录状态
+    $('#userStatus').text('')
+    $('#logoutButton').hide()
+    $('#loginButton').show()
+  }</script>
+
+<div id="footer-placeholder"></div>
+
+</body>
+</html>
