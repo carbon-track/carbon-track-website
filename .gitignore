@@ -8,3 +8,5 @@ uploads/
 db.php
 login.php
 global_variables.php
+.user.ini
+.htaccess
