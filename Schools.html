@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <title>CarbonTrack Map with “Join Us” Below</title>
   <style>
-    /* Allow normal scrolling */
+    
     html, body {
       margin: 0;
       padding: 0;
@@ -12,7 +12,7 @@
       font-family: sans-serif;
     }
 
-    /* Top text section */
+    
     #header {
       width: 100%;
       padding: 40px 20px 20px;
@@ -42,39 +42,39 @@
       font-weight: normal;
     }
 
-    /* Map container (70vh) so it stays at a fixed height */
+    
     #map-container {
       width: 100%;
       height: 70vh;
       position: relative;
-      margin-top: 20px; /* Some spacing below the header */
+      margin-top: 20px; 
     }
-    /* The SVG fills the container */
+    
     svg {
       width: 100%;
       height: 100%;
       display: block;
     }
-    /* Dark grey land, white boundaries */
+    
     .country {
       fill: #444;
       stroke: #fff;
       stroke-width: 0.5;
     }
-    /* Optional US state boundaries */
+    
     .state-boundary {
       fill: none;
       stroke: #888;
       stroke-width: 0.5;
     }
-    /* Markers scale with the map */
+    
     .marker {
      fill: blue;
      stroke: none;
      cursor: pointer;
 }
 
-    /* Popup info box for school details */
+    
     #popup {
       position: absolute;
       background: rgba(255, 255, 255, 0.97);
@@ -101,7 +101,7 @@
       font-size: 14px;
     }
 
-    /* Footer (Join Us) section below the map */
+    
     #footer {
       width: 100%;
       padding: 40px 20px;
@@ -126,7 +126,7 @@
 </head>
 <body>
 
-  <!-- TOP TEXT SECTION (everything except "Join Us") -->
+  
   <div id="header">
     <h1>CarbonTrack Contributor Network 🌎</h1>
     <h2>Global Youth, Creating a Sustainable Future Together</h2>
@@ -143,13 +143,13 @@
     </p>
   </div>
 
-  <!-- MAP SECTION -->
+  
   <div id="map-container">
     <svg id="map"></svg>
     <div id="popup"></div>
   </div>
 
-  <!-- "JOIN US" TEXT BELOW THE MAP -->
+  
   <div id="footer">
     <h3>Join Us</h3>
     <p>
@@ -161,10 +161,6 @@
   <!-- D3.js from CDN -->
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script>
-    /********************************************************
-     *  Same pinned-center + pan-when-zoomed code as before
-     *  with no changes to the map logic.
-     ********************************************************/
     const container = document.getElementById("map-container");
     let width = container.clientWidth;
     let height = container.clientHeight;
@@ -248,13 +244,11 @@
     function markerClicked(event, d) {
       event.stopPropagation();
   
-  // Project this marker’s geographic coords to screen coords
+  
       const [baseX, baseY] = projection(d.coords);
       const transform = d3.zoomTransform(svg.node());
       const screenX = transform.applyX(baseX);
       const screenY = transform.applyY(baseY);
-
-  // Check for markers within ~30 pixels
       const cluster = [];
       mapGroup.selectAll("circle.marker").each(function(d2) {
       const [bx, by] = projection(d2.coords);
@@ -267,7 +261,7 @@
     }
   });
 
-  // If more than one marker is found in that 30-pixel radius, show a group popup
+  
   if (cluster.length > 1) {
     let html = "<h3>Schools in this area:</h3><ul>";
     cluster.forEach(school => {
@@ -276,7 +270,6 @@
     html += "</ul>";
     showPopup(screenX + 10, screenY + 10, html);
   } else {
-    // Otherwise, show info for this single marker
     const html = `<h3>${d.name}</h3><p>${d.info}</p>`;
     showPopup(screenX + 10, screenY + 10, html);
   }
@@ -298,7 +291,6 @@
       t.y = 0;
     }
     mapGroup.attr("transform", t);
-    // Update each marker's radius so it stays constant (base size 5)
     mapGroup.selectAll("circle.marker").attr("r", 5 / t.k);
     hidePopup();
   });
