@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>CarbonTrack Map with “Join Us” Below</title>
+  <style>
+    /* Allow normal scrolling */
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #fff;
+      font-family: sans-serif;
+    }
+
+    /* Top text section */
+    #header {
+      width: 100%;
+      padding: 40px 20px 20px;
+      box-sizing: border-box;
+      text-align: center;
+      font-family:'Times New Roman', Times, serif;
+    }
+    #header h1 {
+      margin: 0;
+      font-size: 48px;
+      font-weight: bold;
+    }
+    #header h2 {
+      margin: 20px 0 10px;
+      font-size: 24px;
+      font-weight: normal;
+    }
+    #header p {
+      max-width: 800px;
+      margin: 10px auto;
+      line-height: 1.4;
+      font-size: 16px;
+    }
+    #header h3 {
+      margin: 30px 0 10px;
+      font-size: 24px;
+      font-weight: normal;
+    }
+
+    /* Map container (70vh) so it stays at a fixed height */
+    #map-container {
+      width: 100%;
+      height: 70vh;
+      position: relative;
+      margin-top: 20px; /* Some spacing below the header */
+    }
+    /* The SVG fills the container */
+    svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    /* Dark grey land, white boundaries */
+    .country {
+      fill: #444;
+      stroke: #fff;
+      stroke-width: 0.5;
+    }
+    /* Optional US state boundaries */
+    .state-boundary {
+      fill: none;
+      stroke: #888;
+      stroke-width: 0.5;
+    }
+    /* Markers scale with the map */
+    .marker {
+     fill: blue;
+     stroke: none;
+     cursor: pointer;
+}
+
+    /* Popup info box for school details */
+    #popup {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.97);
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 10px;
+      max-width: 300px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      display: none;
+      z-index: 10;
+      animation: bounce 0.4s ease-out;
+    }
+    @keyframes bounce {
+      0% { transform: translateY(-20px); opacity: 0; }
+      60% { transform: translateY(10px); opacity: 1; }
+      100% { transform: translateY(0); }
+    }
+    #popup h3 {
+      margin: 0 0 5px 0;
+      font-size: 18px;
+    }
+    #popup p, #popup li {
+      margin: 0;
+      font-size: 14px;
+    }
+
+    /* Footer (Join Us) section below the map */
+    #footer {
+      width: 100%;
+      padding: 40px 20px;
+      box-sizing: border-box;
+      text-align: center;
+      font-family:'Times New Roman', Times, serif;
+      font-size:large;
+    }
+    #footer h3 {
+      margin: 0 0 10px 0;
+      font-size: 24px;
+      font-weight: normal;
+    }
+    #footer p {
+      max-width: 800px;
+      margin: 10px auto;
+      line-height: 1.4;
+      font-size: 16px;
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- TOP TEXT SECTION (everything except "Join Us") -->
+  <div id="header">
+    <h1>CarbonTrack Contributor Network 🌎</h1>
+    <h2>Global Youth, Creating a Sustainable Future Together</h2>
+    <p>
+      CarbonTrack is empowering environmentally conscious youth from around the world. 
+      We cultivate a common drive across schools and communities, using CarbonTrack to track their carbon footprint, 
+      promote sustainable living styles, and drive real impact in their surroundings.
+    </p>
+    <h3>Where Our Contributors Are From</h3>
+    <p>
+      On this map, you can see the schools and communities our contributors come from. 
+      They actively promote sustainability within their campuses and engage in various initiatives 
+      within the CarbonTrack community.
+    </p>
+  </div>
+
+  <!-- MAP SECTION -->
+  <div id="map-container">
+    <svg id="map"></svg>
+    <div id="popup"></div>
+  </div>
+
+  <!-- "JOIN US" TEXT BELOW THE MAP -->
+  <div id="footer">
+    <h3>Join Us</h3>
+    <p>
+      If you’re passionate about sustainability and want to be part of a global network of changemakers, 
+      we welcome you to join us!
+    </p>
+  </div>
+
+  <!-- D3.js from CDN -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script>
+    /********************************************************
+     *  Same pinned-center + pan-when-zoomed code as before
+     *  with no changes to the map logic.
+     ********************************************************/
+    const container = document.getElementById("map-container");
+    let width = container.clientWidth;
+    let height = container.clientHeight;
+
+    const svg = d3.select("#map");
+
+    svg.append("defs")
+       .append("clipPath")
+       .attr("id", "clip")
+       .append("rect")
+       .attr("width", width)
+       .attr("height", height);
+
+    const mapGroup = svg.append("g").attr("clip-path", "url(#clip)");
+
+    const projection = d3.geoNaturalEarth1();
+    const path = d3.geoPath().projection(projection);
+
+    let worldData, usStates;
+
+    const schools = [
+      {
+        name: "Hamden Hall Country Day School",
+        coords: [-72.93, 41.40],
+        info: "Adress: 1108 Whitney Ave, Hamden, Ct, 06516. It is the founding place of the Carbon Footprint Initiative."
+      },
+      {
+        name: "Kingswood Oxford School",
+        coords: [-72.75, 41.78],
+        info: "Adress: 170 Kingswood Rd, West Hartford, CT 06119. Its material club is one of our major collaborators."
+      },
+      {
+        name: "Nanjing Foreign Language School",
+        coords: [118.78, 32.05],
+        info: "Adress: 30 Beijing E Rd, Xuanwu, Nanjing, Jiangsu. One of the founding places of the Carbon Footprint Initiative."
+      },
+      {
+        name:"Shanghai Starriver Bilingual School",
+        coords: [121.2, 31.2],
+        info: "Adress: 上海市闵行区金都路2588号. A bilingual School in Shanghai, China, with a profound focus on sustainability, one of the participants of our Initiative."
+      },
+      {
+        name:"Baylor School",
+        coords: [-85.3, 35.08],
+        info:"Adress: 171 Baylor School Rd, Chattanooga, TN, 37405. It has a strong focus on sustainability and environmental education, one of the participants of our Initiative."
+      },
+      {
+        name:"Hiba Academy shanghai",
+        coords:[121.2, 31.4],
+        info:"Adress: 上海市浦东新区林耀路235号. A bilingual School in Shanghai, China, with a profound focus on sustainability, one of the participants of our Initiative"
+      },
+      {
+        name:"Shanghai Qingpu Pinghe Bilingual School",
+        coords:[121.4, 31.1],
+        info:"Adress: 上海市青浦区朱家角路6号. A bilingual School in Shanghai, China, with a profound focus on sustainability, one of the participants of our Initiative"
+      },
+      {
+        name:"The Bryn Mawr School",
+        coords:[-76.63, 39.37],
+        info:"Adress: 109 W Melrose Ave, Baltimore, MD 21210. It has a great focus on sustainability and environmental education, one of the participants of our Initiative"
+      },
+      {
+        name:"上海市世界外国语中学",
+        coords:[121.4, 31.2],
+        info:"Adress: 中国上海市虹漕南路602号. An international School in Shanghai, China, with a profound focus on sustainability, one of the first participants of our Initiative"
+      }
+
+    ];
+
+    const popup = d3.select("#popup");
+    function showPopup(x, y, htmlContent) {
+      popup.html(htmlContent)
+           .style("left", x + "px")
+           .style("top", y + "px")
+           .style("display", "block");
+    }
+    function hidePopup() {
+      popup.style("display", "none");
+    }
+
+    function markerClicked(event, d) {
+      event.stopPropagation();
+  
+  // Project this marker’s geographic coords to screen coords
+      const [baseX, baseY] = projection(d.coords);
+      const transform = d3.zoomTransform(svg.node());
+      const screenX = transform.applyX(baseX);
+      const screenY = transform.applyY(baseY);
+
+  // Check for markers within ~30 pixels
+      const cluster = [];
+      mapGroup.selectAll("circle.marker").each(function(d2) {
+      const [bx, by] = projection(d2.coords);
+      const sx = transform.applyX(bx);
+      const sy = transform.applyY(by);
+      const dx = sx - screenX;
+      const dy = sy - screenY;
+      if (Math.sqrt(dx*dx + dy*dy) < 30) {
+        cluster.push(d2);
+    }
+  });
+
+  // If more than one marker is found in that 30-pixel radius, show a group popup
+  if (cluster.length > 1) {
+    let html = "<h3>Schools in this area:</h3><ul>";
+    cluster.forEach(school => {
+      html += `<li><strong>${school.name}</strong><br>${school.info}</li>`;
+    });
+    html += "</ul>";
+    showPopup(screenX + 10, screenY + 10, html);
+  } else {
+    // Otherwise, show info for this single marker
+    const html = `<h3>${d.name}</h3><p>${d.info}</p>`;
+    showPopup(screenX + 10, screenY + 10, html);
+  }
+}
+    
+
+
+    svg.on("click", event => {
+      if(event.target.tagName !== "circle") hidePopup();
+    });
+
+    const zoomBehavior = d3.zoom()
+    .scaleExtent([1, 50])
+    .translateExtent([[-width, -height], [2*width, 2*height]])
+    .on("zoom", (event) => {
+    let t = event.transform;
+    if (t.k === 1) {
+      t.x = 0;
+      t.y = 0;
+    }
+    mapGroup.attr("transform", t);
+    // Update each marker's radius so it stays constant (base size 5)
+    mapGroup.selectAll("circle.marker").attr("r", 5 / t.k);
+    hidePopup();
+  });
+    svg.call(zoomBehavior);
+
+    Promise.all([
+      d3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson"),
+      d3.json("https://raw.githubusercontent.com/PublicaMundi/MappingAPI/master/data/geojson/us-states.json")
+    ]).then(([world, states]) => {
+      worldData = world.features.filter(d => d.properties.name !== "Antarctica");
+      usStates = states.features;
+
+      const worldFC = { type: "FeatureCollection", features: worldData };
+      projection.fitSize([width, height], worldFC);
+
+      mapGroup.selectAll("path.country")
+        .data(worldData)
+        .enter()
+        .append("path")
+        .attr("class", "country")
+        .attr("d", path);
+
+      mapGroup.append("g")
+        .selectAll("path.state-boundary")
+        .data(usStates)
+        .enter()
+        .append("path")
+        .attr("class", "state-boundary")
+        .attr("d", path);
+
+      mapGroup.selectAll("circle.marker")
+        .data(schools)
+        .enter()
+        .append("circle")
+        .attr("class", "marker")
+        .attr("cx", d => projection(d.coords)[0])
+        .attr("cy", d => projection(d.coords)[1])
+        .attr("r", 5)
+        .on("click", markerClicked);
+
+      svg.call(zoomBehavior.transform, d3.zoomIdentity);
+    });
+
+    window.addEventListener("resize", () => {
+      width = container.clientWidth;
+      height = container.clientHeight;
+      svg.attr("width", width).attr("height", height);
+      svg.select("clipPath rect")
+         .attr("width", width)
+         .attr("height", height);
+
+      if(worldData) {
+        const worldFC = { type: "FeatureCollection", features: worldData };
+        projection.fitSize([width, height], worldFC);
+
+        mapGroup.selectAll("path.country").attr("d", path);
+        mapGroup.selectAll("path.state-boundary").attr("d", path);
+        mapGroup.selectAll("circle.marker")
+          .attr("cx", d => projection(d.coords)[0])
+          .attr("cy", d => projection(d.coords)[1]);
+
+        svg.call(zoomBehavior.transform, d3.zoomIdentity);
+      }
+    });
+  </script>
+</body>
+</html>
