@@ -4,22 +4,18 @@
   <meta charset="utf-8">
   <title>CarbonTrack Map with “Join Us” Below</title>
   <style>
-    
     html, body {
       margin: 0;
       padding: 0;
       background: #fff;
       font-family: sans-serif;
     }
-
-    
     #header {
       width: 100%;
       padding: 40px 20px 20px;
       box-sizing: border-box;
       text-align: center;
       font-family:'Times New Roman', Times, serif;
-    }
     #header h1 {
       margin: 0;
       font-size: 48px;
@@ -41,40 +37,33 @@
       font-size: 24px;
       font-weight: normal;
     }
-
-    
+    }
     #map-container {
       width: 100%;
       height: 70vh;
       position: relative;
       margin-top: 20px; 
     }
-    
     svg {
       width: 100%;
       height: 100%;
       display: block;
     }
-    
     .country {
       fill: #444;
       stroke: #fff;
       stroke-width: 0.5;
     }
-    
     .state-boundary {
       fill: none;
       stroke: #888;
       stroke-width: 0.5;
     }
-    
     .marker {
-     fill: blue;
+     fill: greenyellow;
      stroke: none;
      cursor: pointer;
-}
-
-    
+   }
     #popup {
       position: absolute;
       background: rgba(255, 255, 255, 0.97);
@@ -100,8 +89,6 @@
       margin: 0;
       font-size: 14px;
     }
-
-    
     #footer {
       width: 100%;
       padding: 40px 20px;
@@ -193,6 +180,11 @@
         info: "Adress: 170 Kingswood Rd, West Hartford, CT 06119. Its material club is one of our major collaborators."
       },
       {
+        name: "Nanjing Foreign Language School",
+        coords: [118.78, 32.05],
+        info: "Adress: 30 Beijing E Rd, Xuanwu, Nanjing, Jiangsu. One of the founding places of the Carbon Footprint Initiative."
+      },
+      {
         name:"Shanghai Starriver Bilingual School",
         coords: [121.2, 31.2],
         info: "Adress: 上海市闵行区金都路2588号. A bilingual School in Shanghai, China, with a profound focus on sustainability, one of the participants of our Initiative."
@@ -221,11 +213,16 @@
         name:"上海市世界外国语中学",
         coords:[121.4, 31.2],
         info:"Adress: 中国上海市虹漕南路602号. An international School in Shanghai, China, with a profound focus on sustainability, one of the first participants of our Initiative"
+      },
+      {
+        name:"广东碧桂园学校",
+        coords:[113.16, 22.56],
+        info:"Adress: Shunde District, Foshan, China, 511419. An international School in Guangdong, China, with a profound focus on sustainability, one of the participants of our Initiative"
       }
 
     ];
 
-    const popup = d3.select("#popup");
+  const popup = d3.select("#popup");
     function showPopup(x, y, htmlContent) {
       popup.html(htmlContent)
            .style("left", x + "px")
@@ -236,26 +233,27 @@
       popup.style("display", "none");
     }
 
-    function markerClicked(event, d) {
-      event.stopPropagation();
+    function markerHovered(event, d) {
+  event.stopPropagation();
   
+
+  const [baseX, baseY] = projection(d.coords);
+  const transform = d3.zoomTransform(svg.node());
+  const screenX = transform.applyX(baseX);
+  const screenY = transform.applyY(baseY);
   
-      const [baseX, baseY] = projection(d.coords);
-      const transform = d3.zoomTransform(svg.node());
-      const screenX = transform.applyX(baseX);
-      const screenY = transform.applyY(baseY);
-      const cluster = [];
-      mapGroup.selectAll("circle.marker").each(function(d2) {
-      const [bx, by] = projection(d2.coords);
-      const sx = transform.applyX(bx);
-      const sy = transform.applyY(by);
-      const dx = sx - screenX;
-      const dy = sy - screenY;
-      if (Math.sqrt(dx*dx + dy*dy) < 30) {
-        cluster.push(d2);
+
+  const cluster = [];
+  mapGroup.selectAll("circle.marker").each(function(d2) {
+    const [bx, by] = projection(d2.coords);
+    const sx = transform.applyX(bx);
+    const sy = transform.applyY(by);
+    const dx = sx - screenX;
+    const dy = sy - screenY;
+    if (Math.sqrt(dx*dx + dy*dy) < 30) {
+      cluster.push(d2);
     }
   });
-
   
   if (cluster.length > 1) {
     let html = "<h3>Schools in this area:</h3><ul>";
@@ -269,7 +267,7 @@
     showPopup(screenX + 10, screenY + 10, html);
   }
 }
-    
+
 
 
     svg.on("click", event => {
@@ -316,15 +314,16 @@
         .attr("class", "state-boundary")
         .attr("d", path);
 
-      mapGroup.selectAll("circle.marker")
-        .data(schools)
-        .enter()
-        .append("circle")
-        .attr("class", "marker")
-        .attr("cx", d => projection(d.coords)[0])
-        .attr("cy", d => projection(d.coords)[1])
-        .attr("r", 5)
-        .on("click", markerClicked);
+        mapGroup.selectAll("circle.marker")
+         .data(schools)
+         .enter()
+         .append("circle")
+         .attr("class", "marker")
+         .attr("cx", d => projection(d.coords)[0])
+         .attr("cy", d => projection(d.coords)[1])
+         .attr("r", 5)
+         .on("mouseover", markerHovered)
+         .on("mouseout", hidePopup);
 
       svg.call(zoomBehavior.transform, d3.zoomIdentity);
     });
