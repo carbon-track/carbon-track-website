@@ -496,7 +496,7 @@ function loadNavbar() {
     <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #002A5C;">
         <div class="container">
             <a class="navbar-brand" href="index.html">
-                <img src="img/team.jpg" width="40" height="40" class="d-inline-block align-top rounded-circle" alt="Logo">
+                <img src="img/team.jpg" width="36" height="36" class="d-inline-block align-top rounded-circle" alt="Logo">
                 <span class="navbar-title-chinese">校园碳账户</span> | CarbonTrack
             </a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -521,7 +521,7 @@ function loadNavbar() {
                     </li>
                 </ul>
                 <div class="navbar-nav align-items-center">
-                    <div class="nav-item dropdown mr-2">
+                    <div class="nav-item dropdown mr-2 message-icon-container">
                         <a class="nav-link dropdown-toggle" href="#" id="messagesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <i class="fas fa-envelope"></i>
                             <span class="badge badge-danger badge-counter" id="unreadMessagesCount" style="display: none;">0</span>
@@ -531,7 +531,7 @@ function loadNavbar() {
                         </div>
                     </div>
                     <span class="navbar-text mx-2 text-light" id="userStatus">Please login or register:</span>
-                    <div class="nav-item">
+                    <div class="nav-item auth-buttons">
                         <button class="btn btn-outline-light btn-sm mx-1" data-toggle="modal" data-target="#loginModal">Sign In</button>
                         <button class="btn btn-outline-light btn-sm mx-1" data-toggle="modal" data-target="#registerModal">Register</button>
                         <button class="btn btn-outline-danger btn-sm mx-1" id="logoutButton" style="display:none;">Logout</button>
@@ -628,35 +628,129 @@ function setupNavbarEventListeners() {
     // Check for unread messages when navbar is loaded
     checkUnreadMessages();
     
+    // Clear any previous body padding (to fix desktop whitespace)
+    $('body').css('padding-top', '0');
+    
     // iOS-style navbar handling for mobile
-    if (window.innerWidth <= 768) {
-        // Initial setup for top padding
-        const navbarHeight = $('.navbar').outerHeight();
-        $('body').css('padding-top', navbarHeight + 'px');
-        
-        // Add the iOS-style transparent background
-        $('.navbar').css({
-            'background-color': 'rgba(0, 42, 92, 0.92)',
-            'backdrop-filter': 'blur(10px)',
-            '-webkit-backdrop-filter': 'blur(10px)',
-            'box-shadow': '0 2px 10px rgba(0, 0, 0, 0.1)',
-            'padding': '6px 12px'
-        });
-        
-        // Reduce logo and text size
-        $('.navbar-brand img').css({
-            'width': '32px',
-            'height': '32px'
-        });
-        
-        $('.navbar-brand').css('font-size', '1.25rem');
-        
-        // Hide navbar text on very small screens
-        if (window.innerWidth <= 576) {
-            $('.navbar .navbar-text').hide();
-            $('.navbar-title-chinese').css('font-size', '1.1rem');
+    function applyMobileStyles() {
+        if (window.innerWidth <= 768) {
+            // Add the iOS-style transparent background for mobile
+            $('.navbar').css({
+                'background-color': 'rgba(0, 42, 92, 0.95)',
+                'backdrop-filter': 'blur(10px)',
+                '-webkit-backdrop-filter': 'blur(10px)',
+                'box-shadow': '0 2px 10px rgba(0, 0, 0, 0.1)',
+                'padding': '8px 12px'
+            });
+            
+            // Adjust logo and text size
+            $('.navbar-brand img').css({
+                'width': '34px',
+                'height': '34px',
+                'margin-right': '8px'
+            });
+            
+            $('.navbar-brand').css({
+                'font-size': '1.3rem',
+                'font-weight': '500'
+            });
+            
+            // Make message icon proportional
+            $('.message-icon-container i').css({
+                'font-size': '1.3rem'
+            });
+            
+            // Adjust nav links for mobile
+            $('.navbar .nav-link').css({
+                'font-size': '1.1rem',
+                'padding': '0.5rem 0.8rem'
+            });
+            
+            // Fix button layout
+            $('.auth-buttons').css({
+                'display': 'flex',
+                'flex-wrap': 'wrap',
+                'justify-content': 'flex-end'
+            });
+            
+            $('.auth-buttons .btn').css({
+                'margin': '0.25rem',
+                'font-size': '0.95rem',
+                'padding': '0.375rem 0.75rem'
+            });
+            
+            // Add top padding to body based on navbar height for mobile only
+            const navbarHeight = $('.navbar').outerHeight();
+            $('body').css('padding-top', navbarHeight + 'px');
+            
+            // Very small screens
+            if (window.innerWidth <= 576) {
+                $('.navbar .navbar-text').hide();
+                $('.navbar-title-chinese').css({
+                    'font-size': '1.15rem',
+                    'font-weight': '500'
+                });
+                
+                $('.navbar-brand').css({
+                    'font-size': '1.15rem'
+                });
+            } else {
+                $('.navbar .navbar-text').show();
+            }
+        } else {
+            // Reset styles for desktop
+            $('body').css('padding-top', '0');
+            $('.navbar').removeClass('navbar-scroll navbar-scroll-hidden');
+            $('.navbar').css({
+                'background-color': '#002A5C',
+                'backdrop-filter': 'none',
+                '-webkit-backdrop-filter': 'none',
+                'box-shadow': 'none',
+                'padding': ''
+            });
+            
+            $('.navbar-brand img').css({
+                'width': '36px',
+                'height': '36px',
+                'margin-right': '10px'
+            });
+            
+            $('.navbar-brand').css({
+                'font-size': '1.25rem',
+                'font-weight': '400'
+            });
+            
+            $('.message-icon-container i').css({
+                'font-size': '1rem'
+            });
+            
+            $('.navbar .nav-link').css({
+                'font-size': '',
+                'padding': ''
+            });
+            
+            $('.auth-buttons').css({
+                'display': '',
+                'flex-wrap': '',
+                'justify-content': ''
+            });
+            
+            $('.auth-buttons .btn').css({
+                'margin': '',
+                'font-size': '',
+                'padding': ''
+            });
+            
+            $('.navbar .navbar-text').show();
+            $('.navbar-title-chinese').css({
+                'font-size': '',
+                'font-weight': ''
+            });
         }
     }
+    
+    // Apply styles immediately
+    applyMobileStyles();
     
     // Add scroll behavior
     let lastScrollTop = 0;
@@ -684,51 +778,7 @@ function setupNavbarEventListeners() {
     
     // Handle window resize
     $(window).resize(function() {
-        if (window.innerWidth <= 768) {
-            const navbarHeight = $('.navbar').outerHeight();
-            $('body').css('padding-top', navbarHeight + 'px');
-            
-            // Apply mobile styles
-            $('.navbar').css({
-                'background-color': 'rgba(0, 42, 92, 0.92)',
-                'backdrop-filter': 'blur(10px)',
-                '-webkit-backdrop-filter': 'blur(10px)',
-                'box-shadow': '0 2px 10px rgba(0, 0, 0, 0.1)',
-                'padding': '6px 12px'
-            });
-            
-            $('.navbar-brand img').css({
-                'width': '32px',
-                'height': '32px'
-            });
-            
-            $('.navbar-brand').css('font-size', '1.25rem');
-            
-            if (window.innerWidth <= 576) {
-                $('.navbar .navbar-text').hide();
-                $('.navbar-title-chinese').css('font-size', '1.1rem');
-            }
-        } else {
-            // Reset styles for desktop
-            $('body').css('padding-top', '0');
-            $('.navbar').removeClass('navbar-scroll navbar-scroll-hidden');
-            $('.navbar').css({
-                'background-color': '#002A5C',
-                'backdrop-filter': 'none',
-                '-webkit-backdrop-filter': 'none',
-                'box-shadow': 'none',
-                'padding': ''
-            });
-            
-            $('.navbar-brand img').css({
-                'width': '40px',
-                'height': '40px'
-            });
-            
-            $('.navbar-brand').css('font-size', '');
-            $('.navbar .navbar-text').show();
-            $('.navbar-title-chinese').css('font-size', '');
-        }
+        applyMobileStyles();
     });
 }
 

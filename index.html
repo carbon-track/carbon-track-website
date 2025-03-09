@@ -595,24 +595,50 @@
       transform: translateY(-100%);
     }
     
+    /* Fix mobile navbar layout */
+    .navbar .message-icon-container {
+      margin-right: 8px;
+    }
+    
+    .navbar .message-icon-container i {
+      vertical-align: middle;
+    }
+    
+    .navbar-nav .nav-link {
+      transition: color 0.2s;
+    }
+    
+    .navbar-brand {
+      display: flex;
+      align-items: center;
+    }
+    
+    .navbar-toggler {
+      border: none;
+      outline: none !important;
+    }
+    
+    /* Auth buttons container */
+    .auth-buttons .btn {
+      transition: background-color 0.2s, transform 0.1s;
+    }
+    
+    .auth-buttons .btn:active {
+      transform: scale(0.96);
+    }
+    
     @media (max-width: 768px) {
       .navbar {
-        padding: 6px 12px !important; /* Reduce vertical padding */
-        background-color: rgba(0, 42, 92, 0.92) !important; /* More transparent */
+        padding: 8px 12px !important; /* Increase vertical padding slightly */
+        background-color: rgba(0, 42, 92, 0.95) !important; /* More transparent */
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
       }
       
-      .navbar-brand {
-        font-size: 1.25rem; /* Smaller font size for brand */
-        padding: 0;
-      }
-      
-      .navbar-brand img {
-        width: 32px; /* Smaller logo */
-        height: 32px;
-        margin-right: 8px;
+      /* Improved tap targets for mobile */
+      .navbar .nav-link {
+        padding: 10px 16px;
       }
       
       .navbar-toggler {
@@ -1101,11 +1127,8 @@
       lastScrollTop = st;
     });
     
-    // Add top padding to body based on navbar height (to prevent content from going under navbar)
-    setTimeout(function() {
-      const navbarHeight = $('.navbar').outerHeight();
-      $('body').css('padding-top', navbarHeight + 'px');
-    }, 100);
+    // Body padding is now handled in the setupNavbarEventListeners function
+    // to ensure it's only applied on mobile
   });
 </script>
 </body>
