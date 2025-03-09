@@ -2,9 +2,6 @@ $(document).ready(function() {
     // Load navbar
     loadNavbar();
     
-    // 初始化消息模态框
-    initMessageModal();
-    
     var translateElement = $('<div>', { id: 'google_translate_element' });
     $('.nav-item #userStatus').parent().before(translateElement);
 
@@ -90,13 +87,13 @@ $('#messagesModal').on('show.bs.modal', function(e) {
             // 确认消息数据存在
             if (data.messages && data.messages.length > 0) {
                 console.log('成功接收消息，数量:', data.messages.length);
-                buildConversationsList(data);
-            } else {
+            buildConversationsList(data);
+        } else {
                 console.warn('没有接收到消息数据或消息数组为空');
                 // 显示无消息提示
                 $('#conversationList').empty().append('<div class="alert alert-info">暂无消息</div>');
                 $('#messageList').empty().append('<div class="alert alert-info text-center">暂无消息</div>');
-            }
+        }
         } else {
             console.error('获取消息失败:', data);
             $('#conversationList').empty().append('<div class="alert alert-danger">获取消息失败</div>');
@@ -491,7 +488,7 @@ function buildConversationsList(data) {
     }
     
     // 为每个发送者创建一个对话项
-    Object.values(conversations).forEach(function(conversation) {
+Object.values(conversations).forEach(function(conversation) {
         var senderId = conversation.sender_id;
         
         // 创建对话项
@@ -627,7 +624,7 @@ function displayMessages(messages, sender) {
         if (timestamp) {
             let date = new Date(timestamp);
             time.textContent = date.toLocaleString();
-        } else {
+} else {
             time.textContent = '未知时间';
         }
         
@@ -724,7 +721,7 @@ function sendMessage() {
                         buildConversationsList(data);
                     }
                 });
-            } else {
+        } else {
                 // 显示发送失败
                 tempMessage.innerHTML = `
                     <div class="message-bubble error" style="background-color:#ffdddd;margin-left:auto;">
@@ -829,8 +826,31 @@ function loadNavbar() {
     // 插入导航栏到页面中
     $('#navbar-container').html(navbarContent);
     
-    // 添加导航栏事件监听器
+    // 初始化所有模态框
+    initAllModals();
+    
+    // 设置事件监听器
     setupNavbarEventListeners();
+    
+    // Check for unread messages when navbar is loaded (only if logged in)
+    if (localStorage.getItem('loggedIn')) {
+        checkUnreadMessages();
+    }
+    
+    // Clear any previous body padding (to fix desktop whitespace)
+    $('body').css('padding-top', '0');
+    
+    // Apply iOS-style styling to messages icon
+    $('.message-icon-container .nav-link').css({
+        'padding': '8px 12px',
+        'border-radius': '50%',
+        'transition': 'all 0.2s ease'
+    });
+    
+    $('.message-icon-container .fa-envelope').css({
+        'font-size': '1.1rem',
+        'color': 'rgba(255, 255, 255, .5)'
+    });
 }
 
 function setupNavbarEventListeners() {
@@ -856,13 +876,13 @@ function setupNavbarEventListeners() {
         $submitButton.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Signing in...');
         
         // Call login logic (using AJAX to authenticate)
-        $.ajax({
-            type: 'POST',
+    $.ajax({
+        type: 'POST',
             url: 'login.php',
             data: { username: username, password: password },
             dataType: 'json',
-            success: function(response) {
-                if (response.success) {
+        success: function(response) {
+            if (response.success) {
                     // 登录成功
                     var now = new Date();
                     var expiration = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000); // 设置7天后的时间
@@ -893,12 +913,12 @@ function setupNavbarEventListeners() {
                     });
 
                     updateLoginStatus(); // 更新页面显示登录状态
-                } else {
+            } else {
                     // Show error message
                     alert('Login failed: ' + response.message);
-                }
-            },
-            error: function() {
+            }
+        },
+        error: function() {
                 alert('Login request failed. Please try again later.');
             },
             complete: function() {
@@ -1192,6 +1212,20 @@ function setupNavbarEventListeners() {
     });
 }
 
+// 初始化所有模态框
+function initAllModals() {
+    console.log('初始化所有模态框');
+    
+    // 初始化站内信模态框
+    initMessageModal();
+    
+    // 初始化登录模态框
+    initLoginModal();
+    
+    // 初始化注册模态框
+    initRegisterModal();
+}
+
 // 初始化消息模态框结构
 function initMessageModal() {
     console.log('初始化消息模态框');
@@ -1255,6 +1289,124 @@ function initMessageModal() {
     });
     
     console.log('消息模态框已创建并初始化完成');
+}
+
+// 初始化登录模态框
+function initLoginModal() {
+    console.log('初始化登录模态框');
+    
+    // 检查模态框是否已存在
+    if (document.getElementById('loginModal')) {
+        console.log('登录模态框已存在，无需重新创建');
+        return;
+    }
+    
+    // 创建模态框HTML
+    const modalHTML = `
+    <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="loginModalLabel">Sign In</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="username">Account / Username / Email</label>
+                            <input type="text" class="form-control" id="username" placeholder="Enter your username or email">
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" class="form-control" id="password" placeholder="Enter your password">
+                        </div>
+                        <button type="submit" class="btn btn-success btn-block">Sign In</button>
+                    </form>
+                </div>
+                <div class="modal-footer" style="flex-direction: column;">
+                    <div class="alert alert-warning" role="alert" id="refreshAlert" style="display: none; width: 100%; border-radius: 12px;">
+                        If you're having trouble, please reload the page or press <a href="#" onclick="location.reload();">here</a>.
+                    </div>
+                    <div style="display: flex; justify-content: space-between; width: 100%;">
+                        <a href="iforgot.html">Forgot password?</a>
+                        <a href="#" data-toggle="modal" data-target="#registerModal">Create Account</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>`;
+    
+    // 将模态框添加到body
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    console.log('登录模态框已创建并初始化完成');
+}
+
+// 初始化注册模态框
+function initRegisterModal() {
+    console.log('初始化注册模态框');
+    
+    // 检查模态框是否已存在
+    if (document.getElementById('registerModal')) {
+        console.log('注册模态框已存在，无需重新创建');
+        return;
+    }
+    
+    // 创建模态框HTML
+    const modalHTML = `
+    <div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="registerModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="registerModalLabel">Create Account</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="regusername">Username</label>
+                            <input type="text" class="form-control required-input" id="regusername" placeholder="Choose a username">
+                        </div>
+                        <div class="form-group">
+                            <label for="regpassword">Password</label>
+                            <input type="password" class="form-control required-input" id="regpassword" placeholder="Create a password">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" class="form-control required-input" id="email" name="email" placeholder="Enter your email address" required>
+                            
+                            <div style="margin-top: 16px;">
+                                <button type="button" class="btn btn-outline-primary" id="sendVerificationCode">Send Verification Code</button>
+                            </div>
+
+                            <div style="margin-top: 16px;">
+                                <label for="verificationCode">Verification Code</label>
+                                <input type="text" class="form-control" id="verificationCode" placeholder="Enter the code sent to your email" required>
+                                <small id="emailHelp" class="form-text text-muted" style="display: none; margin-top: 8px;">The code has been sent to your email.</small>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success btn-block">Create Account</button>
+                        <div id="registerError" style="display:none;" class="alert alert-danger mt-3"></div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <div class="alert alert-warning" role="alert" id="refreshAlert" style="display: none; width: 100%; border-radius: 12px;">
+                        If you're having trouble, please reload the page or press <a href="#" onclick="location.reload();">here</a>.
+                    </div>
+                    <a href="#" data-toggle="modal" data-target="#loginModal">Already have an account? Sign in</a>
+                </div>
+            </div>
+        </div>
+    </div>`;
+    
+    // 将模态框添加到body
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    console.log('注册模态框已创建并初始化完成');
 }
 
 
