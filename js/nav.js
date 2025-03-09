@@ -138,8 +138,28 @@ $('nav .fas.fa-envelope').css('color', 'rgba(255, 255, 255, .5)');
     updateButtonForRemainingTime();
 
     // 点击站内信图标时打开模态框并加载消息
-    $('#messagesIcon').on('click', function() {
-        $('#messagesModal').modal('show'); // 显示模态框
+    $('#messagesIcon, [data-target="#messagesModal"]').on('click', function(e) {
+        e.preventDefault();
+        
+        // 首先确保模态框存在
+        if (!document.getElementById('messagesModal')) {
+            // 如果不存在，触发displayMessages函数创建模态框 
+            // 传入空消息数组和虚拟发送者ID
+            displayMessages([], '0');
+        }
+        
+        // 加载消息
+        var modalBody = $('#messagesModal').find('.modal-body');
+        modalBody.find('#loading').remove(); // 移除之前的loading
+        modalBody.prepend('<div id="loading"><div class="loader"></div></div>');
+        
+        fetchMessages().then(function(data) {
+            modalBody.find('#loading').remove();
+            // 显示模态框
+            $('#messagesModal').modal('show');
+            
+            // 下面的代码逻辑不变...
+        });
     });
 // 绑定发送按钮的点击事件
 $('#sendMessage').on('click', function() {
@@ -354,46 +374,26 @@ function updateButtonForRemainingTime() {
 }
 // 获取消息
 function fetchMessages() {
-    // 检查消息模态框和相关元素是否存在
-    if (!document.getElementById('messagesModal') || !document.getElementById('conversationList') || !document.getElementById('messageList')) {
-        console.warn('Messages modal or related elements not found');
-        return;
-    }
-    
-    // 检查用户是否登录
-    const token = localStorage.getItem('token');
-    if (!token) {
-        console.warn('User not logged in, cannot fetch messages');
-        return;
-    }
-    
-    // 显示加载中状态
-    $('#conversationList').html('<div class="text-center p-3"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Loading conversations...</p></div>');
-    
-    // 发送请求获取消息数据
-    fetch('get_messages.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ token: token })
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log(data);
-        if (data.success) {
-            buildConversationsList(data);
-        } else {
-            console.error('获取消息失败');
-        }
-        checkUnreadMessages();
-        setInterval(checkUnreadMessages(), 30);
-    })
-    .catch(error => {
-        console.error('获取消息时发生错误', error);
-        $('#conversationList').html('<div class="text-center p-3">无法加载消息。请检查网络连接。</div>');
+    return new Promise((resolve, reject) => {
+        var receiverId = localStorage.getItem('id');
+        var token = localStorage.getItem('token');
+        $.ajax({
+            type: 'POST',
+            url: 'getmsg.php',
+            data: JSON.stringify({ receiver_id: receiverId, token: token}),
+            contentType: 'application/json',
+            success: function(data) {
+                console.log(data);
+                resolve(data);
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.error('无法加载消息');
+                reject(new Error('加载消息时发生错误'));
+            }
+        });
     });
 }
+
 
 function buildConversationsList(data) {
     var conversations = {};
@@ -434,24 +434,91 @@ Object.values(conversations).forEach(function(conversation) {
 
 function displayMessages(messages, sender) {
     localStorage.setItem('currentChatPartnerId', sender); // 将当前聊天伙伴的sender_id保存在localStorage中
-    const messagesContainer = document.getElementById('messageList');
     
-    // 如果消息容器不存在，则记录警告并返回
+    // 检查messageList元素是否存在
+    let messagesContainer = document.getElementById('messageList');
+    
+    // 如果messageList元素不存在，则检查messagesModal是否存在
     if (!messagesContainer) {
-        console.warn('Message list container not found in the document');
+        // 如果连模态框都不存在，则创建完整的模态框结构
+        if (!document.getElementById('messagesModal')) {
+            const modalHTML = `
+            <div class="modal fade" id="messagesModal" tabindex="-1" role="dialog" aria-labelledby="messagesModalLabel" aria-hidden="true">
+              <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="messagesModalLabel">Message</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                    <div class="row">
+                      <div class="col-4" id="conversationList">
+                        <!-- 对话列表将在这里动态加载 -->
+                      </div>
+                      <div class="col-8">
+                        <div id="messageList" style="height: 400px; overflow-y: auto;">
+                          <!-- 消息列表将在这里动态加载 -->
+                        </div>
+                        <div class="input-group mt-3">
+                          <input type="text" class="form-control" id="messageInput" placeholder="Enter Message...">
+                          <div class="input-group-append">
+                            <button class="btn btn-primary" type="button" id="sendMessage">Send</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  </div>
+                </div>
+              </div>
+            </div>`;
+            
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            
+            // 初始化新创建的模态框
+            $('#messagesModal').modal({
+                show: false
+            });
+            
+            // 绑定发送消息按钮事件
+            $('#sendMessage').on('click', function() {
+                sendMessage();
+            });
+            
+            // 绑定回车键发送消息
+            $('#messageInput').on('keypress', function(e) {
+                if (e.which === 13) {
+                    sendMessage();
+                    return false;
+                }
+            });
+        } else {
+            // 如果模态框存在但messageList不存在，创建messageList
+            const modalBody = document.querySelector('#messagesModal .modal-body .row .col-8');
+            if (modalBody) {
+                const messageListDiv = document.createElement('div');
+                messageListDiv.id = 'messageList';
+                messageListDiv.style.height = '400px';
+                messageListDiv.style.overflowY = 'auto';
+                modalBody.prepend(messageListDiv);
+            }
+        }
+        
+        // 重新获取messageList元素
+        messagesContainer = document.getElementById('messageList');
+    }
+    
+    // 如果仍然无法获取messageList，则记录错误并返回
+    if (!messagesContainer) {
+        console.error('Error: Could not find or create #messageList element');
         return;
     }
     
     messagesContainer.innerHTML = ''; // 清空现有消息
-
-    // 如果没有消息，显示提示
-    if (!messages || messages.length === 0) {
-        const emptyMessage = document.createElement('div');
-        emptyMessage.className = 'text-center p-3';
-        emptyMessage.textContent = 'No messages yet. Start a conversation!';
-        messagesContainer.appendChild(emptyMessage);
-        return;
-    }
 
     messages.forEach((message, index) => {
         const messageBubble = document.createElement('div');
@@ -489,99 +556,118 @@ if (message.sender_id === currentUserId) {
     });
 }
 function sendMessage() {
-    var receiverId = localStorage.getItem('currentChatPartnerId');  // 假设你有一个接收者ID的输入字段
-    var messageContent = $('#messageInput').val(); // 获取消息输入框的内容
-    var senderId = localStorage.getItem('id'); // 假设在登录时，你已经将用户ID保存在了localStorage中
-    var token = localStorage.getItem('token'); // 获取保存的token
-
-    if (messageContent.trim() === '') {
-        alert('消息内容不能为空！');
+    // 获取消息输入
+    var messageInput = document.getElementById('messageInput');
+    var message = messageInput.value.trim();
+    
+    if (!message) {
+        return; // 如果消息为空，不做任何操作
+    }
+    
+    var receiverId = localStorage.getItem('currentChatPartnerId');
+    var token = localStorage.getItem('token');
+    
+    if (!receiverId || !token) {
+        console.error('Missing receiverId or token');
         return;
     }
-
+    
+    // 发送消息到服务器
     $.ajax({
+        url: 'send_message.php',
         type: 'POST',
-        url: 'sendmsg.php', // 你的后端处理脚本路径
-        contentType: 'application/json',
-        data: JSON.stringify({
-            sender_id: senderId,
-            receiver_id: receiverId,
-            content: messageContent,
-            token: token
-        }),
-        success: function(response) {
-            if (response.success) {
-                alert('消息发送成功！');
-                $('#messageInput').val(''); // 清空输入框
-                // 可选：更新消息列表
-            } else {
-                alert('消息发送失败: ' + response.message);
-            }
+        data: {
+            token: token,
+            receiverId: receiverId,
+            message: message
         },
-        error: function() {
-            alert('消息发送请求失败，请稍后再试。');
+        success: function(response) {
+            // 清空输入框
+            messageInput.value = '';
+            
+            // 重新加载消息列表
+            fetchMessages().then(function(data) {
+                // 如果消息获取成功，显示当前对话
+                if (data.success) {
+                    var userId = localStorage.getItem('id');
+                    var conversationMessages = data.messages.filter(function(msg) {
+                        return (msg.sender_id === userId && msg.receiver_id === receiverId) || 
+                               (msg.sender_id === receiverId && msg.receiver_id === userId);
+                    });
+                    displayMessages(conversationMessages, receiverId);
+                    
+                    // 滚动到最新消息
+                    var messageList = document.getElementById('messageList');
+                    if (messageList) {
+                        messageList.scrollTop = messageList.scrollHeight;
+                    }
+                }
+            });
+        },
+        error: function(xhr, status, error) {
+            console.error('Error sending message:', error);
+            alert('Failed to send message. Please try again.');
         }
     });
 }
 
 // Function to load navbar from navbar.html
 function loadNavbar() {
-    fetch('navbar.html')
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('navbar-container').innerHTML = data;
-            setupNavbarHandlers();
+    // 创建导航栏内容
+    const navbarContent = `
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #002A5C;">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <img src="img/team.jpg" width="36" height="36" class="d-inline-block align-top rounded-circle" alt="Logo">
+                <span class="navbar-title-chinese">校园碳账户</span> | CarbonTrack
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="about.html">About</a>
+                    </li>
+                    <li class="nav-item logoutControl" style="display:none;">
+                        <a class="nav-link" href="center.html">User Center</a>
+                    </li>
+                    <li class="nav-item logoutControl" style="display:none;">
+                        <a class="nav-link" href="CStore.html">Store</a>
+                    </li>
+                    <li class="nav-item logoutControl" style="display:none;">
+                        <a class="nav-link" href="calculate.html">Carbon Count</a>
+                    </li>
+                </ul>
+                <div class="navbar-nav align-items-center">
+                    <!-- Message icon only visible when logged in (add logoutControl class) -->
+                    <div class="nav-item mr-2 message-icon-container logoutControl" style="display:none;">
+                        <a class="nav-link" href="#" data-toggle="modal" data-target="#messagesModal" id="messagesIcon">
+                            <i class="fas fa-envelope"></i>
+                            <span class="badge badge-danger badge-counter" id="unreadMessagesCount" style="display: none;">0</span>
+                        </a>
+                    </div>
+                    <span class="navbar-text mx-2 text-light" id="userStatus">Please login or register:</span>
+                    <div class="nav-item auth-buttons">
+                        <!-- Use iOS-style button classes -->
+                        <button class="btn btn-ios-primary btn-sm mx-1" data-toggle="modal" data-target="#loginModal">Sign In</button>
+                        <button class="btn btn-ios-secondary btn-sm mx-1" data-toggle="modal" data-target="#registerModal">Register</button>
+                        <button class="btn btn-outline-danger btn-sm mx-1" id="logoutButton" style="display:none;">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    `;
 
-            // 检查是否已有站内信模态框
-            if (!document.getElementById('messagesModal')) {
-                // 从navbar.html中提取站内信模态框并添加到body
-                const parser = new DOMParser();
-                const navbarDoc = parser.parseFromString(data, 'text/html');
-                const messagesModal = navbarDoc.getElementById('messagesModal');
-                
-                if (messagesModal) {
-                    document.body.appendChild(messagesModal);
-                }
-            }
-            
-            setLoginStatus();
-        });
-}
-
-// 设置导航栏处理函数
-function setupNavbarHandlers() {
-    // 调用先前的导航栏事件监听器设置函数
+    // 插入导航栏到页面中
+    $('#navbar-container').html(navbarContent);
+    
+    // 添加导航栏事件监听器
     setupNavbarEventListeners();
-    
-    // 设置消息对话框的事件处理
-    setupMessagesModal();
-}
-
-// 设置消息模态框的处理函数
-function setupMessagesModal() {
-    // 检查消息模态框是否存在
-    if (!document.getElementById('messagesModal')) {
-        console.warn('Messages modal not found in the document');
-        return;
-    }
-    
-    // 设置发送消息按钮事件
-    $('#sendMessage').off('click').on('click', function() {
-        sendMessage();
-    });
-    
-    // 设置消息输入框的回车键事件
-    $('#messageInput').off('keypress').on('keypress', function(e) {
-        if (e.which === 13) { // Enter key
-            sendMessage();
-            return false; // 防止表单提交
-        }
-    });
-    
-    // 当消息对话框显示时，刷新消息列表
-    $('#messagesModal').off('shown.bs.modal').on('shown.bs.modal', function() {
-        fetchMessages();
-    });
 }
 
 function setupNavbarEventListeners() {
@@ -730,6 +816,12 @@ function setupNavbarEventListeners() {
                 }
             }).catch(function(error) {
                 console.error('Error fetching messages:', error);
+                // 记录详细错误信息并通知用户
+                if (document.getElementById('conversationList')) {
+                    document.getElementById('conversationList').innerHTML = '<div class="text-center p-3"><p class="text-danger">Failed to load messages. Please try again later.</p></div>';
+                }
+                // 如果发生错误，返回空数组作为默认值
+                return { success: false, messages: [] };
             });
         }
     });
