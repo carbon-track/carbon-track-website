@@ -491,32 +491,68 @@ function sendMessage() {
 
 // Function to load navbar from navbar.html
 function loadNavbar() {
-    $.ajax({
-        url: 'navbar.html',
-        type: 'GET',
-        success: function(data) {
-            // Insert the navbar content into the navbar container
-            $('#navbar-container').html(data);
-            
-            // After navbar is loaded, check login status
-            checkLoginStatus();
-            
-            // Set up event listeners for navbar elements
-            setupNavbarEventListeners();
-        },
-        error: function(xhr, status, error) {
-            console.error('Error loading navbar:', error);
-            // If loading fails, show a basic navbar with minimal functionality
-            $('#navbar-container').html('<nav class="navbar navbar-expand-sm navbar-dark"><div class="container"><a class="navbar-brand" href="index.html">CarbonTrack</a></div></nav>');
-        }
-    });
+    // 创建导航栏内容
+    const navbarContent = `
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #002A5C;">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <img src="img/team.jpg" width="40" height="40" class="d-inline-block align-top rounded-circle" alt="Logo">
+                <span class="navbar-title-chinese">校园碳账户</span> | CarbonTrack
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="about.html">About</a>
+                    </li>
+                    <li class="nav-item logoutControl" style="display:none;">
+                        <a class="nav-link" href="center.html">User Center</a>
+                    </li>
+                    <li class="nav-item logoutControl" style="display:none;">
+                        <a class="nav-link" href="CStore.html">Store</a>
+                    </li>
+                    <li class="nav-item logoutControl" style="display:none;">
+                        <a class="nav-link" href="calculate.html">Carbon Count</a>
+                    </li>
+                </ul>
+                <div class="navbar-nav align-items-center">
+                    <div class="nav-item dropdown mr-2">
+                        <a class="nav-link dropdown-toggle" href="#" id="messagesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-envelope"></i>
+                            <span class="badge badge-danger badge-counter" id="unreadMessagesCount" style="display: none;">0</span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="messagesDropdown">
+                            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#messagesModal">View Messages</a>
+                        </div>
+                    </div>
+                    <span class="navbar-text mx-2 text-light" id="userStatus">Please login or register:</span>
+                    <div class="nav-item">
+                        <button class="btn btn-outline-light btn-sm mx-1" data-toggle="modal" data-target="#loginModal">Sign In</button>
+                        <button class="btn btn-outline-light btn-sm mx-1" data-toggle="modal" data-target="#registerModal">Register</button>
+                        <button class="btn btn-outline-danger btn-sm mx-1" id="logoutButton" style="display:none;">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    `;
+
+    // 插入导航栏到页面中
+    $('#navbar-container').html(navbarContent);
+    
+    // 添加导航栏事件监听器
+    setupNavbarEventListeners();
 }
 
 function setupNavbarEventListeners() {
-    // Set up any event listeners for navbar elements
-    // These will be applied after the navbar is loaded
+    // Set up event listeners for navbar elements
     
-    // Login form submission - use the existing pattern from the codebase
+    // Login form submission
     $('#loginModal form').submit(function(e) {
         e.preventDefault();
         
@@ -591,6 +627,109 @@ function setupNavbarEventListeners() {
     
     // Check for unread messages when navbar is loaded
     checkUnreadMessages();
+    
+    // iOS-style navbar handling for mobile
+    if (window.innerWidth <= 768) {
+        // Initial setup for top padding
+        const navbarHeight = $('.navbar').outerHeight();
+        $('body').css('padding-top', navbarHeight + 'px');
+        
+        // Add the iOS-style transparent background
+        $('.navbar').css({
+            'background-color': 'rgba(0, 42, 92, 0.92)',
+            'backdrop-filter': 'blur(10px)',
+            '-webkit-backdrop-filter': 'blur(10px)',
+            'box-shadow': '0 2px 10px rgba(0, 0, 0, 0.1)',
+            'padding': '6px 12px'
+        });
+        
+        // Reduce logo and text size
+        $('.navbar-brand img').css({
+            'width': '32px',
+            'height': '32px'
+        });
+        
+        $('.navbar-brand').css('font-size', '1.25rem');
+        
+        // Hide navbar text on very small screens
+        if (window.innerWidth <= 576) {
+            $('.navbar .navbar-text').hide();
+            $('.navbar-title-chinese').css('font-size', '1.1rem');
+        }
+    }
+    
+    // Add scroll behavior
+    let lastScrollTop = 0;
+    $(window).scroll(function() {
+        let st = $(this).scrollTop();
+        
+        // Only apply scroll behavior on mobile
+        if (window.innerWidth <= 768) {
+            if (st > lastScrollTop && st > 70) {
+                // Scroll down - hide navbar
+                $('.navbar').addClass('navbar-scroll navbar-scroll-hidden');
+            } else {
+                // Scroll up - show navbar
+                $('.navbar').addClass('navbar-scroll').removeClass('navbar-scroll-hidden');
+            }
+            
+            // At the top, remove scroll styling
+            if (st === 0) {
+                $('.navbar').removeClass('navbar-scroll');
+            }
+        }
+        
+        lastScrollTop = st;
+    });
+    
+    // Handle window resize
+    $(window).resize(function() {
+        if (window.innerWidth <= 768) {
+            const navbarHeight = $('.navbar').outerHeight();
+            $('body').css('padding-top', navbarHeight + 'px');
+            
+            // Apply mobile styles
+            $('.navbar').css({
+                'background-color': 'rgba(0, 42, 92, 0.92)',
+                'backdrop-filter': 'blur(10px)',
+                '-webkit-backdrop-filter': 'blur(10px)',
+                'box-shadow': '0 2px 10px rgba(0, 0, 0, 0.1)',
+                'padding': '6px 12px'
+            });
+            
+            $('.navbar-brand img').css({
+                'width': '32px',
+                'height': '32px'
+            });
+            
+            $('.navbar-brand').css('font-size', '1.25rem');
+            
+            if (window.innerWidth <= 576) {
+                $('.navbar .navbar-text').hide();
+                $('.navbar-title-chinese').css('font-size', '1.1rem');
+            }
+        } else {
+            // Reset styles for desktop
+            $('body').css('padding-top', '0');
+            $('.navbar').removeClass('navbar-scroll navbar-scroll-hidden');
+            $('.navbar').css({
+                'background-color': '#002A5C',
+                'backdrop-filter': 'none',
+                '-webkit-backdrop-filter': 'none',
+                'box-shadow': 'none',
+                'padding': ''
+            });
+            
+            $('.navbar-brand img').css({
+                'width': '40px',
+                'height': '40px'
+            });
+            
+            $('.navbar-brand').css('font-size', '');
+            $('.navbar .navbar-text').show();
+            $('.navbar-title-chinese').css('font-size', '');
+        }
+    });
 }
 
 
