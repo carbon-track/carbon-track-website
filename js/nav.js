@@ -520,40 +520,171 @@ function displayMessages(messages, sender) {
     
     messagesContainer.innerHTML = ''; // 清空现有消息
 
-    messages.forEach((message, index) => {
-        const messageBubble = document.createElement('div');
-        messageBubble.classList.add('message-bubble');
-var currentUserId = localStorage.getItem('id');
-
-// 根据消息发送者和接收者，调整气泡样式
-if (message.sender_id === currentUserId) {
-    messageBubble.classList.add('sent');
-} else {
-    messageBubble.classList.add('received');
-}
-
-        messageBubble.innerHTML = `<p>${message.content}</p>`;
-
-        // 添加已读状态标记
-        const readStatus = document.createElement('span');
-        readStatus.classList.add('read-status');
-        if (message.is_read) {
-            readStatus.classList.add('read');
-            readStatus.textContent = '已读Read';
-        } else {
-            readStatus.classList.add('unread');
-            readStatus.textContent = '未读Unread';
+    // 添加消息样式
+    const styleElement = document.createElement('style');
+    styleElement.textContent = `
+        .message-bubble {
+            max-width: 85%;
+            padding: 10px 15px;
+            border-radius: 18px;
+            margin-bottom: 8px;
+            position: relative;
+            word-wrap: break-word;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
         }
+        .sent {
+            background: linear-gradient(135deg, #34D399, #3B82F6);
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 5px;
+        }
+        .received {
+            background: #F3F4F6;
+            color: #1F2937;
+            margin-right: auto;
+            border-bottom-left-radius: 5px;
+        }
+        .message-time {
+            display: block;
+            font-size: 0.7rem;
+            margin-top: 4px;
+            opacity: 0.8;
+            font-weight: 300;
+        }
+        .sent .message-time {
+            text-align: right;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        .received .message-time {
+            text-align: left;
+            color: #6B7280;
+        }
+        .message-container {
+            margin-bottom: 16px;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .message-date-divider {
+            text-align: center;
+            color: #6B7280;
+            font-size: 0.8rem;
+            margin: 12px 0;
+            position: relative;
+        }
+        .message-date-divider::before,
+        .message-date-divider::after {
+            content: "";
+            display: inline-block;
+            width: 30%;
+            height: 1px;
+            background: #E5E7EB;
+            vertical-align: middle;
+            margin: 0 10px;
+        }
+    `;
+    document.head.appendChild(styleElement);
 
-        messageBubble.appendChild(readStatus);
-        messagesContainer.appendChild(messageBubble);
+    // 获取当前用户ID
+    var currentUserId = localStorage.getItem('id');
+    
+    // 确保消息按时间顺序排序
+    if (messages && messages.length > 0) {
+        messages.sort((a, b) => {
+            return new Date(a.created_at) - new Date(b.created_at);
+        });
+        
+        // 用于跟踪日期，以便添加日期分隔符
+        let lastMessageDate = null;
+        
+        // 遍历消息并添加到容器
+        messages.forEach((message, index) => {
+            // 检查是否需要添加日期分隔符
+            if (message.created_at) {
+                const messageDate = new Date(message.created_at);
+                const formattedDate = messageDate.toLocaleDateString();
+                
+                if (!lastMessageDate || formattedDate !== lastMessageDate) {
+                    const dateDivider = document.createElement('div');
+                    dateDivider.classList.add('message-date-divider');
+                    dateDivider.textContent = formattedDate;
+                    messagesContainer.appendChild(dateDivider);
+                    
+                    lastMessageDate = formattedDate;
+                }
+            }
+            
+            const messageContainer = document.createElement('div');
+            messageContainer.classList.add('message-container');
 
-        // 触发动画
-        setTimeout(() => {
-            messageBubble.style.opacity = 1;
-            messageBubble.style.transform = 'translateY(0)';
-        }, 100 * index); // 为每个消息设置不同的延时，创建"逐个出现"的效果
+            const messageBubble = document.createElement('div');
+            messageBubble.classList.add('message-bubble');
+            
+            // 根据消息发送者和接收者，调整气泡样式
+            if (message.sender_id === currentUserId) {
+                messageBubble.classList.add('sent');
+            } else {
+                messageBubble.classList.add('received');
+            }
+
+            // 添加消息内容
+            const messageContent = document.createElement('div');
+            messageContent.innerText = message.content;
+            messageBubble.appendChild(messageContent);
+
+            // 添加时间显示
+            const messageTime = document.createElement('span');
+            messageTime.classList.add('message-time');
+            
+            // 格式化时间
+            let formattedTime = '时间未知';
+            if (message.created_at) {
+                const msgDate = new Date(message.created_at);
+                formattedTime = msgDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            }
+            
+            messageTime.innerText = formattedTime;
+            messageBubble.appendChild(messageTime);
+
+            messageContainer.appendChild(messageBubble);
+            messagesContainer.appendChild(messageContainer);
+        });
+
+        // 自动滚动到最新消息
+        scrollToBottom(messagesContainer);
+    } else {
+        // 如果没有消息，显示提示
+        const emptyMessageContainer = document.createElement('div');
+        emptyMessageContainer.className = 'text-center p-4';
+        
+        const emptyStateIcon = document.createElement('div');
+        emptyStateIcon.className = 'mb-3';
+        emptyStateIcon.innerHTML = '<i class="far fa-comment-dots fa-3x text-muted"></i>';
+        
+        const emptyText = document.createElement('p');
+        emptyText.className = 'text-muted';
+        emptyText.innerText = '暂无消息，发送第一条消息开始对话';
+        
+        emptyMessageContainer.appendChild(emptyStateIcon);
+        emptyMessageContainer.appendChild(emptyText);
+        messagesContainer.appendChild(emptyMessageContainer);
+    }
+    
+    // 确保模态框出现时滚动到底部
+    $('#messagesModal').on('shown.bs.modal', function() {
+        scrollToBottom(messagesContainer);
     });
+    
+    // 聚焦到消息输入框
+    const messageInput = document.getElementById('messageInput');
+    if (messageInput) {
+        setTimeout(() => {
+            messageInput.focus();
+        }, 300);
+    }
 }
 function sendMessage() {
     // 获取消息输入
@@ -571,6 +702,38 @@ function sendMessage() {
         console.error('Missing receiverId or token');
         return;
     }
+
+    // 立即清空输入框
+    messageInput.value = '';
+    
+    // 生成一个临时ID用于标识这条消息
+    var tempMessageId = 'msg_' + Date.now();
+    
+    // 显示发送中的消息（本地预览）
+    var messageList = document.getElementById('messageList');
+    if (messageList) {
+        const messageContainer = document.createElement('div');
+        messageContainer.classList.add('message-container');
+        messageContainer.id = tempMessageId;
+        
+        const messageBubble = document.createElement('div');
+        messageBubble.classList.add('message-bubble', 'sent', 'sending');
+        
+        const messageContent = document.createElement('div');
+        messageContent.innerText = message;
+        messageBubble.appendChild(messageContent);
+        
+        const messageTime = document.createElement('span');
+        messageTime.classList.add('message-time');
+        messageTime.innerText = '发送中...';
+        messageBubble.appendChild(messageTime);
+        
+        messageContainer.appendChild(messageBubble);
+        messageList.appendChild(messageContainer);
+        
+        // 滚动到最新消息
+        scrollToBottom(messageList);
+    }
     
     // 发送消息到服务器
     $.ajax({
@@ -582,32 +745,95 @@ function sendMessage() {
             message: message
         },
         success: function(response) {
-            // 清空输入框
-            messageInput.value = '';
-            
-            // 重新加载消息列表
-            fetchMessages().then(function(data) {
-                // 如果消息获取成功，显示当前对话
-                if (data.success) {
-                    var userId = localStorage.getItem('id');
-                    var conversationMessages = data.messages.filter(function(msg) {
-                        return (msg.sender_id === userId && msg.receiver_id === receiverId) || 
-                               (msg.sender_id === receiverId && msg.receiver_id === userId);
-                    });
-                    displayMessages(conversationMessages, receiverId);
+            // 如果发送成功并且服务器返回了消息数据
+            if (response.success && response.timestamp) {
+                // 找到之前添加的临时消息元素
+                const tempMessage = document.getElementById(tempMessageId);
+                if (tempMessage) {
+                    // 更新时间显示
+                    const messageTime = tempMessage.querySelector('.message-time');
+                    if (messageTime) {
+                        const msgDate = new Date(response.timestamp);
+                        messageTime.innerText = msgDate.toLocaleString();
+                    }
                     
-                    // 滚动到最新消息
-                    var messageList = document.getElementById('messageList');
-                    if (messageList) {
-                        messageList.scrollTop = messageList.scrollHeight;
+                    // 移除发送中状态
+                    const messageBubble = tempMessage.querySelector('.message-bubble');
+                    if (messageBubble) {
+                        messageBubble.classList.remove('sending');
                     }
                 }
-            });
+                
+                // 确保滚动到底部
+                scrollToBottom(messageList);
+            } else {
+                // 如果服务器响应成功但没有返回预期的数据，还是刷新整个消息列表
+                refreshMessages(receiverId);
+            }
         },
         error: function(xhr, status, error) {
             console.error('Error sending message:', error);
-            alert('Failed to send message. Please try again.');
+            
+            // 更新发送失败的消息状态
+            const tempMessage = document.getElementById(tempMessageId);
+            if (tempMessage) {
+                const messageTime = tempMessage.querySelector('.message-time');
+                if (messageTime) {
+                    messageTime.innerText = '发送失败';
+                }
+                
+                const messageBubble = tempMessage.querySelector('.message-bubble');
+                if (messageBubble) {
+                    messageBubble.classList.remove('sending');
+                    messageBubble.style.opacity = '0.7';
+                    messageBubble.style.backgroundColor = '#ffdddd';
+                }
+            }
+            
+            // 不要弹出警告框，而是在UI中显示错误
+            const errorNotification = document.createElement('div');
+            errorNotification.className = 'alert alert-danger alert-dismissible fade show mt-2';
+            errorNotification.innerHTML = `
+                <strong>发送失败!</strong> 请检查网络连接后重试。
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+            `;
+            messageList.parentNode.appendChild(errorNotification);
+            
+            // 5秒后自动关闭错误提示
+            setTimeout(() => {
+                if (errorNotification.parentNode) {
+                    errorNotification.parentNode.removeChild(errorNotification);
+                }
+            }, 5000);
+            
+            // 确保滚动到底部，即使发生错误
+            scrollToBottom(messageList);
         }
+    });
+}
+
+// 辅助函数：滚动到消息列表底部
+function scrollToBottom(element) {
+    if (element) {
+        setTimeout(() => {
+            element.scrollTop = element.scrollHeight;
+        }, 50);
+    }
+}
+
+// 辅助函数：刷新消息列表
+function refreshMessages(receiverId) {
+    fetchMessages().then(function(data) {
+        if (data.success) {
+            var userId = localStorage.getItem('id');
+            var conversationMessages = data.messages.filter(function(msg) {
+                return (msg.sender_id === userId && msg.receiver_id === receiverId) || 
+                       (msg.sender_id === receiverId && msg.receiver_id === userId);
+            });
+            displayMessages(conversationMessages, receiverId);
+        }
+    }).catch(function(error) {
+        console.error('Failed to refresh messages:', error);
     });
 }
 
