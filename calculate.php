@@ -43,8 +43,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         } else {
             handleApiError(400, '没有上传文件或上传过程中出现错误！');
         }
-
-        $id = getUid($pdo,$email);
         $carbonSavings = 0;
 
         switch ($activity) {
@@ -110,6 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $insertStmt->bindParam(':raw', $dataInput, PDO::PARAM_STR);
         $insertStmt->bindParam(':act', $activity, PDO::PARAM_STR);
         $insertStmt->bindValue(':type', 'ord');
+        $id = getUid($pdo,$email);
         $insertStmt->bindParam(':uid', $id, PDO::PARAM_STR);
         $insertStmt->execute();
 
