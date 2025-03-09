@@ -533,8 +533,9 @@ function loadNavbar() {
                     </div>
                     <span class="navbar-text mx-2 text-light" id="userStatus">Please login or register:</span>
                     <div class="nav-item auth-buttons">
-                        <button class="btn btn-outline-light btn-sm mx-1" data-toggle="modal" data-target="#loginModal">Sign In</button>
-                        <button class="btn btn-outline-light btn-sm mx-1" data-toggle="modal" data-target="#registerModal">Register</button>
+                        <!-- Use iOS-style button classes -->
+                        <button class="btn btn-ios-primary btn-sm mx-1" data-toggle="modal" data-target="#loginModal">Sign In</button>
+                        <button class="btn btn-ios-secondary btn-sm mx-1" data-toggle="modal" data-target="#registerModal">Register</button>
                         <button class="btn btn-outline-danger btn-sm mx-1" id="logoutButton" style="display:none;">Logout</button>
                     </div>
                 </div>
@@ -647,15 +648,26 @@ function setupNavbarEventListeners() {
     
     // iOS-style navbar handling for mobile
     function applyMobileStyles() {
+        // Reset any existing styles to fix potential white bar
+        $('.navbar').css({
+            'padding': '',
+            'background-color': '#002A5C',
+            'backdrop-filter': 'none',
+            '-webkit-backdrop-filter': 'none'
+        });
+        
         if (window.innerWidth <= 768) {
             // Add the iOS-style transparent background for mobile
             $('.navbar').css({
-                'background-color': 'rgba(0, 42, 92, 0.95)',
-                'backdrop-filter': 'blur(10px)',
-                '-webkit-backdrop-filter': 'blur(10px)',
-                'box-shadow': '0 2px 10px rgba(0, 0, 0, 0.1)',
+                'background-color': 'rgba(0, 42, 92, 0.98)', // More opaque to fix white bar
+                'backdrop-filter': 'blur(8px)',
+                '-webkit-backdrop-filter': 'blur(8px)',
+                'box-shadow': '0 1px 10px rgba(0, 0, 0, 0.15)',
                 'padding': '8px 12px'
             });
+            
+            // Fix potential white bar by ensuring full width and proper background
+            $('.navbar').addClass('w-100');
             
             // Adjust logo and text size
             $('.navbar-brand img').css({
@@ -687,15 +699,31 @@ function setupNavbarEventListeners() {
                 'justify-content': 'flex-end'
             });
             
-            $('.auth-buttons .btn').css({
+            // Style buttons distinctly on mobile too
+            $('.auth-buttons .btn-primary').css({
+                'margin': '0.25rem',
+                'font-size': '0.95rem',
+                'padding': '0.375rem 0.75rem',
+                'background-color': '#007AFF' // iOS blue color value directly
+            });
+            
+            $('.auth-buttons .btn-outline-light').css({
                 'margin': '0.25rem',
                 'font-size': '0.95rem',
                 'padding': '0.375rem 0.75rem'
             });
             
+            // Improve mobile brand and toggler appearance
+            $('.navbar-toggler').css({
+                'border': 'none',
+                'padding': '4px 8px'
+            });
+            
             // Add top padding to body based on navbar height for mobile only
-            const navbarHeight = $('.navbar').outerHeight();
-            $('body').css('padding-top', navbarHeight + 'px');
+            setTimeout(function() {
+                const navbarHeight = $('.navbar').outerHeight();
+                $('body').css('padding-top', navbarHeight + 'px');
+            }, 50);
             
             // Very small screens
             if (window.innerWidth <= 576) {
@@ -714,7 +742,7 @@ function setupNavbarEventListeners() {
         } else {
             // Reset styles for desktop
             $('body').css('padding-top', '0');
-            $('.navbar').removeClass('navbar-scroll navbar-scroll-hidden');
+            $('.navbar').removeClass('navbar-scroll navbar-scroll-hidden w-100');
             $('.navbar').css({
                 'background-color': '#002A5C',
                 'backdrop-filter': 'none',
@@ -763,8 +791,9 @@ function setupNavbarEventListeners() {
         }
     }
     
-    // Apply styles immediately
+    // Apply styles immediately and with a short delay to ensure they take effect
     applyMobileStyles();
+    setTimeout(applyMobileStyles, 100); // Apply again after a short delay
     
     // Add scroll behavior
     let lastScrollTop = 0;

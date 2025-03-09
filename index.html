@@ -774,6 +774,70 @@
         font-size: 20px;
       }
     }
+    
+    /* iOS Button Styles */
+    .btn-ios-primary {
+      background-color: var(--ios-blue);
+      color: white;
+      border: none;
+      transition: all 0.2s;
+    }
+    
+    .btn-ios-primary:hover, 
+    .btn-ios-primary:focus {
+      background-color: #0071EB;
+      color: white;
+      transform: translateY(-1px);
+    }
+    
+    .btn-ios-secondary {
+      background-color: transparent;
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      transition: all 0.2s;
+    }
+    
+    .btn-ios-secondary:hover, 
+    .btn-ios-secondary:focus {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+    
+    /* Ensure mobile navbar consistency */
+    .navbar {
+      width: 100%;
+      left: 0;
+      right: 0;
+      top: 0;
+      position: absolute;
+      z-index: 1000;
+      transition: all 0.3s ease;
+    }
+    
+    /* Fix for white bar in mobile navbar */
+    @media (max-width: 768px) {
+      body {
+        padding-top: 0 !important; /* Override any inline styles */
+      }
+      
+      .navbar {
+        background-color: rgba(0, 42, 92, 0.98) !important;
+        box-shadow: 0 1px 8px rgba(0, 0, 0, 0.15);
+      }
+      
+      .navbar-scroll {
+        position: fixed;
+      }
+      
+      /* Ensure contrast between buttons */
+      .btn-primary {
+        background-color: var(--ios-blue);
+      }
+      
+      .btn-outline-light {
+        border-color: rgba(255, 255, 255, 0.8);
+      }
+    }
   </style>
 </head>
 <body>
