@@ -36,8 +36,8 @@ $(document).ready(function() {
     };
 
     document.body.appendChild(googleTranslateScript);*/
-  var loggedIn = sessionStorage.getItem('loggedIn');
-  var expiration = sessionStorage.getItem('expiration');
+  var loggedIn = localStorage.getItem('loggedIn');
+  var expiration = localStorage.getItem('expiration');
   var now = new Date();
 
   if (loggedIn && expiration && now.getTime() < expiration) {
@@ -49,7 +49,7 @@ $(document).ready(function() {
     // 设置按钮颜色
     logoutButton.style.color = 'rgba(255, 255, 255, .5)';
     logoutButton.style.border = '1px solid rgba(255, 255, 255, .5)';
-    var username = sessionStorage.getItem('username');
+    var username = localStorage.getItem('username');
     updateLoginStatus();
             checkUnreadMessages();
         setInterval(checkUnreadMessages(), 30);
@@ -95,12 +95,12 @@ $('nav .fas.fa-envelope').css('color', 'rgba(255, 255, 255, .5)');
                     // 登录成功
                     var now = new Date();
                     var expiration = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000); // 设置7天后的时间
-                    sessionStorage.setItem('loggedIn', true); // 存储登录状态
-                    sessionStorage.setItem('username', response.real_username); // 存储用户名
-                    sessionStorage.setItem('expiration', expiration.getTime()); // 存储过期时间戳
-                    sessionStorage.setItem('email', response.email); // 存储email
-                    sessionStorage.setItem('token', response.token);
-                    sessionStorage.setItem('id', response.id);
+                    localStorage.setItem('loggedIn', true); // 存储登录状态
+                    localStorage.setItem('username', response.real_username); // 存储用户名
+                    localStorage.setItem('expiration', expiration.getTime()); // 存储过期时间戳
+                    localStorage.setItem('email', response.email); // 存储email
+                    localStorage.setItem('token', response.token);
+                    localStorage.setItem('id', response.id);
                     $('[data-target="#loginModal"]').hide();
                     $('[data-target="#registerModal"]').hide();
                     var logoutButton = document.getElementById('logoutButton');
@@ -138,7 +138,7 @@ $('nav .fas.fa-envelope').css('color', 'rgba(255, 255, 255, .5)');
     updateButtonForRemainingTime();
 
     // 点击站内信图标时打开模态框并加载消息
-    $('#messagesDropdown').on('click', function() {
+    $('#messagesIcon').on('click', function() {
         $('#messagesModal').modal('show'); // 显示模态框
     });
 // 绑定发送按钮的点击事件
@@ -173,8 +173,8 @@ function googleTranslateElementInit() {
 
 function checkUnreadMessages() {
     
-    var token = sessionStorage.getItem('token');
-    var id = sessionStorage.getItem('id');
+    var token = localStorage.getItem('token');
+    var id = localStorage.getItem('id');
     $.ajax({
             type: 'POST',
             url: 'chkmsg.php',
@@ -200,8 +200,8 @@ function checkUnreadMessages() {
 
 // 检查登录状态
 function checkLoginStatus() {
-    var loggedIn = sessionStorage.getItem('loggedIn');
-    var expiration = sessionStorage.getItem('expiration');
+    var loggedIn = localStorage.getItem('loggedIn');
+    var expiration = localStorage.getItem('expiration');
     var now = new Date();
 
     if (loggedIn && expiration && now.getTime() < expiration) {
@@ -213,12 +213,11 @@ function checkLoginStatus() {
 
 // 注销函数
 function logout() {
-    sessionStorage.clear();
+    localStorage.clear();
     updateLoginStatus(); // 更新UI为未登录状态
-
 }
 function updateLoginStatus() {
-    var username = sessionStorage.getItem('username');
+    var username = localStorage.getItem('username');
     if (username) {
         // 根据您的页面结构，这里可能需要调整
         $('#userStatus').text('Welcome, ' + username);
@@ -299,13 +298,13 @@ function sendVerificationCode() {
         alert('请填写所有必填信息后再发送验证码。');
         return; // 终止函数执行
     }
-    // 记录发送时间到sessionStorage
+    // 记录发送时间到localStorage
     const now = Date.now();
-    sessionStorage.setItem('lastSentTime', now.toString());
+    localStorage.setItem('lastSentTime', now.toString());
 
     // 获取用户输入的邮箱并发送验证码...
     var email = $('#email').val();
-    var cftoken=sessionStorage.getItem('cf_token');
+    var cftoken=localStorage.getItem('cf_token');
     if (email) {
         $.ajax({
             type: 'POST',
@@ -317,7 +316,7 @@ function sendVerificationCode() {
                     $('#emailHelp').show();
                     // 禁用发送按钮，60秒后再启用
                     const now = Date.now();
-                    sessionStorage.setItem('lastSentTime', now.toString());
+                    localStorage.setItem('lastSentTime', now.toString());
                     $('#sendVerificationCode').prop('disabled', true);
                     updateButtonForRemainingTime();
                     
@@ -338,7 +337,7 @@ function sendVerificationCode() {
 
 function updateButtonForRemainingTime() {
     const now = Date.now();
-    const lastSentTime = sessionStorage.getItem('lastSentTime') ? parseInt(sessionStorage.getItem('lastSentTime'), 10) : 0;
+    const lastSentTime = localStorage.getItem('lastSentTime') ? parseInt(localStorage.getItem('lastSentTime'), 10) : 0;
     let remainingTime = 60000 - (now - lastSentTime);
 
     remainingTime = Math.max(0, remainingTime);
@@ -356,8 +355,8 @@ function updateButtonForRemainingTime() {
 // 获取消息
 function fetchMessages() {
     return new Promise((resolve, reject) => {
-        var receiverId = sessionStorage.getItem('id');
-        var token = sessionStorage.getItem('token');
+        var receiverId = localStorage.getItem('id');
+        var token = localStorage.getItem('token');
         $.ajax({
             type: 'POST',
             url: 'getmsg.php',
@@ -378,7 +377,7 @@ function fetchMessages() {
 
 function buildConversationsList(data) {
     var conversations = {};
-    var userId = sessionStorage.getItem('id'); // 假设当前用户ID已存储在sessionStorage
+    var userId = localStorage.getItem('id'); // 假设当前用户ID已存储在localStorage
 
     data.messages.forEach(function(message) {
         // 对话标识可以是两个用户ID的组合，这里简单地将它们连接起来
@@ -414,14 +413,14 @@ Object.values(conversations).forEach(function(conversation) {
 
 
 function displayMessages(messages,sender) {
-    sessionStorage.setItem('currentChatPartnerId', sender); // 将当前聊天伙伴的sender_id保存在sessionStorage中
+    localStorage.setItem('currentChatPartnerId', sender); // 将当前聊天伙伴的sender_id保存在localStorage中
     const messagesContainer = document.getElementById('messageList');
     messagesContainer.innerHTML = ''; // 清空现有消息
 
     messages.forEach((message, index) => {
         const messageBubble = document.createElement('div');
         messageBubble.classList.add('message-bubble');
-var currentUserId = sessionStorage.getItem('id');
+var currentUserId = localStorage.getItem('id');
 
 // 根据消息发送者和接收者，调整气泡样式
 if (message.sender_id === currentUserId) {
@@ -454,10 +453,10 @@ if (message.sender_id === currentUserId) {
     });
 }
 function sendMessage() {
-    var receiverId = sessionStorage.getItem('currentChatPartnerId');  // 假设你有一个接收者ID的输入字段
+    var receiverId = localStorage.getItem('currentChatPartnerId');  // 假设你有一个接收者ID的输入字段
     var messageContent = $('#messageInput').val(); // 获取消息输入框的内容
-    var senderId = sessionStorage.getItem('id'); // 假设在登录时，你已经将用户ID保存在了sessionStorage中
-    var token = sessionStorage.getItem('token'); // 获取保存的token
+    var senderId = localStorage.getItem('id'); // 假设在登录时，你已经将用户ID保存在了localStorage中
+    var token = localStorage.getItem('token'); // 获取保存的token
 
     if (messageContent.trim() === '') {
         alert('消息内容不能为空！');
@@ -522,14 +521,11 @@ function loadNavbar() {
                 </ul>
                 <div class="navbar-nav align-items-center">
                     <!-- Message icon only visible when logged in (add logoutControl class) -->
-                    <div class="nav-item dropdown mr-2 message-icon-container logoutControl" style="display:none;">
-                        <a class="nav-link dropdown-toggle" href="#" id="messagesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <div class="nav-item mr-2 message-icon-container logoutControl" style="display:none;">
+                        <a class="nav-link" href="#" data-toggle="modal" data-target="#messagesModal" id="messagesIcon">
                             <i class="fas fa-envelope"></i>
                             <span class="badge badge-danger badge-counter" id="unreadMessagesCount" style="display: none;">0</span>
                         </a>
-                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="messagesDropdown">
-                            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#messagesModal">View Messages</a>
-                        </div>
                     </div>
                     <span class="navbar-text mx-2 text-light" id="userStatus">Please login or register:</span>
                     <div class="nav-item auth-buttons">
@@ -559,7 +555,7 @@ function setupNavbarEventListeners() {
     $('#registerModal form').off('submit');
     $('#sendVerificationCode').off('click');
     $('#logoutButton').off('click');
-    $('#messagesDropdown, [data-target="#messagesModal"]').off('click');
+    $('#messagesIcon, [data-target="#messagesModal"]').off('click');
     
     // Login form submission
     $('#loginModal form').on('submit', function(e) {
@@ -584,12 +580,12 @@ function setupNavbarEventListeners() {
                     // 登录成功
                     var now = new Date();
                     var expiration = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000); // 设置7天后的时间
-                    sessionStorage.setItem('loggedIn', true); // 存储登录状态
-                    sessionStorage.setItem('username', response.real_username); // 存储用户名
-                    sessionStorage.setItem('expiration', expiration.getTime()); // 存储过期时间戳
-                    sessionStorage.setItem('email', response.email); // 存储email
-                    sessionStorage.setItem('token', response.token);
-                    sessionStorage.setItem('id', response.id);
+                    localStorage.setItem('loggedIn', true); // 存储登录状态
+                    localStorage.setItem('username', response.real_username); // 存储用户名
+                    localStorage.setItem('expiration', expiration.getTime()); // 存储过期时间戳
+                    localStorage.setItem('email', response.email); // 存储email
+                    localStorage.setItem('token', response.token);
+                    localStorage.setItem('id', response.id);
                     $('[data-target="#loginModal"]').hide();
                     $('[data-target="#registerModal"]').hide();
                     var logoutButton = document.getElementById('logoutButton');
@@ -671,23 +667,75 @@ function setupNavbarEventListeners() {
     });
     
     // Prevent messages from being opened if not logged in
-    $('#messagesDropdown, [data-target="#messagesModal"]').on('click', function(e) {
-        var loggedIn = sessionStorage.getItem('loggedIn');
+    $('#messagesIcon, [data-target="#messagesModal"]').on('click', function(e) {
+        var loggedIn = localStorage.getItem('loggedIn');
         if (!loggedIn) {
             e.preventDefault();
             e.stopPropagation();
             alert('Please login to access messages');
             return false;
+        } else {
+            // When logged in and clicking the message icon, load messages
+            fetchMessages().then(function(data) {
+                if (data && data.messages) {
+                    buildConversationsList(data);
+                    // If there are messages, display the first conversation
+                    if (data.messages.length > 0) {
+                        var firstMessage = data.messages[0];
+                        var userId = localStorage.getItem('id');
+                        var partnerId = firstMessage.sender_id === userId ? firstMessage.receiver_id : firstMessage.sender_id;
+                        var conversationMessages = data.messages.filter(function(msg) {
+                            return (msg.sender_id === userId && msg.receiver_id === partnerId) || 
+                                   (msg.sender_id === partnerId && msg.receiver_id === userId);
+                        });
+                        displayMessages(conversationMessages, partnerId);
+                    }
+                }
+            }).catch(function(error) {
+                console.error('Error fetching messages:', error);
+            });
         }
     });
     
     // Check for unread messages when navbar is loaded (only if logged in)
-    if (sessionStorage.getItem('loggedIn')) {
+    if (localStorage.getItem('loggedIn')) {
         checkUnreadMessages();
     }
     
     // Clear any previous body padding (to fix desktop whitespace)
     $('body').css('padding-top', '0');
+    
+    // Apply iOS-style styling to messages icon
+    $('.message-icon-container .nav-link').css({
+        'padding': '8px 12px',
+        'border-radius': '50%',
+        'transition': 'all 0.2s ease'
+    });
+    
+    $('.message-icon-container .fa-envelope').css({
+        'font-size': '1.1rem',
+        'color': 'rgba(255, 255, 255, .5)'
+    });
+    
+    // Add hover effect to message icon
+    $('.message-icon-container .nav-link').hover(
+        function() {
+            $(this).css('background-color', 'rgba(255, 255, 255, 0.1)');
+        },
+        function() {
+            $(this).css('background-color', 'transparent');
+        }
+    );
+    
+    // Position badge properly
+    $('#unreadMessagesCount').css({
+        'position': 'absolute',
+        'top': '0',
+        'right': '0',
+        'transform': 'translate(25%, -25%)',
+        'font-size': '0.7rem',
+        'padding': '0.25em 0.4em'
+    });
     
     // iOS-style navbar handling for mobile
     function applyMobileStyles() {
