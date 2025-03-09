@@ -244,7 +244,7 @@
   $(document).ready(function () {
     verifyAdmin()
   })
-  var token = sessionStorage.getItem('token')
+  var token = localStorage.getItem('token')
   if (token) {
   } else {
 
@@ -253,7 +253,7 @@
   }
 
   function verifyAdmin() {
-    var token = sessionStorage.getItem('token')
+    var token = localStorage.getItem('token')
     $.ajax({
       type: 'POST',
       data: { token: token },
@@ -275,7 +275,7 @@
   }
 
   function fetchTransactionsForAdmin() {
-    var token = sessionStorage.getItem('token')
+    var token = localStorage.getItem('token')
     $.ajax({
       type: 'POST',
       data: { token: token },
@@ -350,12 +350,13 @@
     $.ajax({
       type: 'POST',
       url: 'approve_transaction.php', // 替换为您的PHP脚本路径
-      data: { token: token, transactionId: id, uid: uid, status: 'approved', type: type },
+      data: { token: localStorage.getItem('token'), transactionId: id, uid: uid, status: 'approved', type: type },
       dataType: 'json',
       success: function (response) {
         if (response.success) {
           alert('交易已通过。')
           // 刷新或更新页面上的记录
+          fetchTransactionsForAdmin();
         } else {
           alert('审批失败: ' + response.message)
         }
@@ -370,12 +371,13 @@
     $.ajax({
       type: 'POST',
       url: 'reject_transaction.php', // 替换为您的PHP脚本路径
-      data: { token: token, transactionId: id, status: 'rejected', type: type },
+      data: { token: localStorage.getItem('token'), transactionId: id, status: 'rejected', type: type },
       dataType: 'json',
       success: function (response) {
         if (response.success) {
           alert('交易已打回。')
           // 刷新或更新页面上的记录
+          fetchTransactionsForAdmin();
         } else {
           alert('打回失败: ' + response.message)
         }
@@ -408,6 +410,13 @@
     }
   }
 
+  function logout() {
+    localStorage.removeItem('token')
+    localStorage.removeItem('id')
+    localStorage.removeItem('email')
+    localStorage.removeItem('username')
+    window.location.href = 'index.html'
+  }
 </script>
 <div id="footer-placeholder"></div>
 <!-- 省略页脚 -->

@@ -354,26 +354,46 @@ function updateButtonForRemainingTime() {
 }
 // 获取消息
 function fetchMessages() {
-    return new Promise((resolve, reject) => {
-        var receiverId = localStorage.getItem('id');
-        var token = localStorage.getItem('token');
-        $.ajax({
-            type: 'POST',
-            url: 'getmsg.php',
-            data: JSON.stringify({ receiver_id: receiverId, token: token}),
-            contentType: 'application/json',
-            success: function(data) {
-                console.log(data);
-                resolve(data);
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                console.log('无法加载消息');
-                reject(new Error('加载消息时发生错误'));
-            }
-        });
+    // 检查消息模态框和相关元素是否存在
+    if (!document.getElementById('messagesModal') || !document.getElementById('conversationList') || !document.getElementById('messageList')) {
+        console.warn('Messages modal or related elements not found');
+        return;
+    }
+    
+    // 检查用户是否登录
+    const token = localStorage.getItem('token');
+    if (!token) {
+        console.warn('User not logged in, cannot fetch messages');
+        return;
+    }
+    
+    // 显示加载中状态
+    $('#conversationList').html('<div class="text-center p-3"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Loading conversations...</p></div>');
+    
+    // 发送请求获取消息数据
+    fetch('get_messages.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ token: token })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+        if (data.success) {
+            buildConversationsList(data);
+        } else {
+            console.error('获取消息失败');
+        }
+        checkUnreadMessages();
+        setInterval(checkUnreadMessages(), 30);
+    })
+    .catch(error => {
+        console.error('获取消息时发生错误', error);
+        $('#conversationList').html('<div class="text-center p-3">无法加载消息。请检查网络连接。</div>');
     });
 }
-
 
 function buildConversationsList(data) {
     var conversations = {};
@@ -412,10 +432,26 @@ Object.values(conversations).forEach(function(conversation) {
     });}
 
 
-function displayMessages(messages,sender) {
+function displayMessages(messages, sender) {
     localStorage.setItem('currentChatPartnerId', sender); // 将当前聊天伙伴的sender_id保存在localStorage中
     const messagesContainer = document.getElementById('messageList');
+    
+    // 如果消息容器不存在，则记录警告并返回
+    if (!messagesContainer) {
+        console.warn('Message list container not found in the document');
+        return;
+    }
+    
     messagesContainer.innerHTML = ''; // 清空现有消息
+
+    // 如果没有消息，显示提示
+    if (!messages || messages.length === 0) {
+        const emptyMessage = document.createElement('div');
+        emptyMessage.className = 'text-center p-3';
+        emptyMessage.textContent = 'No messages yet. Start a conversation!';
+        messagesContainer.appendChild(emptyMessage);
+        return;
+    }
 
     messages.forEach((message, index) => {
         const messageBubble = document.createElement('div');
@@ -490,61 +526,62 @@ function sendMessage() {
 
 // Function to load navbar from navbar.html
 function loadNavbar() {
-    // 创建导航栏内容
-    const navbarContent = `
-    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #002A5C;">
-        <div class="container">
-            <a class="navbar-brand" href="index.html">
-                <img src="img/team.jpg" width="36" height="36" class="d-inline-block align-top rounded-circle" alt="Logo">
-                <span class="navbar-title-chinese">校园碳账户</span> | CarbonTrack
-            </a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav mr-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="index.html">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="about.html">About</a>
-                    </li>
-                    <li class="nav-item logoutControl" style="display:none;">
-                        <a class="nav-link" href="center.html">User Center</a>
-                    </li>
-                    <li class="nav-item logoutControl" style="display:none;">
-                        <a class="nav-link" href="CStore.html">Store</a>
-                    </li>
-                    <li class="nav-item logoutControl" style="display:none;">
-                        <a class="nav-link" href="calculate.html">Carbon Count</a>
-                    </li>
-                </ul>
-                <div class="navbar-nav align-items-center">
-                    <!-- Message icon only visible when logged in (add logoutControl class) -->
-                    <div class="nav-item mr-2 message-icon-container logoutControl" style="display:none;">
-                        <a class="nav-link" href="#" data-toggle="modal" data-target="#messagesModal" id="messagesIcon">
-                            <i class="fas fa-envelope"></i>
-                            <span class="badge badge-danger badge-counter" id="unreadMessagesCount" style="display: none;">0</span>
-                        </a>
-                    </div>
-                    <span class="navbar-text mx-2 text-light" id="userStatus">Please login or register:</span>
-                    <div class="nav-item auth-buttons">
-                        <!-- Use iOS-style button classes -->
-                        <button class="btn btn-ios-primary btn-sm mx-1" data-toggle="modal" data-target="#loginModal">Sign In</button>
-                        <button class="btn btn-ios-secondary btn-sm mx-1" data-toggle="modal" data-target="#registerModal">Register</button>
-                        <button class="btn btn-outline-danger btn-sm mx-1" id="logoutButton" style="display:none;">Logout</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </nav>
-    `;
+    fetch('navbar.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('navbar-container').innerHTML = data;
+            setupNavbarHandlers();
 
-    // 插入导航栏到页面中
-    $('#navbar-container').html(navbarContent);
-    
-    // 添加导航栏事件监听器
+            // 检查是否已有站内信模态框
+            if (!document.getElementById('messagesModal')) {
+                // 从navbar.html中提取站内信模态框并添加到body
+                const parser = new DOMParser();
+                const navbarDoc = parser.parseFromString(data, 'text/html');
+                const messagesModal = navbarDoc.getElementById('messagesModal');
+                
+                if (messagesModal) {
+                    document.body.appendChild(messagesModal);
+                }
+            }
+            
+            setLoginStatus();
+        });
+}
+
+// 设置导航栏处理函数
+function setupNavbarHandlers() {
+    // 调用先前的导航栏事件监听器设置函数
     setupNavbarEventListeners();
+    
+    // 设置消息对话框的事件处理
+    setupMessagesModal();
+}
+
+// 设置消息模态框的处理函数
+function setupMessagesModal() {
+    // 检查消息模态框是否存在
+    if (!document.getElementById('messagesModal')) {
+        console.warn('Messages modal not found in the document');
+        return;
+    }
+    
+    // 设置发送消息按钮事件
+    $('#sendMessage').off('click').on('click', function() {
+        sendMessage();
+    });
+    
+    // 设置消息输入框的回车键事件
+    $('#messageInput').off('keypress').on('keypress', function(e) {
+        if (e.which === 13) { // Enter key
+            sendMessage();
+            return false; // 防止表单提交
+        }
+    });
+    
+    // 当消息对话框显示时，刷新消息列表
+    $('#messagesModal').off('shown.bs.modal').on('shown.bs.modal', function() {
+        fetchMessages();
+    });
 }
 
 function setupNavbarEventListeners() {
