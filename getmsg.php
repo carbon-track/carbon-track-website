@@ -21,35 +21,33 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             handleApiError(401, 'Token不合法。');
         }
         
-        // 使用token中的email获取用户ID
-        $stmtUser = $pdo->prepare("SELECT id FROM users WHERE email = :email");
-        $stmtUser->execute(['email' => $email]);
-        $userData = $stmtUser->fetch(PDO::FETCH_ASSOC);
+        // 使用 getUid 函数通过邮箱获取用户ID
+        $userId = getUid($pdo, $email);
         
-        if (!$userData) {
+        if (!$userId) {
             handleApiError(404, '用户未找到。');
         }
-        
-        $userId = $userData['id'];
         
         // 开始事务
         $pdo->beginTransaction();
 
-        // 获取用户相关的所有消息（作为发送方或接收方）
+        // 获取用户相关的所有消息（作为收信人）
         $stmtSelect = $pdo->prepare("
             SELECT message_id, sender_id, receiver_id, content, is_read, send_time 
             FROM messages 
-            WHERE sender_id = :user_id OR receiver_id = :user_id
+            WHERE receiver_id = :receiver_id
             ORDER BY send_time ASC
         ");
-        $stmtSelect->execute(['user_id' => $userId]);
+        $stmtSelect->bindParam(':receiver_id', $userId, PDO::PARAM_INT);
+        $stmtSelect->execute();
         $messages = $stmtSelect->fetchAll(PDO::FETCH_ASSOC);
 
         // 更新当前用户接收的未读消息为已读
         $stmtUpdate = $pdo->prepare("
             UPDATE messages SET is_read = 1 WHERE receiver_id = :user_id AND is_read = 0
         ");
-        $stmtUpdate->execute(['user_id' => $userId]);
+        $stmtUpdate->bindParam(':user_id', $userId, PDO::PARAM_INT);
+        $stmtUpdate->execute();
 
         // 提交事务
         $pdo->commit();

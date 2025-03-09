@@ -426,31 +426,36 @@ function buildConversationsList(data) {
         return;
     }
 
+    // 按发送者ID分组消息
     data.messages.forEach(function(message) {
-        // 对话标识可以是两个用户ID的组合，这里简单地将它们连接起来
-        var conversationId = [message.sender_id, message.receiver_id].sort().join('-');
-
-        if (!conversations[conversationId]) {
-            conversations[conversationId] = {
-                participants: [message.sender_id, message.receiver_id],
+        // 以发送者ID为键创建会话分组
+        var senderId = message.sender_id;
+        
+        if (!conversations[senderId]) {
+            conversations[senderId] = {
+                sender_id: senderId,
                 messages: []
             };
         }
-        conversations[conversationId].messages.push(message);
+        
+        conversations[senderId].messages.push(message);
     });
 
     var conversationList = $('#conversationList');
     conversationList.empty(); // 清空现有列表
 
+    // 如果没有对话，显示提示
+    if (Object.keys(conversations).length === 0) {
+        conversationList.append('<div class="alert alert-info">暂无消息</div>');
+        return;
+    }
+
+    // 为每个发送者创建一个对话项
     Object.values(conversations).forEach(function(conversation) {
-        var partnerId = conversation.participants.find(id => id !== userId);
-        console.log('对话参与者:', conversation.participants, '当前用户:', userId, '聊天伙伴:', partnerId);
+        var senderId = conversation.sender_id;
+        console.log('发信人ID:', senderId);
         
-        // 存储服务账户ID (假设服务账户的ID是固定的，实际应该根据实际情况调整)
-        var serviceAccountId = conversation.participants.find(id => id !== userId);
-        localStorage.setItem('serviceAccountId', serviceAccountId);
-        
-        //var listItem = $('<div></div>').addClass('conversation-item').text('对话 ' + partnerId);
+        // 创建对话项
         var listItem = $('<div></div>').addClass('conversation-item').text('CarbonTrack User-Service');
         listItem.css({
             padding: '10px 15px',
@@ -464,6 +469,7 @@ function buildConversationsList(data) {
             function() { $(this).css('background-color', ''); }
         );
         
+        // 点击对话项显示消息
         listItem.on('click', function() {
             // 高亮显示选中的对话
             $('.conversation-item').removeClass('active');
@@ -479,16 +485,19 @@ function buildConversationsList(data) {
                 }
             }
             
-            console.log('选择了与用户 ' + partnerId + ' 的对话, 最后消息时间: ' + lastMessageTime);
-            displayMessages(conversation.messages, partnerId);
+            console.log('选择了与发送人 ' + senderId + ' 的对话, 最后消息时间: ' + lastMessageTime);
+            // 显示该发送者的所有消息
+            displayMessages(conversation.messages, senderId);
         });
+        
         conversationList.append(listItem);
     });
 }
 
 
 function displayMessages(messages, sender) {
-    localStorage.setItem('currentChatPartnerId', sender); // 将当前聊天伙伴的sender_id保存在localStorage中
+    // 保存当前聊天的发送者ID，用于发送回复消息
+    localStorage.setItem('currentChatPartnerId', sender);
     
     // 检查messageList元素是否存在
     let messagesContainer = document.getElementById('messageList');
@@ -652,7 +661,7 @@ function displayMessages(messages, sender) {
         currentUserId = localStorage.getItem('id');
     }
     
-    console.log('显示消息 - 当前用户ID:', currentUserId);
+    console.log('显示消息 - 当前用户ID:', currentUserId, '发送者ID:', sender);
     
     // 确保消息按时间顺序排序
     if (messages && messages.length > 0) {
@@ -693,13 +702,9 @@ function displayMessages(messages, sender) {
             messageBubble.classList.add('message-bubble');
             
             // 根据消息发送者和接收者，调整气泡样式
-            if (message.sender_id == currentUserId) { // 使用 == 而不是 === 进行比较，以处理字符串和数字类型
-                messageBubble.classList.add('sent');
-                console.log('显示发送的消息:', message.content);
-            } else {
-                messageBubble.classList.add('received');
-                console.log('显示接收的消息:', message.content);
-            }
+            // 所有消息都应该是"received"，因为这里只显示用户接收到的消息
+            messageBubble.classList.add('received');
+            console.log('显示接收的消息:', message.content, '从发送者:', message.sender_id);
 
             // 添加消息内容
             const messageContent = document.createElement('div');
@@ -766,15 +771,16 @@ function sendMessage() {
         return; // 如果消息为空，不做任何操作
     }
     
+    // 从localStorage获取当前聊天对象的ID（发送者ID）
     var receiverId = localStorage.getItem('currentChatPartnerId');
     var token = localStorage.getItem('token');
     
     if (!receiverId || !token) {
-        console.error('Missing receiverId or token', { receiverId, token });
+        console.error('缺少接收者ID或token', { receiverId, token });
         return;
     }
     
-    console.log('准备发送消息给:', receiverId);
+    console.log('准备向ID为 ' + receiverId + ' 的接收者发送消息');
 
     // 立即清空输入框
     messageInput.value = '';
