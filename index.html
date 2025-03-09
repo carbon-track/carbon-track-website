@@ -440,6 +440,45 @@
     /* Feature Cards Section */
     .feature-section {
       padding: 80px 0;
+      position: relative;
+      background: linear-gradient(180deg, 
+        rgba(242, 242, 247, 1) 0%,
+        rgba(250, 250, 255, 0.8) 100%);
+      overflow: hidden;
+    }
+    
+    .feature-section::before {
+      content: '';
+      position: absolute;
+      top: -200px;
+      right: -200px;
+      width: 500px;
+      height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0, 122, 255, 0.1) 0%, rgba(0, 122, 255, 0) 70%);
+      z-index: 0;
+    }
+    
+    .feature-section::after {
+      content: '';
+      position: absolute;
+      bottom: -200px;
+      left: -200px;
+      width: 500px;
+      height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(88, 86, 214, 0.1) 0%, rgba(88, 86, 214, 0) 70%);
+      z-index: 0;
+    }
+    
+    .section-heading {
+      font-weight: 700;
+      background: linear-gradient(120deg, var(--ios-blue), var(--ios-indigo));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      position: relative;
+      display: inline-block;
+      margin: 0 auto 3rem;
     }
     
     .feature-grid {
@@ -450,14 +489,13 @@
     }
     
     .feature-card {
-      background-color: var(--ios-system-background);
-      border-radius: 20px;
+      border-radius: 24px;
       overflow: hidden;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      transition: transform 0.3s, box-shadow 0.3s;
+      transition: transform 0.4s var(--animation-timing-apple),
+                  box-shadow 0.4s var(--animation-timing-apple);
+      position: relative;
+      z-index: 1;
     }
     
     .feature-card:hover {
@@ -466,17 +504,44 @@
     }
     
     .feature-card--blue {
-      background-color: var(--ios-blue);
-      color: white;
+      background: linear-gradient(135deg, var(--ios-blue), #0054d1);
+      position: relative;
+    }
+    
+    .feature-card--blue::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTAwIDJjNTQgMCA5OCA0NCA5OCA5OHMtNDQgOTgtOTggOTgtOTgtNDQtOTgtOThTNDYgMiAxMDAgMnpNMiAxMDBoMTk2TTEwMCAydjE5NiIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjAuNSIgZmlsbD0ibm9uZSIgb3BhY2l0eT0iMC4xIi8+PC9zdmc+');
+      opacity: 0.1;
+      z-index: 0;
     }
     
     .feature-card--white {
-      background-color: var(--ios-system-background);
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
     }
     
     .feature-card--purple {
-      background-color: var(--ios-indigo);
-      color: white;
+      background: linear-gradient(135deg, var(--ios-indigo), var(--ios-purple));
+      position: relative;
+    }
+    
+    .feature-card--purple::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTAwIDJjNTQgMCA5OCA0NCA5OCA5OHMtNDQgOTgtOTggOTgtOTgtNDQtOTgtOThTNDYgMiAxMDAgMnpNMiAxMDBoMTk2TTEwMCAydjE5NiIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjAuNSIgZmlsbD0ibm9uZSIgb3BhY2l0eT0iMC4xIi8+PC9zdmc+');
+      opacity: 0.1;
+      z-index: 0;
     }
     
     .feature-card__body {
@@ -487,10 +552,20 @@
     }
     
     .feature-card__title {
-      font-size: 1.5rem;
+      position: relative;
+      display: inline-block;
+      margin-bottom: 1.25rem;
       font-weight: 700;
-      margin-bottom: 16px;
-      color: inherit;
+    }
+    
+    .feature-card--white .feature-card__title {
+      background: linear-gradient(120deg, var(--ios-blue), var(--ios-indigo));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .feature-card--white .feature-card__text {
+      color: #333;
     }
     
     .feature-card__text {
@@ -517,30 +592,39 @@
     }
     
     .feature-card__list-icon {
-      margin-right: 12px;
-      font-size: 18px;
-      color: inherit;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      margin-right: 16px;
+      flex-shrink: 0;
+    }
+    
+    .feature-card--white .feature-card__list-icon {
+      background-color: rgba(0, 122, 255, 0.1);
     }
     
     .feature-card__button {
-      display: inline-block;
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 16px;
       padding: 12px 24px;
-      background-color: rgba(255, 255, 255, 0.9);
-      color: var(--ios-indigo);
-      border-radius: 12px;
       font-weight: 600;
-      font-size: 0.9rem;
-      transition: all 0.2s;
-      text-align: center;
-      border: none;
-      cursor: pointer;
-      align-self: flex-start;
-      margin-top: auto;
+      color: white;
+      transition: all 0.3s var(--animation-timing-apple);
     }
     
     .feature-card__button:hover {
-      background-color: white;
-      transform: translateY(-1px);
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      color: white;
+      text-decoration: none;
     }
     
     /* Floating Button */
@@ -1457,13 +1541,13 @@
 <!-- Feature Cards Section -->
 <section class="feature-section section-reveal">
   <div class="container">
-    <h2 class="section-heading animate-on-scroll slide-up">How CarbonTrack Works</h2>
+    <h2 class="section-heading animate-on-scroll slide-up text-center">How CarbonTrack Works</h2>
     
     <div class="feature-grid">
       <div class="feature-card feature-card--white ios-hover-effect animate-on-scroll slide-up">
         <div class="feature-card__body">
           <h3 class="feature-card__title">What is a Carbon Account?</h3>
-          <p class="feature-card__text">A Carbon Account is a tool that tracks CO₂ reductions from eco-friendly actions. By understanding our carbon footprint, we can make informed choices for a greener planet.</p>
+          <p class="feature-card__text">A Carbon Account is a tool that tracks CO<sub>2</sub> reductions from eco-friendly actions. By understanding our carbon footprint, we can make informed choices for a greener planet.</p>
         </div>
       </div>
       
@@ -1472,19 +1556,27 @@
           <h3 class="feature-card__title">How to Use CarbonTrack</h3>
           <ul class="feature-card__list">
             <li class="feature-card__list-item animate-on-scroll slide-up delay-100">
-              <i class="fas fa-check-circle feature-card__list-icon"></i>
+              <div class="feature-card__list-icon">
+                <i class="fas fa-check-circle"></i>
+              </div>
               <span><strong>Sign up & log in.</strong></span>
             </li>
             <li class="feature-card__list-item animate-on-scroll slide-up delay-200">
-              <i class="fas fa-check-circle feature-card__list-icon"></i>
+              <div class="feature-card__list-icon">
+                <i class="fas fa-check-circle"></i>
+              </div>
               <span><strong>Record sustainable actions</strong> in the Carbon Accounting Portal.</span>
             </li>
             <li class="feature-card__list-item animate-on-scroll slide-up delay-300">
-              <i class="fas fa-check-circle feature-card__list-icon"></i>
-              <span><strong>Earn Carbon Credits</strong> based on real CO₂ reductions.</span>
+              <div class="feature-card__list-icon">
+                <i class="fas fa-check-circle"></i>
+              </div>
+              <span><strong>Earn Carbon Credits</strong> based on real CO<sub>2</sub> reductions.</span>
             </li>
             <li class="feature-card__list-item animate-on-scroll slide-up delay-400">
-              <i class="fas fa-check-circle feature-card__list-icon"></i>
+              <div class="feature-card__list-icon">
+                <i class="fas fa-check-circle"></i>
+              </div>
               <span><strong>Track progress & join challenges</strong> to win rewards!</span>
             </li>
           </ul>
@@ -1496,15 +1588,21 @@
           <h3 class="feature-card__title">Why Use a Carbon Account?</h3>
           <ul class="feature-card__list">
             <li class="feature-card__list-item animate-on-scroll slide-up delay-100">
-              <i class="fas fa-check feature-card__list-icon" style="color: var(--ios-green);"></i>
+              <div class="feature-card__list-icon">
+                <i class="fas fa-check" style="color: var(--ios-green);"></i>
+              </div>
               <span><strong>Quantify your impact</strong> on carbon reduction.</span>
             </li>
             <li class="feature-card__list-item animate-on-scroll slide-up delay-200">
-              <i class="fas fa-check feature-card__list-icon" style="color: var(--ios-green);"></i>
+              <div class="feature-card__list-icon">
+                <i class="fas fa-check" style="color: var(--ios-green);"></i>
+              </div>
               <span><strong>Encourage long-term eco-friendly habits.</strong></span>
             </li>
             <li class="feature-card__list-item animate-on-scroll slide-up delay-300">
-              <i class="fas fa-check feature-card__list-icon" style="color: var(--ios-green);"></i>
+              <div class="feature-card__list-icon">
+                <i class="fas fa-check" style="color: var(--ios-green);"></i>
+              </div>
               <span><strong>Raise awareness & promote energy conservation.</strong></span>
             </li>
           </ul>
