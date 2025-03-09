@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>校园碳账户网站主页</title>
+  <title>Password Recovery - CarbonTrack</title>
   <link rel="icon" href="/img/team.jpg" type="image/JPG">
   <!-- 引入Bootstrap和jQuery的CDN链接 -->
   <link rel="stylesheet" href="./css/bootstrap.min.css">
@@ -11,33 +11,135 @@
   <script src="js/bootstrap.min.js"></script>
   <script src="js/nav.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+  <!-- SF Pro 字体 -->
+  <link href="https://fonts.cdnfonts.com/css/sf-pro-display" rel="stylesheet">
+  <!-- Intersection Observer polyfill -->
+  <script src="https://cdn.jsdelivr.net/npm/intersection-observer@0.12.2/intersection-observer.js"></script>
+  <!-- iOS设计CSS -->
+  <link rel="stylesheet" href="./css/ios-design.css">
   <link rel="stylesheet" href="./css/index.css">
-
+  <style>
+    .recovery-header {
+      background: linear-gradient(135deg, var(--ios-purple), var(--ios-pink));
+      color: white;
+      padding: 120px 0 60px;
+      text-align: center;
+      border-radius: 0 0 24px 24px;
+      margin-bottom: 40px;
+    }
+    
+    .recovery-header h1 {
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+    
+    .recovery-header p {
+      opacity: 0.9;
+      max-width: 600px;
+      margin: 0 auto;
+      font-size: 1.1rem;
+    }
+    
+    .recovery-form {
+      background: var(--ios-system-background);
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+      margin-bottom: 40px;
+      max-width: 550px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    .form-title {
+      font-weight: 700;
+      margin-bottom: 24px;
+      position: relative;
+      padding-bottom: 12px;
+    }
+    
+    .form-title::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 60px;
+      height: 4px;
+      background: linear-gradient(to right, var(--ios-purple), var(--ios-pink));
+      border-radius: 2px;
+    }
+    
+    .form-group label {
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--ios-label);
+    }
+    
+    .form-control {
+      border-radius: 12px;
+      border: 1px solid var(--ios-gray-light);
+      padding: 12px 16px;
+      transition: all 0.3s var(--animation-timing-apple);
+    }
+    
+    .form-control:focus {
+      border-color: var(--ios-blue);
+      box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
+    }
+    
+    .btn-recovery {
+      background: linear-gradient(135deg, var(--ios-purple), var(--ios-pink));
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 24px;
+      font-weight: 600;
+      transition: all 0.3s var(--animation-timing-apple);
+      box-shadow: 0 6px 16px rgba(175, 82, 222, 0.15);
+      margin-top: 8px;
+    }
+    
+    .btn-recovery:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(175, 82, 222, 0.25);
+    }
+  </style>
 </head>
 <body>
 <!-- 导航栏容器，将由JavaScript加载 -->
 <div id="navbar-container"></div>
 
-<!-- Add a Password Recovery Section -->
+<header class="recovery-header">
+  <div class="container">
+    <h1>Password Recovery</h1>
+    <p>We'll help you reset your password and get back to tracking your carbon footprint</p>
+  </div>
+</header>
+
 <!-- Password Recovery Section -->
 <div class="container">
-  <h2>忘记密码Forgot Password</h2>
-  <form id="passwordRecoveryForm">
-    <div class="form-group">
-      <label for="recoveryEmail">邮箱地址Email Address</label>
-      <input type="email" class="form-control" id="recoveryEmail" placeholder="请输入您的邮箱地址Please enter your email registered for account" required>
-    </div>
-    <button type="button" class="btn btn-secondary" id="sendRecoveryCode">发送验证码Send Verification Code</button>
-  </form>
+  <div class="recovery-form ios-depth-effect">
+    <h2 class="form-title">Reset Your Password</h2>
+    <form id="passwordRecoveryForm">
+      <div class="form-group">
+        <label for="recoveryEmail">Email Address</label>
+        <input type="email" class="form-control" id="recoveryEmail" placeholder="Enter your registered email address" required>
+        <small class="form-text text-muted">We'll send a verification code to this email</small>
+      </div>
+      <button type="button" class="btn btn-recovery btn-block" id="sendRecoveryCode">
+        <i class="fas fa-paper-plane mr-2"></i> Send Verification Code
+      </button>
+    </form>
+  </div>
 </div>
 
 <!-- Password Reset Modal -->
 <div class="modal fade" id="passwordResetModal" tabindex="-1" role="dialog" aria-labelledby="passwordResetModalLabel"
      aria-hidden="true">
-  <div class="modal-dialog" role="document">
+  <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="passwordResetModalLabel">重置密码Reset Password</h5>
+        <h5 class="modal-title" id="passwordResetModalLabel">Reset Password</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -45,14 +147,17 @@
       <div class="modal-body">
         <form id="passwordResetForm">
           <div class="form-group">
-            <label for="resetCode">验证码Verification Code</label>
-            <input type="text" class="form-control" id="resetCode" placeholder="请输入验证码Please enter the verification code you received" required>
+            <label for="resetCode">Verification Code</label>
+            <input type="text" class="form-control" id="resetCode" placeholder="Enter the verification code from your email" required>
           </div>
           <div class="form-group">
-            <label for="newPassword">新密码New Password</label>
-            <input type="password" class="form-control" id="newPassword" placeholder="请输入新密码Please enter your new Password" required>
+            <label for="newPassword">New Password</label>
+            <input type="password" class="form-control" id="newPassword" placeholder="Enter your new password" required>
+            <small class="form-text text-muted">Use a strong password with at least 8 characters</small>
           </div>
-          <button type="submit" class="btn btn-login btn-block">重置密码Reset Password</button>
+          <button type="submit" class="btn btn-recovery btn-block">
+            <i class="fas fa-key mr-2"></i> Reset Password
+          </button>
         </form>
       </div>
     </div>
@@ -64,24 +169,35 @@
   $('#sendRecoveryCode').on('click', function () {
     var email = $('#recoveryEmail').val()
     if (email) {
+      // Show loading state
+      $(this).html('<i class="fas fa-spinner fa-spin mr-2"></i> Sending...')
+      $(this).prop('disabled', true)
+      
       $.ajax({
         type: 'POST',
         url: 'sendRecoveryCode.php', // PHP script to send the verification code
         data: { email: email },
         dataType: 'json',
         success: function (response) {
+          // Reset button state
+          $('#sendRecoveryCode').html('<i class="fas fa-paper-plane mr-2"></i> Send Verification Code')
+          $('#sendRecoveryCode').prop('disabled', false)
+          
           if (response.success) {
             $('#passwordResetModal').modal('show') // Show the password reset modal
           } else {
-            alert('发送验证码失败: ' + response.error)
+            alert('Failed to send verification code: ' + response.error)
           }
         },
         error: function () {
-          alert('请求发送验证码失败，请稍后再试。')
+          // Reset button state
+          $('#sendRecoveryCode').html('<i class="fas fa-paper-plane mr-2"></i> Send Verification Code')
+          $('#sendRecoveryCode').prop('disabled', false)
+          alert('Request failed. Please try again later.')
         },
       })
     } else {
-      alert('请输入邮箱地址。')
+      alert('Please enter your email address.')
     }
   })
 
@@ -91,6 +207,11 @@
     var email = $('#recoveryEmail').val()
     var code = $('#resetCode').val()
     var newPassword = $('#newPassword').val()
+    
+    // Show loading state
+    $(this).find('button[type="submit"]').html('<i class="fas fa-spinner fa-spin mr-2"></i> Processing...')
+    $(this).find('button[type="submit"]').prop('disabled', true)
+    
     $.ajax({
       type: 'POST',
       url: 'recovery.php', // PHP script to reset the password
@@ -101,15 +222,26 @@
       },
       dataType: 'json',
       success: function (response) {
+        // Reset button state
+        $('#passwordResetForm').find('button[type="submit"]').html('<i class="fas fa-key mr-2"></i> Reset Password')
+        $('#passwordResetForm').find('button[type="submit"]').prop('disabled', false)
+        
         if (response.success) {
-          alert('密码重置成功！')
+          alert('Password reset successful! You can now login with your new password.')
           $('#passwordResetModal').modal('hide')
+          // Redirect to login page after successful reset
+          setTimeout(function() {
+            window.location.href = 'index.html'
+          }, 1500)
         } else {
-          alert('密码重置失败: ' + response.error)
+          alert('Password reset failed: ' + response.error)
         }
       },
       error: function () {
-        alert('密码重置请求失败，请稍后再试。')
+        // Reset button state
+        $('#passwordResetForm').find('button[type="submit"]').html('<i class="fas fa-key mr-2"></i> Reset Password')
+        $('#passwordResetForm').find('button[type="submit"]').prop('disabled', false)
+        alert('Request failed. Please try again later.')
       },
     })
   })

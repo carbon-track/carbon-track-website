@@ -3,45 +3,202 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Managing校园碳账户</title>
+  <title>Management Console - CarbonTrack</title>
   <link rel="icon" href="/img/team.jpg" type="image/JPG">
   <!-- 引入Bootstrap和jQuery的CDN链接 -->
   <link rel="stylesheet" href="./css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
   <script src="js/jquery.min.js"></script>
   <script src="js/bootstrap.min.js"></script>
-  <script src="js/nav.js"> $('#loading').hide()</script>
+  <script src="js/nav.js"></script>
+  <!-- SF Pro 字体 -->
+  <link href="https://fonts.cdnfonts.com/css/sf-pro-display" rel="stylesheet">
+  <!-- Intersection Observer polyfill -->
+  <script src="https://cdn.jsdelivr.net/npm/intersection-observer@0.12.2/intersection-observer.js"></script>
+  <!-- iOS设计CSS -->
+  <link rel="stylesheet" href="./css/ios-design.css">
   <link rel="stylesheet" href="./css/index.css">
-  <!-- 保持与主页相同的样式 -->
-
+  <style>
+    .admin-header {
+      background: linear-gradient(135deg, var(--ios-blue), var(--ios-purple));
+      color: white;
+      padding: 120px 0 60px;
+      text-align: center;
+      border-radius: 0 0 24px 24px;
+      margin-bottom: 40px;
+    }
+    
+    .admin-header h1 {
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+    
+    .admin-header p {
+      opacity: 0.9;
+      max-width: 600px;
+      margin: 0 auto;
+      font-size: 1.1rem;
+    }
+    
+    .admin-card {
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+      margin-bottom: 30px;
+      transition: transform 0.4s var(--animation-timing-apple),
+                  box-shadow 0.4s var(--animation-timing-apple);
+      height: 100%;
+      background-color: var(--ios-system-background);
+    }
+    
+    .admin-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.1);
+    }
+    
+    .admin-card-body {
+      padding: 24px;
+      text-align: center;
+    }
+    
+    .admin-card-icon {
+      font-size: 3rem;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, var(--ios-blue), var(--ios-purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .admin-card-title {
+      font-weight: 700;
+      margin-bottom: 12px;
+      font-size: 1.3rem;
+      color: var(--ios-label);
+    }
+    
+    .admin-card-text {
+      color: var(--ios-gray);
+      margin-bottom: 24px;
+    }
+    
+    .admin-card-link {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--ios-blue), var(--ios-indigo));
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 24px;
+      font-weight: 600;
+      transition: all 0.3s var(--animation-timing-apple);
+      text-decoration: none;
+      box-shadow: 0 6px 16px rgba(0, 122, 255, 0.15);
+    }
+    
+    .admin-card-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 122, 255, 0.25);
+      color: white;
+      text-decoration: none;
+    }
+  </style>
 </head>
 <body>
 <!-- 导航栏容器，将由JavaScript加载 -->
 <div id="navbar-container"></div>
 
-<!-- 用户中心内容 -->
+<header class="admin-header">
+  <div class="container">
+    <h1>Admin Management Console</h1>
+    <p>Manage carbon accounting reviews and product inventory for the CarbonTrack platform</p>
+  </div>
+</header>
+
+<!-- 管理控制台内容 -->
 <div class="container">
-  <div id="productsList" class="row">
-    <div class="col-md-4">
-      <div class="card">
-        <div class="card-body">
-          <a class="card-tittle" href="ptmgmt.html">碳减排核算审查入口</a>
-          <h5 class="card-text">审查用户碳减排记录</h5>
+  <div class="row">
+    <div class="col-md-6">
+      <div class="admin-card ios-depth-effect ios-hover-effect">
+        <div class="admin-card-body">
+          <div class="admin-card-icon">
+            <i class="fas fa-chart-line"></i>
+          </div>
+          <h2 class="admin-card-title">Carbon Reduction Review</h2>
+          <p class="admin-card-text">Review and verify user carbon reduction records and approve carbon credits</p>
+          <a href="ptmgmt.html" class="admin-card-link">
+            <i class="fas fa-clipboard-check mr-2"></i> Access Review Portal
+          </a>
         </div>
       </div>
     </div>
-    <div class="col-md-4">
-      <div class="card">
-        <div class="card-body">
-          <a class="card-tittle" href="productmgmt.html">积分商城管理入口</a>
-          <h5 class="card-text">管理积分商城商品</h5>
+    <div class="col-md-6">
+      <div class="admin-card ios-depth-effect ios-hover-effect">
+        <div class="admin-card-body">
+          <div class="admin-card-icon">
+            <i class="fas fa-shopping-cart"></i>
+          </div>
+          <h2 class="admin-card-title">Credits Mall Management</h2>
+          <p class="admin-card-text">Manage products, update inventory, and handle redemption requests</p>
+          <a href="productmgmt.html" class="admin-card-link">
+            <i class="fas fa-store mr-2"></i> Access Mall Portal
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="row mt-4">
+    <div class="col-md-6 offset-md-3">
+      <div class="admin-card ios-depth-effect ios-hover-effect">
+        <div class="admin-card-body">
+          <div class="admin-card-icon">
+            <i class="fas fa-users"></i>
+          </div>
+          <h2 class="admin-card-title">User Management</h2>
+          <p class="admin-card-text">Manage user accounts, review permissions, and handle user support</p>
+          <a href="#" class="admin-card-link">
+            <i class="fas fa-user-shield mr-2"></i> Access User Portal
+          </a>
         </div>
       </div>
     </div>
   </div>
 </div>
-<!-- 复制您主页的页脚 -->
+
+<!-- 页脚 -->
 <div id="footer-placeholder"></div>
+
+<script>
+  $(document).ready(function() {
+    // 检查管理员权限
+    var token = localStorage.getItem('token');
+    if (!token) {
+      alert('请先登录');
+      window.location.href = 'index.html';
+      return;
+    }
+    
+    checkAdminAccess(token);
+  });
+  
+  function checkAdminAccess(token) {
+    $.ajax({
+      url: 'verify_admin.php',
+      type: 'POST',
+      data: { token: token },
+      dataType: 'json',
+      success: function(response) {
+        if (!response.success) {
+          alert('您没有管理员权限，无法访问此页面');
+          window.location.href = 'index.html';
+        }
+      },
+      error: function() {
+        alert('验证权限失败，请重试');
+        window.location.href = 'index.html';
+      }
+    });
+  }
+</script>
 
 </body>
 </html>

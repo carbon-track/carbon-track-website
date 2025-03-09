@@ -2,102 +2,323 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <title>产品管理系统</title>
+  <title>Product Management - CarbonTrack</title>
   <link rel="icon" href="/img/team.jpg" type="image/JPG">
   <link rel="stylesheet" href="./css/bootstrap.min.css">
   <script src="./js/jquery.min.js"></script>
   <script src="https://cdn.staticfile.org/twitter-bootstrap/4.5.2/js/bootstrap.min.js"></script>
   <script src="js/nav.js"></script>
+  <!-- SF Pro 字体 -->
+  <link href="https://fonts.cdnfonts.com/css/sf-pro-display" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+  <!-- Intersection Observer polyfill -->
+  <script src="https://cdn.jsdelivr.net/npm/intersection-observer@0.12.2/intersection-observer.js"></script>
+  <!-- iOS设计CSS -->
+  <link rel="stylesheet" href="./css/ios-design.css">
   <link rel="stylesheet" href="./css/index.css">
+  <style>
+    .admin-header {
+      background: linear-gradient(135deg, var(--ios-orange), var(--ios-pink));
+      color: white;
+      padding: 120px 0 60px;
+      text-align: center;
+      border-radius: 0 0 24px 24px;
+      margin-bottom: 40px;
+    }
+    
+    .admin-header h1 {
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+    
+    .admin-header p {
+      opacity: 0.9;
+      max-width: 600px;
+      margin: 0 auto;
+      font-size: 1.1rem;
+    }
+    
+    .admin-card {
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+      margin-bottom: 30px;
+      transition: transform 0.4s var(--animation-timing-apple),
+                  box-shadow 0.4s var(--animation-timing-apple);
+      background-color: var(--ios-system-background);
+    }
+    
+    .admin-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.1);
+    }
+    
+    .product-card {
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+      margin-bottom: 30px;
+      transition: transform 0.4s var(--animation-timing-apple),
+                  box-shadow 0.4s var(--animation-timing-apple);
+      height: 100%;
+      background-color: var(--ios-system-background);
+    }
+    
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.1);
+    }
+    
+    .product-img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+    
+    .product-body {
+      padding: 24px;
+    }
+    
+    .product-title {
+      font-weight: 700;
+      margin-bottom: 8px;
+      font-size: 1.2rem;
+    }
+    
+    .product-detail {
+      color: var(--ios-gray);
+      margin-bottom: 4px;
+      font-size: 0.95rem;
+    }
+    
+    .product-price {
+      font-weight: 700;
+      color: var(--ios-green);
+      margin-bottom: 4px;
+    }
+    
+    .section-title {
+      font-weight: 700;
+      margin-bottom: 24px;
+      position: relative;
+      padding-bottom: 12px;
+    }
+    
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 60px;
+      height: 4px;
+      background: linear-gradient(to right, var(--ios-orange), var(--ios-pink));
+      border-radius: 2px;
+    }
+    
+    .form-card {
+      background: var(--ios-system-background);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+      margin-bottom: 30px;
+    }
+    
+    .form-group label {
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--ios-label);
+    }
+    
+    .form-control {
+      border-radius: 12px;
+      border: 1px solid var(--ios-gray-light);
+      padding: 12px 16px;
+      transition: all 0.3s var(--animation-timing-apple);
+    }
+    
+    .form-control:focus {
+      border-color: var(--ios-blue);
+      box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
+    }
+    
+    .btn-add {
+      background: linear-gradient(135deg, var(--ios-green), var(--ios-teal));
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 24px;
+      font-weight: 600;
+      transition: all 0.3s var(--animation-timing-apple);
+      box-shadow: 0 6px 16px rgba(46, 204, 113, 0.15);
+    }
+    
+    .btn-add:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(46, 204, 113, 0.25);
+    }
+    
+    .btn-update {
+      background: linear-gradient(135deg, var(--ios-blue), var(--ios-indigo));
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 24px;
+      font-weight: 600;
+      transition: all 0.3s var(--animation-timing-apple);
+      box-shadow: 0 6px 16px rgba(0, 122, 255, 0.15);
+    }
+    
+    .btn-update:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 122, 255, 0.25);
+    }
+    
+    .btn-delete {
+      background: linear-gradient(135deg, var(--ios-red), var(--ios-pink));
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 24px;
+      font-weight: 600;
+      transition: all 0.3s var(--animation-timing-apple);
+      box-shadow: 0 6px 16px rgba(231, 76, 60, 0.15);
+    }
+    
+    .btn-delete:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(231, 76, 60, 0.25);
+    }
+  </style>
 </head>
 <body>
 
 <!-- 导航栏容器，将由JavaScript加载 -->
 <div id="navbar-container"></div>
 
-<div class="container mt-4">
+<header class="admin-header">
+  <div class="container">
+    <h1>Product Management</h1>
+    <p>Add, update, and manage products in the Carbon Credits Mall</p>
+  </div>
+</header>
+
+<div class="container">
   <div class="row">
     <div class="col-md-6">
-      <h2>添加产品</h2>
-      <form id="addProductForm">
-        <div class="form-group">
-          <label for="addName">名称:</label>
-          <input type="text" class="form-control" id="addName" required>
-        </div>
-        <div class="form-group">
-          <label for="addDescription">描述:</label>
-          <input type="text" class="form-control" id="addDescription" required>
-        </div>
-        <div class="form-group">
-          <label for="addPrice">价格:</label>
-          <input type="number" class="form-control" id="addPrice" required>
-        </div>
-        <div class="form-group">
-          <label for="addPrice">数量:</label>
-          <input type="number" class="form-control" id="addStock" required>
-        </div>
-        <button type="submit" class="btn btn-primary">添加</button>
-      </form>
+      <div class="form-card ios-depth-effect">
+        <h2 class="section-title">Add New Product</h2>
+        <form id="addProductForm">
+          <div class="form-group">
+            <label for="addName"><i class="fas fa-tag mr-2"></i>Product Name:</label>
+            <input type="text" class="form-control" id="addName" required>
+          </div>
+          <div class="form-group">
+            <label for="addDescription"><i class="fas fa-info-circle mr-2"></i>Description:</label>
+            <textarea class="form-control" id="addDescription" rows="3" required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="addPrice"><i class="fas fa-coins mr-2"></i>Price (Credits):</label>
+            <input type="number" class="form-control" id="addPrice" required>
+          </div>
+          <div class="form-group">
+            <label for="addStock"><i class="fas fa-warehouse mr-2"></i>Stock Quantity:</label>
+            <input type="number" class="form-control" id="addStock" required>
+          </div>
+          <button type="submit" class="btn btn-add btn-block">
+            <i class="fas fa-plus-circle mr-2"></i>Add Product
+          </button>
+        </form>
+      </div>
     </div>
     <div class="col-md-6">
-      <h2>更新/删除产品</h2>
-      <form id="updateDeleteProductForm">
-        <div class="form-group">
-          <label for="updateProductId">产品ID:</label>
-          <input type="number" class="form-control" id="updateProductId" required>
-        </div>
-        <div class="form-group">
-          <label for="updateName">名称:</label>
-          <input type="text" class="form-control" id="updateName" required>
-        </div>
-        <div class="form-group">
-          <label for="updateDescription">描述:</label>
-          <input type="text" class="form-control" id="updateDescription" required>
-        </div>
-        <div class="form-group">
-          <label for="updatePrice">价格:</label>
-          <input type="number" class="form-control" id="updatePrice" required>
-        </div>
-        <button type="button" class="btn btn-success" onclick="updateProduct()">更新</button>
-        <button type="button" class="btn btn-danger" onclick="deleteProduct()">删除</button>
-      </form>
+      <div class="form-card ios-depth-effect">
+        <h2 class="section-title">Update or Delete Product</h2>
+        <form id="updateDeleteProductForm">
+          <div class="form-group">
+            <label for="updateProductId"><i class="fas fa-fingerprint mr-2"></i>Product ID:</label>
+            <input type="number" class="form-control" id="updateProductId" required>
+          </div>
+          <div class="form-group">
+            <label for="updateName"><i class="fas fa-tag mr-2"></i>Product Name:</label>
+            <input type="text" class="form-control" id="updateName" required>
+          </div>
+          <div class="form-group">
+            <label for="updateDescription"><i class="fas fa-info-circle mr-2"></i>Description:</label>
+            <textarea class="form-control" id="updateDescription" rows="3" required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="updatePrice"><i class="fas fa-coins mr-2"></i>Price (Credits):</label>
+            <input type="number" class="form-control" id="updatePrice" required>
+          </div>
+          <div class="form-row">
+            <div class="col-md-6">
+              <button type="button" class="btn btn-update btn-block" onclick="updateProduct()">
+                <i class="fas fa-sync-alt mr-2"></i>Update
+              </button>
+            </div>
+            <div class="col-md-6">
+              <button type="button" class="btn btn-delete btn-block" onclick="deleteProduct()">
+                <i class="fas fa-trash-alt mr-2"></i>Delete
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 </div>
+
 <div class="container mt-4">
-  <h2>当前商城商品</h2>
+  <h2 class="section-title">Current Products</h2>
   <div id="productList" class="row">
     <!-- 商品信息将通过JavaScript动态插入 -->
+    <div class="col-12 text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="sr-only">Loading...</span>
+      </div>
+      <p class="mt-3">Loading products...</p>
+    </div>
   </div>
 </div>
+
 <script>
   $(document).ready(function () {
-    var token = sessionStorage.getItem('token') // Assume the user's token is stored in sessionStorage
+    var token = localStorage.getItem('token'); // Use localStorage instead of sessionStorage
     if (!token) {
-      alert('非法访问！')
-      window.location.href = 'index.html' // Redirect to login page if token is not present
+      alert('Please login first!');
+      window.location.href = 'index.html'; // Redirect to login page if token is not present
+      return;
     }
-    verifyAdmin()
-
-  })
+    
+    verifyAdmin();
+  });
 
   function verifyAdmin() {
-    var token = sessionStorage.getItem('token')
+    var token = localStorage.getItem('token');
     $.ajax({
       type: 'POST',
       data: { token: token },
-      url: 'verify_admin.php', // 替换为您的PHP脚本路径
+      url: 'verify_admin.php',
       dataType: 'json',
       success: function (response) {
         if (response.success) {
-          fetchProducts()
+          fetchProducts();
+          
           $('#addProductForm').submit(function (e) {
-            e.preventDefault()
-            var name = $('#addName').val()
-            var description = $('#addDescription').val()
-            var price = $('#addPrice').val()
-            var stock = $('#addStock').val()
-            var token = sessionStorage.getItem('token')
+            e.preventDefault();
+            
+            // Show loading state
+            var submitBtn = $(this).find('button[type="submit"]');
+            var originalText = submitBtn.html();
+            submitBtn.html('<i class="fas fa-spinner fa-spin mr-2"></i> Adding...');
+            submitBtn.prop('disabled', true);
+            
+            var name = $('#addName').val();
+            var description = $('#addDescription').val();
+            var price = $('#addPrice').val();
+            var stock = $('#addStock').val();
+            var token = localStorage.getItem('token');
+            
             $.ajax({
               type: 'POST',
               url: 'add_product.php',
@@ -109,31 +330,50 @@
                 token: token,
               },
               success: function (response) {
-                alert(response.success ? '产品添加成功' : '产品添加失败: ' + response.message)
+                // Reset button state
+                submitBtn.html(originalText);
+                submitBtn.prop('disabled', false);
+                
+                if (response.success) {
+                  alert('Product added successfully!');
+                  $('#addProductForm')[0].reset();
+                  fetchProducts();
+                } else {
+                  alert('Failed to add product: ' + response.message);
+                }
               },
               error: function (xhr) {
-                alert('请求失败，请重试:' + xhr.responseText)
+                // Reset button state
+                submitBtn.html(originalText);
+                submitBtn.prop('disabled', false);
+                alert('Request failed. Please try again: ' + xhr.responseText);
               },
-            })
-          })
+            });
+          });
         } else {
-          alert('非法访问，您不是管理员。')
-          window.location.href = 'index.html'
+          alert('Access denied. You are not an administrator.');
+          window.location.href = 'index.html';
         }
       },
       error: function () {
-        alert('验证失败，请重试。')
-        window.location.href = 'index.html'
+        alert('Verification failed. Please try again.');
+        window.location.href = 'index.html';
       },
-    })
+    });
   }
 
   function updateProduct() {
-    var productId = $('#updateProductId').val()
-    var name = $('#updateName').val()
-    var description = $('#updateDescription').val()
-    var price = $('#updatePrice').val()
-    var token = sessionStorage.getItem('token')
+    var submitBtn = $('.btn-update');
+    var originalText = submitBtn.html();
+    submitBtn.html('<i class="fas fa-spinner fa-spin mr-2"></i> Updating...');
+    submitBtn.prop('disabled', true);
+    
+    var productId = $('#updateProductId').val();
+    var name = $('#updateName').val();
+    var description = $('#updateDescription').val();
+    var price = $('#updatePrice').val();
+    var token = localStorage.getItem('token');
+    
     $.ajax({
       type: 'POST',
       url: 'update_product.php',
@@ -145,17 +385,39 @@
         token: token,
       },
       success: function (response) {
-        alert(response.success ? '产品更新成功' : '产品更新失败: ' + response.message)
+        // Reset button state
+        submitBtn.html(originalText);
+        submitBtn.prop('disabled', false);
+        
+        if (response.success) {
+          alert('Product updated successfully!');
+          fetchProducts();
+        } else {
+          alert('Failed to update product: ' + response.message);
+        }
       },
       error: function (xhr) {
-        alert('请求失败，请重试。')
+        // Reset button state
+        submitBtn.html(originalText);
+        submitBtn.prop('disabled', false);
+        alert('Request failed. Please try again.');
       },
-    })
+    });
   }
 
   function deleteProduct() {
-    var productId = $('#updateProductId').val()
-    var token = sessionStorage.getItem('token')
+    if (!confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
+      return;
+    }
+    
+    var submitBtn = $('.btn-delete');
+    var originalText = submitBtn.html();
+    submitBtn.html('<i class="fas fa-spinner fa-spin mr-2"></i> Deleting...');
+    submitBtn.prop('disabled', true);
+    
+    var productId = $('#updateProductId').val();
+    var token = localStorage.getItem('token');
+    
     $.ajax({
       type: 'POST',
       url: 'delete_product.php',
@@ -164,67 +426,91 @@
         token: token,
       },
       success: function (response) {
-        alert(response.success ? '产品删除成功' : '产品删除失败: ' + response.message)
+        // Reset button state
+        submitBtn.html(originalText);
+        submitBtn.prop('disabled', false);
+        
+        if (response.success) {
+          alert('Product deleted successfully!');
+          $('#updateDeleteProductForm')[0].reset();
+          fetchProducts();
+        } else {
+          alert('Failed to delete product: ' + response.message);
+        }
       },
       error: function (xhr) {
-        alert('请求失败，请重试。')
+        // Reset button state
+        submitBtn.html(originalText);
+        submitBtn.prop('disabled', false);
+        alert('Request failed. Please try again.');
       },
-    })
+    });
   }
 
   function fetchProducts() {
     $.ajax({
       type: 'GET',
-      url: 'product.php', // 替换为获取商品数据的实际URL
+      url: 'product.php',
       dataType: 'json',
       success: function (response) {
         if (response.success) {
-          renderProducts(response.products)
+          renderProducts(response.products);
         } else {
-          console.error('获取商品信息失败: ' + response.message)
+          console.error('Failed to get products: ' + response.message);
+          $('#productList').html('<div class="col-12"><div class="alert alert-danger">Failed to load products: ' + response.message + '</div></div>');
         }
       },
       error: function () {
-        console.error('请求商品数据失败。')
+        console.error('Product data request failed.');
+        $('#productList').html('<div class="col-12"><div class="alert alert-danger">Failed to load products. Please try again later.</div></div>');
       },
-    })
+    });
   }
 
   function renderProducts(products) {
-    var productList = $('#productList')
-    productList.empty() // 清空现有商品列表
+    var productList = $('#productList');
+    productList.empty(); // Clear existing product list
+    
+    if (products.length === 0) {
+      productList.html('<div class="col-12 text-center py-5"><p>No products available. Add your first product!</p></div>');
+      return;
+    }
+    
     products.forEach(function (product) {
       var productHTML = `
-      <div class="col-md-4">
-        <div class="card mb-4">
-          <img class="card-img-top" src="${product.image_path}" alt="${product.name}">
-          <div class="card-body">
-            <h5 class="card-title">${product.name}</h5>
-            <p class="card-text">编号: ${product.product_id}</p>
-            <p class="card-text">描述：${product.description}</p>
-            <p class="card-text">价格: ${product.price}</p>
-            <p class="card-text">库存: ${product.stock}</p>
+      <div class="col-md-4 mb-4">
+        <div class="product-card ios-hover-effect">
+          <img class="product-img" src="${product.image_path || '/img/placeholder.jpg'}" alt="${product.name}">
+          <div class="product-body">
+            <h3 class="product-title">${product.name}</h3>
+            <p class="product-detail"><strong>ID:</strong> ${product.product_id}</p>
+            <p class="product-detail">${product.description}</p>
+            <p class="product-price">${product.price} Credits</p>
+            <p class="product-detail"><strong>Stock:</strong> ${product.stock}</p>
+            <button class="btn btn-update btn-sm" onclick="fillUpdateForm(${product.product_id}, '${product.name}', '${product.description}', ${product.price})">
+              <i class="fas fa-edit mr-1"></i> Edit
+            </button>
           </div>
         </div>
-      </div>`
-      productList.append(productHTML) // 将商品添加到列表
-    })
+      </div>`;
+      productList.append(productHTML);
+    });
+  }
+  
+  function fillUpdateForm(id, name, description, price) {
+    $('#updateProductId').val(id);
+    $('#updateName').val(name);
+    $('#updateDescription').val(description);
+    $('#updatePrice').val(price);
+    
+    // Scroll to the update form
+    $('html, body').animate({
+      scrollTop: $('#updateDeleteProductForm').offset().top - 100
+    }, 800);
   }
 </script>
-<script>function logout() {
-  sessionStorage.removeItem('loggedIn')
-  sessionStorage.removeItem('username')
-  sessionStorage.removeItem('expiration')
-  // 更新UI为未登录状态
-  $('#userStatus').text('')
-  $('#logoutButton').hide()
-  $('#loginButton').show()
-}
 
-function Redirect(webpage) {
-  window.location = webpage
-}</script>
-<!-- 页脚内容 -->
+<!-- 页脚 -->
 <div id="footer-placeholder"></div>
 </body>
 </html>

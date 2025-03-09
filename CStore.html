@@ -8,11 +8,142 @@
   <script src="js/jquery.min.js"></script>
   <script src="js/bootstrap.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+  <!-- SF Pro font -->
+  <link href="https://fonts.cdnfonts.com/css/sf-pro-display" rel="stylesheet">
+  <!-- Intersection Observer polyfill for older browsers -->
+  <script src="https://cdn.jsdelivr.net/npm/intersection-observer@0.12.2/intersection-observer.js"></script>
+  <!-- iOS设计CSS -->
+  <link rel="stylesheet" href="./css/ios-design.css">
   <script src="js/nav.js"></script>
   <link rel="stylesheet" href="/css/index.css">
+  <style>
+    .store-header {
+      background: linear-gradient(135deg, var(--ios-orange), var(--ios-pink));
+      color: white;
+      padding: 120px 0 80px;
+      text-align: center;
+      border-radius: 0 0 24px 24px;
+      margin-bottom: 40px;
+    }
+    
+    .store-header h1 {
+      font-weight: 700;
+      color: white;
+      margin-bottom: 16px;
+    }
+    
+    .store-header p {
+      font-size: 1.2rem;
+      opacity: 0.9;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    
+    .user-credits {
+      background: linear-gradient(135deg, var(--ios-green), var(--ios-mint));
+      color: white;
+      border-radius: 24px;
+      padding: 24px;
+      margin-bottom: 30px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    }
+    
+    .user-credits h2 {
+      color: white;
+      margin-bottom: 16px;
+      font-weight: 700;
+    }
+    
+    .credits-amount {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    
+    .product-card {
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+      margin-bottom: 30px;
+      transition: transform 0.4s var(--animation-timing-apple),
+                  box-shadow 0.4s var(--animation-timing-apple);
+      background-color: var(--ios-system-background);
+    }
+    
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.1);
+    }
+    
+    .product-img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+    
+    .product-body {
+      padding: 24px;
+    }
+    
+    .product-title {
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    
+    .product-description {
+      color: var(--ios-gray);
+      margin-bottom: 16px;
+      height: 48px;
+      overflow: hidden;
+    }
+    
+    .product-price {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    
+    .price-tag {
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: var(--ios-green);
+    }
+    
+    .exchange-btn {
+      background: linear-gradient(135deg, var(--ios-blue), var(--ios-indigo));
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 10px 16px;
+      font-weight: 600;
+      transition: all 0.3s var(--animation-timing-apple);
+    }
+    
+    .exchange-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    }
+    
+    .section-title {
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 2rem;
+      background: linear-gradient(120deg, var(--ios-orange), var(--ios-pink));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .loading-spinner {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 200px;
+    }
+  </style>
   <script>
     $(document).ready(function () {
-      var token = sessionStorage.getItem('token')
+      var token = localStorage.getItem('token')
       if (token) {
       } else {
         $('#userPoints').text('未登录')
@@ -28,135 +159,161 @@
       // 兑换商品
       $('#productsList').on('click', '.exchange-btn', function () {
         var productId = $(this).data('id')
-        var token = sessionStorage.getItem('token')
+        var token = localStorage.getItem('token')
         exchangeProduct(productId, token)
       })
     })
 
     function fetchProducts() {
-      var token = sessionStorage.getItem('token')
+      var token = localStorage.getItem('token')
       $('#loading').show() // 显示加载动画
       $.ajax({
         type: 'POST',
         url: 'product.php',
-        data: { token: token },
+        data: {
+          token: token
+        },
         dataType: 'json',
         success: function (response) {
           $('#loading').hide() // 隐藏加载动画
           if (response.success) {
-            renderProducts(response.products)
+            displayProducts(response.products)
           } else {
-            console.error('获取商品信息失败: ' + response.error)
+            $('#productsList').html('<div class="alert alert-danger">Error: ' + response.message + '</div>')
           }
         },
-        error: function (jqXHR, textStatus, errorThrown) {
+        error: function () {
           $('#loading').hide() // 隐藏加载动画
-          console.error('AJAX error: ' + textStatus + ', ' + errorThrown)
-        },
+          $('#productsList').html('<div class="alert alert-danger">Failed to fetch products. Please try again later.</div>')
+        }
       })
     }
 
     function fetchUserPoints() {
-      var token = sessionStorage.getItem('token');
+      var uid = localStorage.getItem('id')
+      var token = localStorage.getItem('token')
       $.ajax({
         type: 'POST',
         url: 'get_user_points.php',
-        data: { token: token },
+        data: {
+          uid: uid,
+          token: token
+        },
         dataType: 'json',
         success: function (response) {
           if (response.success) {
-            $('#pointsBalance').text(response.userPoints)
+            $('#userPoints').text(response.points)
           } else {
-            alert('获取积分失败: ' + response.error)
+            console.error('Error getting user points:', response.message)
           }
         },
-        error: function (jqXHR, textStatus, errorThrown) {
-          console.error('AJAX error: ' + textStatus + ', ' + errorThrown)
-        },
-      })
-    }
-
-    function renderProducts(products) {
-      $('#productsList').empty() // 清空现有商品列表
-      var userPoints = parseInt($('#pointsBalance').text())
-      products.forEach(function (product) {
-        /*var exchangeClass = userPoints >= product.points_required ? 'exchangeable' : 'non-exchangeable';
-        var exchangeText = userPoints >= product.points_required ? '可兑换' : '积分不足';*/
-        if (userPoints >= product.points_required) {
-          var exchangeText = '可兑换'
-          var exchangeClass = 'exchangeable'
-        } else {
-          var exchangeText = '积分不足'
-          var exchangeClass = 'non-exchangeable'
+        error: function () {
+          console.error('AJAX请求失败')
         }
-        $('#productsList').append(
-          '<div class="col-md-4">' +
-          '<div class="card">' +
-          '<img class="card-img-top" src="' + product.image_path + '" alt="' + product.name + '">' +
-          '<div class="card-body">' +
-          '<h5 class="card-title">' + product.name + '</h5>' +
-          '<p class="card-text">' + product.description + '</p>' +
-          '<p class="card-text">所需积分: ' + product.points_required + '</p>' +
-          '<button class="btn exchange-btn ' + exchangeClass + '" data-id="' + product.product_id + '">' + exchangeText + '</button>' +
-          '</div>' +
-          '</div>' +
-          '</div>',
-        )
       })
     }
 
+    function displayProducts(products) {
+      var productsHtml = ''
+      if (products.length === 0) {
+        $('#productsList').html('<div class="alert alert-info">No products available at the moment.</div>')
+        return
+      }
+
+      // 创建每行的产品列表
+      var productsRow = '<div class="row">'
+      products.forEach(function (product, index) {
+        // 每行显示3个产品
+        if (index > 0 && index % 3 === 0) {
+          productsRow += '</div><div class="row mt-4">'
+        }
+
+        productsRow += `
+          <div class="col-md-4">
+            <div class="product-card ios-hover-effect">
+              <img src="${product.image_url}" alt="${product.name}" class="product-img">
+              <div class="product-body">
+                <h3 class="product-title">${product.name}</h3>
+                <p class="product-description">${product.description}</p>
+                <div class="product-price">
+                  <span class="price-tag">${product.price} Credits</span>
+                  <button class="exchange-btn" data-id="${product.id}">Exchange</button>
+                </div>
+                <div class="stock">Stock: ${product.stock}</div>
+              </div>
+            </div>
+          </div>
+        `
+      })
+      productsRow += '</div>'
+      $('#productsList').html(productsRow)
+    }
 
     function exchangeProduct(productId, token) {
       $.ajax({
         type: 'POST',
         url: 'exchange_product.php',
-        contentType: 'application/json',
-        data: JSON.stringify({ productId: productId, token: token }),
+        data: {
+          product_id: productId,
+          token: token
+        },
         dataType: 'json',
         success: function (response) {
           if (response.success) {
-            alert('商品兑换申请成功！我们将在3个工作日内完成审批您的兑换申请。')
-            fetchUserPoints() // Refresh user points
+            alert('Exchange successful! ' + response.message)
+            // 更新用户积分和产品列表
+            fetchUserPoints()
+            fetchProducts()
           } else {
-            alert('兑换失败: ' + response.error)
+            alert('Exchange failed: ' + response.message)
           }
         },
-        error: function (jqXHR, textStatus, errorThrown) {
-          console.error('AJAX error: ' + textStatus + ', ' + errorThrown)
-        },
+        error: function () {
+          alert('Exchange request failed. Please try again later.')
+        }
       })
     }
-
   </script>
 </head>
 <body>
 <!-- 导航栏容器，将由JavaScript加载 -->
 <div id="navbar-container"></div>
 
-<div class="container mt-4">
-  <div class="alert alert-info" role="alert">
-    <h4 class="alert-heading">Our Rewards System! This block is currently under construction:)</h4>
-    <p>Please take a moment to read the following: This block is currently under construction:)</p>
-    <hr>
-    <ul>
-      <li>When users achieve cumulative carbon reductions of 5kg, 20kg, and 50kg, they will be upgraded and awarded badges, certificates, and thank-you letters via email!</li>
-      <li>Leaderboards are set so that all users can see each other's progress!</li>
-      <li>We will regularly showcase outstanding carbon reduction performance on the homepage!</li>
-      <li>In the near future, we will introduce physical rewards that can be redeemed with carbon credits—stay tuned!</li>
-    </ul>
-    <p class="mb-0">Thank you for reading and for your support! If you have any questions or need assistance, please feel free to contact us.</p>
+<header class="store-header">
+  <div class="container">
+    <h1>Carbon Credits Mall</h1>
+    <p>Exchange your hard-earned carbon credits for eco-friendly rewards and exclusive benefits.</p>
   </div>
-</div>
+</header>
+
 <div class="container">
-  <h3>Your Carbon Credits Balance: <span id="pointsBalance">0</span></h3>
-  <div id="productsList" class="row">
-    <div id="loading">
-      <div class="loader"></div>
+  <div class="user-credits ios-depth-effect ios-shine-effect">
+    <div class="row">
+      <div class="col-md-8">
+        <h2>Your Carbon Credits</h2>
+        <div class="credits-amount"><span id="userPoints">Loading...</span></div>
+        <p>Use your credits to redeem these amazing eco-friendly products and rewards.</p>
+      </div>
+      <div class="col-md-4 d-flex align-items-center justify-content-center">
+        <a href="center.html" class="btn btn-light btn-lg">View History</a>
+      </div>
     </div>
-    <!-- 商品列表将在这里动态生成 -->
+  </div>
+  
+  <h2 class="section-title">Available Rewards</h2>
+  
+  <div id="loading" class="loading-spinner">
+    <div class="spinner-border text-primary" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
+  </div>
+  
+  <div id="productsList">
+    <!-- Products will be dynamically loaded here -->
   </div>
 </div>
+
+<!-- 页脚 -->
 <div id="footer-placeholder"></div>
-<!-- 页脚内容省略，与上面一致 -->
 </body>
 </html>

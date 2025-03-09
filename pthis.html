@@ -2,53 +2,206 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <title>碳减排核算记录</title>
+  <title>Carbon Reduction Records - CarbonTrack</title>
   <link rel="icon" href="/img/team.jpg" type="image/JPG">
   <!-- 引入Bootstrap和jQuery的CDN链接 -->
   <link rel="stylesheet" href="./css/bootstrap.min.css">
   <script src="js/jquery.min.js"></script>
   <script src="js/bootstrap.min.js"></script>
   <script src="js/nav.js"></script>
+  <!-- SF Pro 字体 -->
+  <link href="https://fonts.cdnfonts.com/css/sf-pro-display" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+  <!-- Intersection Observer polyfill -->
+  <script src="https://cdn.jsdelivr.net/npm/intersection-observer@0.12.2/intersection-observer.js"></script>
+  <!-- iOS设计CSS -->
+  <link rel="stylesheet" href="./css/ios-design.css">
   <link rel="stylesheet" href="./css/index.css">
-  <!-- 省略其他链接和样式 -->
   <style>
+    .records-header {
+      background: linear-gradient(135deg, var(--ios-green), var(--ios-teal));
+      color: white;
+      padding: 120px 0 60px;
+      text-align: center;
+      border-radius: 0 0 24px 24px;
+      margin-bottom: 40px;
+    }
+    
+    .records-header h1 {
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+    
+    .records-header p {
+      opacity: 0.9;
+      max-width: 600px;
+      margin: 0 auto;
+      font-size: 1.1rem;
+    }
+    
+    .user-info {
+      background: var(--ios-system-background);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+      margin-bottom: 30px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .user-info-label {
+      font-weight: 700;
+      margin-right: 8px;
+      color: var(--ios-label);
+    }
+    
+    .user-info-value {
+      font-weight: 600;
+      color: var(--ios-blue);
+    }
+    
+    .record-card {
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+      margin-bottom: 30px;
+      transition: transform 0.4s var(--animation-timing-apple),
+                  box-shadow 0.4s var(--animation-timing-apple);
+      height: 100%;
+      background-color: var(--ios-system-background);
+    }
+    
+    .record-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.1);
+    }
+    
+    .record-img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+    
+    .record-body {
+      padding: 24px;
+    }
+    
+    .record-title {
+      font-weight: 700;
+      margin-bottom: 12px;
+      font-size: 1.3rem;
+    }
+    
+    .record-row {
+      display: flex;
+      margin-bottom: 8px;
+      align-items: center;
+    }
+    
+    .record-label {
+      font-weight: 600;
+      color: var(--ios-gray);
+      width: 100px;
+      flex-shrink: 0;
+    }
+    
+    .record-value {
+      flex-grow: 1;
+    }
+    
     .auth-status {
       display: inline-block;
-      padding: 0.25em 0.5em;
-      border-radius: 5px;
+      padding: 8px 16px;
+      border-radius: 12px;
       color: white;
-      font-weight: bold;
+      font-weight: 700;
       text-align: center;
       width: 100%;
-      margin-top: 10px;
+      margin-top: 16px;
+      transition: all 0.3s var(--animation-timing-apple);
     }
-
+    
     .auth-yes {
-      background-color: #28a745;
-      color: black;
+      background: linear-gradient(135deg, var(--ios-green), var(--ios-teal));
     }
-
+    
     .auth-no {
-      background-color: #dc3545;
-      color: black;
+      background: linear-gradient(135deg, var(--ios-red), var(--ios-pink));
     }
-
+    
     .auth-non {
-      background-color: #ffc107;
-      color: black;
-    }</style>
+      background: linear-gradient(135deg, var(--ios-orange), var(--ios-yellow));
+    }
+    
+    .loading-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 0;
+    }
+    
+    .loader {
+      width: 48px;
+      height: 48px;
+      border: 5px solid var(--ios-gray-light);
+      border-bottom-color: var(--ios-blue);
+      border-radius: 50%;
+      animation: rotation 1s linear infinite;
+      margin-bottom: 16px;
+    }
+    
+    @keyframes rotation {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+    
+    .section-title {
+      font-weight: 700;
+      margin-bottom: 24px;
+      position: relative;
+      padding-bottom: 12px;
+    }
+    
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 60px;
+      height: 4px;
+      background: linear-gradient(to right, var(--ios-green), var(--ios-teal));
+      border-radius: 2px;
+    }
+  </style>
 </head>
 <body>
-<div id="loading">
+<div id="loading" class="loading-container">
   <div class="loader"></div>
+  <p>Loading records...</p>
 </div>
 
 <!-- 导航栏容器，将由JavaScript加载 -->
 <div id="navbar-container"></div>
 
+<header class="records-header">
+  <div class="container">
+    <h1>Carbon Reduction Records</h1>
+    <p>View and manage carbon accounting records for verification and approval</p>
+  </div>
+</header>
+
 <div class="container">
-  <h3>碳积分交易记录</h3><br>
-  <label>当前用户：</label><span id="email">加载中...</span>
+  <div class="user-info ios-depth-effect">
+    <div class="user-info-label">Current User:</div>
+    <div class="user-info-value" id="email">Loading...</div>
+  </div>
+  
+  <h2 class="section-title">Carbon Reduction Submissions</h2>
   <div id="records" class="row">
     <!-- 交易记录将在这里动态生成 -->
   </div>
@@ -56,104 +209,139 @@
 
 <script>
   $(document).ready(function () {
-    fetchTransactions()
-  })
-  var token = sessionStorage.getItem('token')
+    fetchTransactions();
+  });
+  
+  var token = localStorage.getItem('token');
   if (token) {
   } else {
-    $('#email').text('未登录')
-    alert('请先登录。')
-    window.location.href = 'index.html'
+    $('#email').text('Not logged in');
+    alert('Please login first.');
+    window.location.href = 'index.html';
   }
 
   function fetchTransactions() {
-    var token = sessionStorage.getItem('token')
+    var token = localStorage.getItem('token');
     if (!token) {
-      alert('请先登录。')
-      window.location.href = 'index.html'
-      return // 如果没有token，停止执行
+      alert('Please login first.');
+      window.location.href = 'index.html';
+      return; // 如果没有token，停止执行
     }
-    $('#email').text(sessionStorage.getItem('email'))
-    $('#loading').show() // 显示加载动画
+    
+    $('#email').text(localStorage.getItem('email'));
+    $('#loading').show(); // 显示加载动画
+    
     $.ajax({
-      type: 'POST', // 确保请求类型与PHP脚本接收的一致
+      type: 'POST',
       data: { token: token },
-      url: 'getpthis.php', // 替换为您的PHP脚本路径
+      url: 'getpthis.php',
       dataType: 'json',
       success: function (response) {
-        $('#loading').hide() // 隐藏加载动画
+        $('#loading').hide(); // 隐藏加载动画
+        
         if (response.success) {
-          const recordsContainer = $('#records')
+          const recordsContainer = $('#records');
+          
           // 使用sort方法和比较函数对数组进行排序
           response.data.sort(function (a, b) {
-            return a.id - b.id // 升序排序
-          })
+            return a.id - b.id; // 升序排序
+          });
+          
+          if (response.data.length === 0) {
+            recordsContainer.html('<div class="col-12 text-center py-5"><p>No records found.</p></div>');
+            return;
+          }
+          
           response.data.forEach(record => {
-            const authClass = getAuthClass(record.auth)
-            const authStatus = getAuthStatus(record.auth)
+            const authClass = getAuthClass(record.auth);
+            const authStatus = getAuthStatus(record.auth);
+            
             const card = `
-                <div class="col-md-4">
-                    <div class="card mb-4">
-                        <img class="card-img-top" src="${record.img}" alt="User Image">
-                        <div class="card-body">
-                            <h5 class="card-title">${record.username}</h5>
-                            <div class="card-text-row">核算ID: ${record.id}</div>
-                            <div class="card-text-row">邮箱: ${record.email}</div>
-                            <div class="card-text-row">提交时间: ${record.time}</div>
-                            <div class="card-text-row">新增分数: ${record.points}</div>
-                            <div class="card-text-row">原始数据: ${record.raw}</div>
-                            <div class="card-text-row">减排行为: ${record.act}</div>
-                            <div class="card-text-row auth-status ${authClass}">${authStatus}</div>
-                        </div>
+              <div class="col-md-4 mb-4">
+                <div class="record-card ios-hover-effect">
+                  <img class="record-img" src="${record.img}" alt="Record Image">
+                  <div class="record-body">
+                    <h3 class="record-title">${record.username}</h3>
+                    
+                    <div class="record-row">
+                      <div class="record-label">ID:</div>
+                      <div class="record-value">${record.id}</div>
                     </div>
+                    
+                    <div class="record-row">
+                      <div class="record-label">Email:</div>
+                      <div class="record-value">${record.email}</div>
+                    </div>
+                    
+                    <div class="record-row">
+                      <div class="record-label">Time:</div>
+                      <div class="record-value">${record.time}</div>
+                    </div>
+                    
+                    <div class="record-row">
+                      <div class="record-label">Points:</div>
+                      <div class="record-value">${record.points}</div>
+                    </div>
+                    
+                    <div class="record-row">
+                      <div class="record-label">Raw Data:</div>
+                      <div class="record-value">${record.raw}</div>
+                    </div>
+                    
+                    <div class="record-row">
+                      <div class="record-label">Activity:</div>
+                      <div class="record-value">${record.act}</div>
+                    </div>
+                    
+                    <div class="auth-status ${authClass}">${authStatus}</div>
+                  </div>
                 </div>
-            `
-            recordsContainer.append(card)
-          })
+              </div>
+            `;
+            
+            recordsContainer.append(card);
+          });
         } else {
           // 处理错误消息
-          alert('错误: ' + response.message)
+          alert('Error: ' + response.message);
         }
       },
-
       error: function (jqXHR, textStatus, errorThrown) {
-        $('#loading').hide() // 隐藏加载动画
-        console.error('AJAX error: ' + textStatus + ' - ' + errorThrown)
-        alert('请求失败: ' + textStatus)
+        $('#loading').hide(); // 隐藏加载动画
+        console.error('AJAX error: ' + textStatus + ' - ' + errorThrown);
+        alert('Request failed: ' + textStatus);
       },
-    })
+    });
   }
-
 
   function getAuthClass(auth) {
     switch (auth) {
       case 'yes':
-        return 'auth-yes'
+        return 'auth-yes';
       case 'no':
-        return 'auth-no'
+        return 'auth-no';
       case 'non':
-        return 'auth-non'
+        return 'auth-non';
       default:
-        return ''
+        return '';
     }
   }
 
   function getAuthStatus(auth) {
     switch (auth) {
       case 'yes':
-        return '已批准'
+        return 'Approved';
       case 'no':
-        return '未批准'
+        return 'Rejected';
       case 'non':
-        return '审核队列中'
+        return 'Pending Review';
       default:
-        return '未知状态'
+        return 'Unknown Status';
     }
   }
 </script>
 
-<!-- 省略页脚 -->
+<!-- 页脚 -->
 <div id="footer-placeholder"></div>
 </body>
-
 </html>
