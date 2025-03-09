@@ -554,13 +554,24 @@ function loadNavbar() {
 function setupNavbarEventListeners() {
     // Set up event listeners for navbar elements
     
+    // Unbind any existing handlers first to prevent duplicates
+    $('#loginModal form').off('submit');
+    $('#registerModal form').off('submit');
+    $('#sendVerificationCode').off('click');
+    $('#logoutButton').off('click');
+    $('#messagesDropdown, [data-target="#messagesModal"]').off('click');
+    
     // Login form submission
-    $('#loginModal form').submit(function(e) {
+    $('#loginModal form').on('submit', function(e) {
         e.preventDefault();
         
         // Get username and password values
         var username = $('#username').val();
         var password = $('#password').val();
+        
+        // Prevent double submissions
+        var $submitButton = $(this).find('button[type="submit"]');
+        $submitButton.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Signing in...');
         
         // Call login logic (using AJAX to authenticate)
         $.ajax({
@@ -607,23 +618,55 @@ function setupNavbarEventListeners() {
             },
             error: function() {
                 alert('Login request failed. Please try again later.');
+            },
+            complete: function() {
+                // Re-enable the button regardless of success/failure
+                $submitButton.prop('disabled', false).html('Sign In');
             }
         });
     });
     
     // Register form submission
-    $('#registerModal form').submit(function(e) {
+    $('#registerModal form').on('submit', function(e) {
         e.preventDefault();
+        
+        // Prevent double submissions
+        var $submitButton = $(this).find('button[type="submit"]');
+        $submitButton.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Creating account...');
+        
         registerUser();
+        
+        // Re-enable button after brief delay
+        setTimeout(function() {
+            $submitButton.prop('disabled', false).html('Create Account');
+        }, 1500);
     });
     
     // Send verification code button
-    $('#sendVerificationCode').click(function() {
+    $('#sendVerificationCode').on('click', function() {
+        // Prevent double clicks
+        var $button = $(this);
+        if ($button.prop('disabled')) return;
+        
+        $button.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Sending...');
+        
         sendVerificationCode();
+        
+        // Disable for 60 seconds to prevent spam
+        var countdown = 60;
+        var interval = setInterval(function() {
+            countdown--;
+            if (countdown > 0) {
+                $button.html('Resend in ' + countdown + 's');
+            } else {
+                clearInterval(interval);
+                $button.prop('disabled', false).html('Send Verification Code');
+            }
+        }, 1000);
     });
     
     // Set up other navbar event listeners
-    $('#logoutButton').click(function() {
+    $('#logoutButton').on('click', function() {
         logout();
     });
     

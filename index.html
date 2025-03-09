@@ -1206,8 +1206,11 @@
       lastScrollTop = st;
     });
     
-    // Body padding is now handled in the setupNavbarEventListeners function
-    // to ensure it's only applied on mobile
+    // Prevent form submissions from index.html to avoid duplicate requests
+    // The actual handlers are in nav.js
+    $('#loginModal form').off('submit');
+    $('#registerModal form').off('submit');
+    $('#sendVerificationCode').off('click');
   });
 </script>
 </body>
