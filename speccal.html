@@ -297,6 +297,19 @@
         <small class="form-text text-muted">For electricity savings, enter the kilowatt-hour (kWh) saved. For water savings, enter liters saved.</small>
       </div>
       
+      <div class="form-group">
+        <label for="activityDate">Activity Date</label>
+        <input type="date" id="activityDate" name="date" class="form-control" required>
+        <small class="form-text text-muted">When did this activity take place? Cannot be a future date.</small>
+        <script>document.getElementById('activityDate').valueAsDate = new Date();</script>
+      </div>
+      
+      <div class="form-group">
+        <label for="notes">Notes (Optional)</label>
+        <textarea id="notes" name="notes" class="form-control" rows="3" placeholder="Add any additional information about your activity..."></textarea>
+        <small class="form-text text-muted">Include any relevant details that might help in verifying your activity.</small>
+      </div>
+      
       <div class="file-upload">
         <div class="file-upload-icon">
           <i class="fas fa-file-image"></i>
@@ -406,6 +419,8 @@
       formData.append('oridata', $('#dataInput').val());
       formData.append('token', localStorage.getItem('token'));
       formData.append('id', uid);
+      formData.append('date', $('#activityDate').val());
+      formData.append('notes', $('#notes').val());
       
       // Show loading state on button
       var submitBtn = $(this).find('button[type="submit"]');
@@ -432,6 +447,8 @@
             // Reset form
             $('#carbonForm')[0].reset();
             $('#selectedFilename').hide();
+            $('#notes').val('');
+            document.getElementById('activityDate').valueAsDate = new Date();
             calculateAndDisplayReduction();
           } else {
             if (response.message === '令牌无效或已过期。') {

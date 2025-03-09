@@ -256,6 +256,12 @@
             const authClass = getAuthClass(record.auth);
             const authStatus = getAuthStatus(record.auth);
             
+            // 处理笔记信息（如果为空则显示"无"）
+            const notes = record.notes ? record.notes : 'No notes provided';
+            
+            // 处理活动日期（如果为空则显示记录创建时间）
+            const activityDate = record.activity_date ? record.activity_date : record.time.split(' ')[0];
+            
             const card = `
               <div class="col-md-4 mb-4">
                 <div class="record-card ios-hover-effect">
@@ -279,6 +285,11 @@
                     </div>
                     
                     <div class="record-row">
+                      <div class="record-label">Activity Date:</div>
+                      <div class="record-value">${activityDate}</div>
+                    </div>
+                    
+                    <div class="record-row">
                       <div class="record-label">Points:</div>
                       <div class="record-value">${record.points}</div>
                     </div>
@@ -291,6 +302,11 @@
                     <div class="record-row">
                       <div class="record-label">Activity:</div>
                       <div class="record-value">${record.act}</div>
+                    </div>
+                    
+                    <div class="record-row">
+                      <div class="record-label">Notes:</div>
+                      <div class="record-value">${notes}</div>
                     </div>
                     
                     <div class="auth-status ${authClass}">${authStatus}</div>

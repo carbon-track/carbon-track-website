@@ -314,6 +314,12 @@
     const authStatus = getAuthStatus(record.auth)
     // 检查记录的type字段，确定是普通记录还是特殊记录
     const cardTypeClass = record.type === 'spec' ? 'special-card' : ''
+    
+    // 处理笔记信息（如果为空则显示"无"）
+    const notes = record.notes ? record.notes : '无'
+    
+    // 处理活动日期（如果为空则显示记录创建时间）
+    const activityDate = record.activity_date ? record.activity_date : record.time.split(' ')[0]
 
     return `
         <div class="col-md-4 ${cardTypeClass}">
@@ -325,9 +331,11 @@
                     <div class="card-text-row">UserID: ${record.uid}</div>
                     <div class="card-text-row">Email: ${record.email}</div>
                     <div class="card-text-row">Time: ${record.time}</div>
+                    <div class="card-text-row">Activity Date: ${activityDate}</div>
                     <div class="card-text-row">Points: ${record.points}</div>
                     <div class="card-text-row">Raw: ${record.raw}</div>
                     <div class="card-text-row">Activity: ${record.act}</div>
+                    <div class="card-text-row">Notes: ${notes}</div>
                     <div class="${authClass}">${authStatus}</div>
                     <button onclick="approveTransaction(${record.id}, '${record.type}','${record.uid}')" class="btn btn-success mx-2">通过</button>
                     <button onclick="rejectTransaction(${record.id}, '${record.type}')" class="btn btn-danger mx-2">打回</button>

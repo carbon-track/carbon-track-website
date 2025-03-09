@@ -16,6 +16,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         $activity = sanitizeInput($_POST['activity']);
         $dataInput = floatval($_POST['oridata']);
+        $notes = isset($_POST['notes']) ? sanitizeInput($_POST['notes']) : NULL;
+        $activityDate = isset($_POST['date']) ? sanitizeInput($_POST['date']) : date('Y-m-d');
+
+        if (!empty($activityDate)) {
+            $dateObj = DateTime::createFromFormat('Y-m-d', $activityDate);
+            if (!$dateObj || $dateObj->format('Y-m-d') !== $activityDate) {
+                handleApiError(400, '日期格式无效');
+            }
+            
+            $today = new DateTime();
+            if ($dateObj > $today) {
+                handleApiError(400, '不能提交未来日期的记录');
+            }
+        }
+
         $uploadPath = '';
 
         if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
@@ -43,6 +58,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         } else {
             handleApiError(400, '没有上传文件或上传过程中出现错误！');
         }
+
+        $id = getUid($pdo,$email);
         $carbonSavings = 0;
 
         switch ($activity) {
@@ -97,7 +114,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $updateStmt->bindParam(':email', $email, PDO::PARAM_STR);
         $updateStmt->execute();
 
-        $insertSql = "INSERT INTO points_transactions (points, email, time, img, auth, raw, act, type) VALUES (:points, :email, :time, :img, :auth, :raw, :act, :type)";
+        $insertSql = "INSERT INTO points_transactions (points, email, time, img, auth, raw, act, type, notes, activity_date, uid) 
+                      VALUES (:points, :email, :time, :img, :auth, :raw, :act, :type, :notes, :activity_date, :uid)";
         $insertStmt = $pdo->prepare($insertSql);
         $now = date('Y-m-d H:i:s');
         $insertStmt->bindParam(':points', $carbonSavings, PDO::PARAM_STR);
@@ -108,7 +126,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $insertStmt->bindParam(':raw', $dataInput, PDO::PARAM_STR);
         $insertStmt->bindParam(':act', $activity, PDO::PARAM_STR);
         $insertStmt->bindValue(':type', 'ord');
-        $id = getUid($pdo,$email);
+        $insertStmt->bindParam(':notes', $notes, PDO::PARAM_STR);
+        $insertStmt->bindParam(':activity_date', $activityDate, PDO::PARAM_STR);
         $insertStmt->bindParam(':uid', $id, PDO::PARAM_STR);
         $insertStmt->execute();
 

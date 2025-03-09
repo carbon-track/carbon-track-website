@@ -14,8 +14,25 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 }
 $uid=$_POST['id'];
 // 验证活动类型和数据
-$activity = $_POST['activity'];
-$dataInput = floatval($_POST['oridata']); // 假设数据是数值类型
+$activity = sanitizeInput($_POST['activity']);
+$dataInput = floatval($_POST['oridata']);
+$notes = isset($_POST['notes']) ? sanitizeInput($_POST['notes']) : NULL;
+$activityDate = isset($_POST['date']) ? sanitizeInput($_POST['date']) : date('Y-m-d');
+
+// 验证日期格式
+if (!empty($activityDate)) {
+    $dateObj = DateTime::createFromFormat('Y-m-d', $activityDate);
+    if (!$dateObj || $dateObj->format('Y-m-d') !== $activityDate) {
+        handleApiError(400, '日期格式无效');
+    }
+    
+    // 检查日期是否是未来日期
+    $today = new DateTime();
+    if ($dateObj > $today) {
+        handleApiError(400, '不能提交未来日期的记录');
+    }
+}
+
 if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
     $image = $_FILES['image'];
     $uploadDirectory = "uploads/"; // 确保这个目录存在并且对PHP可写
@@ -83,20 +100,29 @@ try {
     $pdo->beginTransaction();
     
     // 更新用户积分
-    
-    // 插入积分交易记录
-    $insertSql = "INSERT INTO points_transactions (points, email, time, img, auth, raw, act, type) VALUES (:points, :email, :time, :img, :auth, :raw, :act, :type)";
+    $updateSql = "UPDATE users SET points = points + :points WHERE email = :email";
+    $updateStmt = $pdo->prepare($updateSql);
+    $updateStmt->bindParam(':points', $carbonSavings, PDO::PARAM_STR);
+    $updateStmt->bindParam(':email', $email, PDO::PARAM_STR);
+    $updateStmt->execute();
+
+    // 插入积分交易记录，添加notes和activity_date字段
+    $insertSql = "INSERT INTO points_transactions (points, email, time, img, auth, raw, act, type, notes, activity_date, uid) 
+                  VALUES (:points, :email, :time, :img, :auth, :raw, :act, :type, :notes, :activity_date, :uid)";
     $insertStmt = $pdo->prepare($insertSql);
     $now = date('Y-m-d H:i:s');
-    $insertStmt->bindValue(':points', "0");
-    $insertStmt->bindParam(':email', $email);
-    $insertStmt->bindParam(':time', $now);
-    $insertStmt->bindParam(':img', $uploadPath);
-    $insertStmt->bindValue(':auth', 'non');
-    $insertStmt->bindParam(':raw', $dataInput);
-    $insertStmt->bindParam(':act', $activity);
-    $insertStmt->bindValue(':type', 'spec');
-    $insertStmt->bindParam(':uid', $uid);
+    $insertStmt->bindParam(':points', $carbonSavings, PDO::PARAM_STR);
+    $insertStmt->bindParam(':email', $email, PDO::PARAM_STR);
+    $insertStmt->bindParam(':time', $now, PDO::PARAM_STR);
+    $insertStmt->bindParam(':img', $uploadPath, PDO::PARAM_STR);
+    $insertStmt->bindValue(':auth', 'non', PDO::PARAM_STR);
+    $insertStmt->bindParam(':raw', $dataInput, PDO::PARAM_STR);
+    $insertStmt->bindParam(':act', $activity, PDO::PARAM_STR);
+    $insertStmt->bindValue(':type', 'spec');  // 特殊类型 'spec'
+    $insertStmt->bindParam(':notes', $notes, PDO::PARAM_STR);
+    $insertStmt->bindParam(':activity_date', $activityDate, PDO::PARAM_STR);
+    $id = getUid($pdo, $email);
+    $insertStmt->bindParam(':uid', $id, PDO::PARAM_STR);
     $insertStmt->execute();
 
     // 提交事务
