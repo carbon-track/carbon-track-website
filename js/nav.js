@@ -521,7 +521,8 @@ function loadNavbar() {
                     </li>
                 </ul>
                 <div class="navbar-nav align-items-center">
-                    <div class="nav-item dropdown mr-2 message-icon-container">
+                    <!-- Message icon only visible when logged in (add logoutControl class) -->
+                    <div class="nav-item dropdown mr-2 message-icon-container logoutControl" style="display:none;">
                         <a class="nav-link dropdown-toggle" href="#" id="messagesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <i class="fas fa-envelope"></i>
                             <span class="badge badge-danger badge-counter" id="unreadMessagesCount" style="display: none;">0</span>
@@ -625,8 +626,21 @@ function setupNavbarEventListeners() {
         logout();
     });
     
-    // Check for unread messages when navbar is loaded
-    checkUnreadMessages();
+    // Prevent messages from being opened if not logged in
+    $('#messagesDropdown, [data-target="#messagesModal"]').on('click', function(e) {
+        var loggedIn = sessionStorage.getItem('loggedIn');
+        if (!loggedIn) {
+            e.preventDefault();
+            e.stopPropagation();
+            alert('Please login to access messages');
+            return false;
+        }
+    });
+    
+    // Check for unread messages when navbar is loaded (only if logged in)
+    if (sessionStorage.getItem('loggedIn')) {
+        checkUnreadMessages();
+    }
     
     // Clear any previous body padding (to fix desktop whitespace)
     $('body').css('padding-top', '0');

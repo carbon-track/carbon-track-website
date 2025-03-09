@@ -1107,6 +1107,21 @@
       window.location.href = 'calculate.html';
     });
     
+    // Additional protection for message modal
+    $('#messagesModal').on('show.bs.modal', function(e) {
+      // Check if user is logged in
+      var loggedIn = localStorage.getItem('loggedIn');
+      var expiration = localStorage.getItem('expiration');
+      var now = new Date();
+      
+      // If not logged in or session expired, prevent modal from showing
+      if (!loggedIn || !expiration || now.getTime() >= expiration) {
+        e.preventDefault();
+        alert('Please login to access messages');
+        return false;
+      }
+    });
+    
     // Collapsible Navigation - hide on scroll down, show on scroll up
     let lastScrollTop = 0;
     $(window).scroll(function() {
