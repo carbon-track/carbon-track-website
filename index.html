@@ -138,8 +138,9 @@
     .hero-caption-animate {
       opacity: 0;
       transform: translateY(30px) scale(0.95);
-      transition: opacity var(--animation-duration-slow) var(--animation-timing-apple),
-                  transform var(--animation-duration-slow) var(--animation-timing-apple);
+      transition: opacity 1s var(--animation-timing-apple),
+                  transform 1s var(--animation-timing-apple);
+      will-change: opacity, transform;
     }
     
     .hero-caption-animate.visible {
@@ -1010,6 +1011,63 @@
         border-color: rgba(255, 255, 255, 0.8);
       }
     }
+    
+    /* Carousel image animation */
+    .carousel-item .parallax-bg {
+      opacity: 0;
+      transition: opacity 1s var(--animation-timing-apple);
+      will-change: opacity, transform;
+    }
+    
+    .carousel-item.active .parallax-bg {
+      opacity: 1;
+    }
+    
+    /* Hero caption animation - update timing */
+    .hero-caption-animate {
+      opacity: 0;
+      transform: translateY(30px) scale(0.95);
+      transition: opacity 1s var(--animation-timing-apple),
+                  transform 1s var(--animation-timing-apple);
+      will-change: opacity, transform;
+    }
+    
+    .hero-caption-animate.visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    
+    /* Add animation direction support */
+    .animate-on-scroll {
+      transition-property: opacity, transform;
+      transition-duration: var(--animation-duration-medium);
+      transition-timing-function: var(--animation-timing-apple);
+      will-change: opacity, transform;
+    }
+    
+    .animate-on-scroll.fade-in:not(.visible) {
+      opacity: 0;
+    }
+    
+    .animate-on-scroll.slide-up:not(.visible) {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    
+    .animate-on-scroll.slide-down:not(.visible) {
+      opacity: 0;
+      transform: translateY(-30px);
+    }
+    
+    .animate-on-scroll.scale-in:not(.visible) {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    
+    /* Reset transitions when animation is complete */
+    .animation-complete {
+      transition: none !important;
+    }
   </style>
 </head>
 <body>
@@ -1077,37 +1135,37 @@
 <!-- Announcement Section -->
 <section class="announcement-section">
   <div class="container">
-    <div class="announcement-card scale-in">
+    <div class="announcement-card animate-on-scroll scale-in">
       <h2 class="announcement-heading">Welcome to CarbonTrack! 🌍</h2>
-      <p class="announcement-subheading fade-in">📢 Announcements</p>
-      <div class="announcement-divider fade-in delay-100"></div>
+      <p class="announcement-subheading animate-on-scroll fade-in">📢 Announcements</p>
+      <div class="announcement-divider animate-on-scroll fade-in delay-100"></div>
       <ul class="announcement-list">
-        <li class="announcement-item stagger-item">
+        <li class="announcement-item animate-on-scroll slide-up delay-100">
           <span class="announcement-icon" style="color: var(--ios-yellow);">💡</span>
           <div class="announcement-content">
             <p><strong>We Value Your Feedback!</strong> Have suggestions? Email us at <a href="mailto:carbontrack666@gmail.com">carbontrack666@gmail.com</a>.</p>
           </div>
         </li>
-        <li class="announcement-item stagger-item">
+        <li class="announcement-item animate-on-scroll slide-up delay-200">
           <span class="announcement-icon" style="color: var(--ios-blue);">🎖️</span>
           <div class="announcement-content">
             <p><strong>Earn Rewards!</strong> Log your sustainable actions and receive certificates, badges, and thank-you letters for your contributions.</p>
           </div>
         </li>
-        <li class="announcement-item stagger-item">
+        <li class="announcement-item animate-on-scroll slide-up delay-300">
           <span class="announcement-icon" style="color: var(--ios-green);">🌱</span>
           <div class="announcement-content">
             <p><strong>Who Can Join?</strong> While CarbonTrack primarily serves students, anyone passionate about sustainability is welcome!</p>
           </div>
         </li>
-        <li class="announcement-item stagger-item">
+        <li class="announcement-item animate-on-scroll slide-up delay-400">
           <span class="announcement-icon" style="color: var(--ios-indigo);">⚖️</span>
           <div class="announcement-content">
             <p><strong>Fair Play Matters!</strong> Cheating for Carbon Credits is strictly prohibited. We are committed to a transparent and fair system.</p>
           </div>
         </li>
       </ul>
-      <p class="announcement-footer fade-in delay-300">Thank you for being part of CarbonTrack! Together, we can build a more sustainable future.</p>
+      <p class="announcement-footer animate-on-scroll fade-in delay-500">Thank you for being part of CarbonTrack! Together, we can build a more sustainable future.</p>
     </div>
   </div>
 </section>
@@ -1115,33 +1173,33 @@
 <!-- Feature Cards Section -->
 <section class="feature-section section-reveal">
   <div class="container">
-    <h2 class="section-heading slide-up">How CarbonTrack Works</h2>
+    <h2 class="section-heading animate-on-scroll slide-up">How CarbonTrack Works</h2>
     
     <div class="feature-grid">
-      <div class="feature-card feature-card--white ios-hover-effect slide-up">
+      <div class="feature-card feature-card--white ios-hover-effect animate-on-scroll slide-up">
         <div class="feature-card__body">
           <h3 class="feature-card__title">What is a Carbon Account?</h3>
           <p class="feature-card__text">A Carbon Account is a tool that tracks CO₂ reductions from eco-friendly actions. By understanding our carbon footprint, we can make informed choices for a greener planet.</p>
         </div>
       </div>
       
-      <div class="feature-card feature-card--blue ios-hover-effect slide-up delay-100">
+      <div class="feature-card feature-card--blue ios-hover-effect animate-on-scroll slide-up delay-100">
         <div class="feature-card__body">
           <h3 class="feature-card__title">How to Use CarbonTrack</h3>
           <ul class="feature-card__list">
-            <li class="feature-card__list-item stagger-item">
+            <li class="feature-card__list-item animate-on-scroll slide-up delay-100">
               <i class="fas fa-check-circle feature-card__list-icon"></i>
               <span><strong>Sign up & log in.</strong></span>
             </li>
-            <li class="feature-card__list-item stagger-item">
+            <li class="feature-card__list-item animate-on-scroll slide-up delay-200">
               <i class="fas fa-check-circle feature-card__list-icon"></i>
               <span><strong>Record sustainable actions</strong> in the Carbon Accounting Portal.</span>
             </li>
-            <li class="feature-card__list-item stagger-item">
+            <li class="feature-card__list-item animate-on-scroll slide-up delay-300">
               <i class="fas fa-check-circle feature-card__list-icon"></i>
               <span><strong>Earn Carbon Credits</strong> based on real CO₂ reductions.</span>
             </li>
-            <li class="feature-card__list-item stagger-item">
+            <li class="feature-card__list-item animate-on-scroll slide-up delay-400">
               <i class="fas fa-check-circle feature-card__list-icon"></i>
               <span><strong>Track progress & join challenges</strong> to win rewards!</span>
             </li>
@@ -1149,19 +1207,19 @@
         </div>
       </div>
       
-      <div class="feature-card feature-card--white ios-hover-effect slide-up delay-200">
+      <div class="feature-card feature-card--white ios-hover-effect animate-on-scroll slide-up delay-200">
         <div class="feature-card__body">
           <h3 class="feature-card__title">Why Use a Carbon Account?</h3>
           <ul class="feature-card__list">
-            <li class="feature-card__list-item stagger-item">
+            <li class="feature-card__list-item animate-on-scroll slide-up delay-100">
               <i class="fas fa-check feature-card__list-icon" style="color: var(--ios-green);"></i>
               <span><strong>Quantify your impact</strong> on carbon reduction.</span>
             </li>
-            <li class="feature-card__list-item stagger-item">
+            <li class="feature-card__list-item animate-on-scroll slide-up delay-200">
               <i class="fas fa-check feature-card__list-icon" style="color: var(--ios-green);"></i>
               <span><strong>Encourage long-term eco-friendly habits.</strong></span>
             </li>
-            <li class="feature-card__list-item stagger-item">
+            <li class="feature-card__list-item animate-on-scroll slide-up delay-300">
               <i class="fas fa-check feature-card__list-icon" style="color: var(--ios-green);"></i>
               <span><strong>Raise awareness & promote energy conservation.</strong></span>
             </li>
@@ -1169,7 +1227,7 @@
         </div>
       </div>
       
-      <div class="feature-card feature-card--purple ios-hover-effect slide-up delay-300">
+      <div class="feature-card feature-card--purple ios-hover-effect animate-on-scroll slide-up delay-300">
         <div class="feature-card__body">
           <h3 class="feature-card__title">Join Our Team!</h3>
           <p class="feature-card__text">Passionate about sustainability? Join CarbonTrack and become part of a global movement making a real environmental impact!</p>
@@ -1391,99 +1449,162 @@
       $('.floating-button').addClass('visible');
     }, 800);
     
-    // Initialize carousel caption animations
-    showActiveCarouselCaption();
-    $('#carousel').on('slid.bs.carousel', showActiveCarouselCaption);
+    // Initialize carousel animations
+    initializeCarousel();
     
-    // Set up the intersection observer for scroll animations
-    setupScrollAnimations();
+    // Set up the improved bi-directional scroll animations
+    setupBidirectionalAnimations();
     
-    // Set up parallax scrolling effect
-    setupParallaxEffect();
-    
-    // Apply staggered animations to list items
-    applyStaggeredAnimations();
+    // Set up parallax scrolling effect with improved performance
+    setupEnhancedParallaxEffect();
   });
   
-  // Show the active carousel caption with animation
-  function showActiveCarouselCaption() {
-    $('.carousel-item:not(.active) .hero-caption-animate').removeClass('visible');
+  // Enhanced carousel initialization with synchronized animations
+  function initializeCarousel() {
+    // Initial animation for first slide
     setTimeout(function() {
+      $('.carousel-item.active .parallax-bg').css('opacity', '1');
       $('.carousel-item.active .hero-caption-animate').addClass('visible');
-    }, 100);
+    }, 300);
+    
+    // Handle slide transitions
+    $('#carousel').on('slide.bs.carousel', function(e) {
+      // Hide captions on all slides
+      $('.carousel-item .hero-caption-animate').removeClass('visible');
+      // Prepare next slide elements
+      const nextSlide = $(e.relatedTarget);
+      // Ensure images start with opacity 0
+      nextSlide.find('.parallax-bg').css('opacity', '0');
+    });
+    
+    // Animation after slide completes
+    $('#carousel').on('slid.bs.carousel', function(e) {
+      const activeSlide = $('.carousel-item.active');
+      // Synchronize image and caption animations
+      setTimeout(function() {
+        activeSlide.find('.parallax-bg').css('opacity', '1');
+        activeSlide.find('.hero-caption-animate').addClass('visible');
+      }, 50);
+    });
   }
   
-  // Setup intersection observers for scroll animations
-  function setupScrollAnimations() {
-    const animatedElements = document.querySelectorAll('.fade-in, .slide-up, .scale-in, .section-reveal');
+  // Setup bidirectional animations that work when scrolling both up and down
+  function setupBidirectionalAnimations() {
+    const animatedElements = document.querySelectorAll('.animate-on-scroll');
+    let lastScrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    let scrollDirection = 'down';
     
+    // Track scroll direction
+    window.addEventListener('scroll', function() {
+      const st = window.pageYOffset || document.documentElement.scrollTop;
+      scrollDirection = st > lastScrollTop ? 'down' : 'up';
+      lastScrollTop = st;
+    });
+    
+    // Create an Intersection Observer for animation elements
     const observerOptions = {
       root: null,
-      rootMargin: '0px 0px -100px 0px',
-      threshold: 0.1
+      rootMargin: '0px',
+      threshold: [0.1, 0.5, 0.9] // Multiple thresholds for better accuracy
     };
     
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
+        // Get element's position relative to viewport
+        const rect = entry.boundingClientRect;
+        const windowHeight = window.innerHeight;
+        
+        // Calculate if element is entering from top or bottom
+        const isEnteringFromBottom = rect.top > windowHeight;
+        const isEnteringFromTop = rect.bottom < 0;
+        
         if (entry.isIntersecting) {
+          // Element is visible in viewport
           entry.target.classList.add('visible');
-          observer.unobserve(entry.target); // Stop observing once animation is triggered
+        } else {
+          // Element is outside viewport
+          // Only reset animation if the element fully exits the viewport
+          if (isEnteringFromBottom || isEnteringFromTop) {
+            entry.target.classList.remove('visible');
+            
+            // Reset any inline transition delays to allow for proper animation
+            setTimeout(() => {
+              const originalDelay = entry.target.className.match(/delay-(\d+)/);
+              if (originalDelay) {
+                entry.target.style.transitionDelay = (originalDelay[1] / 1000) + 's';
+              } else {
+                entry.target.style.transitionDelay = '0s';
+              }
+            }, 50);
+          }
         }
       });
     }, observerOptions);
     
+    // Start observing all animated elements
     animatedElements.forEach(element => {
       observer.observe(element);
     });
+    
+    // Initialize section reveal animations
+    const revealSections = document.querySelectorAll('.section-reveal');
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        } else {
+          const rect = entry.boundingClientRect;
+          const isCompletelyOutside = rect.bottom < 0 || rect.top > window.innerHeight;
+          
+          if (isCompletelyOutside) {
+            entry.target.classList.remove('visible');
+          }
+        }
+      });
+    }, { threshold: 0.2 });
+    
+    revealSections.forEach(section => {
+      revealObserver.observe(section);
+    });
   }
   
-  // Set up parallax effect on scroll
-  function setupParallaxEffect() {
+  // Enhanced parallax effect with better performance
+  function setupEnhancedParallaxEffect() {
     const parallaxBgs = document.querySelectorAll('.parallax-bg');
     
-    window.addEventListener('scroll', () => {
+    // Use requestAnimationFrame for smoother parallax
+    let ticking = false;
+    let lastScrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+    
+    function updateParallax() {
       const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
       
       parallaxBgs.forEach(bg => {
-        // Only apply parallax if element is in viewport
         const rect = bg.getBoundingClientRect();
-        if (rect.bottom >= 0 && rect.top <= window.innerHeight) {
-          const speed = 0.5;
-          const yPos = -(scrollTop * speed);
-          bg.style.transform = `translate3d(0, ${yPos / 3}px, 0)`;
+        if (rect.bottom >= -100 && rect.top <= window.innerHeight + 100) {
+          const parentTop = bg.parentElement.getBoundingClientRect().top;
+          const speed = 0.4;
+          const yPos = (parentTop * speed);
+          bg.style.transform = `translate3d(0, ${yPos / 6}px, 0)`;
         }
       });
-    });
-  }
-  
-  // Apply staggered animations to list items
-  function applyStaggeredAnimations() {
-    const staggerLists = document.querySelectorAll('.announcement-list, .feature-card__list');
+      
+      ticking = false;
+      lastScrollPosition = scrollTop;
+    }
     
-    staggerLists.forEach(list => {
-      const items = list.querySelectorAll('.stagger-item');
-      
-      const staggerObserver = new IntersectionObserver((entries) => {
-        let delay = 0;
-        
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            // Set increasing delay for each item
-            setTimeout(() => {
-              entry.target.classList.add('visible');
-              entry.target.style.transitionDelay = `${delay * 0.1}s`;
-            }, 100);
-            
-            delay++;
-            staggerObserver.unobserve(entry.target);
-          }
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          updateParallax();
+          ticking = false;
         });
-      }, { threshold: 0.1 });
-      
-      items.forEach(item => {
-        staggerObserver.observe(item);
-      });
+        ticking = true;
+      }
     });
+    
+    // Initial update
+    updateParallax();
   }
 </script>
 </body>
