@@ -7,14 +7,14 @@
   <title>CarbonTrack校园碳账户</title>
   <link rel="icon" href="/img/team.jpg" type="image/JPG">
   <!-- 引入Bootstrap和jQuery的CDN链接 -->
-  <script src="js/jquery.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
-  <link rel="stylesheet" href="./css/bootstrap.min.css">
-  <script src="js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="js/nav.js"></script>
 
   <link rel="stylesheet" href="./css/index.css">
-  <!-- Replace Google Fonts with SF Pro Display (and system fallbacks) -->
+  <!-- SF Pro font -->
   <link href="https://fonts.cdnfonts.com/css/sf-pro-display" rel="stylesheet">
   <style>
     :root {
@@ -44,364 +44,643 @@
       --ios-system-background: #FFFFFF;
       --ios-secondary-background: #F2F2F7;
       --ios-tertiary-background: #FFFFFF;
-      --ios-grouped-background: #F2F2F7;
-      --ios-secondary-grouped-background: #FFFFFF;
-      --ios-tertiary-grouped-background: #F2F2F7;
+      
+      /* Content width */
+      --content-max-width: 1280px;
+    }
+    
+    * {
+      box-sizing: border-box;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
     
     body, html {
       padding: 0;
       margin: 0;
       font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      scroll-behavior: smooth;
       color: #000000;
       background-color: var(--ios-secondary-background);
+      line-height: 1.5;
+      scroll-behavior: smooth;
+      font-size: 16px;
     }
     
-    h1, h2, h3, h4, h5, h6, .card-title {
+    h1, h2, h3, h4, h5, h6 {
       font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-weight: 600;
+      margin-top: 0;
+      color: #000;
     }
-
-    /* Hero Carousel Styling */
-    .carousel {
-      width: 100% !important;
-      max-width: 100%;
+    
+    p {
+      margin-top: 0;
+      margin-bottom: 1rem;
+    }
+    
+    a {
+      color: var(--ios-blue);
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    
+    a:hover {
+      opacity: 0.8;
+      text-decoration: none;
+    }
+    
+    .container {
+      max-width: var(--content-max-width);
       margin: 0 auto;
-      border-radius: 0;
+      padding: 0 24px;
+    }
+    
+    .section {
+      padding: 60px 0;
+    }
+    
+    .section-heading {
+      font-size: 2rem;
+      text-align: center;
+      margin-bottom: 2.5rem;
+      letter-spacing: -0.01em;
+    }
+    
+    /* Hero Section */
+    .hero-section {
+      position: relative;
+    }
+    
+    .carousel {
+      width: 100%;
+      margin: 0 auto;
       overflow: hidden;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
-
+    
     .carousel-inner {
-      border-radius: 0;
-      max-height: 500px;
+      max-height: 560px; 
     }
-
+    
     .carousel-inner img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      filter: brightness(0.9);
+      filter: brightness(0.95);
     }
     
     .carousel-caption {
-      background-color: rgba(255, 255, 255, 0.7);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      border-radius: 16px;
-      padding: 20px;
-      max-width: 80%;
-      margin: 0 auto;
-      bottom: 50px;
+      position: absolute;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+      background-color: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 24px 32px;
+      max-width: 600px;
       color: #000;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    }
+    
+    .carousel-caption h2 {
+      font-weight: 700;
+      font-size: 2.2rem;
+      margin-bottom: 8px;
+    }
+    
+    .carousel-caption p {
+      font-size: 1.1rem;
+      margin-bottom: 0;
+      color: var(--ios-gray);
+      font-weight: 500;
+    }
+    
+    .carousel-indicators {
+      bottom: 30px;
     }
     
     .carousel-indicators li {
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      margin: 0 5px;
-      background-color: var(--ios-gray3);
-      opacity: 0.5;
+      margin: 0 6px;
+      background-color: rgba(255, 255, 255, 0.5);
+      transition: all 0.3s;
     }
     
     .carousel-indicators .active {
-      background-color: var(--ios-blue);
-      opacity: 1;
+      width: 10px;
+      height: 10px;
+      background-color: white;
     }
     
     .carousel-control-prev, .carousel-control-next {
-      opacity: 0.7;
-      width: 40px;
-      height: 40px;
+      width: 50px;
+      height: 50px;
       top: 50%;
       transform: translateY(-50%);
-      background-color: rgba(255, 255, 255, 0.4);
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
+      background-color: rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       border-radius: 50%;
-      margin: 0 20px;
+      opacity: 0.8;
+      margin: 0 32px;
     }
-
+    
     /* Announcement Section */
-    .alert-info {
-      background-color: var(--ios-system-background);
-      border: none;
-      border-radius: 16px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-      margin-top: -30px;
+    .announcement-section {
+      margin-top: -40px;
       position: relative;
       z-index: 10;
     }
-
-    .alert-heading {
+    
+    .announcement-card {
+      background-color: var(--ios-system-background);
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+      overflow: hidden;
+      padding: 32px;
+    }
+    
+    .announcement-heading {
       text-align: center;
-      color: #000;
-      margin-bottom: 20px;
       font-size: 1.8rem;
+      margin-bottom: 24px;
+      font-weight: 700;
+    }
+    
+    .announcement-subheading {
+      color: var(--ios-blue);
       font-weight: 600;
-    }
-
-    .text-container {
-      width: 90%;
-      margin: 0 auto;
+      font-size: 1.1rem;
+      margin-bottom: 16px;
     }
     
-    .text-container ul {
-      padding-left: 0;
+    .announcement-divider {
+      height: 1px;
+      background-color: var(--ios-gray5);
+      margin: 16px 0 24px;
+      width: 100%;
+    }
+    
+    .announcement-list {
       list-style-type: none;
+      padding: 0;
+      margin: 0;
     }
     
-    .text-container li {
+    .announcement-item {
+      display: flex;
+      align-items: flex-start;
       padding: 16px 0;
       border-bottom: 1px solid var(--ios-gray5);
-      display: flex;
-      align-items: center;
     }
     
-    .text-container li:last-child {
+    .announcement-item:last-child {
       border-bottom: none;
     }
     
-    .text-container li i, 
-    .text-container li .emoji {
-      margin-right: 15px;
+    .announcement-icon {
       font-size: 24px;
-      min-width: 30px;
+      margin-right: 16px;
+      min-width: 32px;
       text-align: center;
     }
-
-    /* Feature Cards */
+    
+    .announcement-content {
+      flex: 1;
+    }
+    
+    .announcement-content p {
+      margin: 0;
+    }
+    
+    .announcement-footer {
+      font-size: 0.95rem;
+      color: var(--ios-gray);
+      margin-top: 24px;
+      text-align: center;
+    }
+    
+    /* Feature Cards Section */
     .feature-section {
-      padding: 40px 0;
+      padding: 80px 0;
     }
     
-    .feature-heading {
-      text-align: center;
-      margin-bottom: 40px;
-      color: #000;
-      font-size: 1.8rem;
-      font-weight: 600;
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 32px;
+      margin-top: 48px;
     }
     
-    .card {
-      border: none;
-      border-radius: 16px;
+    .feature-card {
+      background-color: var(--ios-system-background);
+      border-radius: 20px;
       overflow: hidden;
-      transition: transform 0.3s, box-shadow 0.3s;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
       height: 100%;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.07);
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+    }
+    
+    .feature-card--blue {
+      background-color: var(--ios-blue);
+      color: white;
+    }
+    
+    .feature-card--white {
       background-color: var(--ios-system-background);
     }
     
-    .card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 12px 28px rgba(0,0,0,0.1);
-    }
-    
-    .card1 {
-      background-color: var(--ios-yellow);
-    }
-    
-    .card2 {
-      background-color: var(--ios-blue);
-    }
-    
-    .card3 {
-      background-color: var(--ios-secondary-background);
-    }
-    
-    .card4 {
+    .feature-card--purple {
       background-color: var(--ios-indigo);
+      color: white;
     }
     
-    .card-body {
-      min-height: 250px;
-      padding: 25px;
+    .feature-card__body {
+      padding: 32px;
+      flex: 1;
       display: flex;
       flex-direction: column;
     }
     
-    .card-title {
+    .feature-card__title {
       font-size: 1.5rem;
-      letter-spacing: 0.5px;
-      margin-bottom: 20px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: inherit;
     }
     
-    .card-text {
-      flex-grow: 1;
-      font-size: 1rem;
-      line-height: 1.6;
+    .feature-card__text {
+      flex: 1;
+      margin-bottom: 24px;
+      color: inherit;
+      opacity: 0.95;
     }
     
-    .card-text ul {
-      padding-left: 20px;
+    .feature-card__list {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
     }
     
-    .card-text li {
-      margin-bottom: 10px;
+    .feature-card__list-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 16px;
     }
     
-    /* iOS-style button */
-    .btn {
-      border-radius: 12px;
-      font-weight: 500;
-      padding: 10px 20px;
-      transition: all 0.2s;
-      border: none;
+    .feature-card__list-item:last-child {
+      margin-bottom: 0;
     }
     
-    .btn-light {
+    .feature-card__list-icon {
+      margin-right: 12px;
+      font-size: 18px;
+      color: inherit;
+    }
+    
+    .feature-card__button {
+      display: inline-block;
+      padding: 12px 24px;
       background-color: rgba(255, 255, 255, 0.9);
       color: var(--ios-indigo);
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+      text-align: center;
+      border: none;
+      cursor: pointer;
+      align-self: flex-start;
+      margin-top: auto;
+    }
+    
+    .feature-card__button:hover {
+      background-color: white;
+      transform: translateY(-1px);
+    }
+    
+    /* Floating Button */
+    .floating-button {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      z-index: 100;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background-color: var(--ios-green);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 20px rgba(52, 199, 89, 0.3);
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .floating-button:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 8px 25px rgba(52, 199, 89, 0.4);
+    }
+    
+    .floating-button:active {
+      transform: translateY(0) scale(0.98);
+    }
+    
+    .floating-button i {
+      font-size: 24px;
+    }
+    
+    /* Modal Styling */
+    .modal-dialog {
+      margin-top: 50px;
+    }
+    
+    .modal-content {
+      border-radius: 20px;
+      border: none;
+      overflow: hidden;
+      box-shadow: 0 12px 50px rgba(0, 0, 0, 0.2);
+    }
+    
+    .modal-header, 
+    .modal-footer {
+      border: none;
+      padding: 20px 24px;
+    }
+    
+    .modal-body {
+      padding: 24px;
+    }
+    
+    .modal-title {
+      font-weight: 700;
+      font-size: 1.5rem;
+    }
+    
+    .modal-footer {
+      justify-content: center;
+      padding-top: 0;
+    }
+    
+    .form-group {
+      margin-bottom: 24px;
+    }
+    
+    .form-group label {
+      font-weight: 500;
+      color: var(--ios-gray);
+      margin-bottom: 8px;
+      display: block;
+    }
+    
+    .form-control {
+      border-radius: 12px;
+      border: 1px solid var(--ios-gray4);
+      padding: 12px 16px;
+      height: auto;
+      font-size: 1rem;
+      background-color: var(--ios-secondary-background);
+      transition: all 0.2s;
+    }
+    
+    .form-control:focus {
+      box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
+      border-color: var(--ios-blue);
+    }
+    
+    .btn {
+      border-radius: 12px;
+      padding: 12px 24px;
+      border: none;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    
+    .btn-block {
+      width: 100%;
+      display: block;
     }
     
     .btn-primary {
       background-color: var(--ios-blue);
     }
     
+    .btn-primary:hover {
+      background-color: #0071EB;
+      transform: translateY(-1px);
+    }
+    
     .btn-success {
       background-color: var(--ios-green);
     }
-
-    /* Floating Button */
-    .floating-button {
-      position: fixed;
-      bottom: 30px;
-      right: 30px;
-      z-index: 100;
+    
+    .btn-success:hover {
+      background-color: #2DB84D;
+      transform: translateY(-1px);
+    }
+    
+    .btn-secondary {
+      background-color: var(--ios-gray4);
+      color: #000;
+    }
+    
+    .btn-secondary:hover {
+      background-color: var(--ios-gray3);
+      color: #000;
+    }
+    
+    .btn-outline-primary {
+      background-color: transparent;
+      border: 1px solid var(--ios-blue);
+      color: var(--ios-blue);
+    }
+    
+    .btn-outline-primary:hover {
+      background-color: rgba(0, 122, 255, 0.05);
+    }
+    
+    /* Message Modal */
+    .conversation-list {
+      border-right: 1px solid var(--ios-gray5);
+      height: 450px;
+      overflow-y: auto;
+    }
+    
+    .message-list {
+      height: 400px;
+      overflow-y: auto;
+      padding: 20px;
+      background-color: var(--ios-gray6);
+      border-radius: 16px;
+    }
+    
+    .message-input {
+      display: flex;
+      margin-top: 16px;
+    }
+    
+    .message-input-field {
+      flex: 1;
+      border-radius: 24px;
+      padding: 12px 20px;
+      border: 1px solid var(--ios-gray4);
+      background-color: var(--ios-secondary-background);
+    }
+    
+    .message-input-button {
+      margin-left: 8px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background-color: var(--ios-blue);
+      color: white;
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 60px;
-      height: 60px;
-      background-color: var(--ios-green);
-      color: white;
-      text-decoration: none;
-      font-size: 18px;
-      font-weight: bold;
-      border: none;
-      border-radius: 50%;
-      cursor: pointer;
-      outline: none;
-      box-shadow: 0 4px 12px rgba(52, 199, 89, 0.4);
-      transition: all 0.3s ease;
-    }
-    
-    .floating-button:hover {
-      background-color: #2DB84D;
-      box-shadow: 0 6px 16px rgba(52, 199, 89, 0.6);
-      transform: translateY(-2px) scale(1.05);
-    }
-    
-    .floating-button:active {
-      transform: translateY(1px);
-      box-shadow: 0 2px 8px rgba(52, 199, 89, 0.4);
-    }
-    
-    .foot {
-      margin-left: 4px;
-      font-size: 22px;
-    }
-    
-    /* Form controls */
-    .form-control {
-      border-radius: 10px;
-      border: 1px solid var(--ios-gray4);
-      padding: 12px;
-      background-color: var(--ios-secondary-background);
-      transition: all 0.2s;
-    }
-    
-    .form-control:focus {
-      border-color: var(--ios-blue);
-      box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
-    }
-    
-    /* Modal styling */
-    .modal-content {
-      border-radius: 16px;
-      border: none;
-      overflow: hidden;
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
-    }
-    
-    .modal-header, .modal-footer {
       border: none;
     }
     
-    .modal-header {
-      padding: 20px 24px;
-      background-color: var(--ios-system-background);
-    }
-    
-    .modal-body {
-      padding: 20px 24px;
-      background-color: var(--ios-system-background);
-    }
-    
-    .modal-footer {
-      padding: 16px 24px;
-      background-color: var(--ios-system-background);
-    }
-    
-    .close {
-      font-size: 28px;
-      font-weight: 400;
-      color: var(--ios-gray);
-    }
-    
-    /* Media Queries */
+    /* Responsive styles */
     @media (max-width: 992px) {
-      .carousel-inner {
-        max-height: 400px;
+      .section-heading {
+        font-size: 1.8rem;
       }
       
-      .card-body {
-        min-height: 200px;
+      .carousel-inner {
+        max-height: 450px;
+      }
+      
+      .carousel-caption {
+        max-width: 500px;
+        bottom: 70px;
+        padding: 20px 28px;
+      }
+      
+      .carousel-caption h2 {
+        font-size: 1.8rem;
+      }
+      
+      .feature-card__body {
+        padding: 24px;
       }
     }
     
     @media (max-width: 768px) {
+      .section {
+        padding: 40px 0;
+      }
+      
+      .section-heading {
+        font-size: 1.6rem;
+        margin-bottom: 2rem;
+      }
+      
+      .feature-grid {
+        gap: 24px;
+      }
+      
       .carousel-inner {
         max-height: 350px;
       }
       
-      .alert-info {
-        margin-top: -20px;
+      .carousel-caption {
+        bottom: 50px;
+        max-width: 90%;
+        padding: 16px 24px;
       }
       
-      .card {
-        margin-bottom: 20px;
+      .carousel-caption h2 {
+        font-size: 1.5rem;
+      }
+      
+      .carousel-caption p {
+        font-size: 1rem;
+      }
+      
+      .announcement-card {
+        padding: 24px;
+      }
+      
+      .announcement-section {
+        margin-top: -30px;
       }
       
       .floating-button {
-        width: 50px;
-        height: 50px;
-        font-size: 16px;
+        width: 54px;
+        height: 54px;
+        bottom: 24px;
+        right: 24px;
       }
     }
     
     @media (max-width: 576px) {
+      .container {
+        padding: 0 20px;
+      }
+      
+      .section {
+        padding: 32px 0;
+      }
+      
+      .section-heading {
+        font-size: 1.4rem;
+      }
+      
       .carousel-inner {
         max-height: 250px;
       }
       
       .carousel-caption {
+        bottom: 30px;
+        padding: 12px 20px;
+      }
+      
+      .carousel-caption h2 {
+        font-size: 1.3rem;
+      }
+      
+      .carousel-caption p {
+        font-size: 0.9rem;
+      }
+      
+      .announcement-heading {
+        font-size: 1.3rem;
+      }
+      
+      .announcement-card {
+        padding: 20px;
+      }
+      
+      .feature-card__body {
+        padding: 20px;
+      }
+      
+      .feature-card__title {
+        font-size: 1.3rem;
+      }
+      
+      .floating-button {
+        width: 48px;
+        height: 48px;
         bottom: 20px;
-        padding: 10px;
+        right: 20px;
       }
       
-      .alert-heading {
-        font-size: 1.5rem;
-      }
-      
-      .feature-heading {
-        font-size: 1.5rem;
+      .floating-button i {
+        font-size: 20px;
       }
     }
   </style>
@@ -411,7 +690,7 @@
 <div id="navbar-container"></div>
 
 <!-- Hero Carousel -->
-<div class="hero-section">
+<section class="hero-section">
   <div id="carousel" class="carousel slide" data-ride="carousel">
     <ol class="carousel-indicators">
       <li data-target="#carousel" data-slide-to="0" class="active"></li>
@@ -466,88 +745,117 @@
       <span class="sr-only">Next</span>
     </a>
   </div>
-</div>
+</section>
 
 <!-- Announcement Section -->
-<div class="container mt-4">
-  <div class="alert alert-info" role="alert">
-    <h4 class="alert-heading">Welcome to CarbonTrack! 🌍</h4>
-    <div class="text-container">
-      <p style="color: var(--ios-blue); font-weight: 600; font-size: 1.1rem;">📢 Announcements</p>
-    </div>
-    <hr style="border-color: var(--ios-gray5);">
-    <div class="text-container">
-      <ul>
-        <li><span class="emoji" style="color: var(--ios-yellow);">💡</span> <strong>We Value Your Feedback!</strong> Have suggestions? Email us at <a href="mailto:carbontrack666@gmail.com" style="color: var(--ios-blue); text-decoration: none;">carbontrack666@gmail.com</a>.</li>
-        <li><span class="emoji" style="color: var(--ios-blue);">🎖️</span> <strong>Earn Rewards!</strong> Log your sustainable actions and receive certificates, badges, and thank-you letters for your contributions.</li>
-        <li><span class="emoji" style="color: var(--ios-green);">🌱</span> <strong>Who Can Join?</strong> While CarbonTrack primarily serves students, anyone passionate about sustainability is welcome!</li>
-        <li><span class="emoji" style="color: var(--ios-indigo);">⚖️</span> <strong>Fair Play Matters!</strong> Cheating for Carbon Credits is strictly prohibited. We are committed to a transparent and fair system.</li>
+<section class="announcement-section">
+  <div class="container">
+    <div class="announcement-card">
+      <h2 class="announcement-heading">Welcome to CarbonTrack! 🌍</h2>
+      <p class="announcement-subheading">📢 Announcements</p>
+      <div class="announcement-divider"></div>
+      <ul class="announcement-list">
+        <li class="announcement-item">
+          <span class="announcement-icon" style="color: var(--ios-yellow);">💡</span>
+          <div class="announcement-content">
+            <p><strong>We Value Your Feedback!</strong> Have suggestions? Email us at <a href="mailto:carbontrack666@gmail.com">carbontrack666@gmail.com</a>.</p>
+          </div>
+        </li>
+        <li class="announcement-item">
+          <span class="announcement-icon" style="color: var(--ios-blue);">🎖️</span>
+          <div class="announcement-content">
+            <p><strong>Earn Rewards!</strong> Log your sustainable actions and receive certificates, badges, and thank-you letters for your contributions.</p>
+          </div>
+        </li>
+        <li class="announcement-item">
+          <span class="announcement-icon" style="color: var(--ios-green);">🌱</span>
+          <div class="announcement-content">
+            <p><strong>Who Can Join?</strong> While CarbonTrack primarily serves students, anyone passionate about sustainability is welcome!</p>
+          </div>
+        </li>
+        <li class="announcement-item">
+          <span class="announcement-icon" style="color: var(--ios-indigo);">⚖️</span>
+          <div class="announcement-content">
+            <p><strong>Fair Play Matters!</strong> Cheating for Carbon Credits is strictly prohibited. We are committed to a transparent and fair system.</p>
+          </div>
+        </li>
       </ul>
-      <p class="mb-0" style="font-size: 0.95rem; color: var(--ios-gray);">Thank you for being part of CarbonTrack! Together, we can build a more sustainable future.</p>
+      <p class="announcement-footer">Thank you for being part of CarbonTrack! Together, we can build a more sustainable future.</p>
     </div>
   </div>
-</div>
+</section>
 
 <!-- Feature Cards Section -->
-<div class="feature-section">
+<section class="feature-section">
   <div class="container">
-    <h2 class="feature-heading">How CarbonTrack Works</h2>
-    <div class="row">
-      <div class="col-md-3 col-sm-6 mb-4">
-        <div class="card card3">
-          <div class="card-body">
-            <h5 class="card-title" style="color: #000;">What is a Carbon Account?</h5>
-            <p class="card-text" style="color: var(--ios-gray);">A Carbon Account is a tool that tracks CO₂ reductions from eco-friendly actions. By understanding our carbon footprint, we can make informed choices for a greener planet.</p>
-          </div>
+    <h2 class="section-heading">How CarbonTrack Works</h2>
+    
+    <div class="feature-grid">
+      <div class="feature-card feature-card--white">
+        <div class="feature-card__body">
+          <h3 class="feature-card__title">What is a Carbon Account?</h3>
+          <p class="feature-card__text">A Carbon Account is a tool that tracks CO₂ reductions from eco-friendly actions. By understanding our carbon footprint, we can make informed choices for a greener planet.</p>
         </div>
       </div>
-      <div class="col-md-3 col-sm-6 mb-4">
-        <div class="card card2">
-          <div class="card-body">
-            <h5 class="card-title" style="color:#fff">How to Use CarbonTrack</h5>
-            <p class="card-text" style="color:#fff">
-              <ul style="color:#fff; list-style-type: none; padding-left: 0;">
-                <li style="margin-bottom: 12px;"><i class="fas fa-check-circle" style="margin-right: 8px;"></i><strong>Sign up & log in.</strong></li>
-                <li style="margin-bottom: 12px;"><i class="fas fa-check-circle" style="margin-right: 8px;"></i><strong>Record sustainable actions</strong> in the Carbon Accounting Portal.</li>
-                <li style="margin-bottom: 12px;"><i class="fas fa-check-circle" style="margin-right: 8px;"></i><strong>Earn Carbon Credits</strong> based on real CO₂ reductions.</li>
-                <li style="margin-bottom: 12px;"><i class="fas fa-check-circle" style="margin-right: 8px;"></i><strong>Track progress & join challenges</strong> to win rewards!</li>
-              </ul>
-            </p>
-          </div>
+      
+      <div class="feature-card feature-card--blue">
+        <div class="feature-card__body">
+          <h3 class="feature-card__title">How to Use CarbonTrack</h3>
+          <ul class="feature-card__list">
+            <li class="feature-card__list-item">
+              <i class="fas fa-check-circle feature-card__list-icon"></i>
+              <span><strong>Sign up & log in.</strong></span>
+            </li>
+            <li class="feature-card__list-item">
+              <i class="fas fa-check-circle feature-card__list-icon"></i>
+              <span><strong>Record sustainable actions</strong> in the Carbon Accounting Portal.</span>
+            </li>
+            <li class="feature-card__list-item">
+              <i class="fas fa-check-circle feature-card__list-icon"></i>
+              <span><strong>Earn Carbon Credits</strong> based on real CO₂ reductions.</span>
+            </li>
+            <li class="feature-card__list-item">
+              <i class="fas fa-check-circle feature-card__list-icon"></i>
+              <span><strong>Track progress & join challenges</strong> to win rewards!</span>
+            </li>
+          </ul>
         </div>
       </div>
-      <div class="col-md-3 col-sm-6 mb-4">
-        <div class="card card3">
-          <div class="card-body">
-            <h5 class="card-title" style="color: #000;">Why Use a Carbon Account?</h5>
-            <p class="card-text" style="color: var(--ios-gray);">
-              <ul style="color: var(--ios-gray); list-style-type: none; padding-left: 0;">
-                <li style="margin-bottom: 12px;"><i class="fas fa-check" style="color: var(--ios-green); margin-right: 8px;"></i><strong>Quantify your impact</strong> on carbon reduction.</li>
-                <li style="margin-bottom: 12px;"><i class="fas fa-check" style="color: var(--ios-green); margin-right: 8px;"></i><strong>Encourage long-term eco-friendly habits.</strong></li>
-                <li style="margin-bottom: 12px;"><i class="fas fa-check" style="color: var(--ios-green); margin-right: 8px;"></i><strong>Raise awareness & promote energy conservation.</strong></li>
-              </ul>
-            </p>
-          </div>
+      
+      <div class="feature-card feature-card--white">
+        <div class="feature-card__body">
+          <h3 class="feature-card__title">Why Use a Carbon Account?</h3>
+          <ul class="feature-card__list">
+            <li class="feature-card__list-item">
+              <i class="fas fa-check feature-card__list-icon" style="color: var(--ios-green);"></i>
+              <span><strong>Quantify your impact</strong> on carbon reduction.</span>
+            </li>
+            <li class="feature-card__list-item">
+              <i class="fas fa-check feature-card__list-icon" style="color: var(--ios-green);"></i>
+              <span><strong>Encourage long-term eco-friendly habits.</strong></span>
+            </li>
+            <li class="feature-card__list-item">
+              <i class="fas fa-check feature-card__list-icon" style="color: var(--ios-green);"></i>
+              <span><strong>Raise awareness & promote energy conservation.</strong></span>
+            </li>
+          </ul>
         </div>
       </div>
-      <div class="col-md-3 col-sm-6 mb-4">
-        <div class="card card4">
-          <div class="card-body">
-            <h5 class="card-title" style="color:#fff">Join Our Team!</h5>
-            <p class="card-text" style="color:#fff">
-              Passionate about sustainability? Join CarbonTrack and become part of a global movement making a real environmental impact!
-            </p>
-            <a href="about.html" class="btn btn-light btn-sm mt-auto">Learn More</a>
-          </div>
+      
+      <div class="feature-card feature-card--purple">
+        <div class="feature-card__body">
+          <h3 class="feature-card__title">Join Our Team!</h3>
+          <p class="feature-card__text">Passionate about sustainability? Join CarbonTrack and become part of a global movement making a real environmental impact!</p>
+          <a href="about.html" class="feature-card__button">Learn More</a>
         </div>
       </div>
     </div>
   </div>
-</div>
+</section>
 
 <!-- Floating Action Button -->
 <button class="floating-button" id="recordButton">
-  <i class="fas fa-plus" style="font-size: 24px;"></i>
+  <i class="fas fa-plus"></i>
 </button>
 
 <!-- Footer -->
@@ -559,7 +867,7 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="loginModalLabel" style="font-weight: 600;">Sign In</h5>
+        <h5 class="modal-title" id="loginModalLabel">Sign In</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -567,35 +875,35 @@
       <div class="modal-body">
         <form>
           <div class="form-group">
-            <label for="username" style="font-weight: 500; color: var(--ios-gray);">Account / Username / Email</label>
+            <label for="username">Account / Username / Email</label>
             <input type="text" class="form-control" id="username" placeholder="Enter your username or email">
           </div>
           <div class="form-group">
-            <label for="password" style="font-weight: 500; color: var(--ios-gray);">Password</label>
+            <label for="password">Password</label>
             <input type="password" class="form-control" id="password" placeholder="Enter your password">
           </div>
-          <button type="submit" class="btn btn-success btn-block" style="margin-top: 24px; padding: 12px;">Sign In</button>
+          <button type="submit" class="btn btn-success btn-block">Sign In</button>
         </form>
       </div>
-      <div class="modal-footer" style="justify-content: center; flex-direction: column;">
-        <div class="alert alert-warning" role="alert" id="refreshAlert" style="display: none; cursor: pointer; border-radius: 10px;">
-          If you're having trouble, please reload the page or press <a href="#" onclick="location.reload();" style="color: var(--ios-blue); text-decoration: none;">here</a>.
+      <div class="modal-footer" style="flex-direction: column;">
+        <div class="alert alert-warning" role="alert" id="refreshAlert" style="display: none; width: 100%; border-radius: 12px;">
+          If you're having trouble, please reload the page or press <a href="#" onclick="location.reload();">here</a>.
         </div>
         <div style="display: flex; justify-content: space-between; width: 100%;">
-          <a class="nav-link" href="iforgot.html" style="color: var(--ios-blue); text-decoration: none; padding: 8px 0;">Forgot password?</a>
-          <a class="nav-link" href="#" data-toggle="modal" data-target="#registerModal" style="color: var(--ios-blue); text-decoration: none; padding: 8px 0;">Create Account</a>
+          <a href="iforgot.html">Forgot password?</a>
+          <a href="#" data-toggle="modal" data-target="#registerModal">Create Account</a>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel"
+<div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="registerModalLabel"
      aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="registerModalLabel" style="font-weight: 600;">Create Account</h5>
+        <h5 class="modal-title" id="registerModalLabel">Create Account</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -603,37 +911,36 @@
       <div class="modal-body">
         <form>
           <div class="form-group">
-            <label for="username" style="font-weight: 500; color: var(--ios-gray);">Username</label>
+            <label for="regusername">Username</label>
             <input type="text" class="form-control required-input" id="regusername" placeholder="Choose a username">
           </div>
           <div class="form-group">
-            <label for="password" style="font-weight: 500; color: var(--ios-gray);">Password</label>
+            <label for="regpassword">Password</label>
             <input type="password" class="form-control required-input" id="regpassword" placeholder="Create a password">
           </div>
           <div class="form-group">
-            <label for="email" style="font-weight: 500; color: var(--ios-gray);">Email Address</label>
+            <label for="email">Email Address</label>
             <input type="email" class="form-control required-input" id="email" name="email" placeholder="Enter your email address" required>
             
-            <div class="mt-3">
-              <button type="button" class="btn btn-outline-primary" id="sendVerificationCode" style="border-radius: 10px; border-color: var(--ios-blue); color: var(--ios-blue);">Send Verification Code</button>
+            <div style="margin-top: 16px;">
+              <button type="button" class="btn btn-outline-primary" id="sendVerificationCode">Send Verification Code</button>
             </div>
             
-            <div class="form-group mt-3">
-              <label for="verificationCode" style="font-weight: 500; color: var(--ios-gray);">Verification Code</label>
+            <div style="margin-top: 16px;">
+              <label for="verificationCode">Verification Code</label>
               <input type="text" class="form-control" id="verificationCode" placeholder="Enter the code sent to your email" required>
-              <small id="emailHelp" class="form-text text-muted"
-                     style="display: none; margin-top: 8px;">The code has been sent to your email.</small>
+              <small id="emailHelp" class="form-text text-muted" style="display: none; margin-top: 8px;">The code has been sent to your email.</small>
             </div>
           </div>
-          <button type="submit" class="btn btn-success btn-block" style="margin-top: 24px; padding: 12px;">Create Account</button>
-          <div id="registerError" style="display:none;" class="alert alert-danger mt-3" style="border-radius: 10px;"></div>
+          <button type="submit" class="btn btn-success btn-block">Create Account</button>
+          <div id="registerError" style="display:none;" class="alert alert-danger mt-3"></div>
         </form>
-        <div class="modal-footer" style="justify-content: center; padding-top: 16px; border-top: 1px solid var(--ios-gray5);">
-          <div class="alert alert-warning" role="alert" id="refreshAlert" style="display: none; cursor: pointer; border-radius: 10px;">
-            If you're having trouble, please reload the page or press <a href="#" onclick="location.reload();" style="color: var(--ios-blue); text-decoration: none;">here</a>.
-          </div>
-          <a href="#" data-toggle="modal" data-target="#loginModal" style="color: var(--ios-blue); text-decoration: none;">Already have an account? Sign in</a>
+      </div>
+      <div class="modal-footer">
+        <div class="alert alert-warning" role="alert" id="refreshAlert" style="display: none; width: 100%; border-radius: 12px;">
+          If you're having trouble, please reload the page or press <a href="#" onclick="location.reload();">here</a>.
         </div>
+        <a href="#" data-toggle="modal" data-target="#loginModal">Already have an account? Sign in</a>
       </div>
     </div>
   </div>
@@ -644,33 +951,31 @@
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="messagesModalLabel" style="font-weight: 600;">Messages</h5>
+        <h5 class="modal-title" id="messagesModalLabel">Messages</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body">
         <div class="row">
-          <div class="col-4" id="conversationList" style="border-right: 1px solid var(--ios-gray5); padding-right: 0;">
+          <div class="col-4 conversation-list" id="conversationList">
             <!-- 对话列表将在这里动态加载 -->
           </div>
           <div class="col-8">
-            <div id="messageList" style="height: 400px; overflow-y: auto; padding: 16px; background-color: var(--ios-gray6); border-radius: 12px;">
+            <div class="message-list" id="messageList">
               <!-- 消息列表将在这里动态加载 -->
             </div>
-            <div class="input-group mt-3">
-              <input type="text" class="form-control" id="messageInput" placeholder="Type a message..." style="border-radius: 20px 0 0 20px; padding-left: 16px;">
-              <div class="input-group-append">
-                <button class="btn btn-primary" type="button" id="sendMessage" style="border-radius: 0 20px 20px 0;">
-                  <i class="fas fa-paper-plane"></i>
-                </button>
-              </div>
+            <div class="message-input">
+              <input type="text" class="message-input-field" id="messageInput" placeholder="Type a message...">
+              <button class="message-input-button" id="sendMessage">
+                <i class="fas fa-paper-plane"></i>
+              </button>
             </div>
           </div>
         </div>
       </div>
-      <div class="modal-footer" style="justify-content: flex-end;">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal" style="background-color: var(--ios-gray4); color: #000;">Close</button>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
       </div>
     </div>
   </div>
