@@ -19,7 +19,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
 
         $pdo = new PDO($dsn, $user, $pass, $options);
-        $stmt = $pdo->prepare("SELECT username, id, email, time, img, points, auth, act, raw, notes, activity_date FROM points_transactions WHERE email = :email");
+        $stmt = $pdo->prepare("
+            SELECT p.id, p.email, p.time, p.img, p.points, p.auth, p.act, p.raw, p.notes, p.activity_date, 
+                   u.username 
+            FROM points_transactions p
+            LEFT JOIN users u ON p.email = u.email
+            WHERE p.email = :email
+        ");
         $stmt->bindParam(':email', $email, PDO::PARAM_STR);
         $stmt->execute();
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
