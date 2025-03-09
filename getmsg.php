@@ -31,12 +31,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // 开始事务
         $pdo->beginTransaction();
 
-        // 获取未读消息，确保包含created_at字段
+        // 获取未读消息，确保包含send_time字段
         $stmtSelect = $pdo->prepare("
-            SELECT id, sender_id, receiver_id, content, is_read, created_at 
+            SELECT message_id, sender_id, receiver_id, content, is_read, send_time 
             FROM messages 
             WHERE (receiver_id = :receiver_id OR sender_id = :sender_id)
-            ORDER BY created_at ASC
+            ORDER BY send_time ASC
         ");
         $stmtSelect->execute([
             'receiver_id' => $receiver_id,
@@ -55,9 +55,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         // 确保每条消息都有时间戳
         foreach ($messages as &$message) {
-            if (!isset($message['created_at']) || empty($message['created_at'])) {
-                $message['created_at'] = date('Y-m-d H:i:s');
+            if (!isset($message['send_time']) || empty($message['send_time'])) {
+                $message['send_time'] = date('Y-m-d H:i:s');
             }
+            // 为了兼容前端代码，添加created_at字段作为send_time的别名
+            $message['created_at'] = $message['send_time'];
         }
 
         echo json_encode(['success' => true, 'messages' => $messages]);

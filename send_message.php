@@ -43,14 +43,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         
         // 插入消息
         $stmtInsert = $pdo->prepare("
-            INSERT INTO messages (sender_id, receiver_id, content, is_read, created_at) 
-            VALUES (:sender_id, :receiver_id, :content, 0, :created_at)
+            INSERT INTO messages (sender_id, receiver_id, content, is_read, send_time) 
+            VALUES (:sender_id, :receiver_id, :content, 0, :send_time)
         ");
         
         $stmtInsert->bindParam(':sender_id', $senderId, PDO::PARAM_INT);
         $stmtInsert->bindParam(':receiver_id', $receiverId, PDO::PARAM_INT);
         $stmtInsert->bindParam(':content', $message, PDO::PARAM_STR);
-        $stmtInsert->bindParam(':created_at', $currentTime, PDO::PARAM_STR);
+        $stmtInsert->bindParam(':send_time', $currentTime, PDO::PARAM_STR);
         $stmtInsert->execute();
         
         // 返回成功响应，包括时间戳
@@ -62,6 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 'sender_id' => $senderId,
                 'receiver_id' => $receiverId,
                 'content' => $message,
+                'send_time' => $currentTime,
                 'created_at' => $currentTime,
                 'is_read' => 0
             ]

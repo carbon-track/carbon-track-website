@@ -594,7 +594,10 @@ function displayMessages(messages, sender) {
     // 确保消息按时间顺序排序
     if (messages && messages.length > 0) {
         messages.sort((a, b) => {
-            return new Date(a.created_at) - new Date(b.created_at);
+            // 优先使用 send_time，如果不存在则回退到 created_at
+            const timeA = a.send_time || a.created_at;
+            const timeB = b.send_time || b.created_at;
+            return new Date(timeA) - new Date(timeB);
         });
         
         // 用于跟踪日期，以便添加日期分隔符
@@ -602,9 +605,12 @@ function displayMessages(messages, sender) {
         
         // 遍历消息并添加到容器
         messages.forEach((message, index) => {
+            // 获取消息时间戳（优先使用 send_time，如果不存在则回退到 created_at）
+            const messageTimestamp = message.send_time || message.created_at;
+            
             // 检查是否需要添加日期分隔符
-            if (message.created_at) {
-                const messageDate = new Date(message.created_at);
+            if (messageTimestamp) {
+                const messageDate = new Date(messageTimestamp);
                 const formattedDate = messageDate.toLocaleDateString();
                 
                 if (!lastMessageDate || formattedDate !== lastMessageDate) {
@@ -639,10 +645,10 @@ function displayMessages(messages, sender) {
             const messageTime = document.createElement('span');
             messageTime.classList.add('message-time');
             
-            // 格式化时间
+            // 格式化时间 - 优先使用 send_time，如果不存在则回退到 created_at
             let formattedTime = '时间未知';
-            if (message.created_at) {
-                const msgDate = new Date(message.created_at);
+            if (messageTimestamp) {
+                const msgDate = new Date(messageTimestamp);
                 formattedTime = msgDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             }
             
@@ -746,15 +752,21 @@ function sendMessage() {
         },
         success: function(response) {
             // 如果发送成功并且服务器返回了消息数据
-            if (response.success && response.timestamp) {
+            if (response.success && (response.timestamp || response.message_data)) {
+                // 获取时间戳 - 优先使用 message_data.send_time，然后是 message_data.created_at，最后是 response.timestamp
+                let timestamp = response.timestamp;
+                if (response.message_data) {
+                    timestamp = response.message_data.send_time || response.message_data.created_at || timestamp;
+                }
+                
                 // 找到之前添加的临时消息元素
                 const tempMessage = document.getElementById(tempMessageId);
                 if (tempMessage) {
                     // 更新时间显示
                     const messageTime = tempMessage.querySelector('.message-time');
-                    if (messageTime) {
-                        const msgDate = new Date(response.timestamp);
-                        messageTime.innerText = msgDate.toLocaleString();
+                    if (messageTime && timestamp) {
+                        const msgDate = new Date(timestamp);
+                        messageTime.innerText = msgDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                     }
                     
                     // 移除发送中状态
