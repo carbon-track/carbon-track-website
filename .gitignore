@@ -10,3 +10,4 @@ login.php
 global_variables.php
 .user.ini
 .htaccess
+update.bat
