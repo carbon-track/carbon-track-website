@@ -1,4 +1,7 @@
 $(document).ready(function() {
+    // Load navbar
+    loadNavbar();
+    
     var translateElement = $('<div>', { id: 'google_translate_element' });
     $('.nav-item #userStatus').parent().before(translateElement);
 
@@ -447,7 +450,7 @@ if (message.sender_id === currentUserId) {
         setTimeout(() => {
             messageBubble.style.opacity = 1;
             messageBubble.style.transform = 'translateY(0)';
-        }, 100 * index); // 为每个消息设置不同的延时，创建“逐个出现”的效果
+        }, 100 * index); // 为每个消息设置不同的延时，创建"逐个出现"的效果
     });
 }
 function sendMessage() {
@@ -484,6 +487,110 @@ function sendMessage() {
             alert('消息发送请求失败，请稍后再试。');
         }
     });
+}
+
+// Function to load navbar from navbar.html
+function loadNavbar() {
+    $.ajax({
+        url: 'navbar.html',
+        type: 'GET',
+        success: function(data) {
+            // Insert the navbar content into the navbar container
+            $('#navbar-container').html(data);
+            
+            // After navbar is loaded, check login status
+            checkLoginStatus();
+            
+            // Set up event listeners for navbar elements
+            setupNavbarEventListeners();
+        },
+        error: function(xhr, status, error) {
+            console.error('Error loading navbar:', error);
+            // If loading fails, show a basic navbar with minimal functionality
+            $('#navbar-container').html('<nav class="navbar navbar-expand-sm navbar-dark"><div class="container"><a class="navbar-brand" href="index.html">CarbonTrack</a></div></nav>');
+        }
+    });
+}
+
+function setupNavbarEventListeners() {
+    // Set up any event listeners for navbar elements
+    // These will be applied after the navbar is loaded
+    
+    // Login form submission - use the existing pattern from the codebase
+    $('#loginModal form').submit(function(e) {
+        e.preventDefault();
+        
+        // Get username and password values
+        var username = $('#username').val();
+        var password = $('#password').val();
+        
+        // Call login logic (using AJAX to authenticate)
+        $.ajax({
+            type: 'POST',
+            url: 'login.php',
+            data: { username: username, password: password },
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    // 登录成功
+                    var now = new Date();
+                    var expiration = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000); // 设置7天后的时间
+                    sessionStorage.setItem('loggedIn', true); // 存储登录状态
+                    sessionStorage.setItem('username', response.real_username); // 存储用户名
+                    sessionStorage.setItem('expiration', expiration.getTime()); // 存储过期时间戳
+                    sessionStorage.setItem('email', response.email); // 存储email
+                    sessionStorage.setItem('token', response.token);
+                    sessionStorage.setItem('id', response.id);
+                    $('[data-target="#loginModal"]').hide();
+                    $('[data-target="#registerModal"]').hide();
+                    var logoutButton = document.getElementById('logoutButton');
+                    
+                    // 移除"btn-danger"类
+                    logoutButton.classList.remove('btn-danger');
+                    
+                    // 设置按钮颜色
+                    logoutButton.style.color = 'rgba(255, 255, 255, .5)';
+                    logoutButton.style.border = '1px solid rgba(255, 255, 255, .5)';
+                    $('.logoutControl').show();
+                    $('a[href="center.html"]').hide();
+                    $('a[href="calculate.html"]').hide();
+                    $('a[href="CStore.html"]').hide();
+
+                    $('#loginModal').modal('hide').on('hidden.bs.modal', function() {
+                        // 这里的代码会在模态框完全关闭后执行
+                        $('.modal-backdrop').remove(); // 如果需要的话，手动移除遮罩
+                    });
+
+                    updateLoginStatus(); // 更新页面显示登录状态
+                } else {
+                    // Show error message
+                    alert('Login failed: ' + response.message);
+                }
+            },
+            error: function() {
+                alert('Login request failed. Please try again later.');
+            }
+        });
+    });
+    
+    // Register form submission
+    $('#registerModal form').submit(function(e) {
+        e.preventDefault();
+        registerUser();
+    });
+    
+    // Send verification code button
+    $('#sendVerificationCode').click(function() {
+        sendVerificationCode();
+    });
+    
+    // Set up other navbar event listeners
+    $('#logoutButton').click(function() {
+        logout();
+    });
+    
+    // Check for unread messages when navbar is loaded
+    checkUnreadMessages();
 }
 
 

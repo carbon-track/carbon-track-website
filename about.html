@@ -54,415 +54,247 @@
   </style>
 </head>
 <body>
-<!-- 导航栏 -->
-<nav class="navbar navbar-expand-sm navbar-dark">
+<!-- 导航栏容器，将由JavaScript加载 -->
+<div id="navbar-container"></div>
 
+<!-- 页面主要内容 -->
+<div class="container mt-4">
+  <!-- 关于我们标题 -->
+  <div class="jumbotron">
+    <div class="container">
+      <div class="row">
+        <div class="col">
+          <h1 class="d-inline-block">About Us</h1>
+        </div>
+        <div class="col">
+           <!--旧Join Us button<button type="button" class="btn btn-8uccess float-right" data-toggle="modal" data-target="#joinUsModal">
+            Join Us
+          </button>-->
+          
+   <button id="emailButton" class="btn btn-success float-right">Send Us an Email</button>
+
+  <script>
+      document.getElementById('emailButton').addEventListener('click', function () {
+          window.location.href = 'mailto:carbontrack666@gmail.com';
+      });
+  </script>
+
+
+
+        </div>
+      </div>
+      <p>
+        We are a group of young people keen on environmental protection and technology. Our mission is to promote and practice a low-carbon lifestyle via this Campus Carbon Accounting System, raising awareness of the impact of carbon emissions on the planet and encouraging action to reduce carbon footprints, thereby protecting our shared home.</p>
+      <!--<button>Join Us</button>-->
+    </div>
+  </div>
+
+    
+  <!-- 内容区域 -->
   <div class="container">
-    <a class="navbar-brand" href="index.html">校园碳账户 |</a>
-    <a class="navbar-brand" href="index.html">
-      <img src="/img/team.png" alt="CarbonTrack校园碳账户" style="height: 100px;"></a>
-    <a class="navbar-brand" href="index.html">CarbonTrack</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ml-auto">
-        <li class="nav-item">
-          <span id="userStatus" class="navbar-text mr-3"></span>
-        </li>
-        <!--
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">Contact Us</a>
-                            </li>-->
-        <li class="nav-item">
-          <a class="nav-link" href="#" data-toggle="modal" data-target="#registerModal">Register</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#" data-toggle="modal" data-target="#loginModal">Log-in</a>
-        </li>
-        <li class="nav-item">
-          <button id="logoutButton" class=" logoutControl btn btn-sm btn-danger" onclick="logout()"
-                  style="display:none;">Logout
-          </button>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="index.html">Home</a>
-        </li>
-        <li class="nav-item">
-          <a class="logoutControl nav-link " href="#" data-toggle="modal" data-target="#messagesModal"><i
-              class="logoutControl fas fa-envelope" style="color: rgba(255, 255, 255, .5);font-size: 24px;"></i></a>
-          <div class="badge-container">
-            <span id="unreadMessagesCount" class="badge badge-danger" style="display: none;">0</span>
+    <!-- 内容标题 -->
+    <h2>Team Members</h2>
+    <!-- 内容段落 -->
+    <p>Our team consists of the following passionate members: this block is currently under construction:)</p>
+    
+  <div class="row">
+    <div class="col-md-4">
+        <!-- 内容卡片3 -->
+        <div class="card">
+          <!-- 内容卡片图片3
+          <img src="^15^" class="card-img-top" alt="Jack 虞源正">-->
+          <!-- 内容卡片正文3 -->
+          <div class="card-body">
+            <!-- 内容卡片标题3 -->
+            <h4 class="card-title">Yuanzheng (Jack) Yu</h4>
+            <!-- 内容卡片文本3 -->
+            <p class="card-text">As the leader of the CarbonTrack, Jack Yu is responsible for team formation, work division, future planning, and coordinating collaborations with external partners. Within the Tech-team, Jack Yu oversees web design, testing, and maintenance. He hopes to harness the power of the Internet to engage everyone in emission reduction, addressing environmental challenges while fostering a vibrant and supportive community.</p>
+            <!-- 内容卡片按钮3 -->
+            <button>View More Details</button>
           </div>
-        </li>
-        <li class="nav-item">
-          <a id="logoutButton logoutControl" class=" logoutControl nav-link" href="calculate.html">Accounting Portal</a>
-        </li>
+        </div>
+      </div>
 
-        <li class="nav-item">
-          <a id="logoutControl" class=" logoutControl nav-link" href="CStore.html">Credits Mall</a>
-        </li>
-        <li class="nav-item">
-          <a id=" logoutControl" class="logoutControl nav-link" href="center.html">User Center</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="about.html">About Us</a>
-        </li>
+      
+      <div class="col-md-4">
+        <!-- 内容卡片2 -->
+        <div class="card">
+          <!-- 内容卡片图片2 -->
+          <!-- 内容卡片图片2
+  <img src="^14^" class="card-img-top" alt="Jeffery 吕子宁">-->
+          <!-- 内容卡片正文2 -->
+          <div class="card-body">
+            <!-- 内容卡片标题2-->
+            <h4 class="card-title">Zining (Jeffery) Lu</h4>
+            <!-- 内容卡片文本2 -->
+            <p class="card-text">
+              Jeffery is the core tech-guy in our team. As a skilled full-stack web engineer, he is responsible for the web design and maintenance of our carbon account website. His dream is to use technology to change how people live.</p>
+            <!-- 内容卡片按钮2 -->
+            <button>View More Details</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-body">
+            <h4 class="card-title">Loren Minghan Li</h4>
+            <p class="card-next">
+              Loren is one of the managers and designers of our web. With a deep enthusiasm for environmental conservation and a solid academic foundation in environmental science, he brings a blend of passion and expertise to the team. Loren enjoys photography, exploring the outdoors, and watching anime. His wishes is to contribute significantly to the fight against climate change while advancing efforts toward environmental sustainability.
+            </p>
+            <button>View More Details</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-body">
+            <h4 class="card-title">Smiley Ni</h4>
+            <p class="card-next">
+              Smiley is the advertiser and designer in our team. As a creative person, she loves to dance, make paintings, and do equestrian. Their dream is to spread happiness.
+            </p>
+            <button>View More Details</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-body">
+            <h4 class="card-title">Lan Liu</h4>
+            <p class="card-next">
+              She is our web designer and operator. She loved nature and especially loved hiking. She is good at speaking, communicating with others, dancing, equestrian, and making pottery. Her ambition is to offer a range of sustainable green lifestyles to more people, especially teenagers, through our website.
+            </p>
+            <button>View More Details</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-body">
+            <h4 class="card-title">Jack Shi</h4>
+            <p class="card-next">
+              Jack is also a web designer and operator. He loves the ocean and frequently volunteers in local organizations with local organizations focused on ocean conservation. He loves working out, cross-country running, and swimming. His goal is to use his skills to help protect the ocean and inspire others to care for the environment.
+            </p>
+            <button>View More Details</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-body">
+            <h4 class="card-title">Tony Li</h4>
+            <p class="card-next">
+              Tony is also a core tech guy on the team, responsible for updating new functions, refining website interactions, and further developing user-friendly features to enhance the overall digital experience. His effort ensures that the website remains modern and efficient.
+            </p>
+            <button>View More Details</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-body">
+            <h4 class="card-title">Eddie Peng</h4>
+            <p class="card-next">
+              A member in the content team, responsible for writing articles and descriptions. If you need any help, he will be glad to support you.
+            </p>
+            <button>View More Details</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-body">
+            <h4 class="card-title">Micheal Jiang</h4>
+            <p class="card-next">
+              Micheal Jiang is a member of the tech team, he is responsible for coding and developing the web page and creating new technical features on our website and applications. He also focuses on improving the user interface of the website and our applications
+            </p>
+            <button>View More Details</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-body">
+            <h4 class="card-title">Peter Zhao</h4>
+            <p class="card-next">
+              Member of our content team. He mainly works on information editing and art design of our website. He enjoys traveling, doing sports, and playing video games. He aims to promote environmental sustainability.
+            </p>
+            <button>View More Details</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-4">
+        <!-- 内容卡片3 -->
+        <div class="card">
+          <!-- 内容卡片图片3
+          <img src="^15^" class="card-img-top" alt="特别鸣谢">-->
+          <!-- 内容卡片正文3 -->
+          <div class="card-body">
+            <!-- 内容卡片标题3 -->
+            <h4 class="card-title">特别鸣谢 Special Thanks</h4>
+            <!-- 内容卡片文本3 -->
+            <p class="card-text">Special thanks to "三座雪山_" for providing web-design consultation and artwork. Her personal website: <a
+                href="https://www.whensnowone.com/" target="_blank">https://www.whensnowone.com/</a></p>
+            <!-- 内容卡片按钮3 -->
+            <button id="spec">View More Details</button>
+            <script>
+              document.getElementById('spec').addEventListener('click', function () {
+                window.open('https://www.whensnowone.com/', '_blank')
+              })</script>
+          </div>
+        </div>
+      </div>
+    </div>
 
+    <div class="mt-3 mb-3">
+      <!-- 内容标题 -->
+      <h2>Our Mission</h2>
+      <!-- 内容段落 -->
+      <p>Our mission is to use the carbon account system to help ourselves and others achieve the following goals:</p>
+      <!-- 内容列表 -->
+      <ul>
+        <li>Target students to raise their awareness of climate change and carbon emissions.</li>
+        <li>Help students to record their carbon footprints in daily lives, fostering greater awareness and participation in energy-saving and emission-reducing activities.</li>
+        <li>Through our efforts, we hope to raise awareness of the importance of energy-saving and emission reduction, further promoting world-wide attention and recognition of environmental protection.
+        </li>
+        <li>Participate in and support activities and NPOs that contribute to environmental protection and social welfare, making a positive impact on our shared home.</li>
       </ul>
     </div>
-  </div>
-</nav>
-<div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel"
-     aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="loginModalLabel">User Login</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <form>
-          <div class="form-group">
-            <label for="username">Account/Username</label>
-            <input type="text" class="form-control" id="username" placeholder="Please enter your Username or Email Address">
-          </div>
-          <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" class="form-control" id="password" placeholder="Please enter your Password">
-          </div>
-          <button type="submit" class="btn btn-login btn-block">Log-in</button>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <div class="alert alert-warning" role="alert" id="refreshAlert" style="display: none; cursor: pointer;">
-          If failed, please try reload the page or press<a href="#" onclick="location.reload();">here</a>以重新通过Cloudflare防火墙。
-        </div>
-        <a class="nav-link mr-right" href="iforgot.html">Forgot password?</a>
-        <a class="nav-link" href="#" data-toggle="modal" data-target="#registerModal">Register an account</a>
-      </div>
-    </div>
-  </div>
-</div>
-<div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel"
-     aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="registerModalLabel">Register new account</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <form>
-          <div class="form-group">
-            <label for="username">Username</label>
-            <input type="text" class="form-control required-input" id="regusername" placeholder="Please set your Username">
-          </div>
-          <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" class="form-control required-input" id="regpassword" placeholder="Please set your Password">
-          </div>
-          <div class="form-group">
-            <label for="email">Email Address:</label>
-            <input type="email" class="form-control required-input" id="email" name="email" required>
-            <!-- 添加发送验证码按钮 -->
-            <button type="button" class="btn btn-secondary" id="sendVerificationCode">Send verification code</button>
-            <!-- 在注册模态框的表单中添加一个字段 -->
-            <div class="form-group">
-              <label for="verificationCode">Verification Code</label>
-              <input type="text" class="form-control" id="verificationCode" placeholder="Please enter the verification code you received" required>
-              <small id="emailHelp" class="form-text text-muted"
-                     style="display: none;">The code has been sent to your Email.</small>
-            </div>
-
-          </div>
-          <button type="submit" class="btn btn-login btn-block">Register</button>
-          <div id="registerError" style="display:none;" class="alert alert-danger"></div>
-        </form>
-        <div class="modal-footer">
-          <div class="alert alert-warning" role="alert" id="refreshAlert" style="display: none; cursor: pointer;">
-            If failed, please try reload the page or press<a href="#" onclick="location.reload();">here</a>以重新通过Cloudflare防火墙。
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-<!-- 站内信模态框 -->
-<div class="modal fade" id="messagesModal" tabindex="-1" role="dialog" aria-labelledby="messagesModalLabel"
-     aria-hidden="true">
-  <div class="modal-dialog modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="messagesModalLabel">Message</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="row">
-          <div class="col-4" id="conversationList">
-            <!-- 对话列表将在这里动态加载 -->
-          </div>
-          <div class="col-8">
-            <div id="messageList" style="height: 400px; overflow-y: auto;">
-              <!-- 消息列表将在这里动态加载 -->
-            </div>
-            <div class="input-group mt-3">
-              <input type="text" class="form-control" id="messageInput" placeholder="Enter Message...">
-              <div class="input-group-append">
-                <button class="btn btn-primary" type="button" id="sendMessage">Send</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
-<!-- 关于我们标题 -->
-<div class="jumbotron">
-  <div class="container">
-    <div class="row">
-      <div class="col">
-        <h1 class="d-inline-block">About Us</h1>
-      </div>
-      <div class="col">
-         <!--旧Join Us button<button type="button" class="btn btn-8uccess float-right" data-toggle="modal" data-target="#joinUsModal">
-          Join Us
-        </button>-->
-        
- <button id="emailButton" class="btn btn-success float-right">Send Us an Email</button>
-
-<script>
-    document.getElementById('emailButton').addEventListener('click', function () {
-        window.location.href = 'mailto:carbontrack666@gmail.com';
-    });
-</script>
-
-
-
-      </div>
-    </div>
-    <p>
-      We are a group of young people keen on environmental protection and technology. Our mission is to promote and practice a low-carbon lifestyle via this Campus Carbon Accounting System, raising awareness of the impact of carbon emissions on the planet and encouraging action to reduce carbon footprints, thereby protecting our shared home.</p>
-    <!--<button>Join Us</button>-->
-  </div>
-</div>
-
-  
-<!-- 内容区域 -->
-<div class="container">
-  <!-- 内容标题 -->
-  <h2>Team Members</h2>
-  <!-- 内容段落 -->
-  <p>Our team consists of the following passionate members: this block is currently under construction:)</p>
-  
-<div class="row">
-  <div class="col-md-4">
-      <!-- 内容卡片3 -->
-      <div class="card">
-        <!-- 内容卡片图片3
-        <img src="^15^" class="card-img-top" alt="Jack 虞源正">-->
-        <!-- 内容卡片正文3 -->
-        <div class="card-body">
-          <!-- 内容卡片标题3 -->
-          <h4 class="card-title">Yuanzheng (Jack) Yu</h4>
-          <!-- 内容卡片文本3 -->
-          <p class="card-text">As the leader of the CarbonTrack, Jack Yu is responsible for team formation, work division, future planning, and coordinating collaborations with external partners. Within the Tech-team, Jack Yu oversees web design, testing, and maintenance. He hopes to harness the power of the Internet to engage everyone in emission reduction, addressing environmental challenges while fostering a vibrant and supportive community.</p>
-          <!-- 内容卡片按钮3 -->
-          <button>View More Details</button>
-        </div>
-      </div>
-    </div>
-
-    
-    <div class="col-md-4">
-      <!-- 内容卡片2 -->
-      <div class="card">
-        <!-- 内容卡片图片2 -->
-        <!-- 内容卡片图片2
-<img src="^14^" class="card-img-top" alt="Jeffery 吕子宁">-->
-        <!-- 内容卡片正文2 -->
-        <div class="card-body">
-          <!-- 内容卡片标题2-->
-          <h4 class="card-title">Zining (Jeffery) Lu</h4>
-          <!-- 内容卡片文本2 -->
-          <p class="card-text">
-            Jeffery is the core tech-guy in our team. As a skilled full-stack web engineer, he is responsible for the web design and maintenance of our carbon account website. His dream is to use technology to change how people live.</p>
-          <!-- 内容卡片按钮2 -->
-          <button>View More Details</button>
-        </div>
-      </div>
-    </div>
-    
-    <div class="col-md-4">
-      <div class="card">
-        <div class="card-body">
-          <h4 class="card-title">Loren Minghan Li</h4>
-          <p class="card-next">
-            Loren is one of the managers and designers of our web. With a deep enthusiasm for environmental conservation and a solid academic foundation in environmental science, he brings a blend of passion and expertise to the team. Loren enjoys photography, exploring the outdoors, and watching anime. His wishes is to contribute significantly to the fight against climate change while advancing efforts toward environmental sustainability.
-          </p>
-          <button>View More Details</button>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card">
-        <div class="card-body">
-          <h4 class="card-title">Smiley Ni</h4>
-          <p class="card-next">
-            Smiley is the advertiser and designer in our team. As a creative person, she loves to dance, make paintings, and do equestrian. Their dream is to spread happiness.
-          </p>
-          <button>View More Details</button>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card">
-        <div class="card-body">
-          <h4 class="card-title">Lan Liu</h4>
-          <p class="card-next">
-            She is our web designer and operator. She loved nature and especially loved hiking. She is good at speaking, communicating with others, dancing, equestrian, and making pottery. Her ambition is to offer a range of sustainable green lifestyles to more people, especially teenagers, through our website.
-          </p>
-          <button>View More Details</button>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card">
-        <div class="card-body">
-          <h4 class="card-title">Jack Shi</h4>
-          <p class="card-next">
-            Jack is also a web designer and operator. He loves the ocean and frequently volunteers in local organizations with local organizations focused on ocean conservation. He loves working out, cross-country running, and swimming. His goal is to use his skills to help protect the ocean and inspire others to care for the environment.
-          </p>
-          <button>View More Details</button>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card">
-        <div class="card-body">
-          <h4 class="card-title">Tony Li</h4>
-          <p class="card-next">
-            Tony is also a core tech guy on the team, responsible for updating new functions, refining website interactions, and further developing user-friendly features to enhance the overall digital experience. His effort ensures that the website remains modern and efficient.
-          </p>
-          <button>View More Details</button>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card">
-        <div class="card-body">
-          <h4 class="card-title">Eddie Peng</h4>
-          <p class="card-next">
-            A member in the content team, responsible for writing articles and descriptions. If you need any help, he will be glad to support you.
-          </p>
-          <button>View More Details</button>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card">
-        <div class="card-body">
-          <h4 class="card-title">Micheal Jiang</h4>
-          <p class="card-next">
-            Micheal Jiang is a member of the tech team, he is responsible for coding and developing the web page and creating new technical features on our website and applications. He also focuses on improving the user interface of the website and our applications
-          </p>
-          <button>View More Details</button>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card">
-        <div class="card-body">
-          <h4 class="card-title">Peter Zhao</h4>
-          <p class="card-next">
-            Member of our content team. He mainly works on information editing and art design of our website. He enjoys traveling, doing sports, and playing video games. He aims to promote environmental sustainability.
-          </p>
-          <button>View More Details</button>
-        </div>
-      </div>
-    </div>
-    
-    <div class="col-md-4">
-      <!-- 内容卡片3 -->
-      <div class="card">
-        <!-- 内容卡片图片3
-        <img src="^15^" class="card-img-top" alt="特别鸣谢">-->
-        <!-- 内容卡片正文3 -->
-        <div class="card-body">
-          <!-- 内容卡片标题3 -->
-          <h4 class="card-title">特别鸣谢 Special Thanks</h4>
-          <!-- 内容卡片文本3 -->
-          <p class="card-text">Special thanks to “三座雪山_” for providing web-design consultation and artwork. Her personal website: <a
-              href="https://www.whensnowone.com/" target="_blank">https://www.whensnowone.com/</a></p>
-          <!-- 内容卡片按钮3 -->
-          <button id="spec">View More Details</button>
-          <script>
-            document.getElementById('spec').addEventListener('click', function () {
-              window.open('https://www.whensnowone.com/', '_blank')
-            })</script>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="mt-3 mb-3">
     <!-- 内容标题 -->
-    <h2>Our Mission</h2>
-    <!-- 内容段落 -->
-    <p>Our mission is to use the carbon account system to help ourselves and others achieve the following goals:</p>
-    <!-- 内容列表 -->
-    <ul>
-      <li>Target students to raise their awareness of climate change and carbon emissions.</li>
-      <li>Help students to record their carbon footprints in daily lives, fostering greater awareness and participation in energy-saving and emission-reducing activities.</li>
-      <li>Through our efforts, we hope to raise awareness of the importance of energy-saving and emission reduction, further promoting world-wide attention and recognition of environmental protection.
-      </li>
-      <li>Participate in and support activities and NPOs that contribute to environmental protection and social welfare, making a positive impact on our shared home.</li>
-    </ul>
-  </div>
-  <!-- 内容标题 -->
-  <div class="section-achievements">
-    <h2>Our Achievements</h2>
-    <!-- 内容段落 -->
-    <p>Through the use of the CarbonTrack carbon accounting system, we have achieved the following milestones:</p>
-    <!-- 内容表格 -->
-    <table class="table table-striped table-bordered">
-      <thead>
-      <tr>
-        <th>Category</th>
-        <th>Indicator</th>
-        <th>Description</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr>
-        <td>Carbon Emission Reduction</td>
-        <td>Reduced <span id="totalPoints">加载中Loading</span><br> kg of CO₂ emission
-        <td>We have recorded and managed our carbon footprints via carbon accounts, earning carbon credits and enjoying the benefits of a low-carbon lifestyle.</td>
-      </tr>
-      <tr>
-        <td>Low-Carbon Community Size</td>
-        <td>Recently increased by <span id="userCount">最近增加了加载中人</span> users</td>
-        <td>By sharing our low-carbon lifestyles and stories, we have expanded our low-carbon community, enhanced awareness, and attracted more members to join our team.
-        </td>
-      </tr>
-      <tr>
-        <td>Carbon Account Usage Times</td>
-        <td>Processed <span id="totalTimes">加载中Loading</span> records</td>
-        <td>The increasing number of carbon reduction records reflects the positive impact we are bringing to the community, as well as the stability of our website.</td>
-      </tr>
-      </tbody>
-    </table>
+    <div class="section-achievements">
+      <h2>Our Achievements</h2>
+      <!-- 内容段落 -->
+      <p>Through the use of the CarbonTrack carbon accounting system, we have achieved the following milestones:</p>
+      <!-- 内容表格 -->
+      <table class="table table-striped table-bordered">
+        <thead>
+        <tr>
+          <th>Category</th>
+          <th>Indicator</th>
+          <th>Description</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td>Carbon Emission Reduction</td>
+          <td>Reduced <span id="totalPoints">加载中Loading</span><br> kg of CO₂ emission
+          <td>We have recorded and managed our carbon footprints via carbon accounts, earning carbon credits and enjoying the benefits of a low-carbon lifestyle.</td>
+        </tr>
+        <tr>
+          <td>Low-Carbon Community Size</td>
+          <td>Recently increased by <span id="userCount">最近增加了加载中人</span> users</td>
+          <td>By sharing our low-carbon lifestyles and stories, we have expanded our low-carbon community, enhanced awareness, and attracted more members to join our team.
+          </td>
+        </tr>
+        <tr>
+          <td>Carbon Account Usage Times</td>
+          <td>Processed <span id="totalTimes">加载中Loading</span> records</td>
+          <td>The increasing number of carbon reduction records reflects the positive impact we are bringing to the community, as well as the stability of our website.</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 <!-- 页脚 -->

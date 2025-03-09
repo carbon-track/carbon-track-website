@@ -43,64 +43,9 @@
   <div class="loader"></div>
 </div>
 
-<nav class="navbar navbar-expand-sm navbar-dark">
+<!-- 导航栏容器，将由JavaScript加载 -->
+<div id="navbar-container"></div>
 
-  <div class="container">
-    <a class="navbar-brand" href="index.html">校园碳账户 |</a>
-    <a class="navbar-brand" href="index.html">
-      <img src="/img/team.png" alt="CarbonTrack校园碳账户" style="height: 100px;"></a>
-    <a class="navbar-brand" href="index.html">CarbonTrack</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ml-auto">
-        <li class="nav-item">
-          <span id="userStatus" class="navbar-text mr-3"></span>
-        </li>
-        <!--
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">联系我们</a>
-                            </li>-->
-        <li class="nav-item">
-          <a class="nav-link" href="#" data-toggle="modal" data-target="#registerModal">注册</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#" data-toggle="modal" data-target="#loginModal">登录</a>
-        </li>
-        <li class="nav-item">
-          <button id="logoutButton" class=" logoutControl btn btn-sm btn-danger" onclick="logout()"
-                  style="display:none;">注销
-          </button>
-        </li>
-        <li class="nav-item active">
-          <a class="nav-link" href="#">首页</a>
-        </li>
-        <li class="nav-item">
-          <a class="logoutControl nav-link " href="#" data-toggle="modal" data-target="#messagesModal">站内信</a>
-          <div class="badge-container">
-            <span id="unreadMessagesCount" class="badge badge-danger" style="display: none;">0</span>
-          </div>
-        </li>
-        <li class="nav-item">
-          <a id="logoutButton logoutControl" class=" logoutControl nav-link" href="calculate.html">碳减排核算入口</a>
-        </li>
-
-        <li class="nav-item">
-          <a id="logoutControl" class=" logoutControl nav-link" href="CStore.html">碳积分商城入口</a>
-        </li>
-        <li class="nav-item">
-          <a id=" logoutControl" class="logoutControl nav-link" href="center.html">用户中心</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="about.html">关于我们</a>
-        </li>
-
-      </ul>
-    </div>
-  </div>
-</nav>
 <div class="container">
   <h3>碳积分交易记录</h3><br>
   <label>当前用户：</label><span id="email">加载中...</span>
