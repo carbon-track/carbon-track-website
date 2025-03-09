@@ -55,9 +55,23 @@ $(document).ready(function() {
         setInterval(checkUnreadMessages(), 30);
         // 模态框显示时加载消息
 $('#messagesModal').on('show.bs.modal', function(e) {
-    console.log('消息模态框正在打开');
+    console.log('消息模态框正在打开，清空之前的消息内容');
+    
+    // 先清空之前的消息内容，避免显示旧内容
+    $('#messageList').empty();
+    $('#conversationList').empty();
+    
     var modalBody = $(this).find('.modal-body');
-    modalBody.prepend('<div id="loading"><div class="loader"></div></div>'); 
+    modalBody.prepend('<div id="loading"><div class="loader">加载中...</div></div>'); 
+    
+    // 检查用户登录状态
+    var token = localStorage.getItem('token');
+    if (!token) {
+        $('#loading').remove();
+        console.error('用户未登录，无法获取消息');
+        $('#conversationList').append('<div class="alert alert-warning">请先登录</div>');
+        return;
+    }
     
     fetchMessages().then(function(data) {
         $('#loading').remove(); // 移除加载动画
@@ -80,7 +94,8 @@ $('#messagesModal').on('show.bs.modal', function(e) {
         }
         
         checkUnreadMessages();
-        setInterval(checkUnreadMessages, 30000); // 每30秒检查一次未读消息，注意这里修复了原来的错误
+        // 修复setInterval的用法
+        setInterval(checkUnreadMessages, 30000); // 每30秒检查一次未读消息
     }).catch(function(error) {
         $('#loading').remove(); // 确保即使发生错误也要移除加载动画
         console.error('获取消息出错:', error);
@@ -421,36 +436,31 @@ function fetchMessages() {
 
 function buildConversationsList(data) {
     console.log('开始构建对话列表，收到的数据:', data);
-    var conversations = {};
     
-    // 使用后端返回的用户ID，如果没有则尝试从localStorage获取
-    var userId = data.debug && data.debug.user_id ? data.debug.user_id : localStorage.getItem('id');
-    
-    if (!userId) {
-        console.error('无法获取当前用户ID');
+    // 获取对话列表容器
+    var conversationList = $('#conversationList');
+    if (!conversationList.length) {
+        console.error('找不到对话列表容器');
         return;
     }
     
-    console.log('当前用户ID:', userId);
+    // 清空现有列表
+    conversationList.empty();
     
-    // 将用户ID存储到localStorage，供其他函数使用
-    localStorage.setItem('currentUserId', userId);
-
+    // 如果没有消息或消息为空，显示提示
     if (!data.messages || data.messages.length === 0) {
         console.warn('没有收到任何消息数据');
-        var conversationList = $('#conversationList');
-        conversationList.empty();
         conversationList.append('<div class="alert alert-info">暂无消息</div>');
+        $('#messageList').html('<div class="alert alert-info text-center">暂无消息</div>');
         return;
     }
     
     console.log('收到消息数量:', data.messages.length);
-
+    
     // 按发送者ID分组消息
+    var conversations = {};
     data.messages.forEach(function(message) {
-        // 以发送者ID为键创建会话分组
         var senderId = message.sender_id;
-        console.log('处理消息:', message);
         
         if (!conversations[senderId]) {
             conversations[senderId] = {
@@ -461,71 +471,67 @@ function buildConversationsList(data) {
         
         conversations[senderId].messages.push(message);
     });
-
-    var conversationList = $('#conversationList');
-    conversationList.empty(); // 清空现有列表
-
+    
     // 如果没有对话，显示提示
     if (Object.keys(conversations).length === 0) {
-        conversationList.append('<div class="alert alert-info">暂无消息</div>');
+        conversationList.append('<div class="alert alert-info">暂无对话</div>');
         return;
     }
-
+    
     // 为每个发送者创建一个对话项
     Object.values(conversations).forEach(function(conversation) {
         var senderId = conversation.sender_id;
-        console.log('创建对话项 - 发送者ID:', senderId, '消息数量:', conversation.messages.length);
         
         // 创建对话项
-        var listItem = $('<div></div>').addClass('conversation-item').text('CarbonTrack User-Service');
+        var listItem = $('<div></div>').addClass('conversation-item').html(`
+            <div class="d-flex align-items-center p-2">
+                <div class="flex-shrink-0">
+                    <img src="img/team.jpg" alt="Avatar" class="rounded-circle" style="width: 40px; height: 40px;">
+                </div>
+                <div class="flex-grow-1 ms-3">
+                    <div class="fw-bold">CarbonTrack系统消息</div>
+                    <div class="small text-muted">点击查看消息</div>
+                </div>
+            </div>
+        `);
+        
+        // 样式设置
         listItem.css({
-            padding: '10px 15px',
-            borderBottom: '1px solid #e9ecef',
-            cursor: 'pointer',
-            transition: 'background-color 0.2s'
+            'border-bottom': '1px solid #e9ecef',
+            'cursor': 'pointer',
+            'transition': 'background-color 0.2s'
         });
         
+        // 悬停效果
         listItem.hover(
             function() { $(this).css('background-color', '#f8f9fa'); },
             function() { $(this).css('background-color', ''); }
         );
         
-        // 点击对话项显示消息
-        listItem.on('click', function() {
-            console.log('点击了对话项 - 发送者ID:', senderId);
-            // 高亮显示选中的对话
-            $('.conversation-item').removeClass('active');
+        // 点击显示此对话的消息
+        listItem.click(function() {
+            // 移除其他对话项的选中状态
+            $('.conversation-item').removeClass('active').css('background-color', '');
+            // 添加当前对话项的选中状态
             $(this).addClass('active').css('background-color', '#e9ecef');
             
-            // 获取最后一条消息的时间
-            var lastMessageTime = '没有消息';
-            if (conversation.messages.length > 0) {
-                var lastMessage = conversation.messages[conversation.messages.length - 1];
-                var messageTime = lastMessage.send_time || lastMessage.created_at;
-                if (messageTime) {
-                    lastMessageTime = new Date(messageTime).toLocaleDateString();
-                }
-            }
-            
-            console.log('选择了与发送人 ' + senderId + ' 的对话, 消息数量: ' + conversation.messages.length + ', 最后消息时间: ' + lastMessageTime);
-            
-            // 确保消息数组是有效的
-            if (conversation.messages && conversation.messages.length > 0) {
-                console.log('准备显示消息，第一条消息:', conversation.messages[0]);
-                // 显示该发送者的所有消息
-                displayMessages(conversation.messages, senderId);
-            } else {
-                console.warn('对话中没有消息');
-                // 显示空消息提示
-                var messageList = document.getElementById('messageList');
-                if (messageList) {
-                    messageList.innerHTML = '<div class="alert alert-info text-center">与此用户暂无消息</div>';
-                }
-            }
+            // 显示该发送者的所有消息
+            displayMessages(conversation.messages, senderId);
         });
         
+        // 添加到对话列表
         conversationList.append(listItem);
     });
+    
+    // 默认选中第一个对话并显示其消息
+    if (conversationList.children('.conversation-item').length > 0) {
+        var firstConversation = conversationList.children('.conversation-item').first();
+        firstConversation.addClass('active').css('background-color', '#e9ecef');
+        
+        // 获取第一个对话的发送者ID和消息
+        var firstSenderId = Object.keys(conversations)[0];
+        displayMessages(conversations[firstSenderId].messages, firstSenderId);
+    }
 }
 
 
@@ -535,334 +541,127 @@ function displayMessages(messages, sender) {
     // 保存当前聊天的发送者ID，用于发送回复消息
     localStorage.setItem('currentChatPartnerId', sender);
     
-    // 检查messageList元素是否存在
-    let messagesContainer = document.getElementById('messageList');
-    
-    // 如果messageList元素不存在，则检查messagesModal是否存在
-    if (!messagesContainer) {
-        console.warn('未找到messageList元素，尝试创建');
-        // 如果连模态框都不存在，则创建完整的模态框结构
-        if (!document.getElementById('messagesModal')) {
-            const modalHTML = `
-            <div class="modal fade" id="messagesModal" tabindex="-1" role="dialog" aria-labelledby="messagesModalLabel" aria-hidden="true">
-              <div class="modal-dialog modal-lg" role="document">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-title" id="messagesModalLabel">Message</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                      <span aria-hidden="true">&times;</span>
-                    </button>
-                  </div>
-                  <div class="modal-body">
-                    <div class="row">
-                      <div class="col-4" id="conversationList">
-                        <!-- 对话列表将在这里动态加载 -->
-                      </div>
-                      <div class="col-8">
-                        <div id="messageList" style="height: 400px; overflow-y: auto;">
-                          <!-- 消息列表将在这里动态加载 -->
-                        </div>
-                        <div class="input-group mt-3">
-                          <input type="text" class="form-control" id="messageInput" placeholder="Enter Message...">
-                          <div class="input-group-append">
-                            <button class="btn btn-primary" type="button" id="sendMessage">Send</button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                  </div>
-                </div>
-              </div>
-            </div>`;
-            
-            document.body.insertAdjacentHTML('beforeend', modalHTML);
-            
-            // 初始化新创建的模态框
-            $('#messagesModal').modal({
-                show: false
-            });
-            
-            // 绑定发送消息按钮事件
-            $('#sendMessage').on('click', function() {
-                sendMessage();
-            });
-            
-            // 绑定回车键发送消息
-            $('#messageInput').on('keypress', function(e) {
-                if (e.which === 13) {
-                    sendMessage();
-                    return false;
-                }
-            });
-        } else {
-            // 如果模态框存在但messageList不存在，创建messageList
-            const modalBody = document.querySelector('#messagesModal .modal-body .row .col-8');
-            if (modalBody) {
-                const messageListDiv = document.createElement('div');
-                messageListDiv.id = 'messageList';
-                messageListDiv.style.height = '400px';
-                messageListDiv.style.overflowY = 'auto';
-                modalBody.prepend(messageListDiv);
-            }
-        }
-        
-        // 重新获取messageList元素
-        messagesContainer = document.getElementById('messageList');
-    }
-    
-    // 如果仍然无法获取messageList，则记录错误并返回
-    if (!messagesContainer) {
-        console.error('Error: Could not find or create #messageList element');
+    // 获取或创建messageList元素
+    let messageList = document.getElementById('messageList');
+    if (!messageList) {
+        console.error('找不到messageList元素');
         return;
     }
     
-    console.log('成功获取messageList元素，准备清空并添加消息');
-    messagesContainer.innerHTML = ''; // 清空现有消息
-
-    // 添加消息样式
-    const styleElement = document.createElement('style');
-    styleElement.textContent = `
+    // 清空现有消息
+    messageList.innerHTML = '';
+    
+    // 如果没有消息，显示提示信息
+    if (!messages || messages.length === 0) {
+        messageList.innerHTML = '<div class="alert alert-info text-center">暂无消息</div>';
+        return;
+    }
+    
+    // 创建消息样式
+    let style = document.createElement('style');
+    style.textContent = `
+        .message-container { margin-bottom: 16px; }
         .message-bubble {
-            max-width: 85%;
             padding: 10px 15px;
             border-radius: 18px;
-            margin-bottom: 8px;
-            position: relative;
+            max-width: 80%;
             word-wrap: break-word;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-            transition: all 0.2s ease;
-        }
-        .sent {
-            background: linear-gradient(135deg, #34D399, #3B82F6);
-            color: white;
-            margin-left: auto;
-            border-bottom-right-radius: 5px;
-        }
-        .received {
-            background: #F3F4F6;
-            color: #1F2937;
-            margin-right: auto;
-            border-bottom-left-radius: 5px;
         }
         .message-time {
-            display: block;
-            font-size: 0.7rem;
-            margin-top: 4px;
-            opacity: 0.8;
-            font-weight: 300;
+            font-size: 12px;
+            color: #777;
+            margin-top: 5px;
         }
-        .sent .message-time {
-            text-align: right;
-            color: rgba(255, 255, 255, 0.9);
-        }
-        .received .message-time {
-            text-align: left;
-            color: #6B7280;
-        }
-        .message-container {
-            margin-bottom: 16px;
-            animation: fadeIn 0.3s ease;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .message-date-divider {
-            text-align: center;
-            color: #6B7280;
-            font-size: 0.8rem;
-            margin: 12px 0;
-            position: relative;
-        }
-        .message-date-divider::before,
-        .message-date-divider::after {
-            content: "";
-            display: inline-block;
-            width: 30%;
-            height: 1px;
-            background: #E5E7EB;
-            vertical-align: middle;
-            margin: 0 10px;
+        .received {
+            background-color: #f1f0f0;
+            margin-right: auto;
         }
     `;
-    document.head.appendChild(styleElement);
-
-    // 获取当前用户ID - 使用 localStorage 中的 currentUserId
-    var currentUserId = localStorage.getItem('currentUserId');
+    document.head.appendChild(style);
     
-    if (!currentUserId) {
-        console.error('未找到当前用户ID，无法正确显示消息');
-        // 尝试获取后备值
-        currentUserId = localStorage.getItem('id');
-    }
-    
-    console.log('显示消息 - 当前用户ID:', currentUserId, '发送者ID:', sender);
-    
-    // 确保消息按时间顺序排序
-    if (messages && messages.length > 0) {
-        messages.sort((a, b) => {
-            // 优先使用 send_time，如果不存在则回退到 created_at
-            const timeA = a.send_time || a.created_at;
-            const timeB = b.send_time || b.created_at;
-            return new Date(timeA) - new Date(timeB);
-        });
-        
-        console.log('消息已排序，准备显示');
-        
-        // 用于跟踪日期，以便添加日期分隔符
-        let lastMessageDate = null;
-        
-        // 遍历消息并添加到容器
-        messages.forEach((message, index) => {
-            console.log(`处理第 ${index+1}/${messages.length} 条消息:`, message);
-            
-            // 获取消息时间戳（优先使用 send_time，如果不存在则回退到 created_at）
-            const messageTimestamp = message.send_time || message.created_at;
-            
-            // 检查消息数据的完整性
-            if (!message.content) {
-                console.warn('消息内容为空:', message);
-                return; // 跳过空内容的消息
-            }
-            
-            // 检查是否需要添加日期分隔符
-            if (messageTimestamp) {
-                const messageDate = new Date(messageTimestamp);
-                const formattedDate = messageDate.toLocaleDateString();
-                
-                if (!lastMessageDate || formattedDate !== lastMessageDate) {
-                    const dateDivider = document.createElement('div');
-                    dateDivider.classList.add('message-date-divider');
-                    dateDivider.textContent = formattedDate;
-                    messagesContainer.appendChild(dateDivider);
-                    
-                    lastMessageDate = formattedDate;
-                }
-            }
-            
-            const messageContainer = document.createElement('div');
-            messageContainer.classList.add('message-container');
-
-            const messageBubble = document.createElement('div');
-            messageBubble.classList.add('message-bubble');
-            
-            // 根据消息发送者和接收者，调整气泡样式
-            // 所有消息都应该是"received"，因为这里只显示用户接收到的消息
-            messageBubble.classList.add('received');
-            console.log('显示接收的消息:', message.content, '从发送者:', message.sender_id);
-
-            // 添加消息内容
-            const messageContent = document.createElement('div');
-            messageContent.innerText = message.content;
-            messageBubble.appendChild(messageContent);
-
-            // 添加时间显示
-            const messageTime = document.createElement('span');
-            messageTime.classList.add('message-time');
-            
-            // 格式化时间 - 优先使用 send_time，如果不存在则回退到 created_at
-            let formattedTime = '时间未知';
-            if (messageTimestamp) {
-                const msgDate = new Date(messageTimestamp);
-                formattedTime = msgDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            }
-            
-            messageTime.innerText = formattedTime;
-            messageBubble.appendChild(messageTime);
-
-            messageContainer.appendChild(messageBubble);
-            messagesContainer.appendChild(messageContainer);
-        });
-        
-        console.log('所有消息已添加到容器，设置自动滚动');
-
-        // 自动滚动到最新消息
-        scrollToBottom(messagesContainer);
-    } else {
-        // 如果没有消息，显示提示
-        const emptyMessageContainer = document.createElement('div');
-        emptyMessageContainer.className = 'text-center p-4';
-        
-        const emptyStateIcon = document.createElement('div');
-        emptyStateIcon.className = 'mb-3';
-        emptyStateIcon.innerHTML = '<i class="far fa-comment-dots fa-3x text-muted"></i>';
-        
-        const emptyText = document.createElement('p');
-        emptyText.className = 'text-muted';
-        emptyText.innerText = '暂无消息，发送第一条消息开始对话';
-        
-        emptyMessageContainer.appendChild(emptyStateIcon);
-        emptyMessageContainer.appendChild(emptyText);
-        messagesContainer.appendChild(emptyMessageContainer);
-    }
-    
-    // 确保模态框出现时滚动到底部
-    $('#messagesModal').on('shown.bs.modal', function() {
-        scrollToBottom(messagesContainer);
+    // 根据时间排序消息
+    messages.sort((a, b) => {
+        const timeA = a.send_time || a.created_at;
+        const timeB = b.send_time || b.created_at;
+        return new Date(timeA) - new Date(timeB);
     });
     
-    // 聚焦到消息输入框
-    const messageInput = document.getElementById('messageInput');
-    if (messageInput) {
-        setTimeout(() => {
-            messageInput.focus();
-        }, 300);
-    }
+    // 添加每条消息
+    messages.forEach(message => {
+        // 创建消息容器
+        let container = document.createElement('div');
+        container.className = 'message-container';
+        
+        // 创建消息气泡
+        let bubble = document.createElement('div');
+        bubble.className = 'message-bubble received';
+        
+        // 添加消息内容
+        bubble.textContent = message.content || '(空消息)';
+        
+        // 创建时间显示
+        let time = document.createElement('div');
+        time.className = 'message-time';
+        
+        // 格式化时间
+        let timestamp = message.send_time || message.created_at;
+        if (timestamp) {
+            let date = new Date(timestamp);
+            time.textContent = date.toLocaleString();
+        } else {
+            time.textContent = '未知时间';
+        }
+        
+        // 组装消息
+        container.appendChild(bubble);
+        container.appendChild(time);
+        messageList.appendChild(container);
+    });
+    
+    // 滚动到底部
+    messageList.scrollTop = messageList.scrollHeight;
 }
 function sendMessage() {
     // 获取消息输入
     var messageInput = document.getElementById('messageInput');
-    var message = messageInput.value.trim();
+    if (!messageInput) {
+        console.error('找不到消息输入框');
+        return;
+    }
     
+    var message = messageInput.value.trim();
     if (!message) {
+        console.log('消息内容为空，不发送');
         return; // 如果消息为空，不做任何操作
     }
     
-    // 从localStorage获取当前聊天对象的ID（发送者ID）
+    // 获取必要参数
     var receiverId = localStorage.getItem('currentChatPartnerId');
     var token = localStorage.getItem('token');
     
     if (!receiverId || !token) {
         console.error('缺少接收者ID或token', { receiverId, token });
+        alert('发送失败：无法确定接收者或未登录');
         return;
     }
     
     console.log('准备向ID为 ' + receiverId + ' 的接收者发送消息');
-
-    // 立即清空输入框
+    
+    // 立即清空输入框，提供即时反馈
     messageInput.value = '';
     
-    // 生成一个临时ID用于标识这条消息
-    var tempMessageId = 'msg_' + Date.now();
-    
-    // 显示发送中的消息（本地预览）
+    // 显示一个临时的发送中消息
     var messageList = document.getElementById('messageList');
-    if (messageList) {
-        const messageContainer = document.createElement('div');
-        messageContainer.classList.add('message-container');
-        messageContainer.id = tempMessageId;
-        
-        const messageBubble = document.createElement('div');
-        messageBubble.classList.add('message-bubble', 'sent', 'sending');
-        
-        const messageContent = document.createElement('div');
-        messageContent.innerText = message;
-        messageBubble.appendChild(messageContent);
-        
-        const messageTime = document.createElement('span');
-        messageTime.classList.add('message-time');
-        messageTime.innerText = '发送中...';
-        messageBubble.appendChild(messageTime);
-        
-        messageContainer.appendChild(messageBubble);
-        messageList.appendChild(messageContainer);
-        
-        // 滚动到最新消息
-        scrollToBottom(messageList);
-    }
+    var tempMessage = document.createElement('div');
+    tempMessage.className = 'message-container sending';
+    tempMessage.innerHTML = `
+        <div class="message-bubble sending" style="background-color:#e8f5ff;margin-left:auto;opacity:0.8;">
+            ${message}
+            <div class="message-time">发送中...</div>
+        </div>
+    `;
+    messageList.appendChild(tempMessage);
+    messageList.scrollTop = messageList.scrollHeight;
     
     // 发送消息到服务器
     $.ajax({
@@ -874,75 +673,47 @@ function sendMessage() {
             message: message
         },
         success: function(response) {
-            // 如果发送成功并且服务器返回了消息数据
-            if (response.success && (response.timestamp || response.message_data)) {
-                // 获取时间戳 - 优先使用 message_data.send_time，然后是 message_data.created_at，最后是 response.timestamp
-                let timestamp = response.timestamp;
-                if (response.message_data) {
-                    timestamp = response.message_data.send_time || response.message_data.created_at || timestamp;
-                }
+            console.log('消息发送成功:', response);
+            
+            // 检查响应状态
+            if (response.success) {
+                // 显示发送成功的消息
+                tempMessage.innerHTML = `
+                    <div class="message-bubble sent" style="background-color:#007bff;color:white;margin-left:auto;">
+                        ${message}
+                        <div class="message-time" style="color:#ddd;">
+                            ${new Date().toLocaleString()}
+                        </div>
+                    </div>
+                `;
                 
-                // 找到之前添加的临时消息元素
-                const tempMessage = document.getElementById(tempMessageId);
-                if (tempMessage) {
-                    // 更新时间显示
-                    const messageTime = tempMessage.querySelector('.message-time');
-                    if (messageTime && timestamp) {
-                        const msgDate = new Date(timestamp);
-                        messageTime.innerText = msgDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                // 刷新消息列表
+                fetchMessages().then(function(data) {
+                    if (data.success) {
+                        buildConversationsList(data);
                     }
-                    
-                    // 移除发送中状态
-                    const messageBubble = tempMessage.querySelector('.message-bubble');
-                    if (messageBubble) {
-                        messageBubble.classList.remove('sending');
-                    }
-                }
-                
-                // 确保滚动到底部
-                scrollToBottom(messageList);
+                });
             } else {
-                // 如果服务器响应成功但没有返回预期的数据，还是刷新整个消息列表
-                refreshMessages(receiverId);
+                // 显示发送失败
+                tempMessage.innerHTML = `
+                    <div class="message-bubble error" style="background-color:#ffdddd;margin-left:auto;">
+                        ${message}
+                        <div class="message-time">发送失败</div>
+                    </div>
+                `;
+                console.error('发送失败:', response);
             }
         },
         error: function(xhr, status, error) {
-            console.error('Error sending message:', error);
+            console.error('发送消息时出错:', error);
             
-            // 更新发送失败的消息状态
-            const tempMessage = document.getElementById(tempMessageId);
-            if (tempMessage) {
-                const messageTime = tempMessage.querySelector('.message-time');
-                if (messageTime) {
-                    messageTime.innerText = '发送失败';
-                }
-                
-                const messageBubble = tempMessage.querySelector('.message-bubble');
-                if (messageBubble) {
-                    messageBubble.classList.remove('sending');
-                    messageBubble.style.opacity = '0.7';
-                    messageBubble.style.backgroundColor = '#ffdddd';
-                }
-            }
-            
-            // 不要弹出警告框，而是在UI中显示错误
-            const errorNotification = document.createElement('div');
-            errorNotification.className = 'alert alert-danger alert-dismissible fade show mt-2';
-            errorNotification.innerHTML = `
-                <strong>发送失败!</strong> 请检查网络连接后重试。
-                <button type="button" class="close" data-dismiss="alert">&times;</button>
+            // 显示发送失败
+            tempMessage.innerHTML = `
+                <div class="message-bubble error" style="background-color:#ffdddd;margin-left:auto;">
+                    ${message}
+                    <div class="message-time">发送失败: ${error}</div>
+                </div>
             `;
-            messageList.parentNode.appendChild(errorNotification);
-            
-            // 5秒后自动关闭错误提示
-            setTimeout(() => {
-                if (errorNotification.parentNode) {
-                    errorNotification.parentNode.removeChild(errorNotification);
-                }
-            }, 5000);
-            
-            // 确保滚动到底部，即使发生错误
-            scrollToBottom(messageList);
         }
     });
 }
