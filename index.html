@@ -14,19 +14,54 @@
   <script src="js/nav.js"></script>
 
   <link rel="stylesheet" href="./css/index.css">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Replace Google Fonts with SF Pro Display (and system fallbacks) -->
+  <link href="https://fonts.cdnfonts.com/css/sf-pro-display" rel="stylesheet">
   <style>
+    :root {
+      /* iOS System Colors */
+      --ios-red: #FF3B30;
+      --ios-orange: #FF9500;
+      --ios-yellow: #FFCC00;
+      --ios-green: #34C759;
+      --ios-mint: #00C7BE;
+      --ios-teal: #30B0C7;
+      --ios-cyan: #32ADE6;
+      --ios-blue: #007AFF;
+      --ios-indigo: #5856D6;
+      --ios-purple: #AF52DE;
+      --ios-pink: #FF2D55;
+      --ios-brown: #A2845E;
+      
+      /* iOS Gray Colors */
+      --ios-gray: #8E8E93;
+      --ios-gray2: #AEAEB2;
+      --ios-gray3: #C7C7CC;
+      --ios-gray4: #D1D1D6;
+      --ios-gray5: #E5E5EA;
+      --ios-gray6: #F2F2F7;
+      
+      /* iOS Dynamic Background Colors */
+      --ios-system-background: #FFFFFF;
+      --ios-secondary-background: #F2F2F7;
+      --ios-tertiary-background: #FFFFFF;
+      --ios-grouped-background: #F2F2F7;
+      --ios-secondary-grouped-background: #FFFFFF;
+      --ios-tertiary-grouped-background: #F2F2F7;
+    }
+    
     body, html {
       padding: 0;
       margin: 0;
-      font-family: 'Roboto', sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
       scroll-behavior: smooth;
-      color: #333;
-      background-color: #f9f9f9;
+      color: #000000;
+      background-color: var(--ios-secondary-background);
     }
     
     h1, h2, h3, h4, h5, h6, .card-title {
-      font-family: 'Poppins', sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-weight: 600;
     }
 
@@ -36,7 +71,8 @@
       max-width: 100%;
       margin: 0 auto;
       border-radius: 0;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
 
     .carousel-inner {
@@ -48,31 +84,55 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      filter: brightness(0.85);
+      filter: brightness(0.9);
     }
     
     .carousel-caption {
-      background-color: rgba(0, 0, 0, 0.6);
-      border-radius: 10px;
+      background-color: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-radius: 16px;
       padding: 20px;
       max-width: 80%;
       margin: 0 auto;
       bottom: 50px;
+      color: #000;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
     
     .carousel-indicators li {
-      width: 12px;
-      height: 12px;
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
       margin: 0 5px;
+      background-color: var(--ios-gray3);
+      opacity: 0.5;
+    }
+    
+    .carousel-indicators .active {
+      background-color: var(--ios-blue);
+      opacity: 1;
+    }
+    
+    .carousel-control-prev, .carousel-control-next {
+      opacity: 0.7;
+      width: 40px;
+      height: 40px;
+      top: 50%;
+      transform: translateY(-50%);
+      background-color: rgba(255, 255, 255, 0.4);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      border-radius: 50%;
+      margin: 0 20px;
     }
 
     /* Announcement Section */
     .alert-info {
-      background-color: #ffffff;
+      background-color: var(--ios-system-background);
       border: none;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
       margin-top: -30px;
       position: relative;
       z-index: 10;
@@ -80,9 +140,10 @@
 
     .alert-heading {
       text-align: center;
-      color: #2c3e50;
+      color: #000;
       margin-bottom: 20px;
-      font-size: 2rem;
+      font-size: 1.8rem;
+      font-weight: 600;
     }
 
     .text-container {
@@ -96,8 +157,8 @@
     }
     
     .text-container li {
-      padding: 12px 0;
-      border-bottom: 1px solid #f0f0f0;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--ios-gray5);
       display: flex;
       align-items: center;
     }
@@ -122,38 +183,40 @@
     .feature-heading {
       text-align: center;
       margin-bottom: 40px;
-      color: #2c3e50;
-      font-size: 2rem;
+      color: #000;
+      font-size: 1.8rem;
+      font-weight: 600;
     }
     
     .card {
       border: none;
-      border-radius: 12px;
+      border-radius: 16px;
       overflow: hidden;
       transition: transform 0.3s, box-shadow 0.3s;
       height: 100%;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.07);
+      background-color: var(--ios-system-background);
     }
     
     .card:hover {
       transform: translateY(-5px);
-      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.1);
     }
     
     .card1 {
-      background-color: #f8d566;
+      background-color: var(--ios-yellow);
     }
     
     .card2 {
-      background-color: #6c8bb4;
+      background-color: var(--ios-blue);
     }
     
     .card3 {
-      background-color: #f0f0f0;
+      background-color: var(--ios-secondary-background);
     }
     
     .card4 {
-      background-color: #1c4f8c;
+      background-color: var(--ios-indigo);
     }
     
     .card-body {
@@ -165,7 +228,7 @@
     
     .card-title {
       font-size: 1.5rem;
-      letter-spacing: 1px;
+      letter-spacing: 0.5px;
       margin-bottom: 20px;
     }
     
@@ -182,6 +245,28 @@
     .card-text li {
       margin-bottom: 10px;
     }
+    
+    /* iOS-style button */
+    .btn {
+      border-radius: 12px;
+      font-weight: 500;
+      padding: 10px 20px;
+      transition: all 0.2s;
+      border: none;
+    }
+    
+    .btn-light {
+      background-color: rgba(255, 255, 255, 0.9);
+      color: var(--ios-indigo);
+    }
+    
+    .btn-primary {
+      background-color: var(--ios-blue);
+    }
+    
+    .btn-success {
+      background-color: var(--ios-green);
+    }
 
     /* Floating Button */
     .floating-button {
@@ -189,35 +274,85 @@
       bottom: 30px;
       right: 30px;
       z-index: 100;
-      display: inline-block;
-      padding: 15px 25px;
-      background-color: #4CAF50;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 60px;
+      height: 60px;
+      background-color: var(--ios-green);
       color: white;
       text-decoration: none;
       font-size: 18px;
       font-weight: bold;
       border: none;
-      border-radius: 40px;
+      border-radius: 50%;
       cursor: pointer;
       outline: none;
-      box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+      box-shadow: 0 4px 12px rgba(52, 199, 89, 0.4);
       transition: all 0.3s ease;
     }
     
     .floating-button:hover {
-      background-color: #3e8e41;
-      box-shadow: 0 6px 16px rgba(76, 175, 80, 0.6);
-      transform: translateY(-2px);
+      background-color: #2DB84D;
+      box-shadow: 0 6px 16px rgba(52, 199, 89, 0.6);
+      transform: translateY(-2px) scale(1.05);
     }
     
     .floating-button:active {
       transform: translateY(1px);
-      box-shadow: 0 2px 8px rgba(76, 175, 80, 0.4);
+      box-shadow: 0 2px 8px rgba(52, 199, 89, 0.4);
     }
     
     .foot {
-      margin-left: 8px;
+      margin-left: 4px;
       font-size: 22px;
+    }
+    
+    /* Form controls */
+    .form-control {
+      border-radius: 10px;
+      border: 1px solid var(--ios-gray4);
+      padding: 12px;
+      background-color: var(--ios-secondary-background);
+      transition: all 0.2s;
+    }
+    
+    .form-control:focus {
+      border-color: var(--ios-blue);
+      box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+    }
+    
+    /* Modal styling */
+    .modal-content {
+      border-radius: 16px;
+      border: none;
+      overflow: hidden;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+    }
+    
+    .modal-header, .modal-footer {
+      border: none;
+    }
+    
+    .modal-header {
+      padding: 20px 24px;
+      background-color: var(--ios-system-background);
+    }
+    
+    .modal-body {
+      padding: 20px 24px;
+      background-color: var(--ios-system-background);
+    }
+    
+    .modal-footer {
+      padding: 16px 24px;
+      background-color: var(--ios-system-background);
+    }
+    
+    .close {
+      font-size: 28px;
+      font-weight: 400;
+      color: var(--ios-gray);
     }
     
     /* Media Queries */
@@ -242,6 +377,12 @@
       
       .card {
         margin-bottom: 20px;
+      }
+      
+      .floating-button {
+        width: 50px;
+        height: 50px;
+        font-size: 16px;
       }
     }
     
@@ -332,17 +473,17 @@
   <div class="alert alert-info" role="alert">
     <h4 class="alert-heading">Welcome to CarbonTrack! 🌍</h4>
     <div class="text-container">
-      <p>📢 <strong>Announcements</strong></p>
+      <p style="color: var(--ios-blue); font-weight: 600; font-size: 1.1rem;">📢 Announcements</p>
     </div>
-    <hr>
+    <hr style="border-color: var(--ios-gray5);">
     <div class="text-container">
       <ul>
-        <li><span class="emoji">💡</span> <strong>We Value Your Feedback!</strong> Have suggestions? Email us at <a href="mailto:carbontrack666@gmail.com" class="text-primary">carbontrack666@gmail.com</a>.</li>
-        <li><span class="emoji">🎖️</span> <strong>Earn Rewards!</strong> Log your sustainable actions and receive certificates, badges, and thank-you letters for your contributions.</li>
-        <li><span class="emoji">🌱</span> <strong>Who Can Join?</strong> While CarbonTrack primarily serves students, anyone passionate about sustainability is welcome!</li>
-        <li><span class="emoji">⚖️</span> <strong>Fair Play Matters!</strong> Cheating for Carbon Credits is strictly prohibited. We are committed to a transparent and fair system.</li>
+        <li><span class="emoji" style="color: var(--ios-yellow);">💡</span> <strong>We Value Your Feedback!</strong> Have suggestions? Email us at <a href="mailto:carbontrack666@gmail.com" style="color: var(--ios-blue); text-decoration: none;">carbontrack666@gmail.com</a>.</li>
+        <li><span class="emoji" style="color: var(--ios-blue);">🎖️</span> <strong>Earn Rewards!</strong> Log your sustainable actions and receive certificates, badges, and thank-you letters for your contributions.</li>
+        <li><span class="emoji" style="color: var(--ios-green);">🌱</span> <strong>Who Can Join?</strong> While CarbonTrack primarily serves students, anyone passionate about sustainability is welcome!</li>
+        <li><span class="emoji" style="color: var(--ios-indigo);">⚖️</span> <strong>Fair Play Matters!</strong> Cheating for Carbon Credits is strictly prohibited. We are committed to a transparent and fair system.</li>
       </ul>
-      <p class="mb-0">Thank you for being part of CarbonTrack! Together, we can build a more sustainable future.</p>
+      <p class="mb-0" style="font-size: 0.95rem; color: var(--ios-gray);">Thank you for being part of CarbonTrack! Together, we can build a more sustainable future.</p>
     </div>
   </div>
 </div>
@@ -355,8 +496,8 @@
       <div class="col-md-3 col-sm-6 mb-4">
         <div class="card card3">
           <div class="card-body">
-            <h5 class="card-title" style="color:rgb(87,117,167);">What is a Carbon Account?</h5>
-            <p class="card-text" style="color:rgb(87,117,167);">A Carbon Account is a tool that tracks CO₂ reductions from eco-friendly actions. By understanding our carbon footprint, we can make informed choices for a greener planet.</p>
+            <h5 class="card-title" style="color: #000;">What is a Carbon Account?</h5>
+            <p class="card-text" style="color: var(--ios-gray);">A Carbon Account is a tool that tracks CO₂ reductions from eco-friendly actions. By understanding our carbon footprint, we can make informed choices for a greener planet.</p>
           </div>
         </div>
       </div>
@@ -366,10 +507,10 @@
             <h5 class="card-title" style="color:#fff">How to Use CarbonTrack</h5>
             <p class="card-text" style="color:#fff">
               <ul style="color:#fff; list-style-type: none; padding-left: 0;">
-                <li>1️⃣ <strong>Sign up & log in.</strong></li>
-                <li>2️⃣ <strong>Record your sustainable actions</strong> in the <em>Carbon Accounting Portal</em>.</li>
-                <li>3️⃣ <strong>Earn Carbon Credits</strong> based on real CO₂ reductions.</li>
-                <li>4️⃣ <strong>Track progress & join challenges</strong> to win rewards!</li>
+                <li style="margin-bottom: 12px;"><i class="fas fa-check-circle" style="margin-right: 8px;"></i><strong>Sign up & log in.</strong></li>
+                <li style="margin-bottom: 12px;"><i class="fas fa-check-circle" style="margin-right: 8px;"></i><strong>Record sustainable actions</strong> in the Carbon Accounting Portal.</li>
+                <li style="margin-bottom: 12px;"><i class="fas fa-check-circle" style="margin-right: 8px;"></i><strong>Earn Carbon Credits</strong> based on real CO₂ reductions.</li>
+                <li style="margin-bottom: 12px;"><i class="fas fa-check-circle" style="margin-right: 8px;"></i><strong>Track progress & join challenges</strong> to win rewards!</li>
               </ul>
             </p>
           </div>
@@ -378,12 +519,12 @@
       <div class="col-md-3 col-sm-6 mb-4">
         <div class="card card3">
           <div class="card-body">
-            <h5 class="card-title" style="color:rgb(87,117,167);">Why Use a Carbon Account?</h5>
-            <p class="card-text" style="color:rgb(87,117,167);">
-              <ul style="color:rgb(87,117,167); list-style-type: none; padding-left: 0;">
-                <li>✅ <strong>Quantify your impact</strong> on carbon reduction.</li>
-                <li>✅ <strong>Encourage long-term eco-friendly habits.</strong></li>
-                <li>✅ <strong>Raise awareness & promote energy conservation.</strong></li>
+            <h5 class="card-title" style="color: #000;">Why Use a Carbon Account?</h5>
+            <p class="card-text" style="color: var(--ios-gray);">
+              <ul style="color: var(--ios-gray); list-style-type: none; padding-left: 0;">
+                <li style="margin-bottom: 12px;"><i class="fas fa-check" style="color: var(--ios-green); margin-right: 8px;"></i><strong>Quantify your impact</strong> on carbon reduction.</li>
+                <li style="margin-bottom: 12px;"><i class="fas fa-check" style="color: var(--ios-green); margin-right: 8px;"></i><strong>Encourage long-term eco-friendly habits.</strong></li>
+                <li style="margin-bottom: 12px;"><i class="fas fa-check" style="color: var(--ios-green); margin-right: 8px;"></i><strong>Raise awareness & promote energy conservation.</strong></li>
               </ul>
             </p>
           </div>
@@ -406,7 +547,7 @@
 
 <!-- Floating Action Button -->
 <button class="floating-button" id="recordButton">
-  REC<span class="foot">🦶</span>
+  <i class="fas fa-plus" style="font-size: 24px;"></i>
 </button>
 
 <!-- Footer -->
@@ -418,7 +559,7 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="loginModalLabel">User Login</h5>
+        <h5 class="modal-title" id="loginModalLabel" style="font-weight: 600;">Sign In</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -426,22 +567,24 @@
       <div class="modal-body">
         <form>
           <div class="form-group">
-            <label for="username">Account/Username/Email</label>
-            <input type="text" class="form-control" id="username" placeholder="Please enter your username or Email Address">
+            <label for="username" style="font-weight: 500; color: var(--ios-gray);">Account / Username / Email</label>
+            <input type="text" class="form-control" id="username" placeholder="Enter your username or email">
           </div>
           <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" class="form-control" id="password" placeholder="Please enter your Password">
+            <label for="password" style="font-weight: 500; color: var(--ios-gray);">Password</label>
+            <input type="password" class="form-control" id="password" placeholder="Enter your password">
           </div>
-          <button type="submit" class="btn btn-success btn-block">Log-in</button>
+          <button type="submit" class="btn btn-success btn-block" style="margin-top: 24px; padding: 12px;">Sign In</button>
         </form>
       </div>
-      <div class="modal-footer">
-        <div class="alert alert-warning" role="alert" id="refreshAlert" style="display: none; cursor: pointer;">
-          If failed, please try reload the page or press <a href="#" onclick="location.reload();">here</a>.
+      <div class="modal-footer" style="justify-content: center; flex-direction: column;">
+        <div class="alert alert-warning" role="alert" id="refreshAlert" style="display: none; cursor: pointer; border-radius: 10px;">
+          If you're having trouble, please reload the page or press <a href="#" onclick="location.reload();" style="color: var(--ios-blue); text-decoration: none;">here</a>.
         </div>
-        <a class="nav-link mr-right" href="iforgot.html">Forgot password?</a>
-        <a class="nav-link" href="#" data-toggle="modal" data-target="#registerModal">Register an account</a>
+        <div style="display: flex; justify-content: space-between; width: 100%;">
+          <a class="nav-link" href="iforgot.html" style="color: var(--ios-blue); text-decoration: none; padding: 8px 0;">Forgot password?</a>
+          <a class="nav-link" href="#" data-toggle="modal" data-target="#registerModal" style="color: var(--ios-blue); text-decoration: none; padding: 8px 0;">Create Account</a>
+        </div>
       </div>
     </div>
   </div>
@@ -452,7 +595,7 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="registerModalLabel">Register new account</h5>
+        <h5 class="modal-title" id="registerModalLabel" style="font-weight: 600;">Create Account</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -460,33 +603,36 @@
       <div class="modal-body">
         <form>
           <div class="form-group">
-            <label for="username">Username</label>
-            <input type="text" class="form-control required-input" id="regusername" placeholder="Please set your Username">
+            <label for="username" style="font-weight: 500; color: var(--ios-gray);">Username</label>
+            <input type="text" class="form-control required-input" id="regusername" placeholder="Choose a username">
           </div>
           <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" class="form-control required-input" id="regpassword" placeholder="Please set your Password">
+            <label for="password" style="font-weight: 500; color: var(--ios-gray);">Password</label>
+            <input type="password" class="form-control required-input" id="regpassword" placeholder="Create a password">
           </div>
           <div class="form-group">
-            <label for="email">Email Address:</label>
-            <input type="email" class="form-control required-input" id="email" name="email" required>
-            <!-- 添加发送验证码按钮 -->
-            <button type="button" class="btn btn-secondary" id="sendVerificationCode">Send verification code</button>
-            <!-- 在注册模态框的表单中添加一个字段 -->
-            <div class="form-group">
-              <label for="verificationCode">Verification Code</label>
-              <input type="text" class="form-control" id="verificationCode" placeholder="Please enter the verification code you received" required>
+            <label for="email" style="font-weight: 500; color: var(--ios-gray);">Email Address</label>
+            <input type="email" class="form-control required-input" id="email" name="email" placeholder="Enter your email address" required>
+            
+            <div class="mt-3">
+              <button type="button" class="btn btn-outline-primary" id="sendVerificationCode" style="border-radius: 10px; border-color: var(--ios-blue); color: var(--ios-blue);">Send Verification Code</button>
+            </div>
+            
+            <div class="form-group mt-3">
+              <label for="verificationCode" style="font-weight: 500; color: var(--ios-gray);">Verification Code</label>
+              <input type="text" class="form-control" id="verificationCode" placeholder="Enter the code sent to your email" required>
               <small id="emailHelp" class="form-text text-muted"
-                     style="display: none;">The code has been sent to your Email.</small>
+                     style="display: none; margin-top: 8px;">The code has been sent to your email.</small>
             </div>
           </div>
-          <button type="submit" class="btn btn-success btn-block">Register</button>
-          <div id="registerError" style="display:none;" class="alert alert-danger"></div>
+          <button type="submit" class="btn btn-success btn-block" style="margin-top: 24px; padding: 12px;">Create Account</button>
+          <div id="registerError" style="display:none;" class="alert alert-danger mt-3" style="border-radius: 10px;"></div>
         </form>
-        <div class="modal-footer">
-          <div class="alert alert-warning" role="alert" id="refreshAlert" style="display: none; cursor: pointer;">
-            If failed, please try reload the page or press <a href="#" onclick="location.reload();">here</a>.
+        <div class="modal-footer" style="justify-content: center; padding-top: 16px; border-top: 1px solid var(--ios-gray5);">
+          <div class="alert alert-warning" role="alert" id="refreshAlert" style="display: none; cursor: pointer; border-radius: 10px;">
+            If you're having trouble, please reload the page or press <a href="#" onclick="location.reload();" style="color: var(--ios-blue); text-decoration: none;">here</a>.
           </div>
+          <a href="#" data-toggle="modal" data-target="#loginModal" style="color: var(--ios-blue); text-decoration: none;">Already have an account? Sign in</a>
         </div>
       </div>
     </div>
@@ -498,31 +644,33 @@
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="messagesModalLabel">Message</h5>
+        <h5 class="modal-title" id="messagesModalLabel" style="font-weight: 600;">Messages</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body">
         <div class="row">
-          <div class="col-4" id="conversationList">
+          <div class="col-4" id="conversationList" style="border-right: 1px solid var(--ios-gray5); padding-right: 0;">
             <!-- 对话列表将在这里动态加载 -->
           </div>
           <div class="col-8">
-            <div id="messageList" style="height: 400px; overflow-y: auto;">
+            <div id="messageList" style="height: 400px; overflow-y: auto; padding: 16px; background-color: var(--ios-gray6); border-radius: 12px;">
               <!-- 消息列表将在这里动态加载 -->
             </div>
             <div class="input-group mt-3">
-              <input type="text" class="form-control" id="messageInput" placeholder="Enter message...">
+              <input type="text" class="form-control" id="messageInput" placeholder="Type a message..." style="border-radius: 20px 0 0 20px; padding-left: 16px;">
               <div class="input-group-append">
-                <button class="btn btn-primary" type="button" id="sendMessage">Send</button>
+                <button class="btn btn-primary" type="button" id="sendMessage" style="border-radius: 0 20px 20px 0;">
+                  <i class="fas fa-paper-plane"></i>
+                </button>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      <div class="modal-footer" style="justify-content: flex-end;">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" style="background-color: var(--ios-gray4); color: #000;">Close</button>
       </div>
     </div>
   </div>

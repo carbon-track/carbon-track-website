@@ -11,3 +11,6 @@ global_variables.php
 .user.ini
 .htaccess
 update.bat
+@target.md
+@todolist.md
+draft.md
