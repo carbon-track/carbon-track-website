@@ -16,6 +16,8 @@
   <link rel="stylesheet" href="./css/index.css">
   <!-- SF Pro font -->
   <link href="https://fonts.cdnfonts.com/css/sf-pro-display" rel="stylesheet">
+  <!-- Intersection Observer polyfill for older browsers -->
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=IntersectionObserver"></script>
   <style>
     :root {
       /* iOS System Colors */
@@ -47,6 +49,176 @@
       
       /* Content width */
       --content-max-width: 1280px;
+      
+      /* Animation Durations */
+      --animation-duration-fast: 0.3s;
+      --animation-duration-medium: 0.5s;
+      --animation-duration-slow: 0.8s;
+      
+      /* Animation Timing Functions */
+      --animation-timing-default: cubic-bezier(0.42, 0, 0.58, 1);
+      --animation-timing-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      --animation-timing-apple: cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+    
+    /* iOS-style animations */
+    .fade-in {
+      opacity: 0;
+      transition: opacity var(--animation-duration-medium) var(--animation-timing-apple);
+    }
+    
+    .fade-in.visible {
+      opacity: 1;
+    }
+    
+    .slide-up {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity var(--animation-duration-medium) var(--animation-timing-apple),
+                  transform var(--animation-duration-medium) var(--animation-timing-apple);
+    }
+    
+    .slide-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .scale-in {
+      opacity: 0;
+      transform: scale(0.95);
+      transition: opacity var(--animation-duration-medium) var(--animation-timing-apple),
+                  transform var(--animation-duration-medium) var(--animation-timing-apple);
+    }
+    
+    .scale-in.visible {
+      opacity: 1;
+      transform: scale(1);
+    }
+    
+    .stagger-item {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    
+    .stagger-item.visible {
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity var(--animation-duration-medium) var(--animation-timing-apple),
+                  transform var(--animation-duration-medium) var(--animation-timing-apple);
+    }
+    
+    /* Parallax effect */
+    .parallax-container {
+      overflow: hidden;
+      position: relative;
+    }
+    
+    .parallax-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 120%;
+      background-position: center;
+      background-size: cover;
+      transform: translateZ(0);
+      will-change: transform;
+    }
+    
+    /* Sticky header effect */
+    .sticky-element {
+      position: -webkit-sticky;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      transition: background-color var(--animation-duration-fast) var(--animation-timing-apple);
+    }
+    
+    /* Hero caption animation */
+    .hero-caption-animate {
+      opacity: 0;
+      transform: translateY(30px) scale(0.95);
+      transition: opacity var(--animation-duration-slow) var(--animation-timing-apple),
+                  transform var(--animation-duration-slow) var(--animation-timing-apple);
+    }
+    
+    .hero-caption-animate.visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    
+    /* Apple-style section reveal */
+    .section-reveal {
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .section-reveal::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: var(--ios-system-background);
+      transform: translateY(0);
+      transition: transform var(--animation-duration-medium) var(--animation-timing-apple);
+      z-index: 1;
+    }
+    
+    .section-reveal.visible::before {
+      transform: translateY(-100%);
+    }
+    
+    .section-reveal > * {
+      position: relative;
+      z-index: 2;
+    }
+    
+    /* Carousel caption animation */
+    @keyframes carouselCaptionIn {
+      0% {
+        opacity: 0;
+        transform: translateY(20px) scale(0.98);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+    
+    .carousel-caption-animate {
+      animation: carouselCaptionIn 0.8s var(--animation-timing-apple) forwards;
+    }
+    
+    /* iOS-style hover transitions for interactive elements */
+    .ios-hover-effect {
+      transition: transform var(--animation-duration-fast) var(--animation-timing-apple),
+                  box-shadow var(--animation-duration-fast) var(--animation-timing-apple);
+    }
+    
+    .ios-hover-effect:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Custom delay classes */
+    .delay-100 { transition-delay: 0.1s; }
+    .delay-200 { transition-delay: 0.2s; }
+    .delay-300 { transition-delay: 0.3s; }
+    .delay-400 { transition-delay: 0.4s; }
+    .delay-500 { transition-delay: 0.5s; }
+    
+    /* Apply transitioning to announcement items */
+    .announcement-item {
+      transition: transform var(--animation-duration-medium) var(--animation-timing-apple),
+                  opacity var(--animation-duration-medium) var(--animation-timing-apple);
+    }
+    
+    /* Feature card hover animation */
+    .feature-card {
+      transition: transform 0.4s var(--animation-timing-apple),
+                  box-shadow 0.4s var(--animation-timing-apple);
     }
     
     * {
@@ -845,7 +1017,7 @@
 <div id="navbar-container"></div>
 
 <!-- Hero Carousel -->
-<section class="hero-section">
+<section class="hero-section parallax-container">
   <div id="carousel" class="carousel slide" data-ride="carousel">
     <ol class="carousel-indicators">
       <li data-target="#carousel" data-slide-to="0" class="active"></li>
@@ -856,36 +1028,36 @@
     </ol>
     <div class="carousel-inner">
       <div class="carousel-item active">
-        <img src="img/eg1.jpeg" alt="可持续发展">
-        <div class="carousel-caption d-none d-md-block">
+        <img src="img/eg1.jpeg" alt="可持续发展" class="parallax-bg">
+        <div class="carousel-caption d-none d-md-block hero-caption-animate">
           <h2>Track Your Carbon Footprint</h2>
           <p>Join the movement for a sustainable future</p>
         </div>
       </div>
       <div class="carousel-item">
-        <img src="img/eg2.jpeg" alt="环保行动">
-        <div class="carousel-caption d-none d-md-block">
+        <img src="img/eg2.jpeg" alt="环保行动" class="parallax-bg">
+        <div class="carousel-caption d-none d-md-block hero-caption-animate">
           <h2>Take Action Today</h2>
           <p>Small changes lead to big impacts</p>
         </div>
       </div>
       <div class="carousel-item">
-        <img src="img/eg3.jpeg" alt="校园活动">
-        <div class="carousel-caption d-none d-md-block">
+        <img src="img/eg3.jpeg" alt="校园活动" class="parallax-bg">
+        <div class="carousel-caption d-none d-md-block hero-caption-animate">
           <h2>Campus Sustainability</h2>
           <p>Students leading the way to a greener future</p>
         </div>
       </div>
       <div class="carousel-item">
-        <img src="img/eg4.jpeg" alt="可再生能源">
-        <div class="carousel-caption d-none d-md-block">
+        <img src="img/eg4.jpeg" alt="可再生能源" class="parallax-bg">
+        <div class="carousel-caption d-none d-md-block hero-caption-animate">
           <h2>Earn Carbon Credits</h2>
           <p>Get rewarded for your environmental contributions</p>
         </div>
       </div>
       <div class="carousel-item">
-        <img src="img/eg5.jpeg" alt="社区参与">
-        <div class="carousel-caption d-none d-md-block">
+        <img src="img/eg5.jpeg" alt="社区参与" class="parallax-bg">
+        <div class="carousel-caption d-none d-md-block hero-caption-animate">
           <h2>Join Our Community</h2>
           <p>Connect with like-minded sustainability advocates</p>
         </div>
@@ -905,71 +1077,71 @@
 <!-- Announcement Section -->
 <section class="announcement-section">
   <div class="container">
-    <div class="announcement-card">
+    <div class="announcement-card scale-in">
       <h2 class="announcement-heading">Welcome to CarbonTrack! 🌍</h2>
-      <p class="announcement-subheading">📢 Announcements</p>
-      <div class="announcement-divider"></div>
+      <p class="announcement-subheading fade-in">📢 Announcements</p>
+      <div class="announcement-divider fade-in delay-100"></div>
       <ul class="announcement-list">
-        <li class="announcement-item">
+        <li class="announcement-item stagger-item">
           <span class="announcement-icon" style="color: var(--ios-yellow);">💡</span>
           <div class="announcement-content">
             <p><strong>We Value Your Feedback!</strong> Have suggestions? Email us at <a href="mailto:carbontrack666@gmail.com">carbontrack666@gmail.com</a>.</p>
           </div>
         </li>
-        <li class="announcement-item">
+        <li class="announcement-item stagger-item">
           <span class="announcement-icon" style="color: var(--ios-blue);">🎖️</span>
           <div class="announcement-content">
             <p><strong>Earn Rewards!</strong> Log your sustainable actions and receive certificates, badges, and thank-you letters for your contributions.</p>
           </div>
         </li>
-        <li class="announcement-item">
+        <li class="announcement-item stagger-item">
           <span class="announcement-icon" style="color: var(--ios-green);">🌱</span>
           <div class="announcement-content">
             <p><strong>Who Can Join?</strong> While CarbonTrack primarily serves students, anyone passionate about sustainability is welcome!</p>
           </div>
         </li>
-        <li class="announcement-item">
+        <li class="announcement-item stagger-item">
           <span class="announcement-icon" style="color: var(--ios-indigo);">⚖️</span>
           <div class="announcement-content">
             <p><strong>Fair Play Matters!</strong> Cheating for Carbon Credits is strictly prohibited. We are committed to a transparent and fair system.</p>
           </div>
         </li>
       </ul>
-      <p class="announcement-footer">Thank you for being part of CarbonTrack! Together, we can build a more sustainable future.</p>
+      <p class="announcement-footer fade-in delay-300">Thank you for being part of CarbonTrack! Together, we can build a more sustainable future.</p>
     </div>
   </div>
 </section>
 
 <!-- Feature Cards Section -->
-<section class="feature-section">
+<section class="feature-section section-reveal">
   <div class="container">
-    <h2 class="section-heading">How CarbonTrack Works</h2>
+    <h2 class="section-heading slide-up">How CarbonTrack Works</h2>
     
     <div class="feature-grid">
-      <div class="feature-card feature-card--white">
+      <div class="feature-card feature-card--white ios-hover-effect slide-up">
         <div class="feature-card__body">
           <h3 class="feature-card__title">What is a Carbon Account?</h3>
           <p class="feature-card__text">A Carbon Account is a tool that tracks CO₂ reductions from eco-friendly actions. By understanding our carbon footprint, we can make informed choices for a greener planet.</p>
         </div>
       </div>
       
-      <div class="feature-card feature-card--blue">
+      <div class="feature-card feature-card--blue ios-hover-effect slide-up delay-100">
         <div class="feature-card__body">
           <h3 class="feature-card__title">How to Use CarbonTrack</h3>
           <ul class="feature-card__list">
-            <li class="feature-card__list-item">
+            <li class="feature-card__list-item stagger-item">
               <i class="fas fa-check-circle feature-card__list-icon"></i>
               <span><strong>Sign up & log in.</strong></span>
             </li>
-            <li class="feature-card__list-item">
+            <li class="feature-card__list-item stagger-item">
               <i class="fas fa-check-circle feature-card__list-icon"></i>
               <span><strong>Record sustainable actions</strong> in the Carbon Accounting Portal.</span>
             </li>
-            <li class="feature-card__list-item">
+            <li class="feature-card__list-item stagger-item">
               <i class="fas fa-check-circle feature-card__list-icon"></i>
               <span><strong>Earn Carbon Credits</strong> based on real CO₂ reductions.</span>
             </li>
-            <li class="feature-card__list-item">
+            <li class="feature-card__list-item stagger-item">
               <i class="fas fa-check-circle feature-card__list-icon"></i>
               <span><strong>Track progress & join challenges</strong> to win rewards!</span>
             </li>
@@ -977,19 +1149,19 @@
         </div>
       </div>
       
-      <div class="feature-card feature-card--white">
+      <div class="feature-card feature-card--white ios-hover-effect slide-up delay-200">
         <div class="feature-card__body">
           <h3 class="feature-card__title">Why Use a Carbon Account?</h3>
           <ul class="feature-card__list">
-            <li class="feature-card__list-item">
+            <li class="feature-card__list-item stagger-item">
               <i class="fas fa-check feature-card__list-icon" style="color: var(--ios-green);"></i>
               <span><strong>Quantify your impact</strong> on carbon reduction.</span>
             </li>
-            <li class="feature-card__list-item">
+            <li class="feature-card__list-item stagger-item">
               <i class="fas fa-check feature-card__list-icon" style="color: var(--ios-green);"></i>
               <span><strong>Encourage long-term eco-friendly habits.</strong></span>
             </li>
-            <li class="feature-card__list-item">
+            <li class="feature-card__list-item stagger-item">
               <i class="fas fa-check feature-card__list-icon" style="color: var(--ios-green);"></i>
               <span><strong>Raise awareness & promote energy conservation.</strong></span>
             </li>
@@ -997,7 +1169,7 @@
         </div>
       </div>
       
-      <div class="feature-card feature-card--purple">
+      <div class="feature-card feature-card--purple ios-hover-effect slide-up delay-300">
         <div class="feature-card__body">
           <h3 class="feature-card__title">Join Our Team!</h3>
           <p class="feature-card__text">Passionate about sustainability? Join CarbonTrack and become part of a global movement making a real environmental impact!</p>
@@ -1009,7 +1181,7 @@
 </section>
 
 <!-- Floating Action Button -->
-<button class="floating-button" id="recordButton">
+<button class="floating-button ios-hover-effect fade-in" id="recordButton">
   <i class="fas fa-plus"></i>
 </button>
 
@@ -1211,7 +1383,108 @@
     $('#loginModal form').off('submit');
     $('#registerModal form').off('submit');
     $('#sendVerificationCode').off('click');
+    
+    // ===== iOS Animation System =====
+    
+    // Make floating button visible after a delay
+    setTimeout(function() {
+      $('.floating-button').addClass('visible');
+    }, 800);
+    
+    // Initialize carousel caption animations
+    showActiveCarouselCaption();
+    $('#carousel').on('slid.bs.carousel', showActiveCarouselCaption);
+    
+    // Set up the intersection observer for scroll animations
+    setupScrollAnimations();
+    
+    // Set up parallax scrolling effect
+    setupParallaxEffect();
+    
+    // Apply staggered animations to list items
+    applyStaggeredAnimations();
   });
+  
+  // Show the active carousel caption with animation
+  function showActiveCarouselCaption() {
+    $('.carousel-item:not(.active) .hero-caption-animate').removeClass('visible');
+    setTimeout(function() {
+      $('.carousel-item.active .hero-caption-animate').addClass('visible');
+    }, 100);
+  }
+  
+  // Setup intersection observers for scroll animations
+  function setupScrollAnimations() {
+    const animatedElements = document.querySelectorAll('.fade-in, .slide-up, .scale-in, .section-reveal');
+    
+    const observerOptions = {
+      root: null,
+      rootMargin: '0px 0px -100px 0px',
+      threshold: 0.1
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target); // Stop observing once animation is triggered
+        }
+      });
+    }, observerOptions);
+    
+    animatedElements.forEach(element => {
+      observer.observe(element);
+    });
+  }
+  
+  // Set up parallax effect on scroll
+  function setupParallaxEffect() {
+    const parallaxBgs = document.querySelectorAll('.parallax-bg');
+    
+    window.addEventListener('scroll', () => {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      
+      parallaxBgs.forEach(bg => {
+        // Only apply parallax if element is in viewport
+        const rect = bg.getBoundingClientRect();
+        if (rect.bottom >= 0 && rect.top <= window.innerHeight) {
+          const speed = 0.5;
+          const yPos = -(scrollTop * speed);
+          bg.style.transform = `translate3d(0, ${yPos / 3}px, 0)`;
+        }
+      });
+    });
+  }
+  
+  // Apply staggered animations to list items
+  function applyStaggeredAnimations() {
+    const staggerLists = document.querySelectorAll('.announcement-list, .feature-card__list');
+    
+    staggerLists.forEach(list => {
+      const items = list.querySelectorAll('.stagger-item');
+      
+      const staggerObserver = new IntersectionObserver((entries) => {
+        let delay = 0;
+        
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            // Set increasing delay for each item
+            setTimeout(() => {
+              entry.target.classList.add('visible');
+              entry.target.style.transitionDelay = `${delay * 0.1}s`;
+            }, 100);
+            
+            delay++;
+            staggerObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1 });
+      
+      items.forEach(item => {
+        staggerObserver.observe(item);
+      });
+    });
+  }
 </script>
 </body>
 </html>
