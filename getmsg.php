@@ -10,45 +10,46 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $json = file_get_contents('php://input');
         $data = json_decode($json, true);
 
-        if (!isset($data['token']) || !isset($data['receiver_id'])) {
-            handleApiError(400, 'Token and receiver_id are required');
+        if (!isset($data['token'])) {
+            handleApiError(400, 'Token is required');
         }
 
         $token = sanitizeInput($data['token']);
         $email = opensslDecrypt($token);
-        $receiver_id = getUid($pdo, $email);
-        $sender_id = $receiver_id;
+        
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             handleApiError(401, 'Token不合法。');
         }
-        if (!is_numeric($receiver_id)) {
-            handleApiError(400, '接收者ID不合法。');
+        
+        // 使用token中的email获取用户ID
+        $stmtUser = $pdo->prepare("SELECT id FROM users WHERE email = :email");
+        $stmtUser->execute(['email' => $email]);
+        $userData = $stmtUser->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$userData) {
+            handleApiError(404, '用户未找到。');
         }
-        $sender = $receiver_id;
-        if (!$sender) {
-            handleApiError(404, '发送者未找到。');
-        }     
+        
+        $userId = $userData['id'];
+        
         // 开始事务
         $pdo->beginTransaction();
 
-        // 获取未读消息，确保包含send_time字段
+        // 获取用户相关的所有消息（作为发送方或接收方）
         $stmtSelect = $pdo->prepare("
             SELECT message_id, sender_id, receiver_id, content, is_read, send_time 
             FROM messages 
-            WHERE (receiver_id = :receiver_id OR sender_id = :sender_id)
+            WHERE sender_id = :user_id OR receiver_id = :user_id
             ORDER BY send_time ASC
         ");
-        $stmtSelect->execute([
-            'receiver_id' => $receiver_id,
-            'sender_id' => $sender_id
-        ]);
+        $stmtSelect->execute(['user_id' => $userId]);
         $messages = $stmtSelect->fetchAll(PDO::FETCH_ASSOC);
 
-        // 更新消息为已读
+        // 更新当前用户接收的未读消息为已读
         $stmtUpdate = $pdo->prepare("
-            UPDATE messages SET is_read = 1 WHERE receiver_id = :receiver_id
+            UPDATE messages SET is_read = 1 WHERE receiver_id = :user_id AND is_read = 0
         ");
-        $stmtUpdate->execute(['receiver_id' => $receiver_id]);
+        $stmtUpdate->execute(['user_id' => $userId]);
 
         // 提交事务
         $pdo->commit();
@@ -61,22 +62,29 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             // 为了兼容前端代码，添加created_at字段作为send_time的别名
             $message['created_at'] = $message['send_time'];
         }
+        
+        // 添加调试信息
+        $debugInfo = [
+            'user_id' => $userId,
+            'email' => $email,
+            'message_count' => count($messages)
+        ];
 
-        echo json_encode(['success' => true, 'messages' => $messages]);
+        echo json_encode(['success' => true, 'messages' => $messages, 'debug' => $debugInfo]);
     } catch (PDOException $e) {
         // 回滚事务如果有错误
         if ($pdo->inTransaction()) {
             $pdo->rollBack();
         }
         logException($e);
-        handleApiError(500, '数据库错误');
+        handleApiError(500, '数据库错误: ' . $e->getMessage());
     } catch (Exception $e) {
         // 回滚事务如果有错误
         if ($pdo->inTransaction()) {
             $pdo->rollBack();
         }
         logException($e);
-        handleApiError(500, '内部服务器错误');
+        handleApiError(500, '内部服务器错误: ' . $e->getMessage());
     }
 } else {
     handleApiError(405, '不支持的请求方法。');

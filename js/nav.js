@@ -375,20 +375,28 @@ function updateButtonForRemainingTime() {
 // 获取消息
 function fetchMessages() {
     return new Promise((resolve, reject) => {
-        var receiverId = localStorage.getItem('id');
         var token = localStorage.getItem('token');
+        
+        if (!token) {
+            console.error('Token不存在，无法获取消息');
+            reject(new Error('未登录或会话过期'));
+            return;
+        }
+        
+        console.log('正在获取消息，使用token进行身份验证');
+        
         $.ajax({
             type: 'POST',
             url: 'getmsg.php',
-            data: JSON.stringify({ receiver_id: receiverId, token: token}),
+            data: JSON.stringify({ token: token }),
             contentType: 'application/json',
             success: function(data) {
-                console.log(data);
+                console.log('消息获取成功:', data);
                 resolve(data);
             },
             error: function(jqXHR, textStatus, errorThrown) {
-                console.error('无法加载消息');
-                reject(new Error('加载消息时发生错误'));
+                console.error('无法加载消息:', textStatus, errorThrown);
+                reject(new Error('加载消息时发生错误: ' + errorThrown));
             }
         });
     });
@@ -397,7 +405,26 @@ function fetchMessages() {
 
 function buildConversationsList(data) {
     var conversations = {};
-    var userId = localStorage.getItem('id'); // 假设当前用户ID已存储在localStorage
+    
+    // 使用后端返回的用户ID，如果没有则尝试从localStorage获取
+    var userId = data.debug && data.debug.user_id ? data.debug.user_id : localStorage.getItem('id');
+    
+    if (!userId) {
+        console.error('无法获取当前用户ID');
+        return;
+    }
+    
+    console.log('当前用户ID:', userId);
+    
+    // 将用户ID存储到localStorage，供其他函数使用
+    localStorage.setItem('currentUserId', userId);
+
+    if (!data.messages || data.messages.length === 0) {
+        var conversationList = $('#conversationList');
+        conversationList.empty();
+        conversationList.append('<div class="alert alert-info">暂无消息</div>');
+        return;
+    }
 
     data.messages.forEach(function(message) {
         // 对话标识可以是两个用户ID的组合，这里简单地将它们连接起来
@@ -415,21 +442,49 @@ function buildConversationsList(data) {
     var conversationList = $('#conversationList');
     conversationList.empty(); // 清空现有列表
 
-Object.values(conversations).forEach(function(conversation) {
+    Object.values(conversations).forEach(function(conversation) {
         var partnerId = conversation.participants.find(id => id !== userId);
+        console.log('对话参与者:', conversation.participants, '当前用户:', userId, '聊天伙伴:', partnerId);
+        
+        // 存储服务账户ID (假设服务账户的ID是固定的，实际应该根据实际情况调整)
+        var serviceAccountId = conversation.participants.find(id => id !== userId);
+        localStorage.setItem('serviceAccountId', serviceAccountId);
+        
         //var listItem = $('<div></div>').addClass('conversation-item').text('对话 ' + partnerId);
         var listItem = $('<div></div>').addClass('conversation-item').text('CarbonTrack User-Service');
         listItem.css({
-            'margin-bottom': '10px', // 增加底部外边距
-            'padding': '10px', // 增加内边距
-            'border': '1px solid #ccc', // 可选：添加边框以更好地区分
-            'border-radius': '5px' // 可选：添加圆角
+            padding: '10px 15px',
+            borderBottom: '1px solid #e9ecef',
+            cursor: 'pointer',
+            transition: 'background-color 0.2s'
         });
+        
+        listItem.hover(
+            function() { $(this).css('background-color', '#f8f9fa'); },
+            function() { $(this).css('background-color', ''); }
+        );
+        
         listItem.on('click', function() {
+            // 高亮显示选中的对话
+            $('.conversation-item').removeClass('active');
+            $(this).addClass('active').css('background-color', '#e9ecef');
+            
+            // 获取最后一条消息的时间
+            var lastMessageTime = '没有消息';
+            if (conversation.messages.length > 0) {
+                var lastMessage = conversation.messages[conversation.messages.length - 1];
+                var messageTime = lastMessage.send_time || lastMessage.created_at;
+                if (messageTime) {
+                    lastMessageTime = new Date(messageTime).toLocaleDateString();
+                }
+            }
+            
+            console.log('选择了与用户 ' + partnerId + ' 的对话, 最后消息时间: ' + lastMessageTime);
             displayMessages(conversation.messages, partnerId);
         });
         conversationList.append(listItem);
-    });}
+    });
+}
 
 
 function displayMessages(messages, sender) {
@@ -588,8 +643,16 @@ function displayMessages(messages, sender) {
     `;
     document.head.appendChild(styleElement);
 
-    // 获取当前用户ID
-    var currentUserId = localStorage.getItem('id');
+    // 获取当前用户ID - 使用 localStorage 中的 currentUserId
+    var currentUserId = localStorage.getItem('currentUserId');
+    
+    if (!currentUserId) {
+        console.error('未找到当前用户ID，无法正确显示消息');
+        // 尝试获取后备值
+        currentUserId = localStorage.getItem('id');
+    }
+    
+    console.log('显示消息 - 当前用户ID:', currentUserId);
     
     // 确保消息按时间顺序排序
     if (messages && messages.length > 0) {
@@ -630,10 +693,12 @@ function displayMessages(messages, sender) {
             messageBubble.classList.add('message-bubble');
             
             // 根据消息发送者和接收者，调整气泡样式
-            if (message.sender_id === currentUserId) {
+            if (message.sender_id == currentUserId) { // 使用 == 而不是 === 进行比较，以处理字符串和数字类型
                 messageBubble.classList.add('sent');
+                console.log('显示发送的消息:', message.content);
             } else {
                 messageBubble.classList.add('received');
+                console.log('显示接收的消息:', message.content);
             }
 
             // 添加消息内容
@@ -705,9 +770,11 @@ function sendMessage() {
     var token = localStorage.getItem('token');
     
     if (!receiverId || !token) {
-        console.error('Missing receiverId or token');
+        console.error('Missing receiverId or token', { receiverId, token });
         return;
     }
+    
+    console.log('准备发送消息给:', receiverId);
 
     // 立即清空输入框
     messageInput.value = '';
