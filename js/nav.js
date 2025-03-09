@@ -55,20 +55,36 @@ $(document).ready(function() {
         setInterval(checkUnreadMessages(), 30);
         // 模态框显示时加载消息
 $('#messagesModal').on('show.bs.modal', function(e) {
+    console.log('消息模态框正在打开');
     var modalBody = $(this).find('.modal-body');
     modalBody.prepend('<div id="loading"><div class="loader"></div></div>'); 
+    
     fetchMessages().then(function(data) {
         $('#loading').remove(); // 移除加载动画
+        console.log('获取消息成功，返回数据:', data);
+        
         if (data.success) {
-            buildConversationsList(data);
+            // 确认消息数据存在
+            if (data.messages && data.messages.length > 0) {
+                console.log('成功接收消息，数量:', data.messages.length);
+                buildConversationsList(data);
+            } else {
+                console.warn('没有接收到消息数据或消息数组为空');
+                // 显示无消息提示
+                $('#conversationList').empty().append('<div class="alert alert-info">暂无消息</div>');
+                $('#messageList').empty().append('<div class="alert alert-info text-center">暂无消息</div>');
+            }
         } else {
-            console.error('获取消息失败');
+            console.error('获取消息失败:', data);
+            $('#conversationList').empty().append('<div class="alert alert-danger">获取消息失败</div>');
         }
+        
         checkUnreadMessages();
-        setInterval(checkUnreadMessages(), 30);
+        setInterval(checkUnreadMessages, 30000); // 每30秒检查一次未读消息，注意这里修复了原来的错误
     }).catch(function(error) {
         $('#loading').remove(); // 确保即使发生错误也要移除加载动画
-        console.error(error.message);
+        console.error('获取消息出错:', error);
+        $('#conversationList').empty().append('<div class="alert alert-danger">加载消息时出错</div>');
     });
 });  } else {
     logout(); // 如果过期或未登录，执行注销操作
@@ -404,6 +420,7 @@ function fetchMessages() {
 
 
 function buildConversationsList(data) {
+    console.log('开始构建对话列表，收到的数据:', data);
     var conversations = {};
     
     // 使用后端返回的用户ID，如果没有则尝试从localStorage获取
@@ -420,16 +437,20 @@ function buildConversationsList(data) {
     localStorage.setItem('currentUserId', userId);
 
     if (!data.messages || data.messages.length === 0) {
+        console.warn('没有收到任何消息数据');
         var conversationList = $('#conversationList');
         conversationList.empty();
         conversationList.append('<div class="alert alert-info">暂无消息</div>');
         return;
     }
+    
+    console.log('收到消息数量:', data.messages.length);
 
     // 按发送者ID分组消息
     data.messages.forEach(function(message) {
         // 以发送者ID为键创建会话分组
         var senderId = message.sender_id;
+        console.log('处理消息:', message);
         
         if (!conversations[senderId]) {
             conversations[senderId] = {
@@ -453,7 +474,7 @@ function buildConversationsList(data) {
     // 为每个发送者创建一个对话项
     Object.values(conversations).forEach(function(conversation) {
         var senderId = conversation.sender_id;
-        console.log('发信人ID:', senderId);
+        console.log('创建对话项 - 发送者ID:', senderId, '消息数量:', conversation.messages.length);
         
         // 创建对话项
         var listItem = $('<div></div>').addClass('conversation-item').text('CarbonTrack User-Service');
@@ -471,6 +492,7 @@ function buildConversationsList(data) {
         
         // 点击对话项显示消息
         listItem.on('click', function() {
+            console.log('点击了对话项 - 发送者ID:', senderId);
             // 高亮显示选中的对话
             $('.conversation-item').removeClass('active');
             $(this).addClass('active').css('background-color', '#e9ecef');
@@ -485,9 +507,21 @@ function buildConversationsList(data) {
                 }
             }
             
-            console.log('选择了与发送人 ' + senderId + ' 的对话, 最后消息时间: ' + lastMessageTime);
-            // 显示该发送者的所有消息
-            displayMessages(conversation.messages, senderId);
+            console.log('选择了与发送人 ' + senderId + ' 的对话, 消息数量: ' + conversation.messages.length + ', 最后消息时间: ' + lastMessageTime);
+            
+            // 确保消息数组是有效的
+            if (conversation.messages && conversation.messages.length > 0) {
+                console.log('准备显示消息，第一条消息:', conversation.messages[0]);
+                // 显示该发送者的所有消息
+                displayMessages(conversation.messages, senderId);
+            } else {
+                console.warn('对话中没有消息');
+                // 显示空消息提示
+                var messageList = document.getElementById('messageList');
+                if (messageList) {
+                    messageList.innerHTML = '<div class="alert alert-info text-center">与此用户暂无消息</div>';
+                }
+            }
         });
         
         conversationList.append(listItem);
@@ -496,6 +530,8 @@ function buildConversationsList(data) {
 
 
 function displayMessages(messages, sender) {
+    console.log('开始显示消息，消息数量:', messages ? messages.length : 0, '发送者ID:', sender);
+    
     // 保存当前聊天的发送者ID，用于发送回复消息
     localStorage.setItem('currentChatPartnerId', sender);
     
@@ -504,6 +540,7 @@ function displayMessages(messages, sender) {
     
     // 如果messageList元素不存在，则检查messagesModal是否存在
     if (!messagesContainer) {
+        console.warn('未找到messageList元素，尝试创建');
         // 如果连模态框都不存在，则创建完整的模态框结构
         if (!document.getElementById('messagesModal')) {
             const modalHTML = `
@@ -582,6 +619,7 @@ function displayMessages(messages, sender) {
         return;
     }
     
+    console.log('成功获取messageList元素，准备清空并添加消息');
     messagesContainer.innerHTML = ''; // 清空现有消息
 
     // 添加消息样式
@@ -672,13 +710,23 @@ function displayMessages(messages, sender) {
             return new Date(timeA) - new Date(timeB);
         });
         
+        console.log('消息已排序，准备显示');
+        
         // 用于跟踪日期，以便添加日期分隔符
         let lastMessageDate = null;
         
         // 遍历消息并添加到容器
         messages.forEach((message, index) => {
+            console.log(`处理第 ${index+1}/${messages.length} 条消息:`, message);
+            
             // 获取消息时间戳（优先使用 send_time，如果不存在则回退到 created_at）
             const messageTimestamp = message.send_time || message.created_at;
+            
+            // 检查消息数据的完整性
+            if (!message.content) {
+                console.warn('消息内容为空:', message);
+                return; // 跳过空内容的消息
+            }
             
             // 检查是否需要添加日期分隔符
             if (messageTimestamp) {
@@ -728,6 +776,8 @@ function displayMessages(messages, sender) {
             messageContainer.appendChild(messageBubble);
             messagesContainer.appendChild(messageContainer);
         });
+        
+        console.log('所有消息已添加到容器，设置自动滚动');
 
         // 自动滚动到最新消息
         scrollToBottom(messagesContainer);

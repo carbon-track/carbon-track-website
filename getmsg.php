@@ -28,6 +28,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             handleApiError(404, '用户未找到。');
         }
         
+        // 记录用户信息
+        file_put_contents('getmsg_log.txt', date('Y-m-d H:i:s') . ' - 用户ID: ' . $userId . ', 邮箱: ' . $email . "\n", FILE_APPEND);
+        
         // 开始事务
         $pdo->beginTransaction();
 
@@ -41,6 +44,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmtSelect->bindParam(':receiver_id', $userId, PDO::PARAM_INT);
         $stmtSelect->execute();
         $messages = $stmtSelect->fetchAll(PDO::FETCH_ASSOC);
+        
+        // 记录查询结果
+        file_put_contents('getmsg_log.txt', date('Y-m-d H:i:s') . ' - 查询到消息数量: ' . count($messages) . "\n", FILE_APPEND);
 
         // 更新当前用户接收的未读消息为已读
         $stmtUpdate = $pdo->prepare("
@@ -52,29 +58,40 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // 提交事务
         $pdo->commit();
 
-        // 确保每条消息都有时间戳
+        // 确保每条消息都有时间戳和内容
         foreach ($messages as &$message) {
             if (!isset($message['send_time']) || empty($message['send_time'])) {
                 $message['send_time'] = date('Y-m-d H:i:s');
             }
             // 为了兼容前端代码，添加created_at字段作为send_time的别名
             $message['created_at'] = $message['send_time'];
+            
+            // 确保内容不为null
+            if (!isset($message['content'])) {
+                $message['content'] = '';
+            }
         }
         
         // 添加调试信息
         $debugInfo = [
             'user_id' => $userId,
             'email' => $email,
-            'message_count' => count($messages)
+            'message_count' => count($messages),
+            'timestamp' => date('Y-m-d H:i:s')
         ];
 
-        echo json_encode(['success' => true, 'messages' => $messages, 'debug' => $debugInfo]);
+        // 记录响应数据
+        $response = ['success' => true, 'messages' => $messages, 'debug' => $debugInfo];
+        file_put_contents('getmsg_log.txt', date('Y-m-d H:i:s') . ' - 响应: ' . json_encode($response) . "\n", FILE_APPEND);
+        
+        echo json_encode($response);
     } catch (PDOException $e) {
         // 回滚事务如果有错误
         if ($pdo->inTransaction()) {
             $pdo->rollBack();
         }
         logException($e);
+        file_put_contents('getmsg_log.txt', date('Y-m-d H:i:s') . ' - 数据库错误: ' . $e->getMessage() . "\n", FILE_APPEND);
         handleApiError(500, '数据库错误: ' . $e->getMessage());
     } catch (Exception $e) {
         // 回滚事务如果有错误
@@ -82,9 +99,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $pdo->rollBack();
         }
         logException($e);
+        file_put_contents('getmsg_log.txt', date('Y-m-d H:i:s') . ' - 服务器错误: ' . $e->getMessage() . "\n", FILE_APPEND);
         handleApiError(500, '内部服务器错误: ' . $e->getMessage());
     }
 } else {
+    file_put_contents('getmsg_log.txt', date('Y-m-d H:i:s') . ' - 不支持的请求方法: ' . $_SERVER['REQUEST_METHOD'] . "\n", FILE_APPEND);
     handleApiError(405, '不支持的请求方法。');
 }
 ?>
