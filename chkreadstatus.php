@@ -37,7 +37,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // 记录请求信息
         file_put_contents('chkreadstatus_log.txt', date('Y-m-d H:i:s') . ' - 用户ID: ' . $userId . ', 伙伴ID: ' . $partnerId . "\n", FILE_APPEND);
         
-        // 获取当前用户发送给伙伴且已读的消息ID列表
+        // 安全检查：验证用户与伙伴之间存在有效的消息交流关系
+        $checkRelationship = $pdo->prepare("
+            SELECT COUNT(*) as message_count 
+            FROM messages 
+            WHERE (sender_id = :user_id AND receiver_id = :partner_id)
+            OR (sender_id = :partner_id AND receiver_id = :user_id)
+        ");
+        $checkRelationship->execute([
+            ':user_id' => $userId,
+            ':partner_id' => $partnerId
+        ]);
+        $relationship = $checkRelationship->fetch(PDO::FETCH_ASSOC);
+        
+        // 如果没有消息交流记录，返回错误
+        if ($relationship['message_count'] == 0) {
+            file_put_contents('chkreadstatus_log.txt', date('Y-m-d H:i:s') . ' - 安全警告: 用户ID ' . $userId . ' 尝试查询与用户ID ' . $partnerId . ' 的消息状态，但他们之间没有消息记录。\n', FILE_APPEND);
+            handleApiError(403, '您没有权限查询此用户的消息状态。');
+        }
+        
+        // 只有验证关系存在后，才获取已读消息ID
         $stmt = $pdo->prepare("
             SELECT message_id 
             FROM messages 
