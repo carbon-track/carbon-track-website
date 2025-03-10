@@ -5,17 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>User Center - CarbonTrack</title>
   <link rel="icon" href="/img/team.jpg" type="image/JPG">
-  <!-- 引入Bootstrap和jQuery的CDN链接 -->
-  <link rel="stylesheet" href="./css/bootstrap.min.css">
+  <!-- 将Bootstrap改为CDN引用 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
   <!-- 引入iOS设计风格CSS -->
   <link rel="stylesheet" href="./css/ios-design.css">
   <link rel="stylesheet" href="./css/index.css">
 
-  <script src="js/jquery.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="js/utils.js"></script>
   <script src="js/nav.js"></script>
-  <script src="js/bootstrap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
   
   <!-- 页面特定的样式，补充ios-design.css中没有的样式 -->
   <style>
@@ -140,6 +140,49 @@
   </table>
 </div>
 
+<!-- 添加编辑个人资料的模态窗口 -->
+<div class="modal fade" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editUserModalLabel">编辑个人资料 Edit Profile</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="editUserForm">
+          <div class="form-group">
+            <label for="userCountrySelect">国家/地区 Country/Region</label>
+            <select class="form-control" id="userCountrySelect">
+              <option value="">加载中 Loading...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="userStateSelect">省份/州 State/Province</label>
+            <select class="form-control" id="userStateSelect">
+              <option value="">请先选择国家 Please select a country first</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="userSchoolSelect">学校 School</label>
+            <select class="form-control" id="userSchoolSelect">
+              <option value="">加载中 Loading...</option>
+            </select>
+          </div>
+          <div class="form-group" id="userSchoolInputGroup" style="display: none;">
+            <label for="userSchoolInput">输入学校名称 Enter School Name</label>
+            <input type="text" class="form-control" id="userSchoolInput" placeholder="请输入学校名称 Enter school name">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">取消 Cancel</button>
+            <button type="submit" class="btn btn-ios-primary">保存 Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- 复制您主页的页脚 -->
 <div id="footer-placeholder"></div>
@@ -222,9 +265,9 @@
     // 监听学校选择框的变化
     $('#userSchoolSelect').change(function () {
       if ($(this).val() == 'other') {
-        $('#userSchoolInput').show()
+        $('#userSchoolInputGroup').show()
       } else {
-        $('#userSchoolInput').hide()
+        $('#userSchoolInputGroup').hide()
       }
     })
 
@@ -290,21 +333,27 @@
       .then(response => response.json())
       .then(data => {
         const countrySelect = document.getElementById('userCountrySelect')
-        countrySelect.innerHTML = '' // 清空现有选项
-        data.forEach(country => {
-          const option = document.createElement('option')
-          option.value = country.code
-          option.textContent = country.name
-          countrySelect.appendChild(option)
-        })
+        if (countrySelect) {
+          countrySelect.innerHTML = '' // 清空现有选项
+          data.forEach(country => {
+            const option = document.createElement('option')
+            option.value = country.code
+            option.textContent = country.name
+            countrySelect.appendChild(option)
+          })
+        } else {
+          console.log('userCountrySelect element not found')
+        }
       })
       .catch(error => console.error('Error loading countries:', error))
   }
 
   // Step 2: Listen for changes on the country select element
-  document.getElementById('userCountrySelect').addEventListener('change', function () {
-    const selectedCountryCode = this.value
-    updateStates(selectedCountryCode)
+  $(document).ready(function() {
+    $(document).on('change', '#userCountrySelect', function() {
+      const selectedCountryCode = this.value
+      updateStates(selectedCountryCode)
+    })
   })
 
   // Step 3: Populate states/provinces based on the selected country
@@ -313,15 +362,19 @@
       .then(response => response.json())
       .then(data => {
         const statesSelect = document.getElementById('userStateSelect')
-        statesSelect.innerHTML = '' // Clear current states/provinces
-        const selectedCountry = data.find(country => country.code === countryCode)
-        if (selectedCountry && selectedCountry.states) {
-          selectedCountry.states.forEach(state => {
-            const option = document.createElement('option')
-            option.value = state.code
-            option.textContent = state.name
-            statesSelect.appendChild(option)
-          })
+        if (statesSelect) {
+          statesSelect.innerHTML = '' // Clear current states/provinces
+          const selectedCountry = data.find(country => country.code === countryCode)
+          if (selectedCountry && selectedCountry.states) {
+            selectedCountry.states.forEach(state => {
+              const option = document.createElement('option')
+              option.value = state.code
+              option.textContent = state.name
+              statesSelect.appendChild(option)
+            })
+          }
+        } else {
+          console.log('userStateSelect element not found')
         }
       })
       .catch(error => console.error('Error updating states:', error))
@@ -339,15 +392,20 @@
       dataType: 'json',
       data: { token: token }, // 将 token 作为请求参数发送
       success: function (data) {
-        var schoolOptions = '<option value="">请选择学校Select school</option>'
-        $.each(data, function (index, school) {
-          schoolOptions += '<option value="' + school.id + '">' + school.name + '</option>'
-        })
-        schoolOptions += '<option value="other">其他Other（自行输入Enter new）</option>' // 添加一个"其他"选项
-        $('#userSchoolSelect').html(schoolOptions)
+        var schoolSelect = document.getElementById('userSchoolSelect')
+        if (schoolSelect) {
+          var schoolOptions = '<option value="">请选择学校Select school</option>'
+          $.each(data, function (index, school) {
+            schoolOptions += '<option value="' + school.id + '">' + school.name + '</option>'
+          })
+          schoolOptions += '<option value="other">其他Other（自行输入Enter new）</option>' // 添加一个"其他"选项
+          $('#userSchoolSelect').html(schoolOptions)
+        } else {
+          console.log('userSchoolSelect element not found')
+        }
       },
       error: function (xhr, status, error) {
-        alert('加载学校列表失败: ', error)
+        console.log('加载学校列表失败: ', error)
       },
     })
   }

@@ -56,41 +56,41 @@ $(document).ready(function() {
     // 启动定时检查
     startUnreadChecksAndUpdates();
     
-    // 模态框显示时加载消息
-    $('#messagesModal').on('show.bs.modal', function(e) {
+        // 模态框显示时加载消息
+$('#messagesModal').on('show.bs.modal', function(e) {
         console.log('消息模态框正在打开');
         
         // 添加加载动画
-        var modalBody = $(this).find('.modal-body');
+    var modalBody = $(this).find('.modal-body');
         modalBody.prepend('<div id="loading"><div class="spinner-border text-primary" role="status"><span class="sr-only">加载中...</span></div></div>');
         
         // 清除新消息标志
         localStorage.removeItem('hasNewMessages');
         
         // 获取消息
-        fetchMessages().then(function(data) {
-            $('#loading').remove(); // 移除加载动画
+    fetchMessages().then(function(data) {
+        $('#loading').remove(); // 移除加载动画
             
-            if (data.success) {
+        if (data.success) {
                 // 默认显示"选择一个会话"提示
                 $('#messageContainer').hide();
                 $('#noConversationSelected').show();
                 
                 // 构建会话列表
-                buildConversationsList(data);
-            } else {
-                console.error('获取消息失败');
+            buildConversationsList(data);
+        } else {
+            console.error('获取消息失败');
                 showAlert('加载消息失败：' + (data.message || '未知错误'), 'error');
-            }
+        }
             
             // 开始定期检查未读消息
             startUnreadChecksAndUpdates();
-        }).catch(function(error) {
-            $('#loading').remove(); // 确保即使发生错误也要移除加载动画
+    }).catch(function(error) {
+        $('#loading').remove(); // 确保即使发生错误也要移除加载动画
             console.error('加载消息出错:', error.message);
             showAlert('加载消息出错：' + error.message, 'error');
-        });
-    });  } else {
+    });
+});  } else {
     logout(); // 如果过期或未登录，执行注销操作
     
   }
@@ -2294,12 +2294,12 @@ function startMessageReadStatusCheck() {
         $.ajax({
             url: 'chkreadstatus.php', // 这个API需要单独实现，只返回消息的已读状态
             type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({ 
+        contentType: 'application/json',
+        data: JSON.stringify({
                 token: token,
                 partner_id: currentChatPartnerId 
-            }),
-            success: function(response) {
+        }),
+        success: function(response) {
                 if (response.success && response.read_messages) {
                     // 更新消息已读状态
                     updateMessageReadStatus(response.read_messages);
