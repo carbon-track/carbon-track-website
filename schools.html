@@ -50,7 +50,7 @@
       width: 100%;
       height: 70vh;
       position: relative;
-      margin-top: 20px;
+      margin-top: 20px; 
       border-radius: 24px;
       overflow: hidden;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
@@ -78,7 +78,7 @@
       fill: var(--ios-green);
       stroke: white;
       stroke-width: 1.5;
-      cursor: pointer;
+     cursor: pointer;
       filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
       transition: transform 0.3s var(--animation-timing-apple);
     }
@@ -251,7 +251,7 @@
     <div id="popup"></div>
   </div>
 </div>
-
+  
 <section class="join-section ios-depth-effect ios-shine-effect">
   <div class="container">
     <h2>Join Our Global Movement</h2>
@@ -265,208 +265,208 @@
   </div>
 </section>
 
-<!-- D3.js from CDN -->
-<script src="https://d3js.org/d3.v7.min.js"></script>
-<script>
-  const container = document.getElementById("map-container");
-  let width = container.clientWidth;
-  let height = container.clientHeight;
+  <!-- D3.js from CDN -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script>
+    const container = document.getElementById("map-container");
+    let width = container.clientWidth;
+    let height = container.clientHeight;
 
-  const svg = d3.select("#map");
+    const svg = d3.select("#map");
 
-  svg.append("defs")
-     .append("clipPath")
-     .attr("id", "clip")
-     .append("rect")
-     .attr("width", width)
-     .attr("height", height);
+    svg.append("defs")
+       .append("clipPath")
+       .attr("id", "clip")
+       .append("rect")
+       .attr("width", width)
+       .attr("height", height);
 
-  const mapGroup = svg.append("g").attr("clip-path", "url(#clip)");
+    const mapGroup = svg.append("g").attr("clip-path", "url(#clip)");
 
-  const projection = d3.geoNaturalEarth1();
-  const path = d3.geoPath().projection(projection);
+    const projection = d3.geoNaturalEarth1();
+    const path = d3.geoPath().projection(projection);
 
-  let worldData, usStates;
+    let worldData, usStates;
 
-  const schools = [
-    {
-      name: "Hamden Hall Country Day School",
-      coords: [-72.93, 41.40],
-      info: "Adress: 1108 Whitney Ave, Hamden, Ct, 06516. It is the founding place of the Carbon Footprint Initiative."
-    },
-    {
-      name: "Kingswood Oxford School",
-      coords: [-72.75, 41.78],
-      info: "Adress: 170 Kingswood Rd, West Hartford, CT 06119. Its material club is one of our major collaborators."
-    },
-    {
-      name: "Nanjing Foreign Language School",
-      coords: [118.78, 32.05],
-      info: "Adress: 30 Beijing E Rd, Xuanwu, Nanjing, Jiangsu. One of the founding places of the Carbon Footprint Initiative."
-    },
-    {
-      name:"Shanghai Starriver Bilingual School",
-      coords: [121.2, 31.2],
-      info: "Adress: 上海市闵行区金都路2588号. A bilingual School in Shanghai, China, with a profound focus on sustainability, one of the participants of our Initiative."
-    },
-    {
-      name:"Baylor School",
-      coords: [-85.3, 35.08],
-      info:"Adress: 171 Baylor School Rd, Chattanooga, TN, 37405. It has a strong focus on sustainability and environmental education, one of the participants of our Initiative."
-    },
-    {
-      name:"Hiba Academy shanghai",
-      coords:[121.2, 31.4],
-      info:"Adress: 上海市浦东新区林耀路235号. A bilingual School in Shanghai, China, with a profound focus on sustainability, one of the participants of our Initiative"
-    },
-    {
-      name:"Shanghai Qingpu Pinghe Bilingual School",
-      coords:[121.4, 31.1],
-      info:"Adress: 上海市青浦区朱家角路6号. A bilingual School in Shanghai, China, with a profound focus on sustainability, one of the participants of our Initiative"
-    },
-    {
-      name:"The Bryn Mawr School",
-      coords:[-76.63, 39.37],
-      info:"Adress: 109 W Melrose Ave, Baltimore, MD 21210. It has a great focus on sustainability and environmental education, one of the participants of our Initiative"
-    },
-    {
-      name:"上海市世界外国语中学",
-      coords:[121.4, 31.2],
-      info:"Adress: 中国上海市虹漕南路602号. An international School in Shanghai, China, with a profound focus on sustainability, one of the first participants of our Initiative"
-    },
-    {
-      name:"广东碧桂园学校",
-      coords:[113.16, 22.56],
-      info:"Adress: Shunde District, Foshan, China, 511419. An international School in Guangdong, China, with a profound focus on sustainability, one of the participants of our Initiative"
-    }
-  ];
+    const schools = [
+      {
+        name: "Hamden Hall Country Day School",
+        coords: [-72.93, 41.40],
+        info: "Adress: 1108 Whitney Ave, Hamden, Ct, 06516. It is the founding place of the Carbon Footprint Initiative."
+      },
+      {
+        name: "Kingswood Oxford School",
+        coords: [-72.75, 41.78],
+        info: "Adress: 170 Kingswood Rd, West Hartford, CT 06119. Its material club is one of our major collaborators."
+      },
+      {
+        name: "Nanjing Foreign Language School",
+        coords: [118.78, 32.05],
+        info: "Adress: 30 Beijing E Rd, Xuanwu, Nanjing, Jiangsu. One of the founding places of the Carbon Footprint Initiative."
+      },
+      {
+        name:"Shanghai Starriver Bilingual School",
+        coords: [121.2, 31.2],
+        info: "Adress: 上海市闵行区金都路2588号. A bilingual School in Shanghai, China, with a profound focus on sustainability, one of the participants of our Initiative."
+      },
+      {
+        name:"Baylor School",
+        coords: [-85.3, 35.08],
+        info:"Adress: 171 Baylor School Rd, Chattanooga, TN, 37405. It has a strong focus on sustainability and environmental education, one of the participants of our Initiative."
+      },
+      {
+        name:"Hiba Academy shanghai",
+        coords:[121.2, 31.4],
+        info:"Adress: 上海市浦东新区林耀路235号. A bilingual School in Shanghai, China, with a profound focus on sustainability, one of the participants of our Initiative"
+      },
+      {
+        name:"Shanghai Qingpu Pinghe Bilingual School",
+        coords:[121.4, 31.1],
+        info:"Adress: 上海市青浦区朱家角路6号. A bilingual School in Shanghai, China, with a profound focus on sustainability, one of the participants of our Initiative"
+      },
+      {
+        name:"The Bryn Mawr School",
+        coords:[-76.63, 39.37],
+        info:"Adress: 109 W Melrose Ave, Baltimore, MD 21210. It has a great focus on sustainability and environmental education, one of the participants of our Initiative"
+      },
+      {
+        name:"上海市世界外国语中学",
+        coords:[121.4, 31.2],
+        info:"Adress: 中国上海市虹漕南路602号. An international School in Shanghai, China, with a profound focus on sustainability, one of the first participants of our Initiative"
+      },
+      {
+        name:"广东碧桂园学校",
+        coords:[113.16, 22.56],
+        info:"Adress: Shunde District, Foshan, China, 511419. An international School in Guangdong, China, with a profound focus on sustainability, one of the participants of our Initiative"
+      }
+    ];
 
   const popup = d3.select("#popup");
-  function showPopup(x, y, htmlContent) {
-    popup.html(htmlContent)
-        .style("left", x + "px")
-        .style("top", y + "px")
-        .style("display", "block");
-  }
-  
-  function hidePopup() {
-    popup.style("display", "none");
-  }
-
-  function markerHovered(event, d) {
-    event.stopPropagation();
-    
-    const [baseX, baseY] = projection(d.coords);
-    const transform = d3.zoomTransform(svg.node());
-    const screenX = transform.applyX(baseX);
-    const screenY = transform.applyY(baseY);
-    
-    const cluster = [];
-    mapGroup.selectAll("circle.marker").each(function(d2) {
-      const [bx, by] = projection(d2.coords);
-      const sx = transform.applyX(bx);
-      const sy = transform.applyY(by);
-      const dx = sx - screenX;
-      const dy = sy - screenY;
-      if (Math.sqrt(dx*dx + dy*dy) < 30) {
-        cluster.push(d2);
-      }
-    });
-    
-    if (cluster.length > 1) {
-      let html = "<h3>Schools in this area:</h3><ul>";
-      cluster.forEach(school => {
-        html += `<li><strong>${school.name}</strong><br>${school.info}</li>`;
-      });
-      html += "</ul>";
-      showPopup(screenX + 10, screenY + 10, html);
-    } else {
-      const html = `<h3>${d.name}</h3><p>${d.info}</p>`;
-      showPopup(screenX + 10, screenY + 10, html);
+    function showPopup(x, y, htmlContent) {
+      popup.html(htmlContent)
+           .style("left", x + "px")
+           .style("top", y + "px")
+           .style("display", "block");
     }
-  }
+  
+    function hidePopup() {
+      popup.style("display", "none");
+    }
 
-  svg.on("click", event => {
-    if(event.target.tagName !== "circle") hidePopup();
+    function markerHovered(event, d) {
+  event.stopPropagation();
+
+  const [baseX, baseY] = projection(d.coords);
+  const transform = d3.zoomTransform(svg.node());
+  const screenX = transform.applyX(baseX);
+  const screenY = transform.applyY(baseY);
+
+  const cluster = [];
+  mapGroup.selectAll("circle.marker").each(function(d2) {
+    const [bx, by] = projection(d2.coords);
+    const sx = transform.applyX(bx);
+    const sy = transform.applyY(by);
+    const dx = sx - screenX;
+    const dy = sy - screenY;
+    if (Math.sqrt(dx*dx + dy*dy) < 30) {
+      cluster.push(d2);
+    }
   });
+  
+  if (cluster.length > 1) {
+    let html = "<h3>Schools in this area:</h3><ul>";
+    cluster.forEach(school => {
+      html += `<li><strong>${school.name}</strong><br>${school.info}</li>`;
+    });
+    html += "</ul>";
+    showPopup(screenX + 10, screenY + 10, html);
+  } else {
+    const html = `<h3>${d.name}</h3><p>${d.info}</p>`;
+    showPopup(screenX + 10, screenY + 10, html);
+  }
+}
 
-  const zoomBehavior = d3.zoom()
+    svg.on("click", event => {
+      if(event.target.tagName !== "circle") hidePopup();
+    });
+
+    const zoomBehavior = d3.zoom()
     .scaleExtent([1, 50])
     .translateExtent([[-width, -height], [2*width, 2*height]])
     .on("zoom", (event) => {
-      let t = event.transform;
-      if (t.k === 1) {
-        t.x = 0;
-        t.y = 0;
-      }
-      mapGroup.attr("transform", t);
-      mapGroup.selectAll("circle.marker").attr("r", 5 / t.k);
-      hidePopup();
-    });
-    
-  svg.call(zoomBehavior);
-
-  Promise.all([
-    d3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson"),
-    d3.json("https://raw.githubusercontent.com/PublicaMundi/MappingAPI/master/data/geojson/us-states.json")
-  ]).then(([world, states]) => {
-    worldData = world.features.filter(d => d.properties.name !== "Antarctica");
-    usStates = states.features;
-
-    const worldFC = { type: "FeatureCollection", features: worldData };
-    projection.fitSize([width, height], worldFC);
-
-    mapGroup.selectAll("path.country")
-      .data(worldData)
-      .enter()
-      .append("path")
-      .attr("class", "country")
-      .attr("d", path);
-
-    mapGroup.append("g")
-      .selectAll("path.state-boundary")
-      .data(usStates)
-      .enter()
-      .append("path")
-      .attr("class", "state-boundary")
-      .attr("d", path);
-
-    mapGroup.selectAll("circle.marker")
-      .data(schools)
-      .enter()
-      .append("circle")
-      .attr("class", "marker")
-      .attr("cx", d => projection(d.coords)[0])
-      .attr("cy", d => projection(d.coords)[1])
-      .attr("r", 6)
-      .on("mouseover", markerHovered)
-      .on("mouseout", hidePopup);
-
-    svg.call(zoomBehavior.transform, d3.zoomIdentity);
+    let t = event.transform;
+    if (t.k === 1) {
+      t.x = 0;
+      t.y = 0;
+    }
+    mapGroup.attr("transform", t);
+    mapGroup.selectAll("circle.marker").attr("r", 5 / t.k);
+    hidePopup();
   });
+    
+    svg.call(zoomBehavior);
 
-  window.addEventListener("resize", () => {
-    width = container.clientWidth;
-    height = container.clientHeight;
-    svg.attr("width", width).attr("height", height);
-    svg.select("clipPath rect")
-      .attr("width", width)
-      .attr("height", height);
+    Promise.all([
+      d3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson"),
+      d3.json("https://raw.githubusercontent.com/PublicaMundi/MappingAPI/master/data/geojson/us-states.json")
+    ]).then(([world, states]) => {
+      worldData = world.features.filter(d => d.properties.name !== "Antarctica");
+      usStates = states.features;
 
-    if(worldData) {
       const worldFC = { type: "FeatureCollection", features: worldData };
       projection.fitSize([width, height], worldFC);
 
-      mapGroup.selectAll("path.country").attr("d", path);
-      mapGroup.selectAll("path.state-boundary").attr("d", path);
-      mapGroup.selectAll("circle.marker")
-        .attr("cx", d => projection(d.coords)[0])
-        .attr("cy", d => projection(d.coords)[1]);
+      mapGroup.selectAll("path.country")
+        .data(worldData)
+        .enter()
+        .append("path")
+        .attr("class", "country")
+        .attr("d", path);
+
+      mapGroup.append("g")
+        .selectAll("path.state-boundary")
+        .data(usStates)
+        .enter()
+        .append("path")
+        .attr("class", "state-boundary")
+        .attr("d", path);
+
+        mapGroup.selectAll("circle.marker")
+         .data(schools)
+         .enter()
+         .append("circle")
+         .attr("class", "marker")
+         .attr("cx", d => projection(d.coords)[0])
+         .attr("cy", d => projection(d.coords)[1])
+      .attr("r", 6)
+         .on("mouseover", markerHovered)
+         .on("mouseout", hidePopup);
 
       svg.call(zoomBehavior.transform, d3.zoomIdentity);
-    }
-  });
-</script>
+    });
+
+    window.addEventListener("resize", () => {
+      width = container.clientWidth;
+      height = container.clientHeight;
+      svg.attr("width", width).attr("height", height);
+      svg.select("clipPath rect")
+         .attr("width", width)
+         .attr("height", height);
+
+      if(worldData) {
+        const worldFC = { type: "FeatureCollection", features: worldData };
+        projection.fitSize([width, height], worldFC);
+
+        mapGroup.selectAll("path.country").attr("d", path);
+        mapGroup.selectAll("path.state-boundary").attr("d", path);
+        mapGroup.selectAll("circle.marker")
+          .attr("cx", d => projection(d.coords)[0])
+          .attr("cy", d => projection(d.coords)[1]);
+
+        svg.call(zoomBehavior.transform, d3.zoomIdentity);
+      }
+    });
+  </script>
 
 <!-- 页脚 -->
 <div id="footer-placeholder"></div>

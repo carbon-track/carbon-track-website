@@ -65,47 +65,30 @@ $('#messagesModal').on('show.bs.modal', function(e) {
     
     // 清空现有内容
     $('#messageList').empty();
-    $('#conversationList').empty();
-    
-    var modalBody = $(this).find('.modal-body');
-    modalBody.prepend('<div id="loading"><div class="loader">加载中...</div></div>'); 
+    $('#conversationList').empty().html('<div class="text-center p-3"><div class="spinner-border text-primary" role="status"><span class="sr-only">Loading...</span></div><div class="mt-2">加载消息中...</div></div>');
     
     // 检查用户登录状态
     var token = localStorage.getItem('token');
     if (!token) {
-        $('#loading').remove();
-        console.error('用户未登录，无法获取消息');
-        $('#conversationList').append('<div class="alert alert-warning">请先登录</div>');
+        $('#conversationList').empty().html('<div class="alert alert-warning">请先登录</div>');
+        $('#messageList').empty().html('<div class="alert alert-warning text-center">请先登录以查看消息</div>');
         return;
     }
     
+    // 添加加载指示器
+    $('#messageList').html('<div class="text-center p-3"><div class="spinner-border text-primary" role="status"><span class="sr-only">Loading...</span></div><div class="mt-2">加载消息中...</div></div>');
+    
+    // 获取消息数据
+    console.log('开始获取消息数据');
     fetchMessages().then(function(data) {
-        $('#loading').remove(); // 移除加载动画
-        console.log('获取消息成功，返回数据:', data);
+        console.log('消息数据获取成功，开始构建对话列表');
         
-        if (data.success) {
-            // 确认消息数据存在
-            if (data.messages && data.messages.length > 0) {
-                console.log('成功接收消息，数量:', data.messages.length);
-            buildConversationsList(data);
-        } else {
-                console.warn('没有接收到消息数据或消息数组为空');
-                // 显示无消息提示
-                $('#conversationList').empty().append('<div class="alert alert-info">暂无消息</div>');
-                $('#messageList').empty().append('<div class="alert alert-info text-center">暂无消息</div>');
-        }
-        } else {
-            console.error('获取消息失败:', data);
-            $('#conversationList').empty().append('<div class="alert alert-danger">获取消息失败</div>');
-        }
-        
-        checkUnreadMessages();
-        // 修复setInterval的用法
-        setInterval(checkUnreadMessages, 30000); // 每30秒检查一次未读消息
+        // 构建对话列表
+        buildConversationsList(data);
     }).catch(function(error) {
-        $('#loading').remove(); // 确保即使发生错误也要移除加载动画
         console.error('获取消息出错:', error);
-        $('#conversationList').empty().append('<div class="alert alert-danger">加载消息时出错</div>');
+        $('#conversationList').empty().html('<div class="alert alert-danger">加载消息失败</div>');
+        $('#messageList').empty().html('<div class="alert alert-danger text-center">加载消息失败: ' + error.message + '</div>');
     });
 });  } else {
     logout(); // 如果过期或未登录，执行注销操作
@@ -418,20 +401,79 @@ function fetchMessages() {
         
         console.log('正在获取消息，使用token进行身份验证');
         
-        $.ajax({
-            type: 'POST',
-            url: 'getmsg.php',
-            data: JSON.stringify({ token: token }),
-            contentType: 'application/json',
-            success: function(data) {
-                console.log('消息获取成功:', data);
-                resolve(data);
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                console.error('无法加载消息:', textStatus, errorThrown);
-                reject(new Error('加载消息时发生错误: ' + errorThrown));
-            }
-        });
+        try {
+            $.ajax({
+                type: 'POST',
+                url: 'getmsg.php',
+                data: JSON.stringify({ token: token }),
+                contentType: 'application/json',
+                success: function(data) {
+                    console.log('消息获取成功，原始响应:', data);
+                    
+                    // 检查数据结构
+                    if (typeof data === 'string') {
+                        try {
+                            // 尝试解析字符串为JSON
+                            data = JSON.parse(data);
+                            console.log('解析字符串响应为JSON对象:', data);
+                        } catch (e) {
+                            console.error('解析响应字符串失败:', e);
+                        }
+                    }
+                    
+                    // 确保data是一个包含messages数组的对象
+                    if (!data || typeof data !== 'object') {
+                        console.error('响应数据格式错误，期望为对象，实际为:', typeof data);
+                        data = { success: false, messages: [] };
+                    }
+                    
+                    // 如果响应中没有messages字段，添加一个空数组
+                    if (!data.messages) {
+                        console.warn('响应中没有messages字段，添加空数组');
+                        data.messages = [];
+                    }
+                    
+                    // 确保messages是一个数组
+                    if (!Array.isArray(data.messages)) {
+                        console.error('messages不是数组，转换为数组');
+                        // 如果messages是对象，尝试将其转换为数组
+                        if (typeof data.messages === 'object') {
+                            data.messages = [data.messages];
+                        } else {
+                            data.messages = [];
+                        }
+                    }
+                    
+                    // 为每条消息添加默认字段
+                    data.messages.forEach(function(message, index) {
+                        // 确保每条消息都有content字段
+                        if (!message.content && (message.message || message.text)) {
+                            message.content = message.message || message.text;
+                        }
+                        
+                        // 确保每条消息都有时间戳
+                        if (!message.send_time && !message.created_at) {
+                            message.send_time = new Date().toISOString();
+                        }
+                    });
+                    
+                    resolve(data);
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.error('无法加载消息:', textStatus, errorThrown);
+                    // 记录详细错误信息
+                    console.error('错误详情:', {
+                        status: jqXHR.status,
+                        statusText: jqXHR.statusText,
+                        responseText: jqXHR.responseText
+                    });
+                    reject(new Error('加载消息时发生错误: ' + errorThrown));
+                }
+            });
+        } catch (err) {
+            console.error('发送请求时发生异常:', err);
+            reject(err);
+        }
     });
 }
 
@@ -456,96 +498,114 @@ function buildConversationsList(data) {
     // 清空现有列表
     conversationList.empty();
     
-    // 如果没有消息或消息为空，显示提示
-    if (!data.messages || data.messages.length === 0) {
-        console.warn('没有收到任何消息数据');
-        conversationList.append('<div class="alert alert-info">暂无消息</div>');
-        $('#messageList').html('<div class="alert alert-info text-center">暂无消息</div>');
-        return;
-    }
-    
-    console.log('收到消息数量:', data.messages.length);
-    
-    // 按发送者ID分组消息
-    var conversations = {};
-    data.messages.forEach(function(message) {
-        var senderId = message.sender_id;
-        
-        if (!conversations[senderId]) {
-            conversations[senderId] = {
-                sender_id: senderId,
-                messages: []
-            };
+    try {
+        // 如果没有消息或消息为空，显示提示
+        if (!data || !data.messages || data.messages.length === 0) {
+            console.warn('没有收到任何消息数据');
+            conversationList.append('<div class="alert alert-info">暂无消息</div>');
+            $('#messageList').html('<div class="alert alert-info text-center">暂无消息</div>');
+            return;
         }
         
-        conversations[senderId].messages.push(message);
-    });
-    
-    // 如果没有对话，显示提示
-    if (Object.keys(conversations).length === 0) {
-        conversationList.append('<div class="alert alert-info">暂无对话</div>');
-        return;
-    }
-    
-    // 为每个发送者创建一个对话项
-Object.values(conversations).forEach(function(conversation) {
-        var senderId = conversation.sender_id;
+        console.log('收到消息数量:', data.messages.length);
         
-        // 创建对话项
-        var listItem = $('<div></div>').addClass('conversation-item').html(`
-            <div class="d-flex align-items-center p-2">
-                <div class="flex-shrink-0">
-                    <img src="img/team.jpg" alt="Avatar" class="rounded-circle" style="width: 40px; height: 40px;">
-                </div>
-                <div class="flex-grow-1 ms-3">
-                    <div class="fw-bold">CarbonTrack系统消息</div>
-                    <div class="small text-muted">点击查看消息</div>
-                </div>
-            </div>
-        `);
-        
-        // 样式设置
-        listItem.css({
-            'border-bottom': '1px solid #e9ecef',
-            'cursor': 'pointer',
-            'transition': 'background-color 0.2s'
-        });
-        
-        // 悬停效果
-        listItem.hover(
-            function() { $(this).css('background-color', '#f8f9fa'); },
-            function() { $(this).css('background-color', ''); }
-        );
-        
-        // 点击显示此对话的消息
-        listItem.click(function() {
-            // 移除其他对话项的选中状态
-            $('.conversation-item').removeClass('active').css('background-color', '');
-            // 添加当前对话项的选中状态
-            $(this).addClass('active').css('background-color', '#e9ecef');
+        // 按发送者ID分组消息
+        var conversations = {};
+        data.messages.forEach(function(message, index) {
+            console.log(`处理第 ${index+1} 条消息:`, message);
             
-            // 显示该发送者的所有消息
-            displayMessages(conversation.messages, senderId);
+            // 确保消息有发送者ID
+            var senderId = message.sender_id || 'unknown';
+            
+            if (!conversations[senderId]) {
+                conversations[senderId] = {
+                    sender_id: senderId,
+                    messages: []
+                };
+            }
+            
+            conversations[senderId].messages.push(message);
         });
         
-        // 添加到对话列表
-        conversationList.append(listItem);
-    });
-    
-    // 默认选中第一个对话并显示其消息
-    if (conversationList.children('.conversation-item').length > 0) {
-        var firstConversation = conversationList.children('.conversation-item').first();
-        firstConversation.addClass('active').css('background-color', '#e9ecef');
+        console.log('分组后的对话:', conversations);
         
-        // 获取第一个对话的发送者ID和消息
-        var firstSenderId = Object.keys(conversations)[0];
-        displayMessages(conversations[firstSenderId].messages, firstSenderId);
+        // 如果没有对话，显示提示
+        if (Object.keys(conversations).length === 0) {
+            conversationList.append('<div class="alert alert-info">暂无对话</div>');
+            return;
+        }
+        
+        // 为每个发送者创建一个对话项
+        Object.values(conversations).forEach(function(conversation) {
+            var senderId = conversation.sender_id;
+            
+            // 创建对话项
+            var listItem = $('<div></div>').addClass('conversation-item').html(`
+                <div class="d-flex align-items-center p-2">
+                    <div class="flex-shrink-0">
+                        <img src="img/team.jpg" alt="Avatar" class="rounded-circle" style="width: 40px; height: 40px;">
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <div class="fw-bold">CarbonTrack系统消息</div>
+                        <div class="small text-muted">点击查看消息 (${conversation.messages.length}条)</div>
+                    </div>
+                </div>
+            `);
+            
+            // 样式设置
+            listItem.css({
+                'border-bottom': '1px solid #e9ecef',
+                'cursor': 'pointer',
+                'transition': 'background-color 0.2s'
+            });
+            
+            // 悬停效果
+            listItem.hover(
+                function() { $(this).css('background-color', '#f8f9fa'); },
+                function() { $(this).css('background-color', ''); }
+            );
+            
+            // 点击显示此对话的消息
+            listItem.click(function() {
+                console.log('点击对话项:', senderId, '，消息数量:', conversation.messages.length);
+                
+                // 移除其他对话项的选中状态
+                $('.conversation-item').removeClass('active').css('background-color', '');
+                // 添加当前对话项的选中状态
+                $(this).addClass('active').css('background-color', '#e9ecef');
+                
+                // 显示该发送者的所有消息
+                displayMessages(conversation.messages, senderId);
+            });
+            
+            // 添加到对话列表
+            conversationList.append(listItem);
+        });
+        
+        // 默认选中第一个对话并显示其消息
+        if (conversationList.children('.conversation-item').length > 0) {
+            var firstConversation = conversationList.children('.conversation-item').first();
+            firstConversation.addClass('active').css('background-color', '#e9ecef');
+            
+            // 获取第一个对话的发送者ID和消息
+            var firstSenderId = Object.keys(conversations)[0];
+            console.log('默认选中第一个对话:', firstSenderId, '，消息数量:', conversations[firstSenderId].messages.length);
+            
+            // 延迟一点时间再显示消息，确保DOM已经完全渲染
+            setTimeout(() => {
+                displayMessages(conversations[firstSenderId].messages, firstSenderId);
+            }, 100);
+        }
+    } catch (err) {
+        console.error('构建对话列表时出错:', err);
+        conversationList.append('<div class="alert alert-danger">加载对话列表时出错，请刷新页面重试</div>');
     }
 }
 
 
 function displayMessages(messages, sender) {
     console.log('开始显示消息，消息数量:', messages ? messages.length : 0, '发送者ID:', sender);
+    console.log('完整消息数据:', JSON.stringify(messages));
     
     // 保存当前聊天的发送者ID，用于发送回复消息
     localStorage.setItem('currentChatPartnerId', sender);
@@ -573,69 +633,81 @@ function displayMessages(messages, sender) {
         return;
     }
     
-    // 创建消息样式
-    let style = document.createElement('style');
-    style.textContent = `
-        .message-container { margin-bottom: 16px; }
-        .message-bubble {
-            padding: 10px 15px;
-            border-radius: 18px;
-            max-width: 80%;
-            word-wrap: break-word;
-        }
-        .message-time {
-            font-size: 12px;
-            color: #777;
-            margin-top: 5px;
-        }
-        .received {
-            background-color: #f1f0f0;
-            margin-right: auto;
-        }
-    `;
-    document.head.appendChild(style);
-    
-    // 根据时间排序消息
-    messages.sort((a, b) => {
-        const timeA = a.send_time || a.created_at;
-        const timeB = b.send_time || b.created_at;
-        return new Date(timeA) - new Date(timeB);
-    });
-    
-    // 添加每条消息
-    messages.forEach(message => {
-        // 创建消息容器
-        let container = document.createElement('div');
-        container.className = 'message-container';
+    try {
+        // 创建消息样式
+        let style = document.createElement('style');
+        style.textContent = `
+            .message-container { margin-bottom: 16px; }
+            .message-bubble {
+                padding: 10px 15px;
+                border-radius: 18px;
+                max-width: 80%;
+                word-wrap: break-word;
+                background-color: #f1f0f0;
+                margin-right: auto;
+            }
+            .message-time {
+                font-size: 12px;
+                color: #777;
+                margin-top: 5px;
+            }
+        `;
+        document.head.appendChild(style);
         
-        // 创建消息气泡
-        let bubble = document.createElement('div');
-        bubble.className = 'message-bubble received';
+        // 根据时间排序消息
+        messages.sort((a, b) => {
+            const timeA = a.send_time || a.created_at;
+            const timeB = b.send_time || b.created_at;
+            return new Date(timeA) - new Date(timeB);
+        });
         
-        // 添加消息内容
-        bubble.textContent = message.content || '(空消息)';
+        // 添加每条消息
+        messages.forEach((message, index) => {
+            console.log(`处理第 ${index+1} 条消息:`, message);
+            
+            try {
+                // 创建消息容器
+                let container = document.createElement('div');
+                container.className = 'message-container';
+                
+                // 创建消息气泡
+                let bubble = document.createElement('div');
+                bubble.className = 'message-bubble';
+                
+                // 添加消息内容 - 检查所有可能的内容字段
+                const messageContent = message.content || message.message || message.text || JSON.stringify(message);
+                bubble.textContent = messageContent || '(空消息)';
+                console.log('消息内容:', messageContent);
+                
+                // 创建时间显示
+                let time = document.createElement('div');
+                time.className = 'message-time';
+                
+                // 格式化时间
+                let timestamp = message.send_time || message.created_at || message.time || message.timestamp;
+                if (timestamp) {
+                    let date = new Date(timestamp);
+                    time.textContent = date.toLocaleString();
+                } else {
+                    time.textContent = '未知时间';
+                }
+                
+                // 组装消息
+                container.appendChild(bubble);
+                container.appendChild(time);
+                messageList.appendChild(container);
+            } catch (err) {
+                console.error('处理单条消息时出错:', err, message);
+            }
+        });
         
-        // 创建时间显示
-        let time = document.createElement('div');
-        time.className = 'message-time';
-        
-        // 格式化时间
-        let timestamp = message.send_time || message.created_at;
-        if (timestamp) {
-            let date = new Date(timestamp);
-            time.textContent = date.toLocaleString();
-} else {
-            time.textContent = '未知时间';
-        }
-        
-        // 组装消息
-        container.appendChild(bubble);
-        container.appendChild(time);
-        messageList.appendChild(container);
-    });
-    
-    // 滚动到底部
-    messageList.scrollTop = messageList.scrollHeight;
+        // 滚动到底部
+        messageList.scrollTop = messageList.scrollHeight;
+        console.log('消息显示完成，已滚动到底部');
+    } catch (err) {
+        console.error('显示消息时发生错误:', err);
+        messageList.innerHTML = '<div class="alert alert-danger text-center">显示消息时出错，请刷新页面重试</div>';
+    }
 }
 function sendMessage() {
     // 获取消息输入

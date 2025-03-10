@@ -147,7 +147,7 @@
         // 显示加载状态
         $('#submitButton').prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> 提交中...');
         $('.progress').show();
-        
+
         $.ajax({
           type: 'POST',
           url: 'calculate.php',
@@ -402,14 +402,14 @@
       <div class="calculator-card frosted-glass ios-depth-effect">
         <div class="calculator-header">
           <h2>Carbon Reduction Calculator</h2>
-        </div>
+      </div>
         <div class="calculator-body">
           <p class="alert alert-info" role="alert" style="text-align: center;">
             If you need to record activities related to "Housing," please click <a href="speccal.html" class="alert-link">here</a> to jump to the corresponding page.
           </p>
           
           <form id="carbonForm" method="post" enctype="multipart/form-data">
-            <div class="form-group">
+          <div class="form-group">
               <label for="category">Category</label>
               <select class="form-control" id="category" name="category">
                 <option value="衣">衣 Clothing</option>
@@ -417,23 +417,23 @@
                 <option value="行">行 Traveling</option>
                 <option value="习">习 Studying</option>
               </select>
-            </div>
-            <div class="form-group">
+          </div>
+          <div class="form-group">
               <label for="activity">Activity</label>
               <select class="form-control" id="activity" name="activity">
                 <!-- 将由JavaScript动态填充 -->
               </select>
-            </div>
-            <div class="form-group">
+      </div>
+          <div class="form-group">
               <label for="dataInput">Quantity <span id="unitLabel">units</span></label>
               <input type="number" class="form-control" id="dataInput" name="data" placeholder="Enter amount" min="0.1" step="0.1" required>
-            </div>
-            <div class="form-group">
+          </div>
+          <div class="form-group">
               <label for="date">Date</label>
               <input type="date" class="form-control" id="date" name="date" value="" required>
               <script>document.getElementById('date').valueAsDate = new Date()</script>
-            </div>
-            <div class="form-group">
+          </div>
+          <div class="form-group">
               <label for="imageUpload">Upload Photo Evidence</label>
               <input type="file" class="form-control-file" id="imageUpload" name="image" accept="image/*" required>
               <small class="form-text text-muted">Please upload a photo as evidence of your activity (max 5MB).</small>
@@ -452,7 +452,7 @@
               <i class="fas fa-question-circle"></i> Submission Guide
             </button>
             <button type="submit" id="submitButton" class="btn btn-ios-primary btn-block">Submit Carbon Reduction</button>
-          </form>
+        </form>
           <div id="submissionResult" class="mt-3"></div>
         </div>
       </div>
@@ -468,7 +468,7 @@
       <div class="calculator-card mt-4">
         <div class="calculator-header">
           <h2>Your Account</h2>
-        </div>
+          </div>
         <div class="calculator-body">
           <p><strong>Total Carbon Credits:</strong> <span id="userPoints">Loading...</span></p>
           <a href="center.html" class="btn btn-outline-primary btn-block">View Account History</a>
