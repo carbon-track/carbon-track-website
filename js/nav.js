@@ -769,7 +769,7 @@ function displayMessages(messages, sender) {
     }
     
     // 获取当前用户ID
-    const currentUserId = localStorage.getItem('userId');
+    const currentUserId = localStorage.getItem('userId') || localStorage.getItem('id') || sessionStorage.getItem('id');
     console.log('当前用户ID (displayMessages):', currentUserId);
     
     if (!currentUserId) {
@@ -805,12 +805,14 @@ function displayMessages(messages, sender) {
         
         // 创建消息容器
         const messageContainer = document.createElement('div');
-        messageContainer.className = 'message-container';
-        messageContainer.style.margin = '8px 0';
         
         // 确定消息类型（发送/接收）
         const isSent = message.sender_id == currentUserId;
         console.log(`消息${index+1} 是否由当前用户发送:`, isSent, 'sender_id:', message.sender_id, 'currentUserId:', currentUserId);
+        
+        // 根据消息类型设置不同的类名，实现左右区分
+        messageContainer.className = isSent ? 'message-container sent-container' : 'message-container received-container';
+        messageContainer.style.margin = '8px 0';
         
         // 获取安全的消息内容
         let content = message.content || message.message || '';
@@ -869,13 +871,21 @@ function ensureMessageStyles() {
     if (!$('head style:contains(".message-bubble")').length) {
         const messageStyles = `
         <style>
-            .message-container {
-                margin-bottom: 15px;
+            #messageList {
                 display: flex;
-                width: 100%;
-                flex-direction: row; /* 修改为水平方向 */
-                justify-content: flex-start; /* 默认靠左 */
+                flex-direction: column;
+                padding: 10px;
+                overflow-y: auto;
+                height: 400px;
             }
+            
+            .message-container {
+                width: 100%;
+                margin: 8px 0;
+                display: flex;
+                clear: both;
+            }
+            
             .message-bubble {
                 max-width: 80%;
                 padding: 10px 15px;
@@ -885,46 +895,52 @@ function ensureMessageStyles() {
                 word-break: break-word;
                 color: #000; /* 确保文字颜色为黑色 */
             }
+            
+            /* 发送的消息 - 绿色气泡，靠右 */
+            .sent-container {
+                justify-content: flex-end;
+            }
+            
             .message-bubble.sent {
                 background-color: #dcf8c6;
                 border-bottom-right-radius: 5px;
-                margin-left: auto; /* 向右对齐 */
-                margin-right: 10px; /* 右侧边距 */
             }
+            
+            /* 接收的消息 - 灰色气泡，靠左 */
+            .received-container {
+                justify-content: flex-start;
+            }
+            
             .message-bubble.received {
                 background-color: #f1f0f0;
                 border-bottom-left-radius: 5px;
-                margin-right: auto; /* 向左对齐 */
-                margin-left: 10px; /* 左侧边距 */
             }
-            /* 对齐消息容器 */
-            .message-container.sent-container {
-                justify-content: flex-end; /* 发送的消息靠右 */
-            }
-            .message-container.received-container {
-                justify-content: flex-start; /* 接收的消息靠左 */
-            }
+            
             .message-time {
                 font-size: 0.7rem;
                 color: #999;
                 margin-top: 5px;
                 text-align: right;
             }
+            
             .message-read-status {
                 font-size: 0.7rem;
                 color: #999;
                 text-align: right;
                 margin-top: 2px;
             }
+            
             .conversation-item {
                 cursor: pointer;
                 transition: background-color 0.2s;
                 border-radius: 8px;
                 margin-bottom: 5px;
             }
+            
             .conversation-item:hover {
                 background-color: #f5f5f5;
             }
+            
             .conversation-item.active {
                 background-color: #e9ecef;
                 border-left: 3px solid #007bff;
@@ -987,16 +1003,16 @@ function sendMessage() {
     // 安全处理消息内容（仅用于显示）
     var safeMessageDisplay = sanitizeHTML(message);
     
-    // 创建临时消息元素
+    // 创建临时消息元素 - 修改类名使其显示在右侧
     const tempMessage = document.createElement('div');
-    tempMessage.className = 'message-container';
+    tempMessage.className = 'message-container sent-container';
     tempMessage.innerHTML = `
         <div class="message-bubble sent" data-temp-id="${tempMessageId}">
             ${safeMessageDisplay}
             <div class="message-time">发送中...</div>
             <div class="message-read-status" style="font-size: 0.75rem; text-align: right; margin-top: 2px;">
                 <span style="background-color: #f0f0f0; color: #888; padding: 1px 5px; border-radius: 10px; display: inline-block;">
-                    <i class="fas fa-circle-notch fa-spin"></i> 发送中
+                    <i class="fas fa-clock"></i> 发送中
                 </span>
             </div>
         </div>
