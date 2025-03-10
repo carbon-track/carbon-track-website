@@ -794,7 +794,9 @@ function displayMessages(messages, sender) {
         
         // 使用innerHTML添加消息
         messageContainer.innerHTML = `
-            <div class="message-bubble ${bubbleClass}" style="color: #000 !important; visibility: visible !important; display: block !important;">
+            <div class="message-bubble ${bubbleClass}" 
+                data-message-id="${message.message_id || ''}" 
+                style="color: #000 !important; visibility: visible !important; display: block !important;">
                 ${safeContent || '<span class="text-muted">(空消息)</span>'}
                 <div class="message-time">${formattedTime}</div>
                 ${readStatus}
@@ -2163,8 +2165,13 @@ function loadMessages(userId, username) {
 function startMessageReadStatusCheck() {
     console.log('启动定期更新消息已读状态');
     
-    // 每5秒检查一次当前打开的会话中的消息已读状态
-    setInterval(function() {
+    // 清除可能存在的旧定时器
+    if (window.readStatusTimer) {
+        clearInterval(window.readStatusTimer);
+    }
+    
+    // 设置定时器，每5秒检查一次已读状态
+    window.readStatusTimer = setInterval(function() {
         // 获取当前打开的会话ID
         const currentChatPartnerId = localStorage.getItem('currentChatPartnerId');
         
@@ -2173,14 +2180,78 @@ function startMessageReadStatusCheck() {
             return;
         }
         
-        console.log('更新消息已读状态，会话ID:', currentChatPartnerId);
+        console.log('只检查消息已读状态，不获取所有消息，会话ID:', currentChatPartnerId);
         
-        // 获取用户名
-        const partnerName = $('#messagesModalLabel').text().replace('与 ', '').replace(' 的对话', '');
+        // 获取当前显示的消息元素，而不是重新获取所有消息
+        const messageElements = $('#messageList .message-bubble.sent');
         
-        // 刷新消息，更新已读状态
-        loadMessages(currentChatPartnerId, partnerName);
+        // 如果没有发送的消息，则不需要检查
+        if (messageElements.length === 0) {
+            return;
+        }
+        
+        // 获取token
+        var token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        if (!token) {
+            console.error('未找到token，无法检查消息状态');
+            return;
+        }
+        
+        // 只检查消息已读状态，不获取所有消息
+        $.ajax({
+            url: 'chkreadstatus.php', // 这个API需要单独实现，只返回消息的已读状态
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ 
+                token: token,
+                partner_id: currentChatPartnerId 
+            }),
+            success: function(response) {
+                if (response.success && response.read_messages) {
+                    // 更新消息已读状态
+                    updateMessageReadStatus(response.read_messages);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('检查消息已读状态失败:', error);
+            }
+        });
     }, 5000);
+    
+    // 当模态框关闭时，清除定时器
+    $('#messagesModal').on('hidden.bs.modal', function() {
+        console.log('消息模态框已关闭，清除已读状态检查定时器');
+        if (window.readStatusTimer) {
+            clearInterval(window.readStatusTimer);
+        }
+    });
+}
+
+// 辅助函数：更新消息已读状态
+function updateMessageReadStatus(readMessageIds) {
+    // 如果没有已读消息ID列表，则不处理
+    if (!readMessageIds || !readMessageIds.length) {
+        return;
+    }
+    
+    console.log('更新消息已读状态:', readMessageIds);
+    
+    // 遍历所有发送的消息，更新已读状态
+    $('.message-bubble.sent').each(function() {
+        const messageId = $(this).data('message-id');
+        
+        // 如果消息ID在已读列表中，则更新状态为已读
+        if (messageId && readMessageIds.includes(messageId)) {
+            const readStatusElement = $(this).find('.message-read-status');
+            if (readStatusElement.length) {
+                readStatusElement.html(`
+                    <span style="background-color: #9FE2BF; color: #006400; padding: 1px 5px; border-radius: 10px; display: inline-block;">
+                        <i class="fas fa-check-double"></i> 已读
+                    </span>
+                `);
+            }
+        }
+    });
 }
 
 // 开始所有消息相关的定期检查
