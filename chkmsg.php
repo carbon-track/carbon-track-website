@@ -8,16 +8,11 @@ header('Content-Type: application/json');
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     try {
         $token = sanitizeInput($_POST['token']);
-        // 使用uid参数查找用户，如果不存在则通过token解密获取
-        if (isset($_POST['uid']) && !empty($_POST['uid'])) {
-            $userId = getUid($pdo, $email);
-        } else {
-            $email = opensslDecrypt($token);
-            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                handleApiError(401, 'Token不合法。');
-            }
-            $userId = getUid($pdo, $email);
+        $email = opensslDecrypt($token);
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            handleApiError(401, 'Token不合法。');
         }
+        $userId = getUid($pdo, $email);
 
         $sql = "SELECT COUNT(*) AS unread_count FROM `messages` WHERE `receiver_id` = ? AND `is_read` = 0";
         $stmt = $pdo->prepare($sql);
