@@ -238,36 +238,74 @@ $('#sendMessage').on('click', function() {
   
     $("#footer-placeholder").load("footer.html");
     
+    // 将消息图标添加class便于操作
+    $('.fa-envelope').addClass('msg-icon');
+    
+    // 设置图标容器为relative，以便放置徽章
+    $('.fa-envelope').parent().css('position', 'relative');
+    
+    // 启动未读消息检查
+    startUnreadMessageCheck();
 });
 function googleTranslateElementInit() {
   new google.translate.TranslateElement({pageLanguage: 'en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element');
 }
 
 function checkUnreadMessages() {
-    
+    console.log('检查未读消息');
     var token = localStorage.getItem('token');
-    var id = localStorage.getItem('id');
+    var userId = localStorage.getItem('userId');
+    
+    if (!token || !userId) {
+        return; // 如果未登录，不检查
+    }
+    
     $.ajax({
-            type: 'POST',
-            url: 'chkmsg.php',
-            data: { token: token, uid:id },
-            dataType: 'json',
-            success: function(response) {
-                if (response.unreadCount > 0) {
-                $('#unreadMessagesCount').text(response.unreadCount).show();
-                // 更改图标颜色为红色
-                $('nav .fas.fa-envelope').css('color', 'red');
-            } else {
-                $('#unreadMessagesCount').hide();
-                // 没有未读消息时，恢复图标原始颜色
-                $('nav .fas.fa-envelope').css('color', 'rgba(255, 255, 255, .5)');
-            }},
-            error: function() {
-                $('#emailHelp').hide();
-                console.log('请求未读消息数量失败');
+        url: 'chkmsg.php',
+        type: 'POST',
+        data: {
+            token: token,
+            uid: userId
+        },
+        success: function(response) {
+            if (response.success) {
+                const unreadCount = response.unreadCount || 0;
+                
+                // 获取消息图标元素
+                const msgIcon = $('.msg-icon');
+                
+                if (unreadCount > 0) {
+                    // 有未读消息，改变图标颜色和添加未读数量
+                    msgIcon.addClass('text-danger');
+                    
+                    // 移除旧的消息计数
+                    $('.msg-badge').remove();
+                    
+                    // 添加未读消息数量徽章
+                    msgIcon.parent().append(`<span class="msg-badge position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">${unreadCount}</span>`);
+                } else {
+                    // 无未读消息，恢复图标颜色和移除未读数量
+                    msgIcon.removeClass('text-danger');
+                    $('.msg-badge').remove();
+                }
             }
+        },
+        // 即使请求失败也不显示错误，只记录到控制台
+        error: function(xhr, status, error) {
+            console.error('检查未读消息失败:', error);
+        }
     });
 }
+
+// 定时检查未读消息
+function startUnreadMessageCheck() {
+    // 立即检查一次
+    checkUnreadMessages();
+    
+    // 每30秒检查一次
+    setInterval(checkUnreadMessages, 30000);
+}
+
 // 更新页面显示登录状态的函数
 
 // 检查登录状态
@@ -644,12 +682,11 @@ Object.values(conversations).forEach(function(conversation) {
 
 function displayMessages(messages, sender) {
     console.log('开始显示消息，消息数量:', messages ? messages.length : 0, '发送者ID:', sender);
-    console.log('完整消息数据:', JSON.stringify(messages));
     
     // 保存当前聊天的发送者ID，用于发送回复消息
     localStorage.setItem('currentChatPartnerId', sender);
     
-    // 获取或创建messageList元素
+    // 获取messageList元素
     let messageList = document.getElementById('messageList');
     if (!messageList) {
         console.error('无法创建messageList元素，可能存在DOM结构问题');
@@ -662,100 +699,75 @@ function displayMessages(messages, sender) {
     
     // 如果没有消息，显示提示信息
     if (!messages || messages.length === 0) {
-        messageList.innerHTML = '<div class="alert alert-info text-center">暂无消息</div>';
+        messageList.innerHTML = '<div class="text-center p-4"><i class="fas fa-comment-slash fa-3x text-muted mb-3"></i><p>暂无消息记录</p></div>';
         return;
     }
     
-    try {
-        // 创建消息样式
-        let style = document.createElement('style');
-        style.textContent = `
-            .message-container { 
-                margin-bottom: 16px; 
-            }
-            .message-bubble {
-                padding: 15px;
-                border-radius: 18px;
-                max-width: 90%;
-                word-wrap: break-word;
-                background-color: #f1f0f0;
-                margin-right: auto;
-                box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-                line-height: 1.5;
-            }
-            .message-time {
-                font-size: 12px;
-                color: #777;
-                margin-top: 5px;
-                text-align: right;
-            }
-            .message-bubble p {
-                margin-top: 0;
-                margin-bottom: 8px;
-            }
-            .message-bubble p:last-child {
-                margin-bottom: 0;
-            }
+    // 获取当前用户ID
+    const currentUserId = localStorage.getItem('userId');
+    
+    // 对消息按时间排序
+    messages.sort(function(a, b) {
+        return new Date(a.send_time || a.created_at || 0) - new Date(b.send_time || b.created_at || 0);
+    });
+    
+    // 用于跟踪日期变化
+    let lastDate = '';
+    
+    // 显示消息
+    messages.forEach(function(message) {
+        // 处理时间戳
+        const timestamp = message.send_time || message.created_at || new Date().toISOString();
+        const messageDate = new Date(timestamp);
+        const formattedDate = messageDate.toLocaleDateString();
+        const formattedTime = messageDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        
+        // 如果日期变化了，添加日期分隔线
+        if (formattedDate !== lastDate) {
+            const dateDiv = document.createElement('div');
+            dateDiv.className = 'text-center my-3';
+            dateDiv.innerHTML = `<span class="badge bg-secondary px-3 py-2">${formattedDate}</span>`;
+            messageList.appendChild(dateDiv);
+            lastDate = formattedDate;
+        }
+        
+        // 创建消息容器
+        const messageContainer = document.createElement('div');
+        messageContainer.className = 'message-container';
+        
+        // 确定消息类型（发送/接收）
+        const isSent = message.sender_id == currentUserId;
+        
+        // 获取安全的消息内容
+        const safeContent = sanitizeHTML(message.content || '');
+        
+        // 创建消息气泡
+        const bubbleClass = isSent ? 'sent' : 'received';
+        
+        messageContainer.innerHTML = `
+            <div class="message-bubble ${bubbleClass}">
+                ${safeContent}
+                <div class="message-time">${formattedTime}</div>
+            </div>
         `;
-        document.head.appendChild(style);
         
-        // 根据时间排序消息
-        messages.sort((a, b) => {
-            const timeA = a.send_time || a.created_at;
-            const timeB = b.send_time || b.created_at;
-            return new Date(timeA) - new Date(timeB);
-        });
-        
-        // 添加每条消息
-    messages.forEach((message, index) => {
-            console.log(`处理第 ${index+1} 条消息:`, message);
-            
-            try {
-                // 创建消息容器
-                let container = document.createElement('div');
-                container.className = 'message-container';
-                
-                // 创建消息气泡
-                let bubble = document.createElement('div');
-                bubble.className = 'message-bubble';
-                
-                // 添加消息内容 - 检查所有可能的内容字段
-                const messageContent = message.content || message.message || message.text || JSON.stringify(message);
-                // 使用sanitizeHTML函数净化HTML内容，防止XSS攻击
-                bubble.innerHTML = sanitizeHTML(messageContent) || '(空消息)';
-                console.log('消息内容:', messageContent);
-                
-                // 创建时间显示
-                let time = document.createElement('div');
-                time.className = 'message-time';
-                
-                // 格式化时间
-                let timestamp = message.send_time || message.created_at || message.time || message.timestamp;
-                if (timestamp) {
-                    let date = new Date(timestamp);
-                    // 使用textContent显示时间，因为这是纯文本内容
-                    time.textContent = date.toLocaleString();
-} else {
-                    time.textContent = '未知时间';
-                }
-                
-                // 组装消息
-                container.appendChild(bubble);
-                container.appendChild(time);
-                messageList.appendChild(container);
-            } catch (err) {
-                console.error('处理单条消息时出错:', err, message);
-            }
-        });
-        
-        // 滚动到底部
-        messageList.scrollTop = messageList.scrollHeight;
-        console.log('消息显示完成，已滚动到底部');
-    } catch (err) {
-        console.error('显示消息时发生错误:', err);
-        messageList.innerHTML = '<div class="alert alert-danger text-center">显示消息时出错，请刷新页面重试</div>';
-    }
+        // 添加到消息列表
+        messageList.appendChild(messageContainer);
+    });
+    
+    // 滚动到底部
+    scrollToBottom(messageList);
 }
+
+// 滚动消息列表到底部
+function scrollToBottom(element) {
+    if (!element) return;
+    
+    setTimeout(() => {
+        element.scrollTop = element.scrollHeight;
+    }, 100);
+}
+
 function sendMessage() {
     // 获取消息输入
     var messageInput = document.getElementById('messageInput');
@@ -785,32 +797,35 @@ function sendMessage() {
     // 立即清空输入框，提供即时反馈
     messageInput.value = '';
     
+    // 生成临时消息ID
+    const tempMessageId = 'msg_' + Date.now();
+    
     // 显示一个临时的发送中消息
     var messageList = document.getElementById('messageList');
     if (!messageList) {
-        console.error('找不到messageList元素，正在重新初始化消息模态框');
-        initMessageModal();
-        // 重新获取元素
-        messageList = document.getElementById('messageList');
-        if (!messageList) {
-            console.error('无法创建messageList元素，可能存在DOM结构问题');
-            showAlert('无法发送消息，请刷新页面重试', 'error');
-            return;
-        }
+        console.error('找不到messageList元素，可能存在DOM结构问题');
+        showAlert('无法发送消息，请刷新页面重试', 'error');
+        return;
     }
     
-    var tempMessage = document.createElement('div');
-    tempMessage.className = 'message-container sending';
     // 安全处理消息内容（仅用于显示）
     var safeMessageDisplay = sanitizeHTML(message);
+    
+    // 创建临时消息元素
+    const tempMessage = document.createElement('div');
+    tempMessage.className = 'message-container';
     tempMessage.innerHTML = `
-        <div class="message-bubble sending" style="background-color:#e8f5ff;margin-left:auto;opacity:0.8;">
+        <div class="message-bubble sent" data-temp-id="${tempMessageId}">
             ${safeMessageDisplay}
             <div class="message-time">发送中...</div>
         </div>
     `;
+    
+    // 添加到消息列表
     messageList.appendChild(tempMessage);
-    messageList.scrollTop = messageList.scrollHeight;
+    
+    // 滚动到底部
+    scrollToBottom(messageList);
     
     // 发送消息到服务器
     $.ajax({
@@ -824,33 +839,36 @@ function sendMessage() {
         success: function(response) {
             console.log('消息发送成功:', response);
             
+            // 获取消息气泡元素
+            const messageBubble = document.querySelector(`[data-temp-id="${tempMessageId}"]`);
+            
             // 检查响应状态
             if (response.success) {
-                // 显示发送成功的消息
-                tempMessage.innerHTML = `
-                    <div class="message-bubble sent" style="background-color:#007bff;color:white;margin-left:auto;">
-                        ${safeMessageDisplay}
-                        <div class="message-time" style="color:#ddd;">
-                            ${new Date().toLocaleString()}
-                        </div>
-                    </div>
-                `;
-                
-                // 刷新消息列表
-                fetchMessages().then(function(data) {
-                    if (data.success) {
-                        buildConversationsList(data);
+                // 更新时间戳
+                if (messageBubble) {
+                    const timeElement = messageBubble.querySelector('.message-time');
+                    if (timeElement) {
+                        const timestamp = response.timestamp || response.created_at || new Date().toISOString();
+                        const date = new Date(timestamp);
+                        timeElement.textContent = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
                     }
-                });
-        } else {
+                }
+                
+                // 触发未读消息检查以更新UI
+                checkUnreadMessages();
+            } else {
                 // 显示发送失败
-                tempMessage.innerHTML = `
-                    <div class="message-bubble error" style="background-color:#ffdddd;margin-left:auto;">
-                        ${safeMessageDisplay}
-                        <div class="message-time">发送失败</div>
-                    </div>
-                `;
-                console.error('发送失败:', response);
+                if (messageBubble) {
+                    messageBubble.classList.add('failed');
+                    const timeElement = messageBubble.querySelector('.message-time');
+                    if (timeElement) {
+                        timeElement.textContent = '发送失败';
+                        timeElement.style.color = '#ff4d4f';
+                    }
+                }
+                
+                // 显示错误提示
+                showAlert('消息发送失败：' + (response.message || '未知错误'), 'error');
             }
         },
         error: function(xhr, status, error) {
@@ -871,15 +889,6 @@ function sendMessage() {
             showAlert('消息发送失败，请稍后再试。', 'error');
         }
     });
-}
-
-// 辅助函数：滚动到消息列表底部
-function scrollToBottom(element) {
-    if (element) {
-        setTimeout(() => {
-            element.scrollTop = element.scrollHeight;
-        }, 50);
-    }
 }
 
 // 辅助函数：刷新消息列表
@@ -1342,6 +1351,83 @@ function initMessageModal() {
         return;
     }
     
+    // 添加消息模态框样式
+    const messageStyles = `
+    <style>
+        .message-container {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+        .message-bubble {
+            max-width: 80%;
+            padding: 10px 15px;
+            border-radius: 18px;
+            position: relative;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            word-break: break-word;
+        }
+        .message-bubble.sent {
+            background-color: #dcf8c6;
+            align-self: flex-end;
+            margin-left: auto;
+            border-bottom-right-radius: 5px;
+        }
+        .message-bubble.received {
+            background-color: #f1f0f0;
+            align-self: flex-start;
+            margin-right: auto;
+            border-bottom-left-radius: 5px;
+        }
+        .message-time {
+            font-size: 0.7rem;
+            color: #999;
+            margin-top: 5px;
+            text-align: right;
+        }
+        .conversation-item {
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border-radius: 8px;
+            margin-bottom: 5px;
+        }
+        .conversation-item:hover {
+            background-color: #f5f5f5;
+        }
+        .conversation-item.active {
+            background-color: #e9ecef;
+            border-left: 3px solid #007bff;
+        }
+        .message-input-container {
+            border-top: 1px solid #dee2e6;
+            padding-top: 15px;
+        }
+        #messageList {
+            background-color: #e5ddd5;
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgb3BhY2l0eT0iMC4yIj48cGF0aCBkPSJNMTIuNSAwdjUwaDI1VjBIMTIuNXoiIGZpbGw9IiNmZmYiLz48L3N2Zz4=');
+            padding: 15px;
+            border-radius: 8px;
+        }
+        .no-conversation {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: #6c757d;
+        }
+        .no-conversation i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+    </style>`;
+    
+    // 将样式添加到头部
+    if (!$('head style:contains(".message-bubble")').length) {
+        $('head').append(messageStyles);
+    }
+    
     // 创建模态框HTML结构
     var modalHTML = `
         <div class="modal fade" id="messagesModal" tabindex="-1" aria-labelledby="messagesModalLabel" aria-hidden="true">
@@ -1364,7 +1450,7 @@ function initMessageModal() {
                             </div>
                             <!-- 右侧消息内容 -->
                             <div class="col-md-8">
-                                <div id="messageContainer" class="d-flex flex-column">
+                                <div id="messageContainer" class="d-flex flex-column" style="display: none;">
                                     <div id="messageList" class="overflow-auto flex-grow-1" style="height: 350px; padding: 10px;">
                                         <!-- 消息内容将通过JS动态加载 -->
                                     </div>
@@ -1374,6 +1460,10 @@ function initMessageModal() {
                                             <button class="btn btn-primary" id="sendMessageBtn">发送</button>
                                         </div>
                                     </div>
+                                </div>
+                                <div id="noConversationSelected" class="no-conversation" style="height: 400px;">
+                                    <i class="fas fa-comments"></i>
+                                    <p>选择一个会话开始聊天</p>
                                 </div>
                             </div>
                         </div>
@@ -1399,18 +1489,30 @@ function initMessageModal() {
         }
     });
     
+    // 搜索会话
+    $('#conversationSearch').on('input', function() {
+        const searchText = $(this).val().toLowerCase();
+        $('.conversation-item').each(function() {
+            const username = $(this).find('h6').text().toLowerCase();
+            const lastMessage = $(this).find('small').text().toLowerCase();
+            if (username.includes(searchText) || lastMessage.includes(searchText)) {
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+        });
+    });
+    
     // 为模态框显示事件添加处理程序，当模态框显示时加载会话列表
     $('#messagesModal').on('shown.bs.modal', function() {
         console.log('消息模态框已显示，加载会话列表');
-        loadConversations();
         
-        // 确保消息列表滚动到底部
-        const messageList = document.getElementById('messageList');
-        if (messageList) {
-            setTimeout(() => {
-                messageList.scrollTop = messageList.scrollHeight;
-            }, 100);
-        }
+        // 默认显示"选择一个会话"提示
+        $('#messageContainer').hide();
+        $('#noConversationSelected').show();
+        
+        // 加载会话列表
+        loadConversations();
     });
     
     console.log('消息模态框初始化完成');
@@ -1491,7 +1593,9 @@ function loadConversations() {
                         // 设置最新消息
                         if (conversation.messages.length > 0) {
                             const latestMessage = conversation.messages[0];
-                            conversation.last_message = latestMessage.content || '';
+                            // 截取消息内容，防止过长
+                            const content = latestMessage.content || '';
+                            conversation.last_message = content.length > 15 ? content.substring(0, 15) + '...' : content;
                             conversation.last_time = latestMessage.send_time || latestMessage.created_at || '';
                         }
                     });
@@ -1513,9 +1617,9 @@ function loadConversations() {
                             const conversationItem = `
                                 <div class="conversation-item p-2 border-bottom" data-user-id="${conversation.user_id}">
                                     <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <h6 class="mb-0">${sanitizeHTML(conversation.username)}</h6>
-                                            <small class="text-muted">${sanitizeHTML(lastMessage)}</small>
+                                        <div class="conversation-info">
+                                            <h6 class="mb-1">${sanitizeHTML(conversation.username)}</h6>
+                                            <small class="text-muted text-truncate d-block" style="max-width: 150px;">${sanitizeHTML(lastMessage)}</small>
                                         </div>
                                         ${unreadBadge}
                                     </div>
@@ -1529,6 +1633,10 @@ function loadConversations() {
                         $('.conversation-item').click(function() {
                             var userId = $(this).data('user-id');
                             var username = $(this).find('h6').text();
+                            
+                            // 显示消息区域
+                            $('#messageContainer').show();
+                            $('#noConversationSelected').hide();
                             
                             // 加载与该用户的消息
                             loadMessages(userId, username);
@@ -1561,26 +1669,6 @@ function loadConversations() {
             $('#conversationList').html('<div class="text-center text-danger">加载失败</div>');
         }
     });
-    
-    // 使用chkmsg.php检查是否有未读消息
-    var userId = localStorage.getItem('userId');
-    if (userId) {
-        $.ajax({
-            url: 'chkmsg.php',
-            type: 'POST',
-            data: {
-                token: token,
-                uid: userId
-            },
-            success: function(response) {
-                if (response.success && response.unreadCount > 0) {
-                    // 显示未读消息数量
-                    console.log('有 ' + response.unreadCount + ' 条未读消息');
-                    // 可以在这里添加代码来显示未读消息数量的通知
-                }
-            }
-        });
-    }
 }
 
 // 初始化登录模态框
