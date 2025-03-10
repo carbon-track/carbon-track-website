@@ -51,9 +51,12 @@ $(document).ready(function() {
     logoutButton.style.border = '1px solid rgba(255, 255, 255, .5)';
     var username = localStorage.getItem('username');
     updateLoginStatus();
-            checkUnreadMessages();
-        setInterval(checkUnreadMessages(), 30);
-        // 模态框显示时加载消息
+    
+    // 开始定期检查未读消息 - 每30秒检查一次
+    // 这会立即执行一次检查，然后每30秒检查一次
+    startUnreadChecksAndUpdates();
+    
+    // 模态框显示时加载消息
 $('#messagesModal').on('show.bs.modal', function(e) {
     console.log('消息模态框正在打开');
     
@@ -223,10 +226,20 @@ $('nav .fas.fa-envelope').css('color', 'rgba(255, 255, 255, .5)');
         // 显示模态框
         $('#messagesModal').modal('show');
     });
-// 绑定发送按钮的点击事件
-$('#sendMessage').on('click', function() {
-    sendMessage();
-});
+    
+    // Check for unread messages when navbar is loaded (only if logged in)
+    if (localStorage.getItem('loggedIn')) {
+        // 使用改进的函数检查未读消息
+        checkUnreadMessagesAndUpdate();
+    }
+    
+    // Clear any previous body padding (to fix desktop whitespace)
+    $('body').css('padding-top', '0');
+
+    // 绑定发送按钮的点击事件
+    $('#sendMessage').on('click', function() {
+        sendMessage();
+    });
 
 
 
@@ -317,7 +330,8 @@ function checkUnreadMessages() {
     });
 }
 
-// 定时检查未读消息
+// 定时检查未读消息 - 已弃用，改用startUnreadChecksAndUpdates
+/*
 function startUnreadMessageCheck() {
     console.log('启动定时检查未读消息');
     
@@ -330,6 +344,7 @@ function startUnreadMessageCheck() {
         checkUnreadMessages();
     }, 30000);
 }
+*/
 
 // 更新页面显示登录状态的函数
 
@@ -1137,11 +1152,11 @@ function refreshMessages(receiverId) {
 // Function to load navbar from navbar.html
 function loadNavbar() {
     // 创建导航栏内容
-    const navbarContent = `
-    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #002A5C;">
+    var navbarContent = `
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark" id="main-navbar">
         <div class="container">
-            <a class="navbar-brand" href="index.html">
-                <img src="img/team.jpg" width="36" height="36" class="d-inline-block align-top rounded-circle" alt="Logo">
+            <a class="navbar-brand d-flex align-items-center" href="index.html">
+                <img src="carbon-footprint.png" alt="CarbonTrack Logo" width="30" height="30" class="d-inline-block align-top mr-2">
                 <span class="navbar-title-chinese">校园碳账户</span> | CarbonTrack
             </a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -1197,7 +1212,8 @@ function loadNavbar() {
     
     // Check for unread messages when navbar is loaded (only if logged in)
     if (localStorage.getItem('loggedIn')) {
-        checkUnreadMessages();
+        // 使用改进的函数检查未读消息
+        checkUnreadMessagesAndUpdate();
     }
     
     // Clear any previous body padding (to fix desktop whitespace)
@@ -1350,7 +1366,8 @@ function setupNavbarEventListeners() {
     
     // Check for unread messages when navbar is loaded (only if logged in)
     if (localStorage.getItem('loggedIn')) {
-        checkUnreadMessages();
+        // 使用改进的函数检查未读消息
+        checkUnreadMessagesAndUpdate();
     }
     
     // Clear any previous body padding (to fix desktop whitespace)
