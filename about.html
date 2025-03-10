@@ -1,39 +1,128 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>About Us - CarbonTrack</title>
-  <script src="js/jquery.min.js"></script>
   <link rel="icon" href="/img/team.jpg" type="image/JPG">
-  <!-- Bootstrap and jQuery -->
-  <link rel="stylesheet" href="./css/bootstrap.min.css">
-  <script src="js/bootstrap.min.js"></script>
-  <script src="js/utils.js"></script>
-  <script src="js/nav.js"></script>
-  <!-- Font Awesome -->
+  
+  <!-- CDN References -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+  
   <!-- SF Pro font -->
   <link href="https://fonts.cdnfonts.com/css/sf-pro-display" rel="stylesheet">
-  <!-- Intersection Observer polyfill for older browsers -->
-  <script src="https://cdn.jsdelivr.net/npm/intersection-observer@0.12.2/intersection-observer.js"></script>
-  <!-- iOS design CSS -->
-  <link rel="stylesheet" href="./css/ios-design.css">
+  
   <!-- Custom CSS -->
-  <link rel="stylesheet" href="/css/index.css">
+  <link rel="stylesheet" href="./css/ios-design.css">
+  <link rel="stylesheet" href="./css/index.css">
+  
+  <!-- JavaScript libraries -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/nav.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/intersection-observer@0.12.2/intersection-observer.js"></script>
+  
   <style>
     /* Page-specific styles */
+    :root {
+      --card-bg-light: rgba(255, 255, 255, 0.8);
+      --card-bg-dark: rgba(44, 44, 46, 0.8);
+      --text-color-light: #000;
+      --text-color-dark: #FFFFFF;
+      --about-gradient-start: var(--ios-blue);
+      --about-gradient-end: var(--ios-indigo);
+    }
+    
+    body {
+      background-color: var(--ios-secondary-system-background, #F2F2F7);
+      color: var(--text-color-light);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      position: relative;
+      min-height: 100vh;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    
+    /* Frosted glass background effect */
+    .frosted-glass {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: -2;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      background: rgba(255, 255, 255, 0.05);
+    }
+    
+    /* Add ambient glow effects */
+    .glow-effect {
+      position: fixed;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      filter: blur(50px);
+      z-index: -1;
+      opacity: 0.5;
+      animation: pulse 8s infinite alternate cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+    
+    .glow-blue {
+      top: 10%;
+      right: 10%;
+      background: radial-gradient(circle, rgba(0, 122, 255, 0.2), transparent 70%);
+    }
+    
+    .glow-purple {
+      bottom: 10%;
+      left: 5%;
+      background: radial-gradient(circle, rgba(88, 86, 214, 0.15), transparent 70%);
+      animation-delay: 2s;
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1) translate(0, 0); opacity: 0.5; }
+      50% { transform: scale(1.05) translate(20px, -10px); opacity: 0.7; }
+      100% { transform: scale(1) translate(0, 0); opacity: 0.5; }
+    }
+    
     .about-header {
-      background: linear-gradient(135deg, var(--ios-blue), var(--ios-indigo));
+      background: linear-gradient(135deg, var(--about-gradient-start), var(--about-gradient-end));
       color: white;
       padding: 120px 0 80px;
       text-align: center;
       border-radius: 0 0 24px 24px;
       margin-bottom: 40px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    /* Add shimmer effect */
+    .about-header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
+      transform: rotate(30deg);
+      animation: shimmer 10s infinite linear;
+      pointer-events: none;
+    }
+    
+    @keyframes shimmer {
+      0% { transform: translateX(-50%) rotate(0deg); }
+      100% { transform: translateX(0%) rotate(360deg); }
     }
     
     .about-header h1 {
       font-weight: 700;
       margin-bottom: 16px;
+      position: relative;
+      z-index: 2;
     }
     
     .about-header p {
@@ -42,6 +131,8 @@
       max-width: 700px;
       margin: 0 auto;
       line-height: 1.6;
+      position: relative;
+      z-index: 2;
     }
     
     .about-section {
@@ -66,7 +157,9 @@
       transition: transform 0.4s var(--animation-timing-apple),
                   box-shadow 0.4s var(--animation-timing-apple);
       height: 100%;
-      background-color: var(--ios-system-background);
+      background-color: var(--card-bg-light);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
     }
     
     .team-card:hover {
@@ -82,7 +175,10 @@
       font-weight: 700;
       margin-bottom: 12px;
       font-size: 1.3rem;
-      color: var(--ios-label);
+      background: linear-gradient(135deg, var(--ios-blue), var(--ios-indigo));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
     
     .team-card-text {
@@ -127,11 +223,20 @@
     }
     
     .mission-card {
-      background: var(--ios-system-background);
+      background: var(--card-bg-light);
       border-radius: 24px;
       padding: 32px;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
       margin-bottom: 40px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      transition: transform 0.4s var(--animation-timing-apple),
+                box-shadow 0.4s var(--animation-timing-apple);
+    }
+    
+    .mission-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
     }
     
     .mission-list {
@@ -142,13 +247,28 @@
       margin-bottom: 16px;
       color: var(--ios-gray);
       line-height: 1.6;
+      position: relative;
+      padding-left: 24px;
+    }
+    
+    .mission-list li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 10px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--ios-blue), var(--ios-indigo));
     }
     
     .achievements-table {
-      background: var(--ios-system-background);
+      background: var(--card-bg-light);
       border-radius: 24px;
       overflow: hidden;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
     }
     
     .achievements-table thead {
@@ -178,10 +298,24 @@
       border-radius: 24px;
       overflow: hidden;
       color: white;
+      position: relative;
+    }
+    
+    .special-thanks-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent 50%);
+      pointer-events: none;
     }
     
     .special-thanks-body {
       padding: 24px;
+      position: relative;
+      z-index: 1;
     }
     
     .special-thanks-title {
@@ -236,19 +370,147 @@
       box-shadow: 0 8px 24px rgba(46, 204, 113, 0.3);
       color: white;
       text-decoration: none;
-  }
+    }
+    
+    /* Animation classes */
+    .fade-in-up {
+      animation: fadeInUp 0.6s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+      opacity: 0;
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+    .delay-4 { animation-delay: 0.4s; }
+    .delay-5 { animation-delay: 0.5s; }
+    
+    /* Theme toggle button */
+    .theme-toggle {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      width: 50px;
+      height: 50px;
+      border-radius: 25px;
+      background: var(--ios-system-background);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      cursor: pointer;
+      z-index: 100;
+      transition: all 0.3s var(--animation-timing-apple);
+    }
+    
+    .theme-toggle:hover {
+      transform: scale(1.05);
+    }
+    
+    .theme-toggle i {
+      font-size: 24px;
+      color: var(--ios-gray);
+    }
+    
+    /* Dark mode adaptations */
+    @media (prefers-color-scheme: dark) {
+      body.auto-theme {
+        background-color: #1C1C1E;
+        color: var(--text-color-dark);
+      }
+      
+      body.auto-theme .team-card,
+      body.auto-theme .mission-card,
+      body.auto-theme .achievements-table {
+        background-color: var(--card-bg-dark);
+      }
+      
+      body.auto-theme .achievements-table td {
+        border-color: rgba(255, 255, 255, 0.1);
+        color: var(--text-color-dark);
+      }
+      
+      body.auto-theme .team-card-title {
+        background: linear-gradient(135deg, #64D2FF, #5E5CE6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      
+      body.auto-theme .achievements-highlight {
+        color: #64D2FF;
+      }
+      
+      body.auto-theme .mission-list li {
+        color: #AEAEB2;
+      }
+    }
+    
+    /* Manual theme classes */
+    body.dark-theme {
+      background-color: #1C1C1E;
+      color: var(--text-color-dark);
+    }
+    
+    body.dark-theme .team-card,
+    body.dark-theme .mission-card,
+    body.dark-theme .achievements-table {
+      background-color: var(--card-bg-dark);
+    }
+    
+    body.dark-theme .achievements-table td {
+      border-color: rgba(255, 255, 255, 0.1);
+      color: var(--text-color-dark);
+    }
+    
+    body.dark-theme .team-card-title {
+      background: linear-gradient(135deg, #64D2FF, #5E5CE6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    body.dark-theme .achievements-highlight {
+      color: #64D2FF;
+    }
+    
+    body.dark-theme .mission-list li {
+      color: #AEAEB2;
+    }
+    
+    body.light-theme {
+      background-color: #F2F2F7;
+      color: var(--text-color-light);
+    }
   </style>
 </head>
-<body>
+<body class="auto-theme">
+<!-- Add frosted glass background -->
+<div class="frosted-glass"></div>
+
+<!-- Add ambient glow effects -->
+<div class="glow-effect glow-blue"></div>
+<div class="glow-effect glow-purple"></div>
+
 <!-- Navigation bar container that will be loaded by JavaScript -->
 <div id="navbar-container"></div>
 
 <!-- About Header -->
 <header class="about-header">
   <div class="container">
-    <h1>About CarbonTrack</h1>
-    <p>We are a group of young people passionate about environmental protection and technology, working together to build a sustainable future.</p>
-    <a href="mailto:carbontrack666@gmail.com" class="contact-btn">
+    <h1 class="fade-in-up">About CarbonTrack</h1>
+    <p class="fade-in-up delay-1">We are a group of young people passionate about environmental protection and technology, working together to build a sustainable future.</p>
+    <a href="mailto:carbontrack666@gmail.com" class="contact-btn fade-in-up delay-2">
       <i class="fas fa-envelope mr-2"></i> Contact Us
     </a>
   </div>
@@ -258,12 +520,12 @@
 <div class="container">
   <!-- Team Members Section -->
   <section class="team-section">
-    <h2 class="section-title">Our Team</h2>
-    <p class="mb-4">Meet the dedicated individuals behind CarbonTrack who are committed to making a difference.</p>
+    <h2 class="section-title fade-in-up">Our Team</h2>
+    <p class="mb-4 fade-in-up">Meet the dedicated individuals behind CarbonTrack who are committed to making a difference.</p>
     
     <div class="team-grid">
       <!-- Team Member - Jack Yu -->
-      <div class="team-card ios-depth-effect ios-hover-effect">
+      <div class="team-card ios-depth-effect ios-hover-effect fade-in-up delay-1">
         <div class="team-card-body">
           <h3 class="team-card-title">Yuanzheng (Jack) Yu</h3>
           <p class="team-card-text">
@@ -274,7 +536,7 @@
     </div>
 
       <!-- Team Member - Jeffery Lu -->
-      <div class="team-card ios-depth-effect ios-hover-effect">
+      <div class="team-card ios-depth-effect ios-hover-effect fade-in-up delay-1">
         <div class="team-card-body">
           <h3 class="team-card-title">Zining (Jeffery) Lu</h3>
           <p class="team-card-text">
@@ -285,7 +547,7 @@
     </div>
     
       <!-- Team Member - Loren Li -->
-      <div class="team-card ios-depth-effect ios-hover-effect">
+      <div class="team-card ios-depth-effect ios-hover-effect fade-in-up delay-2">
         <div class="team-card-body">
           <h3 class="team-card-title">Loren Minghan Li</h3>
           <p class="team-card-text">
@@ -296,7 +558,7 @@
       </div>
       
       <!-- Team Member - Smiley Ni -->
-      <div class="team-card ios-depth-effect ios-hover-effect">
+      <div class="team-card ios-depth-effect ios-hover-effect fade-in-up delay-2">
         <div class="team-card-body">
           <h3 class="team-card-title">Smiley Ni</h3>
           <p class="team-card-text">
@@ -307,7 +569,7 @@
       </div>
       
       <!-- Team Member - Lan Liu -->
-      <div class="team-card ios-depth-effect ios-hover-effect">
+      <div class="team-card ios-depth-effect ios-hover-effect fade-in-up delay-3">
         <div class="team-card-body">
           <h3 class="team-card-title">Lan Liu</h3>
           <p class="team-card-text">
@@ -318,7 +580,7 @@
       </div>
       
       <!-- Team Member - Jack Shi -->
-      <div class="team-card ios-depth-effect ios-hover-effect">
+      <div class="team-card ios-depth-effect ios-hover-effect fade-in-up delay-3">
         <div class="team-card-body">
           <h3 class="team-card-title">Jack Shi</h3>
           <p class="team-card-text">
@@ -329,7 +591,7 @@
       </div>
       
       <!-- Team Member - Tony Li -->
-      <div class="team-card ios-depth-effect ios-hover-effect">
+      <div class="team-card ios-depth-effect ios-hover-effect fade-in-up delay-4">
         <div class="team-card-body">
           <h3 class="team-card-title">Tony Li</h3>
           <p class="team-card-text">
@@ -340,7 +602,7 @@
       </div>
       
       <!-- Team Member - Eddie Peng -->
-      <div class="team-card ios-depth-effect ios-hover-effect">
+      <div class="team-card ios-depth-effect ios-hover-effect fade-in-up delay-4">
         <div class="team-card-body">
           <h3 class="team-card-title">Eddie Peng</h3>
           <p class="team-card-text">
@@ -351,7 +613,7 @@
       </div>
       
       <!-- Team Member - Michael Jiang -->
-      <div class="team-card ios-depth-effect ios-hover-effect">
+      <div class="team-card ios-depth-effect ios-hover-effect fade-in-up delay-5">
         <div class="team-card-body">
           <h3 class="team-card-title">Michael Jiang</h3>
           <p class="team-card-text">
@@ -362,7 +624,7 @@
       </div>
       
       <!-- Team Member - Peter Zhao -->
-      <div class="team-card ios-depth-effect ios-hover-effect">
+      <div class="team-card ios-depth-effect ios-hover-effect fade-in-up delay-5">
         <div class="team-card-body">
           <h3 class="team-card-title">Peter Zhao</h3>
           <p class="team-card-text">
@@ -373,7 +635,7 @@
     </div>
     
       <!-- Special Thanks -->
-      <div class="special-thanks-card ios-shine-effect">
+      <div class="special-thanks-card ios-shine-effect fade-in-up delay-5">
         <div class="special-thanks-body">
           <h3 class="special-thanks-title">Special Thanks</h3>
           <p class="special-thanks-text">
@@ -388,8 +650,8 @@
   
   <!-- Mission Section -->
   <section class="mission-section">
-    <h2 class="section-title">Our Mission</h2>
-    <div class="mission-card ios-depth-effect">
+    <h2 class="section-title fade-in-up">Our Mission</h2>
+    <div class="mission-card ios-depth-effect fade-in-up delay-1">
     <p>Our mission is to use the carbon account system to help ourselves and others achieve the following goals:</p>
       <ul class="mission-list">
       <li>Target students to raise their awareness of climate change and carbon emissions.</li>
@@ -402,10 +664,10 @@
   
   <!-- Achievements Section -->
   <section class="achievements-section mb-5">
-    <h2 class="section-title">Our Achievements</h2>
-    <p class="mb-4">Through the use of the CarbonTrack carbon accounting system, we have achieved the following milestones:</p>
+    <h2 class="section-title fade-in-up">Our Achievements</h2>
+    <p class="mb-4 fade-in-up delay-1">Through the use of the CarbonTrack carbon accounting system, we have achieved the following milestones:</p>
     
-    <table class="table achievements-table">
+    <table class="table achievements-table fade-in-up delay-2">
       <thead>
       <tr>
         <th>Category</th>
@@ -434,10 +696,73 @@
   </section>
 </div>
 
+<!-- Theme toggle button -->
+<div class="theme-toggle" id="themeToggle">
+  <i class="fas fa-moon"></i>
+</div>
+
 <!-- Footer -->
 <div id="footer-placeholder"></div>
 
 <script>
+  // Intersection Observer to trigger animations when elements enter viewport
+  document.addEventListener('DOMContentLoaded', function() {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('show');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, {
+      threshold: 0.1
+    });
+    
+    document.querySelectorAll('.fade-in-up').forEach(el => {
+      observer.observe(el);
+    });
+    
+    // Theme toggling functionality
+    const themeToggle = document.getElementById('themeToggle');
+    const body = document.body;
+    const icon = themeToggle.querySelector('i');
+    
+    // Check if user has a saved preference
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      body.className = savedTheme;
+      updateIcon(savedTheme);
+    }
+    
+    themeToggle.addEventListener('click', () => {
+      if (body.classList.contains('auto-theme')) {
+        body.classList.remove('auto-theme');
+        body.classList.add('dark-theme');
+        localStorage.setItem('theme', 'dark-theme');
+      } else if (body.classList.contains('dark-theme')) {
+        body.classList.remove('dark-theme');
+        body.classList.add('light-theme');
+        localStorage.setItem('theme', 'light-theme');
+      } else {
+        body.classList.remove('light-theme');
+        body.classList.add('auto-theme');
+        localStorage.setItem('theme', 'auto-theme');
+      }
+      
+      updateIcon(body.className);
+    });
+    
+    function updateIcon(theme) {
+      if (theme === 'dark-theme') {
+        icon.className = 'fas fa-sun';
+      } else if (theme === 'light-theme') {
+        icon.className = 'fas fa-adjust';
+      } else {
+        icon.className = 'fas fa-moon';
+      }
+    }
+  });
+
   // Check login status when page loads
   $(document).ready(function () {
     updateCommunityCount();
