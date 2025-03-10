@@ -41,8 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             WHERE receiver_id = :user_id OR sender_id = :user_id
             ORDER BY send_time ASC
         ");
-        $stmtSelect->bindParam(':user_id', $userId, PDO::PARAM_INT);
-        $stmtSelect->execute();
+        $stmtSelect->execute([':user_id' => $userId]);
         $messages = $stmtSelect->fetchAll(PDO::FETCH_ASSOC);
         
         // 记录查询结果
@@ -52,8 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmtUpdate = $pdo->prepare("
             UPDATE messages SET is_read = 1 WHERE receiver_id = :user_id AND is_read = 0
         ");
-        $stmtUpdate->bindParam(':user_id', $userId, PDO::PARAM_INT);
-        $stmtUpdate->execute();
+        $stmtUpdate->execute([':user_id' => $userId]);
 
         // 提交事务
         $pdo->commit();
