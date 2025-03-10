@@ -620,7 +620,7 @@ function buildConversationsList(data) {
         }
         
         // 按对话伙伴ID分组消息
-        var conversations = {};
+    var conversations = {};
         data.messages.forEach(function(message, index) {
             console.log(`处理第 ${index+1} 条消息:`, message);
             
@@ -638,9 +638,9 @@ function buildConversationsList(data) {
             if (!conversations[partnerId]) {
                 conversations[partnerId] = {
                     user_id: partnerId,
-                    messages: []
-                };
-            }
+                messages: []
+            };
+        }
             
             conversations[partnerId].messages.push(message);
         });
@@ -870,32 +870,49 @@ function ensureMessageStyles() {
         const messageStyles = `
         <style>
             .message-container {
-                display: flex; /* 使用 Flexbox 布局 */
-                margin-bottom: 10px;
+                margin-bottom: 15px;
+                display: flex;
+                width: 100%;
+                flex-direction: row; /* 修改为水平方向 */
+                justify-content: flex-start; /* 默认靠左 */
             }
             .message-bubble {
+                max-width: 80%;
                 padding: 10px 15px;
-                border-radius: 20px;
-                background-color: #f0f0f0; /* 默认背景色 */
-                word-wrap: break-word;
-                max-width: 70%; /* 限制消息气泡的最大宽度 */
+                border-radius: 18px;
+                position: relative;
+                box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+                word-break: break-word;
+                color: #000; /* 确保文字颜色为黑色 */
             }
             .message-bubble.sent {
-                background-color: #DCF8C6; /* 发送消息的背景色，例如浅绿色 */
-                margin-left: auto; /* 将发送消息推到右侧 */
+                background-color: #dcf8c6;
+                border-bottom-right-radius: 5px;
+                margin-left: auto; /* 向右对齐 */
+                margin-right: 10px; /* 右侧边距 */
             }
             .message-bubble.received {
-                background-color: #E5E5EA; /* 接收消息的背景色，例如浅灰色 */
-                margin-right: auto; /* 将接收消息推到左侧 */
+                background-color: #f1f0f0;
+                border-bottom-left-radius: 5px;
+                margin-right: auto; /* 向左对齐 */
+                margin-left: 10px; /* 左侧边距 */
+            }
+            /* 对齐消息容器 */
+            .message-container.sent-container {
+                justify-content: flex-end; /* 发送的消息靠右 */
+            }
+            .message-container.received-container {
+                justify-content: flex-start; /* 接收的消息靠左 */
             }
             .message-time {
                 font-size: 0.7rem;
-                color: #888;
+                color: #999;
                 margin-top: 5px;
-                text-align: right; /* 时间显示在气泡右下角 */
+                text-align: right;
             }
             .message-read-status {
-                font-size: 0.75rem;
+                font-size: 0.7rem;
+                color: #999;
                 text-align: right;
                 margin-top: 2px;
             }
