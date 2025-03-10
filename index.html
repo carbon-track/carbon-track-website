@@ -48,180 +48,18 @@
       --ios-secondary-background: #F2F2F7;
       --ios-tertiary-background: #FFFFFF;
       
-      /* Text colors */
-      --text-color-light: #000000;
-      --text-color-dark: #FFFFFF;
+      /* Content width */
+      --content-max-width: 1280px;
       
-      /* Card backgrounds */
-      --card-bg-light: rgba(255, 255, 255, 0.8);
-      --card-bg-dark: rgba(44, 44, 46, 0.8);
+      /* Animation Durations */
+      --animation-duration-fast: 0.3s;
+      --animation-duration-medium: 0.5s;
+      --animation-duration-slow: 0.8s;
       
-      /* Animation timing */
+      /* Animation Timing Functions */
+      --animation-timing-default: cubic-bezier(0.42, 0, 0.58, 1);
+      --animation-timing-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
       --animation-timing-apple: cubic-bezier(0.25, 0.1, 0.25, 1);
-    }
-    
-    /* Add dark mode adaptations */
-    @media (prefers-color-scheme: dark) {
-      body.auto-theme {
-        background-color: #1C1C1E;
-        color: var(--text-color-dark);
-      }
-      
-      body.auto-theme .card,
-      body.auto-theme .hero-card,
-      body.auto-theme .feature-card {
-        background-color: var(--card-bg-dark);
-      }
-      
-      body.auto-theme .card-title,
-      body.auto-theme .section-title,
-      body.auto-theme h1, 
-      body.auto-theme h2, 
-      body.auto-theme h3, 
-      body.auto-theme h4, 
-      body.auto-theme h5, 
-      body.auto-theme h6 {
-        color: #FFFFFF;
-      }
-      
-      body.auto-theme p,
-      body.auto-theme .card-text {
-        color: rgba(255, 255, 255, 0.8);
-      }
-      
-      body.auto-theme .form-control {
-        background-color: #2C2C2E;
-        border-color: rgba(255, 255, 255, 0.1);
-        color: #FFFFFF;
-      }
-      
-      body.auto-theme .form-control:focus {
-        background-color: #3A3A3C;
-        color: #FFFFFF;
-      }
-      
-      body.auto-theme .modal-content {
-        background-color: #2C2C2E;
-        color: #FFFFFF;
-      }
-      
-      body.auto-theme .modal-header,
-      body.auto-theme .modal-footer {
-        border-color: rgba(255, 255, 255, 0.1);
-      }
-      
-      body.auto-theme .close {
-        color: #FFFFFF;
-      }
-      
-      body.auto-theme .navbar {
-        background-color: rgba(28, 28, 30, 0.8) !important;
-      }
-      
-      body.auto-theme .navbar .nav-link {
-        color: rgba(255, 255, 255, 0.8) !important;
-      }
-      
-      body.auto-theme .navbar .nav-link:hover {
-        color: #FFFFFF !important;
-      }
-    }
-    
-    /* Manual theme classes */
-    body.dark-theme {
-      background-color: #1C1C1E;
-      color: var(--text-color-dark);
-    }
-    
-    body.dark-theme .card,
-    body.dark-theme .hero-card,
-    body.dark-theme .feature-card {
-      background-color: var(--card-bg-dark);
-    }
-    
-    body.dark-theme .card-title,
-    body.dark-theme .section-title,
-    body.dark-theme h1, 
-    body.dark-theme h2, 
-    body.dark-theme h3, 
-    body.dark-theme h4, 
-    body.dark-theme h5, 
-    body.dark-theme h6 {
-      color: #FFFFFF;
-    }
-    
-    body.dark-theme p,
-    body.dark-theme .card-text {
-      color: rgba(255, 255, 255, 0.8);
-    }
-    
-    body.dark-theme .form-control {
-      background-color: #2C2C2E;
-      border-color: rgba(255, 255, 255, 0.1);
-      color: #FFFFFF;
-    }
-    
-    body.dark-theme .form-control:focus {
-      background-color: #3A3A3C;
-      color: #FFFFFF;
-    }
-    
-    body.dark-theme .modal-content {
-      background-color: #2C2C2E;
-      color: #FFFFFF;
-    }
-    
-    body.dark-theme .modal-header,
-    body.dark-theme .modal-footer {
-      border-color: rgba(255, 255, 255, 0.1);
-    }
-    
-    body.dark-theme .close {
-      color: #FFFFFF;
-    }
-    
-    body.dark-theme .navbar {
-      background-color: rgba(28, 28, 30, 0.8) !important;
-    }
-    
-    body.dark-theme .navbar .nav-link {
-      color: rgba(255, 255, 255, 0.8) !important;
-    }
-    
-    body.dark-theme .navbar .nav-link:hover {
-      color: #FFFFFF !important;
-    }
-    
-    body.light-theme {
-      background-color: #F2F2F7;
-      color: var(--text-color-light);
-    }
-    
-    /* Theme toggle button */
-    .theme-toggle {
-      position: fixed;
-      right: 20px;
-      bottom: 20px;
-      width: 50px;
-      height: 50px;
-      border-radius: 25px;
-      background: var(--ios-system-background);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      cursor: pointer;
-      z-index: 1000;
-      transition: all 0.3s var(--animation-timing-apple);
-    }
-    
-    .theme-toggle:hover {
-      transform: scale(1.05);
-    }
-    
-    .theme-toggle i {
-      font-size: 24px;
-      color: var(--ios-gray);
     }
     
     /* iOS-style animations */
@@ -1601,7 +1439,7 @@
     }
   </style>
 </head>
-<body class="auto-theme">
+<body>
 <!-- 导航栏容器，将由JavaScript加载 -->
 <div id="navbar-container"></div>
 
@@ -1790,11 +1628,6 @@
 
 <!-- Footer -->
 <div id="footer-placeholder"></div>
-
-<!-- Theme toggle button -->
-<div class="theme-toggle" id="themeToggle">
-  <i class="fas fa-moon"></i>
-      </div>
 
 <script>
   // 页面加载时检查登录状态
@@ -2021,48 +1854,6 @@
     // Initial update
     updateParallax();
   }
-
-  // Theme toggling functionality
-  document.addEventListener('DOMContentLoaded', function() {
-    const themeToggle = document.getElementById('themeToggle');
-    const body = document.body;
-    const icon = themeToggle.querySelector('i');
-    
-    // Check if user has a saved preference
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme) {
-      body.className = savedTheme;
-      updateIcon(savedTheme);
-    }
-    
-    themeToggle.addEventListener('click', () => {
-      if (body.classList.contains('auto-theme')) {
-        body.classList.remove('auto-theme');
-        body.classList.add('dark-theme');
-        localStorage.setItem('theme', 'dark-theme');
-      } else if (body.classList.contains('dark-theme')) {
-        body.classList.remove('dark-theme');
-        body.classList.add('light-theme');
-        localStorage.setItem('theme', 'light-theme');
-      } else {
-        body.classList.remove('light-theme');
-        body.classList.add('auto-theme');
-        localStorage.setItem('theme', 'auto-theme');
-      }
-      
-      updateIcon(body.className);
-    });
-    
-    function updateIcon(theme) {
-      if (theme === 'dark-theme') {
-        icon.className = 'fas fa-sun';
-      } else if (theme === 'light-theme') {
-        icon.className = 'fas fa-adjust';
-      } else {
-        icon.className = 'fas fa-moon';
-      }
-    }
-  });
 </script>
 </body>
 </html>
