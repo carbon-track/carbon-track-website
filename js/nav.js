@@ -113,11 +113,21 @@ $('nav .fas.fa-envelope').css('color', 'rgba(255, 255, 255, .5)');
             success: function(response) {
                 $('#loading').hide();
                 if (response.success) {
-                    console.log('登录成功，身份：', response.real_username);
+                    console.log('登录成功，身份：', response.real_username, '用户ID:', response.id);
                     $('#loginModal').modal('hide');
                     localStorage.setItem('loggedIn', true);
                     localStorage.setItem('username', response.real_username);
                     localStorage.setItem('token', response.token);
+                    
+                    // 保存用户ID到localStorage
+                    if (response.id) {
+                        localStorage.setItem('userId', response.id);
+                        console.log('用户ID已保存到localStorage:', response.id);
+                    } else {
+                        console.warn('登录响应中未找到id字段');
+                        console.log('完整响应:', JSON.stringify(response));
+                    }
+                    
                     // 设置7天的到期时间
                     localStorage.setItem('expiration', new Date().getTime() + 7 * 24 * 60 * 60 * 1000);
                     updateLoginStatus();
@@ -140,6 +150,9 @@ $('nav .fas.fa-envelope').css('color', 'rgba(255, 255, 255, .5)');
                     });
 
                     updateLoginStatus(); // 更新页面显示登录状态
+                    
+                    // 登录成功后立即检查未读消息
+                    checkUnreadMessages();
                 } else {
                     showAlert(response.message || '登录失败', 'error');
                     var logoutButton = document.getElementById('logoutButton');
@@ -251,25 +264,30 @@ function googleTranslateElementInit() {
   new google.translate.TranslateElement({pageLanguage: 'en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element');
 }
 
+// 检查未读消息
 function checkUnreadMessages() {
     console.log('检查未读消息');
     var token = localStorage.getItem('token');
-    var userId = localStorage.getItem('userId');
     
-    if (!token || !userId) {
+    if (!token) {
+        console.log('未登录，跳过未读消息检查');
         return; // 如果未登录，不检查
     }
     
+    console.log('发送未读消息检查请求');
+    
     $.ajax({
-            url: 'chkmsg.php',
+        url: 'chkmsg.php',
         type: 'POST',
         data: {
-            token: token,
-            uid: userId
+            token: token
         },
-            success: function(response) {
+        success: function(response) {
+            console.log('未读消息检查响应:', response);
+            
             if (response.success) {
                 const unreadCount = response.unreadCount || 0;
+                console.log('未读消息数量:', unreadCount);
                 
                 // 获取消息图标元素
                 const msgIcon = $('.msg-icon');
@@ -283,7 +301,7 @@ function checkUnreadMessages() {
                     
                     // 添加未读消息数量徽章
                     msgIcon.parent().append(`<span class="msg-badge position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">${unreadCount}</span>`);
-            } else {
+                } else {
                     // 无未读消息，恢复图标颜色和移除未读数量
                     msgIcon.removeClass('text-danger');
                     $('.msg-badge').remove();
@@ -292,18 +310,23 @@ function checkUnreadMessages() {
         },
         // 即使请求失败也不显示错误，只记录到控制台
         error: function(xhr, status, error) {
-            console.error('检查未读消息失败:', error);
-            }
+            console.error('检查未读消息失败:', error, xhr.responseText);
+        }
     });
 }
 
 // 定时检查未读消息
 function startUnreadMessageCheck() {
+    console.log('启动定时检查未读消息');
+    
     // 立即检查一次
     checkUnreadMessages();
     
     // 每30秒检查一次
-    setInterval(checkUnreadMessages, 30000);
+    setInterval(function() {
+        console.log('定时检查未读消息');
+        checkUnreadMessages();
+    }, 30000);
 }
 
 // 更新页面显示登录状态的函数
@@ -586,22 +609,38 @@ function buildConversationsList(data) {
         
         console.log('收到消息数量:', data.messages.length);
         
-        // 按发送者ID分组消息
-    var conversations = {};
+        // 获取当前用户ID
+        const currentUserId = localStorage.getItem('userId');
+        console.log('当前用户ID (buildConversationsList):', currentUserId);
+        
+        if (!currentUserId) {
+            console.warn('未找到当前用户ID，对话列表可能无法正确构建');
+        }
+        
+        // 按对话伙伴ID分组消息
+        var conversations = {};
         data.messages.forEach(function(message, index) {
             console.log(`处理第 ${index+1} 条消息:`, message);
             
-            // 确保消息有发送者ID
-            var senderId = message.sender_id || 'unknown';
+            // 确定对话伙伴ID
+            var partnerId;
+            if (message.sender_id == currentUserId) {
+                partnerId = message.receiver_id;
+            } else {
+                partnerId = message.sender_id;
+            }
             
-            if (!conversations[senderId]) {
-                conversations[senderId] = {
-                    sender_id: senderId,
-                messages: []
-            };
-        }
+            // 如果partnerId为undefined或null，设为'unknown'
+            partnerId = partnerId || 'unknown';
             
-            conversations[senderId].messages.push(message);
+            if (!conversations[partnerId]) {
+                conversations[partnerId] = {
+                    user_id: partnerId,
+                    messages: []
+                };
+            }
+            
+            conversations[partnerId].messages.push(message);
         });
         
         console.log('分组后的对话:', conversations);
@@ -682,6 +721,7 @@ Object.values(conversations).forEach(function(conversation) {
 
 function displayMessages(messages, sender) {
     console.log('开始显示消息，消息数量:', messages ? messages.length : 0, '发送者ID:', sender);
+    console.log('消息数据示例:', messages && messages.length > 0 ? JSON.stringify(messages[0]) : 'None');
     
     // 保存当前聊天的发送者ID，用于发送回复消息
     localStorage.setItem('currentChatPartnerId', sender);
@@ -705,6 +745,11 @@ function displayMessages(messages, sender) {
     
     // 获取当前用户ID
     const currentUserId = localStorage.getItem('userId');
+    console.log('当前用户ID (displayMessages):', currentUserId);
+    
+    if (!currentUserId) {
+        console.warn('未找到当前用户ID，消息可能无法正确显示');
+    }
     
     // 对消息按时间排序
     messages.sort(function(a, b) {
@@ -715,7 +760,9 @@ function displayMessages(messages, sender) {
     let lastDate = '';
     
     // 显示消息
-    messages.forEach(function(message) {
+    messages.forEach(function(message, index) {
+        console.log(`处理第 ${index+1} 条消息:`, message);
+        
         // 处理时间戳
         const timestamp = message.send_time || message.created_at || new Date().toISOString();
         const messageDate = new Date(timestamp);
@@ -737,16 +784,23 @@ function displayMessages(messages, sender) {
         
         // 确定消息类型（发送/接收）
         const isSent = message.sender_id == currentUserId;
+        console.log(`消息${index+1} 是否由当前用户发送:`, isSent, 'sender_id:', message.sender_id, 'currentUserId:', currentUserId);
         
         // 获取安全的消息内容
-        const safeContent = sanitizeHTML(message.content || '');
+        let content = message.content || message.message || '';
+        if (typeof content !== 'string') {
+            content = JSON.stringify(content);
+        }
+        const safeContent = sanitizeHTML(content);
+        console.log(`消息${index+1} 内容:`, content, '安全内容:', safeContent);
         
         // 创建消息气泡
         const bubbleClass = isSent ? 'sent' : 'received';
         
+        // 使用innerHTML添加消息
         messageContainer.innerHTML = `
             <div class="message-bubble ${bubbleClass}">
-                ${safeContent}
+                ${safeContent || '<span class="text-muted">(空消息)</span>'}
                 <div class="message-time">${formattedTime}</div>
             </div>
         `;
@@ -755,8 +809,68 @@ function displayMessages(messages, sender) {
         messageList.appendChild(messageContainer);
     });
     
+    // 确保样式已添加到页面
+    ensureMessageStyles();
+    
     // 滚动到底部
     scrollToBottom(messageList);
+}
+
+// 确保消息样式已添加到页面
+function ensureMessageStyles() {
+    // 如果样式尚未添加，则添加
+    if (!$('head style:contains(".message-bubble")').length) {
+        const messageStyles = `
+        <style>
+            .message-container {
+                margin-bottom: 15px;
+                display: flex;
+                flex-direction: column;
+            }
+            .message-bubble {
+                max-width: 80%;
+                padding: 10px 15px;
+                border-radius: 18px;
+                position: relative;
+                box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+                word-break: break-word;
+                color: #000; /* 确保文字颜色为黑色 */
+            }
+            .message-bubble.sent {
+                background-color: #dcf8c6;
+                align-self: flex-end;
+                margin-left: auto;
+                border-bottom-right-radius: 5px;
+            }
+            .message-bubble.received {
+                background-color: #f1f0f0;
+                align-self: flex-start;
+                margin-right: auto;
+                border-bottom-left-radius: 5px;
+            }
+            .message-time {
+                font-size: 0.7rem;
+                color: #999;
+                margin-top: 5px;
+                text-align: right;
+            }
+            .conversation-item {
+                cursor: pointer;
+                transition: background-color 0.2s;
+                border-radius: 8px;
+                margin-bottom: 5px;
+            }
+            .conversation-item:hover {
+                background-color: #f5f5f5;
+            }
+            .conversation-item.active {
+                background-color: #e9ecef;
+                border-left: 3px solid #007bff;
+            }
+        </style>`;
+        $('head').append(messageStyles);
+        console.log('添加了消息样式到页面');
+    }
 }
 
 // 滚动消息列表到底部
@@ -1020,15 +1134,28 @@ function setupNavbarEventListeners() {
         success: function(response) {
             $('#loading').hide();
             if (response.success) {
-                    console.log('登录成功，身份：', response.real_username);
+                    console.log('登录成功，身份：', response.real_username, '用户ID:', response.id);
                     $('#loginModal').modal('hide');
                     localStorage.setItem('loggedIn', true);
                     localStorage.setItem('username', response.real_username);
                     localStorage.setItem('token', response.token);
+                    
+                    // 保存用户ID到localStorage
+                    if (response.id) {
+                        localStorage.setItem('userId', response.id);
+                        console.log('用户ID已保存到localStorage:', response.id);
+                    } else {
+                        console.warn('登录响应中未找到id字段');
+                        console.log('完整响应:', JSON.stringify(response));
+                    }
+                    
                     // 设置7天的到期时间
                     localStorage.setItem('expiration', new Date().getTime() + 7 * 24 * 60 * 60 * 1000);
                     updateLoginStatus();
                     $submitButton.prop('disabled', false).text('Login');
+                    
+                    // 登录成功后立即检查未读消息
+                    checkUnreadMessages();
         } else {
                     showAlert(response.message || '登录失败', 'error');
                     $submitButton.prop('disabled', false).text('Login');
@@ -1546,7 +1673,9 @@ function loadConversations() {
                 
                 // 从消息中提取唯一的对话者
                 const conversations = {};
-                const currentUserId = response.debug?.user_id || "";
+                // 首先尝试从localStorage获取userId，然后从response.debug中尝试获取
+                const currentUserId = localStorage.getItem('userId') || response.debug?.user_id || "";
+                console.log('当前用户ID (loadConversations):', currentUserId);
                 
                 if (response.messages && response.messages.length > 0) {
                     // 处理消息，构建会话列表
@@ -1898,7 +2027,8 @@ function loadMessages(userId, username) {
         success: function(response) {
             if (response.success) {
                 // 获取当前用户ID
-                const currentUserId = response.debug?.user_id || "";
+                const currentUserId = localStorage.getItem('userId') || response.debug?.user_id || "";
+                console.log('当前用户ID (loadMessages):', currentUserId);
                 
                 // 过滤获取与特定用户的消息
                 const filteredMessages = response.messages.filter(function(message) {
