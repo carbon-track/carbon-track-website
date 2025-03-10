@@ -55,40 +55,37 @@ $(document).ready(function() {
         setInterval(checkUnreadMessages(), 30);
         // 模态框显示时加载消息
 $('#messagesModal').on('show.bs.modal', function(e) {
-    console.log('消息模态框正在打开，确保模态框已初始化');
+    console.log('消息模态框正在打开');
     
-    // 确保模态框结构已初始化
-    if (!document.getElementById('messageList') || !document.getElementById('conversationList')) {
-        console.log('重新初始化消息模态框结构');
-        initMessageModal();
-    }
+    // 添加加载动画
+    var modalBody = $(this).find('.modal-body');
+    modalBody.prepend('<div id="loading"><div class="spinner-border text-primary" role="status"><span class="sr-only">加载中...</span></div></div>');
     
-    // 清空现有内容
-    $('#messageList').empty();
-    $('#conversationList').empty().html('<div class="text-center p-3"><div class="spinner-border text-primary" role="status"><span class="sr-only">Loading...</span></div><div class="mt-2">加载消息中...</div></div>');
-    
-    // 检查用户登录状态
-    var token = localStorage.getItem('token');
-    if (!token) {
-        $('#conversationList').empty().html('<div class="alert alert-warning">请先登录</div>');
-        $('#messageList').empty().html('<div class="alert alert-warning text-center">请先登录以查看消息</div>');
-        return;
-    }
-    
-    // 添加加载指示器
-    $('#messageList').html('<div class="text-center p-3"><div class="spinner-border text-primary" role="status"><span class="sr-only">Loading...</span></div><div class="mt-2">加载消息中...</div></div>');
-    
-    // 获取消息数据
-    console.log('开始获取消息数据');
+    // 获取消息
     fetchMessages().then(function(data) {
-        console.log('消息数据获取成功，开始构建对话列表');
+        $('#loading').remove(); // 移除加载动画
         
-        // 构建对话列表
+        if (data.success) {
+            // 默认显示"选择一个会话"提示
+            $('#messageContainer').hide();
+            $('#noConversationSelected').show();
+            
+            // 构建会话列表
             buildConversationsList(data);
+        } else {
+            console.error('获取消息失败');
+            showAlert('加载消息失败：' + (data.message || '未知错误'), 'error');
+        }
+        
+        // 检查未读消息
+        checkUnreadMessages();
+        
+        // 开始定期检查未读消息和更新已读状态
+        startUnreadChecksAndUpdates();
     }).catch(function(error) {
-        console.error('获取消息出错:', error);
-        $('#conversationList').empty().html('<div class="alert alert-danger">加载消息失败</div>');
-        $('#messageList').empty().html('<div class="alert alert-danger text-center">加载消息失败: ' + error.message + '</div>');
+        $('#loading').remove(); // 确保即使发生错误也要移除加载动画
+        console.error('加载消息出错:', error.message);
+        showAlert('加载消息出错：' + error.message, 'error');
     });
 });  } else {
     logout(); // 如果过期或未登录，执行注销操作
@@ -267,51 +264,56 @@ function googleTranslateElementInit() {
 // 检查未读消息
 function checkUnreadMessages() {
     console.log('检查未读消息');
-    var token = localStorage.getItem('token');
     
-    if (!token) {
+    // 统一使用的存储方式，优先使用localStorage，然后尝试sessionStorage
+    var token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    var userId = localStorage.getItem('userId') || localStorage.getItem('id') || sessionStorage.getItem('id');
+    
+    if (!token || !userId) {
         console.log('未登录，跳过未读消息检查');
         return; // 如果未登录，不检查
     }
     
-    console.log('发送未读消息检查请求');
+    console.log('发送未读消息检查请求，用户ID:', userId);
     
     $.ajax({
-            url: 'chkmsg.php',
+        url: 'chkmsg.php',
         type: 'POST',
         data: {
-            token: token
+            token: token,
+            uid: userId
         },
-            success: function(response) {
+        dataType: 'json',
+        success: function(response) {
             console.log('未读消息检查响应:', response);
             
-            if (response.success) {
-                const unreadCount = response.unreadCount || 0;
-                console.log('未读消息数量:', unreadCount);
+            if (response.success && response.unreadCount > 0) {
+                console.log('有 ' + response.unreadCount + ' 条未读消息');
                 
-                // 获取消息图标元素
-                const msgIcon = $('.msg-icon');
+                // 显示未读消息数量徽章
+                $('#unreadMessagesCount').text(response.unreadCount).show();
                 
-                if (unreadCount > 0) {
-                    // 有未读消息，改变图标颜色和添加未读数量
-                    msgIcon.addClass('text-danger');
-                    
-                    // 移除旧的消息计数
-                    $('.msg-badge').remove();
-                    
-                    // 添加未读消息数量徽章
-                    msgIcon.parent().append(`<span class="msg-badge position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">${unreadCount}</span>`);
+                // 更改图标颜色为红色
+                $('nav .fas.fa-envelope').css('color', 'red');
+                $('.msg-icon').addClass('text-danger');
+                
+                // 移除旧的消息计数徽章，添加新的
+                $('.msg-badge').remove();
+                $('.msg-icon').parent().append(`<span class="msg-badge position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">${response.unreadCount}</span>`);
             } else {
-                    // 无未读消息，恢复图标颜色和移除未读数量
-                    msgIcon.removeClass('text-danger');
-                    $('.msg-badge').remove();
-                }
+                // 无未读消息，恢复图标原始颜色和移除未读数量
+                $('#unreadMessagesCount').hide();
+                $('nav .fas.fa-envelope').css('color', 'rgba(255, 255, 255, .5)');
+                $('.msg-icon').removeClass('text-danger');
+                $('.msg-badge').remove();
             }
         },
         // 即使请求失败也不显示错误，只记录到控制台
         error: function(xhr, status, error) {
             console.error('检查未读消息失败:', error, xhr.responseText);
-            }
+            $('#emailHelp').hide();
+            console.log('请求未读消息数量失败');
+        }
     });
 }
 
@@ -721,7 +723,6 @@ Object.values(conversations).forEach(function(conversation) {
 
 function displayMessages(messages, sender) {
     console.log('开始显示消息，消息数量:', messages ? messages.length : 0, '发送者ID:', sender);
-    console.log('消息数据示例:', messages && messages.length > 0 ? JSON.stringify(messages[0]) : 'None');
     
     // 保存当前聊天的发送者ID，用于发送回复消息
     localStorage.setItem('currentChatPartnerId', sender);
@@ -809,8 +810,20 @@ function displayMessages(messages, sender) {
         let readStatus = '';
         if (isSent) {
             // 检查消息是否已读
-            const isRead = message.is_read === 1 || message.is_read === true || message.is_read === '1';
-            readStatus = `<div class="message-read-status" style="font-size: 0.7rem; text-align: right; color: #999; margin-top: 2px;">${isRead ? '已读' : '未读'}</div>`;
+            const isRead = message.is_read == 1 || message.is_read === true || message.is_read === '1';
+            console.log(`消息${index+1} 已读状态:`, message.is_read, isRead ? '已读' : '未读');
+            
+            // 添加已读状态显示，使用更明显的样式
+            readStatus = `
+                <div class="message-read-status" style="font-size: 0.75rem; text-align: right; margin-top: 2px;">
+                    <span style="background-color: ${isRead ? '#9FE2BF' : '#f0f0f0'}; 
+                           color: ${isRead ? '#006400' : '#888'}; 
+                           padding: 1px 5px; 
+                           border-radius: 10px;
+                           display: inline-block;">
+                        ${isRead ? '<i class="fas fa-check-double"></i> 已读' : '<i class="fas fa-check"></i> 未读'}
+                    </span>
+                </div>`;
         }
         
         // 使用innerHTML添加消息
@@ -919,9 +932,9 @@ function sendMessage() {
         return; // 如果消息为空，不做任何操作
     }
     
-    // 获取必要参数
+    // 获取必要参数 - 统一使用的存储方式，优先使用localStorage，然后尝试sessionStorage
+    var token = localStorage.getItem('token') || sessionStorage.getItem('token');
     var receiverId = localStorage.getItem('currentChatPartnerId');
-    var token = localStorage.getItem('token');
     
     if (!receiverId || !token) {
         console.error('缺少接收者ID或token', { receiverId, token });
@@ -955,7 +968,11 @@ function sendMessage() {
         <div class="message-bubble sent" data-temp-id="${tempMessageId}">
             ${safeMessageDisplay}
             <div class="message-time">发送中...</div>
-            <div class="message-read-status" style="font-size: 0.7rem; text-align: right; color: #999; margin-top: 2px;">发送中</div>
+            <div class="message-read-status" style="font-size: 0.75rem; text-align: right; margin-top: 2px;">
+                <span style="background-color: #f0f0f0; color: #888; padding: 1px 5px; border-radius: 10px; display: inline-block;">
+                    <i class="fas fa-circle-notch fa-spin"></i> 发送中
+                </span>
+            </div>
         </div>
     `;
     
@@ -991,10 +1008,14 @@ function sendMessage() {
                         timeElement.textContent = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
                     }
                     
-                    // 更新已读状态为"未读"
+                    // 更新已读状态为"未读"，使用更明显的样式
                     const readStatusElement = messageBubble.querySelector('.message-read-status');
                     if (readStatusElement) {
-                        readStatusElement.textContent = '未读';
+                        readStatusElement.innerHTML = `
+                            <span style="background-color: #f0f0f0; color: #888; padding: 1px 5px; border-radius: 10px; display: inline-block;">
+                                <i class="fas fa-check"></i> 未读
+                            </span>
+                        `;
                     }
                 }
                 
@@ -1013,8 +1034,11 @@ function sendMessage() {
                     // 更新已读状态
                     const readStatusElement = messageBubble.querySelector('.message-read-status');
                     if (readStatusElement) {
-                        readStatusElement.textContent = '发送失败';
-                        readStatusElement.style.color = '#ff4d4f';
+                        readStatusElement.innerHTML = `
+                            <span style="background-color: #ffebee; color: #d32f2f; padding: 1px 5px; border-radius: 10px; display: inline-block;">
+                                <i class="fas fa-times"></i> 发送失败
+                            </span>
+                        `;
                     }
                 }
                 
@@ -1038,8 +1062,11 @@ function sendMessage() {
                 // 更新已读状态
                 const readStatusElement = messageBubble.querySelector('.message-read-status');
                 if (readStatusElement) {
-                    readStatusElement.textContent = '发送失败';
-                    readStatusElement.style.color = '#ff4d4f';
+                    readStatusElement.innerHTML = `
+                        <span style="background-color: #ffebee; color: #d32f2f; padding: 1px 5px; border-radius: 10px; display: inline-block;">
+                            <i class="fas fa-times"></i> 发送失败
+                        </span>
+                    `;
                 }
             }
             
@@ -2165,5 +2192,54 @@ function startMessageReadStatusCheck() {
         // 刷新消息，更新已读状态
         loadMessages(currentChatPartnerId, partnerName);
     }, 5000);
+}
+
+// 开始所有消息相关的定期检查
+function startUnreadChecksAndUpdates() {
+    console.log('启动所有消息相关的定期检查');
+    
+    // 立即检查一次未读消息
+    checkUnreadMessages();
+    
+    // 清除可能存在的旧定时器
+    if (window.unreadMessageTimer) {
+        clearInterval(window.unreadMessageTimer);
+    }
+    if (window.readStatusTimer) {
+        clearInterval(window.readStatusTimer);
+    }
+    
+    // 设置每30秒检查一次未读消息的定时器
+    window.unreadMessageTimer = setInterval(function() {
+        console.log('定时检查未读消息');
+        checkUnreadMessages();
+    }, 30000);
+    
+    // 设置每5秒更新一次已读状态的定时器
+    window.readStatusTimer = setInterval(function() {
+        // 获取当前打开的会话ID
+        const currentChatPartnerId = localStorage.getItem('currentChatPartnerId');
+        
+        // 如果没有打开的会话，或者消息模态框没有显示，则不更新
+        if (!currentChatPartnerId || !$('#messagesModal').hasClass('show')) {
+            return;
+        }
+        
+        console.log('定时更新消息已读状态，会话ID:', currentChatPartnerId);
+        
+        // 获取用户名
+        const partnerName = $('#messagesModalLabel').text().replace('与 ', '').replace(' 的对话', '');
+        
+        // 刷新消息，更新已读状态
+        loadMessages(currentChatPartnerId, partnerName);
+    }, 5000);
+    
+    // 当模态框关闭时，清除定时器
+    $('#messagesModal').on('hidden.bs.modal', function() {
+        console.log('消息模态框已关闭，清除定时器');
+        if (window.readStatusTimer) {
+            clearInterval(window.readStatusTimer);
+        }
+    });
 }
 
