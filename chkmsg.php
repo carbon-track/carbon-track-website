@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $token = sanitizeInput($_POST['token']);
         // 使用uid参数查找用户，如果不存在则通过token解密获取
         if (isset($_POST['uid']) && !empty($_POST['uid'])) {
-            $userId = sanitizeInput($_POST['uid']);
+            $userId = getUid($pdo, $email);
         } else {
             $email = opensslDecrypt($token);
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
