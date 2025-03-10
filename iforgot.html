@@ -5,33 +5,124 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Password Recovery - CarbonTrack</title>
   <link rel="icon" href="/img/team.jpg" type="image/JPG">
-  <!-- 引入Bootstrap和jQuery的CDN链接 -->
-  <link rel="stylesheet" href="./css/bootstrap.min.css">
-  <script src="js/jquery.min.js"></script>
-  <script src="js/bootstrap.min.js"></script>
-  <script src="js/utils.js"></script>
-  <script src="js/nav.js"></script>
+  
+  <!-- CDN References -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
-  <!-- SF Pro 字体 -->
+  
+  <!-- SF Pro font -->
   <link href="https://fonts.cdnfonts.com/css/sf-pro-display" rel="stylesheet">
-  <!-- Intersection Observer polyfill -->
-  <script src="https://cdn.jsdelivr.net/npm/intersection-observer@0.12.2/intersection-observer.js"></script>
-  <!-- iOS设计CSS -->
+  
+  <!-- Custom CSS -->
   <link rel="stylesheet" href="./css/ios-design.css">
   <link rel="stylesheet" href="./css/index.css">
+  
+  <!-- JavaScript libraries -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/nav.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/intersection-observer@0.12.2/intersection-observer.js"></script>
+  
   <style>
+    :root {
+      --card-bg-light: rgba(255, 255, 255, 0.8);
+      --card-bg-dark: rgba(44, 44, 46, 0.8);
+      --text-color-light: #000;
+      --text-color-dark: #FFFFFF;
+      --recovery-gradient-start: var(--ios-purple);
+      --recovery-gradient-end: var(--ios-pink);
+      --animation-timing-apple: cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+    
+    body {
+      background-color: var(--ios-secondary-system-background, #F2F2F7);
+      color: var(--text-color-light);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      position: relative;
+      min-height: 100vh;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    
+    /* Frosted glass background effect */
+    .frosted-glass {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: -2;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      background: rgba(255, 255, 255, 0.05);
+    }
+    
+    /* Add ambient glow effects */
+    .glow-effect {
+      position: fixed;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      filter: blur(50px);
+      z-index: -1;
+      opacity: 0.5;
+      animation: pulse 8s infinite alternate cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+    
+    .glow-purple {
+      top: 10%;
+      right: 10%;
+      background: radial-gradient(circle, rgba(175, 82, 222, 0.2), transparent 70%);
+    }
+    
+    .glow-pink {
+      bottom: 10%;
+      left: 5%;
+      background: radial-gradient(circle, rgba(255, 45, 85, 0.15), transparent 70%);
+      animation-delay: 2s;
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1) translate(0, 0); opacity: 0.5; }
+      50% { transform: scale(1.05) translate(20px, -10px); opacity: 0.7; }
+      100% { transform: scale(1) translate(0, 0); opacity: 0.5; }
+    }
+    
     .recovery-header {
-      background: linear-gradient(135deg, var(--ios-purple), var(--ios-pink));
+      background: linear-gradient(135deg, var(--recovery-gradient-start), var(--recovery-gradient-end));
       color: white;
       padding: 120px 0 60px;
       text-align: center;
       border-radius: 0 0 24px 24px;
       margin-bottom: 40px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    /* Add shimmer effect */
+    .recovery-header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
+      transform: rotate(30deg);
+      animation: shimmer 10s infinite linear;
+      pointer-events: none;
+    }
+    
+    @keyframes shimmer {
+      0% { transform: translateX(-50%) rotate(0deg); }
+      100% { transform: translateX(0%) rotate(360deg); }
     }
     
     .recovery-header h1 {
       font-weight: 700;
       margin-bottom: 16px;
+      position: relative;
+      z-index: 2;
     }
     
     .recovery-header p {
@@ -39,10 +130,12 @@
       max-width: 600px;
       margin: 0 auto;
       font-size: 1.1rem;
+      position: relative;
+      z-index: 2;
     }
     
     .recovery-form {
-      background: var(--ios-system-background);
+      background-color: var(--card-bg-light);
       border-radius: 24px;
       padding: 32px;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
@@ -50,206 +143,640 @@
       max-width: 550px;
       margin-left: auto;
       margin-right: auto;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      transition: transform 0.3s var(--animation-timing-apple),
+                box-shadow 0.3s var(--animation-timing-apple);
     }
     
-    .form-title {
-      font-weight: 700;
-      margin-bottom: 24px;
+    .recovery-form:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    .recovery-steps {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 30px;
+    }
+    
+    .step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 20px;
       position: relative;
-      padding-bottom: 12px;
     }
     
-    .form-title::after {
+    .step:not(:last-child)::after {
       content: '';
       position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 60px;
-      height: 4px;
+      top: 14px;
+      right: -15px;
+      width: 30px;
+      height: 2px;
+      background: var(--ios-gray5);
+    }
+    
+    .step.active:not(:last-child)::after {
       background: linear-gradient(to right, var(--ios-purple), var(--ios-pink));
-      border-radius: 2px;
+    }
+    
+    .step-number {
+      width: 30px;
+      height: 30px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 50%;
+      margin-bottom: 8px;
+      font-weight: 600;
+      background: var(--ios-gray5);
+      color: var(--ios-gray);
+      transition: all 0.3s var(--animation-timing-apple);
+    }
+    
+    .step.active .step-number {
+      background: linear-gradient(135deg, var(--ios-purple), var(--ios-pink));
+      color: white;
+      box-shadow: 0 4px 10px rgba(175, 82, 222, 0.3);
+      animation: pulse-step 1.5s infinite alternate cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+    
+    @keyframes pulse-step {
+      0% { transform: scale(1); box-shadow: 0 4px 10px rgba(175, 82, 222, 0.3); }
+      100% { transform: scale(1.05); box-shadow: 0 6px 14px rgba(175, 82, 222, 0.5); }
+    }
+    
+    .step-label {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--ios-gray);
+      transition: color 0.3s var(--animation-timing-apple);
+    }
+    
+    .step.active .step-label {
+      color: var(--ios-purple);
+      font-weight: 600;
     }
     
     .form-group label {
-      font-weight: 600;
-      margin-bottom: 8px;
+      font-weight: 500;
       color: var(--ios-label);
+      margin-bottom: 8px;
+      font-size: 0.9rem;
     }
     
     .form-control {
       border-radius: 12px;
-      border: 1px solid var(--ios-gray-light);
-      padding: 12px 16px;
+      padding: 12px 15px;
+      border: 1px solid var(--ios-gray5);
       transition: all 0.3s var(--animation-timing-apple);
     }
     
     .form-control:focus {
-      border-color: var(--ios-blue);
-      box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
+      border-color: var(--ios-purple);
+      box-shadow: 0 0 0 3px rgba(175, 82, 222, 0.15);
     }
     
-    .btn-recovery {
+    .btn-primary {
       background: linear-gradient(135deg, var(--ios-purple), var(--ios-pink));
-      color: white;
       border: none;
       border-radius: 12px;
       padding: 12px 24px;
       font-weight: 600;
       transition: all 0.3s var(--animation-timing-apple);
-      box-shadow: 0 6px 16px rgba(175, 82, 222, 0.15);
-      margin-top: 8px;
+      box-shadow: 0 4px 12px rgba(175, 82, 222, 0.2);
     }
     
-    .btn-recovery:hover {
+    .btn-primary:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(175, 82, 222, 0.25);
+      box-shadow: 0 6px 16px rgba(175, 82, 222, 0.3);
+      background: linear-gradient(135deg, var(--ios-purple), var(--ios-pink));
+    }
+    
+    .btn-primary:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 8px rgba(175, 82, 222, 0.3);
+    }
+    
+    .verification-code {
+      display: flex;
+      justify-content: space-between;
+    }
+    
+    .verification-code .form-control {
+      width: 50px;
+      height: 60px;
+      margin: 0 5px;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+    
+    .form-step {
+      display: none;
+    }
+    
+    .form-step.active {
+      display: block;
+      animation: fadeIn 0.5s var(--animation-timing-apple);
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .recovery-info {
+      text-align: center;
+      color: var(--ios-gray);
+      font-size: 0.9rem;
+      margin-top: -20px;
+      margin-bottom: 30px;
+    }
+    
+    .recovery-info a {
+      color: var(--ios-purple);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    
+    .recovery-info a:hover {
+      text-decoration: underline;
+    }
+    
+    /* Theme toggle button */
+    .theme-toggle {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      width: 50px;
+      height: 50px;
+      border-radius: 25px;
+      background: var(--ios-system-background);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      cursor: pointer;
+      z-index: 100;
+      transition: all 0.3s var(--animation-timing-apple);
+    }
+    
+    .theme-toggle:hover {
+      transform: scale(1.05);
+    }
+    
+    .theme-toggle i {
+      font-size: 24px;
+      color: var(--ios-gray);
+    }
+    
+    /* Animation classes */
+    .fade-in-up {
+      animation: fadeInUp 0.6s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+      opacity: 0;
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+    .delay-4 { animation-delay: 0.4s; }
+    .delay-5 { animation-delay: 0.5s; }
+    
+    /* Dark mode adaptations */
+    @media (prefers-color-scheme: dark) {
+      body.auto-theme {
+        background-color: #1C1C1E;
+        color: var(--text-color-dark);
+      }
+      
+      body.auto-theme .recovery-form {
+        background-color: var(--card-bg-dark);
+      }
+      
+      body.auto-theme .step-number {
+        background: #3A3A3C;
+        color: rgba(255, 255, 255, 0.7);
+      }
+      
+      body.auto-theme .step-label {
+        color: rgba(255, 255, 255, 0.6);
+      }
+      
+      body.auto-theme .step.active .step-label {
+        color: #BF5AF2;
+      }
+      
+      body.auto-theme .step:not(:last-child)::after {
+        background: #3A3A3C;
+      }
+      
+      body.auto-theme .form-control {
+        background-color: #2C2C2E;
+        border-color: rgba(255, 255, 255, 0.1);
+        color: #FFFFFF;
+      }
+      
+      body.auto-theme .form-control:focus {
+        background-color: #3A3A3C;
+        border-color: #BF5AF2;
+        color: #FFFFFF;
+      }
+      
+      body.auto-theme label {
+        color: rgba(255, 255, 255, 0.8);
+      }
+      
+      body.auto-theme .theme-toggle {
+        background-color: rgba(44, 44, 46, 0.8);
+      }
+      
+      body.auto-theme .theme-toggle i {
+        color: #AEAEB2;
+      }
+      
+      body.auto-theme .recovery-info {
+        color: rgba(255, 255, 255, 0.6);
+      }
+      
+      body.auto-theme .recovery-info a {
+        color: #BF5AF2;
+      }
+    }
+    
+    /* Manual theme classes */
+    body.dark-theme {
+      background-color: #1C1C1E;
+      color: var(--text-color-dark);
+    }
+    
+    body.dark-theme .recovery-form {
+      background-color: var(--card-bg-dark);
+    }
+    
+    body.dark-theme .step-number {
+      background: #3A3A3C;
+      color: rgba(255, 255, 255, 0.7);
+    }
+    
+    body.dark-theme .step-label {
+      color: rgba(255, 255, 255, 0.6);
+    }
+    
+    body.dark-theme .step.active .step-label {
+      color: #BF5AF2;
+    }
+    
+    body.dark-theme .step:not(:last-child)::after {
+      background: #3A3A3C;
+    }
+    
+    body.dark-theme .form-control {
+      background-color: #2C2C2E;
+      border-color: rgba(255, 255, 255, 0.1);
+      color: #FFFFFF;
+    }
+    
+    body.dark-theme .form-control:focus {
+      background-color: #3A3A3C;
+      border-color: #BF5AF2;
+      color: #FFFFFF;
+    }
+    
+    body.dark-theme label {
+      color: rgba(255, 255, 255, 0.8);
+    }
+    
+    body.dark-theme .theme-toggle {
+      background-color: rgba(44, 44, 46, 0.8);
+    }
+    
+    body.dark-theme .theme-toggle i {
+      color: #AEAEB2;
+    }
+    
+    body.dark-theme .recovery-info {
+      color: rgba(255, 255, 255, 0.6);
+    }
+    
+    body.dark-theme .recovery-info a {
+      color: #BF5AF2;
+    }
+    
+    body.light-theme {
+      background-color: #F2F2F7;
+      color: var(--text-color-light);
     }
   </style>
 </head>
-<body>
+<body class="auto-theme">
+<!-- Add frosted glass background -->
+<div class="frosted-glass"></div>
+
+<!-- Add ambient glow effects -->
+<div class="glow-effect glow-purple"></div>
+<div class="glow-effect glow-pink"></div>
+
 <!-- 导航栏容器，将由JavaScript加载 -->
 <div id="navbar-container"></div>
 
 <header class="recovery-header">
   <div class="container">
-    <h1>Password Recovery</h1>
-    <p>We'll help you reset your password and get back to tracking your carbon footprint</p>
+    <h1 class="fade-in-up">Password Recovery</h1>
+    <p class="fade-in-up delay-1">Follow the steps below to reset your password and regain access to your account.</p>
   </div>
 </header>
 
-<!-- Password Recovery Section -->
 <div class="container">
-  <div class="recovery-form ios-depth-effect">
-    <h2 class="form-title">Reset Your Password</h2>
-    <form id="passwordRecoveryForm">
-      <div class="form-group">
-        <label for="recoveryEmail">Email Address</label>
-        <input type="email" class="form-control" id="recoveryEmail" placeholder="Enter your registered email address" required>
-        <small class="form-text text-muted">We'll send a verification code to this email</small>
-      </div>
-      <button type="button" class="btn btn-recovery btn-block" id="sendRecoveryCode">
-        <i class="fas fa-paper-plane mr-2"></i> Send Verification Code
-      </button>
-    </form>
+  <div class="recovery-steps fade-in-up delay-2">
+    <div class="step active" id="step1">
+      <div class="step-number">1</div>
+      <div class="step-label">Verify Email</div>
+    </div>
+    <div class="step" id="step2">
+      <div class="step-number">2</div>
+      <div class="step-label">Enter Code</div>
+    </div>
+    <div class="step" id="step3">
+      <div class="step-number">3</div>
+      <div class="step-label">Reset Password</div>
+    </div>
   </div>
-</div>
-
-<!-- Password Reset Modal -->
-<div class="modal fade" id="passwordResetModal" tabindex="-1" role="dialog" aria-labelledby="passwordResetModalLabel"
-     aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="passwordResetModalLabel">Reset Password</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
+  
+  <div class="recovery-form ios-depth-effect fade-in-up delay-3">
+    <!-- Step 1: Enter Email Address -->
+    <div class="form-step active" id="step1-content">
+      <h3 class="mb-4">Verify Your Email</h3>
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" class="form-control" id="email" placeholder="Enter your registered email">
       </div>
-      <div class="modal-body">
-        <form id="passwordResetForm">
-          <div class="form-group">
-            <label for="resetCode">Verification Code</label>
-            <input type="text" class="form-control" id="resetCode" placeholder="Enter the verification code from your email" required>
-          </div>
-          <div class="form-group">
-            <label for="newPassword">New Password</label>
-            <input type="password" class="form-control" id="newPassword" placeholder="Enter your new password" required>
-            <small class="form-text text-muted">Use a strong password with at least 8 characters</small>
-          </div>
-          <button type="submit" class="btn btn-recovery btn-block">
-            <i class="fas fa-key mr-2"></i> Reset Password
-          </button>
-        </form>
+      <div class="text-right mt-4">
+        <button type="button" class="btn btn-primary" id="nextToStep2">Send Verification Code</button>
+      </div>
+    </div>
+    
+    <!-- Step 2: Enter Verification Code -->
+    <div class="form-step" id="step2-content">
+      <h3 class="mb-4">Enter Verification Code</h3>
+      <p class="mb-4">We've sent a 4-digit verification code to your email. Please enter it below.</p>
+      <div class="form-group">
+        <div class="verification-code">
+          <input type="text" class="form-control digit" id="digit1" maxlength="1" autofocus>
+          <input type="text" class="form-control digit" id="digit2" maxlength="1">
+          <input type="text" class="form-control digit" id="digit3" maxlength="1">
+          <input type="text" class="form-control digit" id="digit4" maxlength="1">
+        </div>
+      </div>
+      <div class="text-right mt-4">
+        <button type="button" class="btn btn-link" id="backToStep1">Back</button>
+        <button type="button" class="btn btn-primary" id="nextToStep3">Verify Code</button>
+      </div>
+    </div>
+    
+    <!-- Step 3: Reset Password -->
+    <div class="form-step" id="step3-content">
+      <h3 class="mb-4">Reset Your Password</h3>
+      <div class="form-group">
+        <label for="newPassword">New Password</label>
+        <input type="password" class="form-control" id="newPassword" placeholder="Enter new password">
+      </div>
+      <div class="form-group">
+        <label for="confirmPassword">Confirm Password</label>
+        <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm new password">
+      </div>
+      <div class="text-right mt-4">
+        <button type="button" class="btn btn-link" id="backToStep2">Back</button>
+        <button type="button" class="btn btn-primary" id="resetPassword">Reset Password</button>
       </div>
     </div>
   </div>
+  
+  <div class="recovery-info fade-in-up delay-4">
+    <p>Remember your password? <a href="index.html">Log in</a></p>
+  </div>
 </div>
 
+<!-- Theme toggle button -->
+<div class="theme-toggle" id="themeToggle">
+  <i class="fas fa-moon"></i>
+</div>
+
+<!-- 页脚 -->
+<div id="footer-placeholder"></div>
+
 <script>
-  // Send verification code
-  $('#sendRecoveryCode').on('click', function () {
-    var email = $('#recoveryEmail').val()
-    if (email) {
-      // Show loading state
-      $(this).html('<i class="fas fa-spinner fa-spin mr-2"></i> Sending...')
-      $(this).prop('disabled', true)
+  // Theme toggling functionality
+  document.addEventListener('DOMContentLoaded', function() {
+    const themeToggle = document.getElementById('themeToggle');
+    const body = document.body;
+    const icon = themeToggle.querySelector('i');
+    
+    // Check if user has a saved preference
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      body.className = savedTheme;
+      updateIcon(savedTheme);
+    }
+    
+    themeToggle.addEventListener('click', () => {
+      if (body.classList.contains('auto-theme')) {
+        body.classList.remove('auto-theme');
+        body.classList.add('dark-theme');
+        localStorage.setItem('theme', 'dark-theme');
+      } else if (body.classList.contains('dark-theme')) {
+        body.classList.remove('dark-theme');
+        body.classList.add('light-theme');
+        localStorage.setItem('theme', 'light-theme');
+      } else {
+        body.classList.remove('light-theme');
+        body.classList.add('auto-theme');
+        localStorage.setItem('theme', 'auto-theme');
+      }
+      
+      updateIcon(body.className);
+    });
+    
+    function updateIcon(theme) {
+      if (theme === 'dark-theme') {
+        icon.className = 'fas fa-sun';
+      } else if (theme === 'light-theme') {
+        icon.className = 'fas fa-adjust';
+      } else {
+        icon.className = 'fas fa-moon';
+      }
+    }
+  
+    // Set up navigation between steps
+    document.getElementById('nextToStep2').addEventListener('click', function() {
+      const email = document.getElementById('email').value;
+      if (!email) {
+        showAlert('Please enter your email address', 'warning');
+        return;
+      }
+      
+      // Send verification code
+      $.ajax({
+        type: 'POST',
+        url: 'sendVerificationCode.php',
+        data: { email: email },
+        dataType: 'json',
+        success: function(response) {
+          if (response.success) {
+            goToStep(2);
+            showAlert('Verification code sent to your email', 'success');
+          } else {
+            showAlert(response.message || 'Error sending verification code', 'error');
+          }
+        },
+        error: function() {
+          showAlert('Error connecting to server. Please try again.', 'error');
+        }
+      });
+    });
+    
+    document.getElementById('backToStep1').addEventListener('click', function() {
+      goToStep(1);
+    });
+    
+    document.getElementById('nextToStep3').addEventListener('click', function() {
+      // Verify the code
+      const digit1 = document.getElementById('digit1').value;
+      const digit2 = document.getElementById('digit2').value;
+      const digit3 = document.getElementById('digit3').value;
+      const digit4 = document.getElementById('digit4').value;
+      const code = digit1 + digit2 + digit3 + digit4;
+      
+      if (code.length !== 4) {
+        showAlert('Please enter all four digits of the verification code', 'warning');
+        return;
+      }
+      
+      const email = document.getElementById('email').value;
       
       $.ajax({
         type: 'POST',
-        url: 'sendRecoveryCode.php', // PHP script to send the verification code
-        data: { email: email },
+        url: 'recovery.php',
+        data: { email: email, code: code, action: 'verify' },
         dataType: 'json',
-        success: function (response) {
-          // Reset button state
-          $('#sendRecoveryCode').html('<i class="fas fa-paper-plane mr-2"></i> Send Verification Code')
-          $('#sendRecoveryCode').prop('disabled', false)
-          
+        success: function(response) {
           if (response.success) {
-            $('#passwordResetModal').modal('show') // Show the password reset modal
+            goToStep(3);
           } else {
-            showAlert('验证码发送失败：' + response.error, 'error')
+            showAlert(response.message || 'Invalid verification code', 'error');
           }
         },
-        error: function () {
-          // Reset button state
-          $('#sendRecoveryCode').html('<i class="fas fa-paper-plane mr-2"></i> Send Verification Code')
-          $('#sendRecoveryCode').prop('disabled', false)
-          showAlert('请求失败，请稍后再试。', 'error')
-        },
-      })
-    } else {
-      showAlert('请输入您的邮箱地址。', 'warning')
-    }
-  })
-
-  // Reset password
-  $('#passwordResetForm').submit(function (event) {
-    event.preventDefault()
-    var email = $('#recoveryEmail').val()
-    var code = $('#resetCode').val()
-    var newPassword = $('#newPassword').val()
-    
-    // Show loading state
-    $(this).find('button[type="submit"]').html('<i class="fas fa-spinner fa-spin mr-2"></i> Processing...')
-    $(this).find('button[type="submit"]').prop('disabled', true)
-    
-    $.ajax({
-      type: 'POST',
-      url: 'recovery.php', // PHP script to reset the password
-      data: {
-        email: email,
-        verificationCode: code,
-        newPassword: newPassword,
-      },
-      dataType: 'json',
-      success: function (response) {
-        // Reset button state
-        $('#passwordResetForm').find('button[type="submit"]').html('<i class="fas fa-key mr-2"></i> Reset Password')
-        $('#passwordResetForm').find('button[type="submit"]').prop('disabled', false)
-        
-        if (response.success) {
-          showAlert('密码重置成功！您现在可以使用新密码登录。', 'success', function() {
-            $('#passwordResetModal').modal('hide')
-            // Redirect to login page after successful reset
-            setTimeout(function() {
-              window.location.href = 'index.html'
-            }, 500)
-          })
-        } else {
-          showAlert('密码重置失败：' + response.error, 'error')
+        error: function() {
+          showAlert('Error connecting to server. Please try again.', 'error');
         }
-      },
-      error: function () {
-        // Reset button state
-        $('#passwordResetForm').find('button[type="submit"]').html('<i class="fas fa-key mr-2"></i> Reset Password')
-        $('#passwordResetForm').find('button[type="submit"]').prop('disabled', false)
-        showAlert('请求失败，请稍后再试。', 'error')
-      },
-    })
-  })
+      });
+    });
+    
+    document.getElementById('backToStep2').addEventListener('click', function() {
+      goToStep(2);
+    });
+    
+    document.getElementById('resetPassword').addEventListener('click', function() {
+      const newPassword = document.getElementById('newPassword').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      
+      if (!newPassword) {
+        showAlert('Please enter your new password', 'warning');
+        return;
+      }
+      
+      if (newPassword !== confirmPassword) {
+        showAlert('Passwords do not match', 'warning');
+        return;
+      }
+      
+      const email = document.getElementById('email').value;
+      const digit1 = document.getElementById('digit1').value;
+      const digit2 = document.getElementById('digit2').value;
+      const digit3 = document.getElementById('digit3').value;
+      const digit4 = document.getElementById('digit4').value;
+      const code = digit1 + digit2 + digit3 + digit4;
+      
+      $.ajax({
+        type: 'POST',
+        url: 'recovery.php',
+        data: { 
+          email: email, 
+          code: code, 
+          new_password: newPassword,
+          action: 'reset'
+        },
+        dataType: 'json',
+        success: function(response) {
+          if (response.success) {
+            showAlert('Password reset successful! You can now log in with your new password', 'success');
+            setTimeout(function() {
+              window.location.href = 'index.html';
+            }, 2000);
+          } else {
+            showAlert(response.message || 'Password reset failed', 'error');
+          }
+        },
+        error: function() {
+          showAlert('Error connecting to server. Please try again.', 'error');
+        }
+      });
+    });
+    
+    // Auto focus next input in verification code
+    const digitInputs = document.querySelectorAll('.digit');
+    digitInputs.forEach(function(input, index) {
+      input.addEventListener('input', function() {
+        if (this.value.length === this.maxLength && index < digitInputs.length - 1) {
+          digitInputs[index + 1].focus();
+        }
+      });
+      
+      input.addEventListener('keydown', function(e) {
+        if (e.key === 'Backspace' && !this.value && index > 0) {
+          digitInputs[index - 1].focus();
+        }
+      });
+    });
+    
+    function goToStep(step) {
+      // Update step indicators
+      document.querySelectorAll('.step').forEach(function(stepEl, index) {
+        if (index + 1 < step) {
+          stepEl.classList.add('active');
+          stepEl.classList.add('completed');
+        } else if (index + 1 === step) {
+          stepEl.classList.add('active');
+          stepEl.classList.remove('completed');
+        } else {
+          stepEl.classList.remove('active');
+          stepEl.classList.remove('completed');
+        }
+      });
+      
+      // Show the correct step content
+      document.querySelectorAll('.form-step').forEach(function(content, index) {
+        if (index + 1 === step) {
+          content.classList.add('active');
+        } else {
+          content.classList.remove('active');
+        }
+      });
+    }
+  });
 </script>
-
-<div id="footer-placeholder"></div>
-
 </body>
 </html>

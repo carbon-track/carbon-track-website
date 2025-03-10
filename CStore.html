@@ -518,7 +518,7 @@
 <!-- 页脚 -->
 <div id="footer-placeholder"></div>
 
-<script>
+  <script>
   // Theme toggling functionality
   document.addEventListener('DOMContentLoaded', function() {
     const themeToggle = document.getElementById('themeToggle');
@@ -561,69 +561,69 @@
     }
   });
   
-  $(document).ready(function () {
+    $(document).ready(function () {
     var token = localStorage.getItem('token')
-    if (token) {
-    } else {
-      $('#userPoints').text('未登录')
+      if (token) {
+      } else {
+        $('#userPoints').text('未登录')
       showAlert('请先登录。', 'warning', function() {
         window.location.href = 'index.html'
       })
-    }
-    // 获取用户积分
-    fetchUserPoints()
+      }
+      // 获取用户积分
+      fetchUserPoints()
 
-    // 从PHP接口获取商品数据
-    fetchProducts()
+      // 从PHP接口获取商品数据
+      fetchProducts()
 
-    // 兑换商品
-    $('#productsList').on('click', '.exchange-btn', function () {
-      var productId = $(this).data('id')
+      // 兑换商品
+      $('#productsList').on('click', '.exchange-btn', function () {
+        var productId = $(this).data('id')
       var token = localStorage.getItem('token')
-      exchangeProduct(productId, token)
+        exchangeProduct(productId, token)
+      })
     })
-  })
 
-  function fetchProducts() {
+    function fetchProducts() {
     var token = localStorage.getItem('token')
-    $('#loading').show() // 显示加载动画
-    $.ajax({
-      type: 'POST',
-      url: 'product.php',
+      $('#loading').show() // 显示加载动画
+      $.ajax({
+        type: 'POST',
+        url: 'product.php',
       data: {
         token: token
       },
-      dataType: 'json',
-      success: function (response) {
-        $('#loading').hide() // 隐藏加载动画
-        if (response.success) {
+        dataType: 'json',
+        success: function (response) {
+          $('#loading').hide() // 隐藏加载动画
+          if (response.success) {
           displayProducts(response.products)
-        } else {
+          } else {
           $('#productsList').html('<div class="alert alert-danger">Error: ' + response.message + '</div>')
-        }
-      },
+          }
+        },
       error: function () {
-        $('#loading').hide() // 隐藏加载动画
+          $('#loading').hide() // 隐藏加载动画
         $('#productsList').html('<div class="alert alert-danger">Failed to fetch products. Please try again later.</div>')
       }
-    })
-  }
+      })
+    }
 
-  function fetchUserPoints() {
+    function fetchUserPoints() {
     var uid = localStorage.getItem('id')
     var token = localStorage.getItem('token')
-    $.ajax({
-      type: 'POST',
-      url: 'get_user_points.php',
+      $.ajax({
+        type: 'POST',
+        url: 'get_user_points.php',
       data: {
         uid: uid,
         token: token
       },
-      dataType: 'json',
-      success: function (response) {
-        if (response.success) {
+        dataType: 'json',
+        success: function (response) {
+          if (response.success) {
           $('#userPoints').text(response.points)
-        } else {
+          } else {
           console.error('Error getting user points:', response.message)
         }
       },
@@ -675,22 +675,22 @@
     $('#productsList').html(productsRow)
   }
 
-  function exchangeProduct(productId, token) {
-    $.ajax({
-      type: 'POST',
-      url: 'exchange_product.php',
+    function exchangeProduct(productId, token) {
+      $.ajax({
+        type: 'POST',
+        url: 'exchange_product.php',
       data: {
         product_id: productId,
         token: token
       },
-      dataType: 'json',
-      success: function (response) {
-        if (response.success) {
+        dataType: 'json',
+        success: function (response) {
+          if (response.success) {
           showAlert('兑换成功！' + response.message, 'success');
           // 更新用户积分和产品列表
           fetchUserPoints()
           fetchProducts()
-        } else {
+          } else {
           showAlert('兑换失败：' + response.message, 'error');
         }
       },
@@ -699,6 +699,6 @@
       }
     })
   }
-</script>
+  </script>
 </body>
 </html>
