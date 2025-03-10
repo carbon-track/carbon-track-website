@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
+  <!-- 背景圆形 -->
+  <circle cx="250" cy="250" r="240" fill="#f0f8ff" />
+  
+  <!-- 消息气泡-左 -->
+  <rect x="80" y="180" width="150" height="80" rx="20" ry="20" fill="#e6e6e6" />
+  <circle cx="100" cy="280" r="20" fill="#e6e6e6" />
+  
+  <!-- 消息气泡-右 -->
+  <rect x="270" y="230" width="150" height="80" rx="20" ry="20" fill="#dcf8c6" />
+  <circle cx="400" cy="330" r="20" fill="#dcf8c6" />
+  
+  <!-- 中间装饰 -->
+  <circle cx="250" cy="250" r="60" fill="#007bff" opacity="0.2" />
+  <path d="M250,220 L280,260 L250,280 L220,260 Z" fill="#007bff" />
+  
+  <!-- 小装饰点 -->
+  <circle cx="150" cy="120" r="15" fill="#007bff" opacity="0.3" />
+  <circle cx="350" cy="140" r="10" fill="#007bff" opacity="0.3" />
+  <circle cx="390" cy="180" r="8" fill="#007bff" opacity="0.3" />
+  <circle cx="120" cy="350" r="12" fill="#007bff" opacity="0.3" />
+  <circle cx="330" cy="380" r="10" fill="#007bff" opacity="0.3" />
+</svg> 

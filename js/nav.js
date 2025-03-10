@@ -894,6 +894,82 @@ function ensureMessageStyles() {
                 background-color: #e9ecef;
                 border-left: 3px solid #007bff;
             }
+            
+            /* 未选择对话时的欢迎界面样式 */
+            .no-conversation {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                height: 100%;
+                width: 100%;
+                background-color: #f8f9fa;
+                border-radius: 12px;
+                padding: 20px;
+            }
+            
+            .welcome-message {
+                text-align: center;
+                max-width: 500px;
+                padding: 30px;
+                background-color: white;
+                border-radius: 16px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            }
+            
+            .welcome-img {
+                width: 150px;
+                height: 150px;
+                margin-bottom: 20px;
+            }
+            
+            .welcome-message h3 {
+                font-size: 24px;
+                color: #333;
+                margin-bottom: 15px;
+            }
+            
+            .welcome-message p {
+                color: #666;
+                margin-bottom: 25px;
+                font-size: 16px;
+            }
+            
+            .welcome-features {
+                display: flex;
+                justify-content: space-around;
+                margin-top: 20px;
+                flex-wrap: wrap;
+            }
+            
+            .feature-item {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                margin: 10px;
+                width: 120px;
+                padding: 15px;
+                border-radius: 8px;
+                background-color: #f8f9fa;
+                transition: transform 0.2s, box-shadow 0.2s;
+            }
+            
+            .feature-item:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+            }
+            
+            .feature-item i {
+                font-size: 24px;
+                color: #007bff;
+                margin-bottom: 10px;
+            }
+            
+            .feature-item span {
+                font-size: 14px;
+                color: #555;
+                text-align: center;
+            }
         </style>`;
         $('head').append(messageStyles);
         console.log('添加了消息样式到页面');
@@ -1679,8 +1755,25 @@ function initMessageModal() {
                                     </div>
                                 </div>
                                 <div id="noConversationSelected" class="no-conversation">
-                                    <i class="fas fa-comments"></i>
-                                    <p>选择一个会话开始聊天</p>
+                                    <div class="welcome-message">
+                                        <img src="img/message_welcome.svg" alt="欢迎使用站内信" class="welcome-img" onerror="this.onerror=null; this.src=''; this.style.display='none'; document.querySelector('.welcome-message').style.paddingTop='10px';">
+                                        <h3>欢迎使用站内信</h3>
+                                        <p>从左侧选择一个联系人开始对话，或者开始一个新的对话</p>
+                                        <div class="welcome-features">
+                                            <div class="feature-item">
+                                                <i class="fas fa-shield-alt"></i>
+                                                <span>安全加密的消息</span>
+                                            </div>
+                                            <div class="feature-item">
+                                                <i class="fas fa-bell"></i>
+                                                <span>实时消息通知</span>
+                                            </div>
+                                            <div class="feature-item">
+                                                <i class="fas fa-history"></i>
+                                                <span>完整的消息历史</span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
