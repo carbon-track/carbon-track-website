@@ -38,10 +38,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmtSelect = $pdo->prepare("
             SELECT message_id, sender_id, receiver_id, content, is_read, send_time 
             FROM messages 
-            WHERE receiver_id = :user_id OR sender_id = :user_id
+            WHERE receiver_id = :receiver_id OR sender_id = :sender_id
             ORDER BY send_time ASC
         ");
-        $stmtSelect->execute([':user_id' => $userId]);
+        $stmtSelect->execute([':receiver_id' => $userId, ':sender_id' => $userId]);
+
         $messages = $stmtSelect->fetchAll(PDO::FETCH_ASSOC);
         
         // 记录查询结果
