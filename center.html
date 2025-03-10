@@ -107,9 +107,9 @@
     }
     
     /* 按钮激活状态 */
-    .btn-group .btn-secondary.active {
-      background-color: #007AFF;
-      color: white;
+    .btn-group .btn.active {
+      background-color: #007AFF !important;
+      color: white !important;
       box-shadow: 0 4px 12px rgba(0, 122, 255, 0.15);
     }
     
@@ -309,11 +309,67 @@
       
       .info-value {
         background: rgba(0, 122, 255, 0.2);
+        color: #64D2FF;
+      }
+      
+      .card-text {
+        color: #FFFFFF;
+      }
+      
+      .ios-section-heading {
+        color: #FFFFFF;
+      }
+      
+      .leaderboard-table {
+        color: #FFFFFF;
+      }
+      
+      .leaderboard-table thead th {
+        color: #64D2FF;
+        border-bottom-color: rgba(255, 255, 255, 0.1);
+      }
+      
+      .leaderboard-table tbody td {
+        color: #FFFFFF;
       }
       
       .ios-btn-group .btn {
         background-color: rgba(44, 44, 46, 0.8);
         color: #8E8E93;
+      }
+      
+      .ios-btn-group .btn:hover {
+        background-color: rgba(0, 122, 255, 0.2);
+        color: #64D2FF;
+      }
+      
+      .ios-btn-group .btn.active {
+        background-color: #0A84FF !important;
+        color: white !important;
+      }
+      
+      .modal-content {
+        background-color: #2C2C2E;
+        color: #FFFFFF;
+      }
+      
+      .modal-header, .modal-footer {
+        border-color: rgba(255, 255, 255, 0.1);
+      }
+      
+      .form-control {
+        background-color: #3A3A3C;
+        border-color: rgba(255, 255, 255, 0.1);
+        color: #FFFFFF;
+      }
+      
+      .form-control:focus {
+        background-color: #3A3A3C;
+        color: #FFFFFF;
+      }
+      
+      .close {
+        color: #FFFFFF;
       }
     }
   </style>
@@ -367,7 +423,7 @@
 <div class="container content-container fade-in-up delay-4">
   <h2 class="ios-section-heading">Carbon Credits Leaderboards</h2>
   <!-- 排行榜切换按钮 -->
-  <div class="btn-group ios-btn-group mb-4" role="group" aria-label="Ranking Filters">
+  <div class="ios-btn-group mb-4" role="group" aria-label="Ranking Filters">
     <button type="button" class="btn active" id="allRankingBtn">
       <i class="fas fa-globe-asia mr-2"></i>Global Leaderboard
     </button>
@@ -441,10 +497,10 @@
 <div id="footer-placeholder"></div>
 
 <script>
-  // 添加按钮点击状态切换
   $(document).ready(function() {
-    $('.btn-group .btn').click(function() {
-      $('.btn-group .btn').removeClass('active');
+    // 添加按钮点击状态切换
+    $('.ios-btn-group .btn').click(function() {
+      $('.ios-btn-group .btn').removeClass('active');
       $(this).addClass('active');
     });
     
@@ -452,11 +508,11 @@
     document.getElementById('navigateButton').addEventListener('click', function () {
       window.location.href = 'pthis.html' // 指定要跳转的页面
     });
-  });
-
-  $(document).ready(function () {
-    bindRankingButtons()
-    switchRanking('all')
+    
+    // 初始化
+    bindRankingButtons();
+    switchRanking('all');
+    
     var token = localStorage.getItem('token') // 假设用户的 token 存储在 localStorage
     if (token) {
       $.ajax({
@@ -473,13 +529,13 @@
             // 清空排行榜表格
             $('#leaderboard').empty()
 
-// 根据排名获取相应的行的 CSS 类
+            // 根据排名获取相应的行的 CSS 类
             function getRowClass(rank) {
               var classes = ['rank-1', 'rank-2', 'rank-3']
               return rank <= 3 ? classes[rank - 1] : ''
             }
 
-// 遍历排行榜数据并添加到表格中
+            // 遍历排行榜数据并添加到表格中
             $.each(response.leaderboard, function (index, user) {
               var rank = index + 1 // 排名是索引加1
               var rankIcon = getRankIcon(rank) // 获取排名图标
@@ -499,8 +555,6 @@
               }
               return rank // 其他排名只显示数字
             }
-
-
           } else {
             $('#userPoints').text('无法加载积分')
             alert('获取积分失败: ' + response.error)
@@ -517,6 +571,7 @@
       alert('请先登录。')
       window.location.href = 'index.html'
     }
+    
     // 加载国家和学校数据
     loadCountries()
     loadSchools()
@@ -571,7 +626,7 @@
         },
       })
     })
-  })
+  });
 
   function logout() {
     localStorage.removeItem('token') // 确保移除正确的 localStorage 项
@@ -671,6 +726,7 @@
 
   // 切换排行榜类型的事件处理函数
   function switchRanking(type) {
+    console.log('切换排行榜类型:', type);
     var token = localStorage.getItem('token')
     var userLocation = $('#userLocation').text() // 获取用户地区
     var userSchool = $('#userSchool').text() // 获取用户学校
@@ -737,19 +793,30 @@
 
   function bindRankingButtons() {
     $('#allRankingBtn').off('click').on('click', function () {
-      switchRanking('all')
-    })
+      console.log('点击全服排行榜按钮');
+      $('.ios-btn-group .btn').removeClass('active');
+      $(this).addClass('active');
+      switchRanking('all');
+    });
+    
     $('#localRankingBtn').off('click').on('click', function () {
-      var userLocation = $('#userLocation').text().trim() // 使用.trim()去除可能的空白字符
+      console.log('点击地区排行榜按钮');
+      $('.ios-btn-group .btn').removeClass('active');
+      $(this).addClass('active');
+      var userLocation = $('#userLocation').text().trim();
       if (userLocation) {
-        switchRanking('local', userLocation) // 如果地区信息不为空，则提交
+        switchRanking('local');
       } else {
-        alert('用户地区信息未加载，请稍后再试。')
+        alert('用户地区信息未加载，请稍后再试。');
       }
-    })
+    });
+    
     $('#schoolRankingBtn').off('click').on('click', function () {
-      switchRanking('school')
-    })
+      console.log('点击学校排行榜按钮');
+      $('.ios-btn-group .btn').removeClass('active');
+      $(this).addClass('active');
+      switchRanking('school');
+    });
   }
 
   function logout() {
