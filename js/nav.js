@@ -1431,58 +1431,124 @@ function loadConversations() {
     // 显示加载状态
     $('#conversationList').html('<div class="text-center"><div class="spinner-border spinner-border-sm text-primary" role="status"></div><span class="ms-2">加载中...</span></div>');
 
-    // 发送AJAX请求获取会话列表
+    // 使用getmsg.php获取所有消息，然后从消息中构建会话列表
     $.ajax({
-        url: 'get_conversations.php',
+        url: 'getmsg.php',
         type: 'GET',
-        headers: {
-            'Authorization': 'Bearer ' + token
+        data: {
+            token: token
         },
         success: function(response) {
             if (response.success) {
                 // 清空列表
                 $('#conversationList').empty();
                 
-                // 处理数据
-                if (response.conversations && response.conversations.length > 0) {
-                    // 显示会话
-                    response.conversations.forEach(function(conversation) {
-                        var lastMessage = conversation.last_message || '无消息';
-                        var unreadCount = conversation.unread_count || 0;
-                        var unreadBadge = unreadCount > 0 ? `<span class="badge bg-danger rounded-pill">${unreadCount}</span>` : '';
+                // 从消息中提取唯一的对话者
+                const conversations = {};
+                const currentUserId = response.user_id || "";
+                
+                if (response.messages && response.messages.length > 0) {
+                    // 处理消息，构建会话列表
+                    response.messages.forEach(function(message) {
+                        // 确定对话者ID
+                        let partnerId;
                         
-                        var conversationItem = `
-                            <div class="conversation-item p-2 border-bottom" data-user-id="${conversation.user_id}">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="mb-0">${sanitizeHTML(conversation.username)}</h6>
-                                        <small class="text-muted">${sanitizeHTML(lastMessage)}</small>
-                                    </div>
-                                    ${unreadBadge}
-                                </div>
-                            </div>
-                        `;
+                        // 如果当前用户是发送者，那么接收者就是对话伙伴
+                        if (message.sender_id == currentUserId) {
+                            partnerId = message.receiver_id;
+                        } else {
+                            // 否则发送者是对话伙伴
+                            partnerId = message.sender_id;
+                        }
                         
-                        $('#conversationList').append(conversationItem);
+                        // 如果这个对话伙伴还没有记录，创建一个
+                        if (!conversations[partnerId]) {
+                            conversations[partnerId] = {
+                                user_id: partnerId,
+                                username: message.sender_id == currentUserId ? 
+                                          (message.receiver_name || '用户 ' + partnerId) : 
+                                          (message.sender_name || '用户 ' + partnerId),
+                                messages: [],
+                                unread_count: 0,
+                                last_message: '',
+                                last_time: null
+                            };
+                        }
+                        
+                        // 添加消息到这个对话
+                        conversations[partnerId].messages.push(message);
+                        
+                        // 如果消息是未读的并且不是当前用户发送的，增加未读计数
+                        if (message.is_read == 0 && message.sender_id != currentUserId) {
+                            conversations[partnerId].unread_count++;
+                        }
                     });
                     
-                    // 绑定点击事件
-                    $('.conversation-item').click(function() {
-                        var userId = $(this).data('user-id');
-                        var username = $(this).find('h6').text();
+                    // 为每个对话找出最新的消息
+                    Object.values(conversations).forEach(function(conversation) {
+                        // 按时间排序消息
+                        conversation.messages.sort(function(a, b) {
+                            return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+                        });
                         
-                        // 加载与该用户的消息
-                        loadMessages(userId, username);
-                        
-                        // 高亮选中的会话
-                        $('.conversation-item').removeClass('active');
-                        $(this).addClass('active');
-                        
-                        // 清除未读标记
-                        $(this).find('.badge').remove();
+                        // 设置最新消息
+                        if (conversation.messages.length > 0) {
+                            const latestMessage = conversation.messages[0];
+                            conversation.last_message = latestMessage.content || '';
+                            conversation.last_time = latestMessage.created_at || '';
+                        }
                     });
+                    
+                    // 将对话转换为数组并按最新消息时间排序
+                    const sortedConversations = Object.values(conversations).sort(function(a, b) {
+                        const timeA = a.last_time ? new Date(a.last_time) : new Date(0);
+                        const timeB = b.last_time ? new Date(b.last_time) : new Date(0);
+                        return timeB - timeA;
+                    });
+                    
+                    // 显示排序后的会话
+                    if (sortedConversations.length > 0) {
+                        sortedConversations.forEach(function(conversation) {
+                            const lastMessage = conversation.last_message || '无消息';
+                            const unreadCount = conversation.unread_count || 0;
+                            const unreadBadge = unreadCount > 0 ? `<span class="badge bg-danger rounded-pill">${unreadCount}</span>` : '';
+                            
+                            const conversationItem = `
+                                <div class="conversation-item p-2 border-bottom" data-user-id="${conversation.user_id}">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-0">${sanitizeHTML(conversation.username)}</h6>
+                                            <small class="text-muted">${sanitizeHTML(lastMessage)}</small>
+                                        </div>
+                                        ${unreadBadge}
+                                    </div>
+                                </div>
+                            `;
+                            
+                            $('#conversationList').append(conversationItem);
+                        });
+                        
+                        // 绑定点击事件
+                        $('.conversation-item').click(function() {
+                            var userId = $(this).data('user-id');
+                            var username = $(this).find('h6').text();
+                            
+                            // 加载与该用户的消息
+                            loadMessages(userId, username);
+                            
+                            // 高亮选中的会话
+                            $('.conversation-item').removeClass('active');
+                            $(this).addClass('active');
+                            
+                            // 清除未读标记
+                            $(this).find('.badge').remove();
+                        });
+                    } else {
+                        // 没有会话时显示提示
+                        $('#conversationList').html('<div class="text-center text-muted py-3">暂无会话</div>');
+                    }
                 } else {
-                    // 没有会话时显示提示
+                    // 没有消息时显示提示
                     $('#conversationList').html('<div class="text-center text-muted py-3">暂无会话</div>');
                 }
             } else {
@@ -1491,10 +1557,27 @@ function loadConversations() {
                 $('#conversationList').html('<div class="text-center text-danger">加载失败</div>');
             }
         },
-        error: function() {
+        error: function(xhr, status, error) {
+            console.error('加载会话列表失败:', error);
             // 显示错误信息
             showAlert('网络错误，请稍后再试', 'error');
             $('#conversationList').html('<div class="text-center text-danger">加载失败</div>');
+        }
+    });
+    
+    // 使用chkmsg.php检查是否有未读消息
+    $.ajax({
+        url: 'chkmsg.php',
+        type: 'GET',
+        data: {
+            token: token
+        },
+        success: function(response) {
+            if (response.success && response.unread_count > 0) {
+                // 显示未读消息数量
+                console.log('有 ' + response.unread_count + ' 条未读消息');
+                // 可以在这里添加代码来显示未读消息数量的通知
+            }
         }
     });
 }
@@ -1719,25 +1802,31 @@ function loadMessages(userId, username) {
     
     // 发送AJAX请求获取消息
     $.ajax({
-        url: 'get_messages.php',
+        url: 'getmsg.php',
         type: 'GET',
         data: {
+            token: token,
             receiver_id: userId
-        },
-        headers: {
-            'Authorization': 'Bearer ' + token
         },
         success: function(response) {
             if (response.success) {
-                // 显示消息
-                displayMessages(response.messages, userId);
+                // 过滤获取与特定用户的消息
+                const filteredMessages = response.messages.filter(function(message) {
+                    return (message.sender_id == userId || message.receiver_id == userId);
+                });
+                
+                // 显示过滤后的消息
+                displayMessages(filteredMessages, userId);
+                
+                // 注意：getmsg.php可能已经内置了将消息标记为已读的功能
             } else {
                 // 显示错误信息
                 showAlert(response.message || '加载消息失败', 'error');
                 $('#messageList').html('<div class="text-center text-danger mt-3">加载失败</div>');
             }
         },
-        error: function() {
+        error: function(xhr, status, error) {
+            console.error('加载消息失败:', error);
             // 显示错误信息
             showAlert('网络错误，请稍后再试', 'error');
             $('#messageList').html('<div class="text-center text-danger mt-3">加载失败</div>');
