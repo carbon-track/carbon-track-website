@@ -1416,6 +1416,89 @@ function initMessageModal() {
     console.log('消息模态框初始化完成');
 }
 
+// 加载会话列表
+function loadConversations() {
+    console.log('开始加载会话列表');
+    
+    // 获取登录token
+    var token = localStorage.getItem('token');
+    if (!token) {
+        console.error('未找到token，用户可能未登录');
+        showAlert('请先登录以查看会话列表', 'warning');
+        return;
+    }
+
+    // 显示加载状态
+    $('#conversationList').html('<div class="text-center"><div class="spinner-border spinner-border-sm text-primary" role="status"></div><span class="ms-2">加载中...</span></div>');
+
+    // 发送AJAX请求获取会话列表
+    $.ajax({
+        url: 'get_conversations.php',
+        type: 'GET',
+        headers: {
+            'Authorization': 'Bearer ' + token
+        },
+        success: function(response) {
+            if (response.success) {
+                // 清空列表
+                $('#conversationList').empty();
+                
+                // 处理数据
+                if (response.conversations && response.conversations.length > 0) {
+                    // 显示会话
+                    response.conversations.forEach(function(conversation) {
+                        var lastMessage = conversation.last_message || '无消息';
+                        var unreadCount = conversation.unread_count || 0;
+                        var unreadBadge = unreadCount > 0 ? `<span class="badge bg-danger rounded-pill">${unreadCount}</span>` : '';
+                        
+                        var conversationItem = `
+                            <div class="conversation-item p-2 border-bottom" data-user-id="${conversation.user_id}">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0">${sanitizeHTML(conversation.username)}</h6>
+                                        <small class="text-muted">${sanitizeHTML(lastMessage)}</small>
+                                    </div>
+                                    ${unreadBadge}
+                                </div>
+                            </div>
+                        `;
+                        
+                        $('#conversationList').append(conversationItem);
+                    });
+                    
+                    // 绑定点击事件
+                    $('.conversation-item').click(function() {
+                        var userId = $(this).data('user-id');
+                        var username = $(this).find('h6').text();
+                        
+                        // 加载与该用户的消息
+                        loadMessages(userId, username);
+                        
+                        // 高亮选中的会话
+                        $('.conversation-item').removeClass('active');
+                        $(this).addClass('active');
+                        
+                        // 清除未读标记
+                        $(this).find('.badge').remove();
+                    });
+                } else {
+                    // 没有会话时显示提示
+                    $('#conversationList').html('<div class="text-center text-muted py-3">暂无会话</div>');
+                }
+            } else {
+                // 显示错误信息
+                showAlert(response.message || '加载会话失败', 'error');
+                $('#conversationList').html('<div class="text-center text-danger">加载失败</div>');
+            }
+        },
+        error: function() {
+            // 显示错误信息
+            showAlert('网络错误，请稍后再试', 'error');
+            $('#conversationList').html('<div class="text-center text-danger">加载失败</div>');
+        }
+    });
+}
+
 // 初始化登录模态框
 function initLoginModal() {
     console.log('初始化登录模态框');
@@ -1611,5 +1694,54 @@ function sanitizeHTML(html) {
     });
     
     return sanitized;
+}
+
+// 加载与特定用户的消息
+function loadMessages(userId, username) {
+    console.log('加载与用户ID为 ' + userId + ' 的消息');
+    
+    // 获取登录token
+    var token = localStorage.getItem('token');
+    if (!token) {
+        console.error('未找到token，用户可能未登录');
+        showAlert('请先登录以查看消息', 'warning');
+        return;
+    }
+    
+    // 保存当前聊天对象的ID
+    localStorage.setItem('currentChatPartnerId', userId);
+    
+    // 更新消息区域标题
+    $('#messagesModalLabel').text('与 ' + sanitizeHTML(username) + ' 的对话');
+    
+    // 显示加载状态
+    $('#messageList').html('<div class="text-center mt-3"><div class="spinner-border text-primary" role="status"></div><div class="mt-2">加载消息中...</div></div>');
+    
+    // 发送AJAX请求获取消息
+    $.ajax({
+        url: 'get_messages.php',
+        type: 'GET',
+        data: {
+            receiver_id: userId
+        },
+        headers: {
+            'Authorization': 'Bearer ' + token
+        },
+        success: function(response) {
+            if (response.success) {
+                // 显示消息
+                displayMessages(response.messages, userId);
+            } else {
+                // 显示错误信息
+                showAlert(response.message || '加载消息失败', 'error');
+                $('#messageList').html('<div class="text-center text-danger mt-3">加载失败</div>');
+            }
+        },
+        error: function() {
+            // 显示错误信息
+            showAlert('网络错误，请稍后再试', 'error');
+            $('#messageList').html('<div class="text-center text-danger mt-3">加载失败</div>');
+        }
+    });
 }
 
