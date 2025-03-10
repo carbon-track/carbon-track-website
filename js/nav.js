@@ -448,6 +448,7 @@ function fetchMessages() {
                     data.messages.forEach(function(message, index) {
                         // 确保每条消息都有content字段
                         if (!message.content && (message.message || message.text)) {
+                            // 不要处理HTML内容，直接赋值
                             message.content = message.message || message.text;
                         }
                         
@@ -637,19 +638,31 @@ function displayMessages(messages, sender) {
         // 创建消息样式
         let style = document.createElement('style');
         style.textContent = `
-            .message-container { margin-bottom: 16px; }
+            .message-container { 
+                margin-bottom: 16px; 
+            }
             .message-bubble {
-                padding: 10px 15px;
+                padding: 15px;
                 border-radius: 18px;
-                max-width: 80%;
+                max-width: 90%;
                 word-wrap: break-word;
                 background-color: #f1f0f0;
                 margin-right: auto;
+                box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+                line-height: 1.5;
             }
             .message-time {
                 font-size: 12px;
                 color: #777;
                 margin-top: 5px;
+                text-align: right;
+            }
+            .message-bubble p {
+                margin-top: 0;
+                margin-bottom: 8px;
+            }
+            .message-bubble p:last-child {
+                margin-bottom: 0;
             }
         `;
         document.head.appendChild(style);
@@ -676,7 +689,8 @@ function displayMessages(messages, sender) {
                 
                 // 添加消息内容 - 检查所有可能的内容字段
                 const messageContent = message.content || message.message || message.text || JSON.stringify(message);
-                bubble.textContent = messageContent || '(空消息)';
+                // 使用innerHTML而不是textContent，以便正确渲染HTML标签
+                bubble.innerHTML = messageContent || '(空消息)';
                 console.log('消息内容:', messageContent);
                 
                 // 创建时间显示
@@ -687,6 +701,7 @@ function displayMessages(messages, sender) {
                 let timestamp = message.send_time || message.created_at || message.time || message.timestamp;
                 if (timestamp) {
                     let date = new Date(timestamp);
+                    // 使用textContent显示时间，因为这是纯文本内容
                     time.textContent = date.toLocaleString();
                 } else {
                     time.textContent = '未知时间';
@@ -1479,6 +1494,85 @@ function initRegisterModal() {
     document.body.insertAdjacentHTML('beforeend', modalHTML);
     
     console.log('注册模态框已创建并初始化完成');
+}
+
+// 安全净化HTML内容，防止XSS攻击
+function sanitizeHTML(html) {
+    if (!html) return '';
+    
+    // 创建一个临时元素
+    const tempElement = document.createElement('div');
+    // 将内容设置为文本，避免解析
+    tempElement.textContent = html;
+    // 获取编码后的内容
+    let sanitized = tempElement.innerHTML;
+    
+    // 现在将安全标签转换回HTML
+    // 只允许安全的标签: p, br, b, i, strong, em, u, ul, ol, li, span
+    const allowedTags = {
+        'p': { allowedAttrs: [] },
+        'br': { allowedAttrs: [] },
+        'b': { allowedAttrs: [] },
+        'i': { allowedAttrs: [] },
+        'strong': { allowedAttrs: [] },
+        'em': { allowedAttrs: [] },
+        'u': { allowedAttrs: [] },
+        'ul': { allowedAttrs: [] },
+        'ol': { allowedAttrs: [] },
+        'li': { allowedAttrs: [] },
+        'span': { allowedAttrs: ['class'] },
+        'div': { allowedAttrs: ['class'] }
+    };
+    
+    // 为每个允许的标签处理开标签和闭标签
+    Object.keys(allowedTags).forEach(tag => {
+        const openTagPattern = new RegExp(`&lt;${tag}(\\s+[^&>]*)?(/?&gt;)`, 'gi');
+        const closeTagPattern = new RegExp(`&lt;/${tag}&gt;`, 'gi');
+        
+        // 替换开标签
+        sanitized = sanitized.replace(openTagPattern, (match, attributes, closeTag) => {
+            if (!attributes) {
+                return `<${tag}${closeTag.replace('&gt;', '>')}`;
+            }
+            
+            // 处理属性
+            let safeAttributes = '';
+            const tagConfig = allowedTags[tag];
+            
+            // 如果有允许的属性，检查并保留它们
+            if (tagConfig.allowedAttrs.length > 0) {
+                // 解码属性
+                const decodedAttrs = attributes.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&');
+                
+                // 提取属性
+                const attrPattern = /(\w+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|(\w+)))?/g;
+                let attrMatch;
+                
+                while ((attrMatch = attrPattern.exec(decodedAttrs)) !== null) {
+                    const attrName = attrMatch[1];
+                    
+                    // 如果属性名在允许列表中
+                    if (tagConfig.allowedAttrs.includes(attrName)) {
+                        const attrValue = attrMatch[2] || attrMatch[3] || attrMatch[4] || '';
+                        
+                        // 确保属性值不包含JavaScript
+                        if (!attrValue.toLowerCase().includes('javascript:') && 
+                            !attrValue.toLowerCase().includes('data:') &&
+                            !attrValue.match(/on\w+/i)) {
+                            safeAttributes += ` ${attrName}="${attrValue.replace(/"/g, '&quot;')}"`;
+                        }
+                    }
+                }
+            }
+            
+            return `<${tag}${safeAttributes}${closeTag.replace('&gt;', '>')}`;
+        });
+        
+        // 替换闭标签
+        sanitized = sanitized.replace(closeTagPattern, `</${tag}>`);
+    });
+    
+    return sanitized;
 }
 
 
