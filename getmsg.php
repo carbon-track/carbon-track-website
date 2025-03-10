@@ -34,21 +34,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // 开始事务
         $pdo->beginTransaction();
 
-        // 获取用户相关的所有消息（作为收信人）
+        // 获取用户相关的所有消息（同时作为发送者和接收者）
         $stmtSelect = $pdo->prepare("
             SELECT message_id, sender_id, receiver_id, content, is_read, send_time 
             FROM messages 
-            WHERE receiver_id = :receiver_id
+            WHERE receiver_id = :user_id OR sender_id = :user_id
             ORDER BY send_time ASC
         ");
-        $stmtSelect->bindParam(':receiver_id', $userId, PDO::PARAM_INT);
+        $stmtSelect->bindParam(':user_id', $userId, PDO::PARAM_INT);
         $stmtSelect->execute();
         $messages = $stmtSelect->fetchAll(PDO::FETCH_ASSOC);
         
         // 记录查询结果
         file_put_contents('getmsg_log.txt', date('Y-m-d H:i:s') . ' - 查询到消息数量: ' . count($messages) . "\n", FILE_APPEND);
 
-        // 更新当前用户接收的未读消息为已读
+        // 只将用户接收的未读消息标记为已读
         $stmtUpdate = $pdo->prepare("
             UPDATE messages SET is_read = 1 WHERE receiver_id = :user_id AND is_read = 0
         ");
