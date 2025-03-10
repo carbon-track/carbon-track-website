@@ -726,6 +726,10 @@ function displayMessages(messages, sender) {
     // 保存当前聊天的发送者ID，用于发送回复消息
     localStorage.setItem('currentChatPartnerId', sender);
     
+    // 确保消息区域可见
+    $('#messageContainer').css('display', 'flex').show();
+    $('#noConversationSelected').hide();
+    
     // 获取messageList元素
     let messageList = document.getElementById('messageList');
     if (!messageList) {
@@ -736,6 +740,9 @@ function displayMessages(messages, sender) {
     
     // 清空现有消息
     messageList.innerHTML = '';
+    
+    // 确保样式已添加到页面
+    ensureMessageStyles();
     
     // 如果没有消息，显示提示信息
     if (!messages || messages.length === 0) {
@@ -781,6 +788,7 @@ function displayMessages(messages, sender) {
         // 创建消息容器
         const messageContainer = document.createElement('div');
         messageContainer.className = 'message-container';
+        messageContainer.style.margin = '8px 0';
         
         // 确定消息类型（发送/接收）
         const isSent = message.sender_id == currentUserId;
@@ -799,7 +807,7 @@ function displayMessages(messages, sender) {
         
         // 使用innerHTML添加消息
         messageContainer.innerHTML = `
-            <div class="message-bubble ${bubbleClass}">
+            <div class="message-bubble ${bubbleClass}" style="color: #000 !important; visibility: visible !important; display: block !important;">
                 ${safeContent || '<span class="text-muted">(空消息)</span>'}
                 <div class="message-time">${formattedTime}</div>
             </div>
@@ -809,8 +817,8 @@ function displayMessages(messages, sender) {
         messageList.appendChild(messageContainer);
     });
     
-    // 确保样式已添加到页面
-    ensureMessageStyles();
+    // 移除可能导致ARIA错误的属性
+    $('.modal').removeAttr('aria-hidden');
     
     // 滚动到底部
     scrollToBottom(messageList);
@@ -1493,6 +1501,7 @@ function initMessageModal() {
             position: relative;
             box-shadow: 0 1px 2px rgba(0,0,0,0.1);
             word-break: break-word;
+            color: #000; /* 确保文字显示为黑色 */
         }
         .message-bubble.sent {
             background-color: #dcf8c6;
@@ -1534,9 +1543,11 @@ function initMessageModal() {
             background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgb3BhY2l0eT0iMC4yIj48cGF0aCBkPSJNMTIuNSAwdjUwaDI1VjBIMTIuNXoiIGZpbGw9IiNmZmYiLz48L3N2Zz4=');
             padding: 15px;
             border-radius: 8px;
+            height: 350px !important;
+            overflow-y: auto !important;
         }
         .no-conversation {
-            height: 100%;
+            height: 400px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1547,6 +1558,19 @@ function initMessageModal() {
             font-size: 3rem;
             margin-bottom: 1rem;
             opacity: 0.5;
+        }
+        /* 确保消息区域正确显示 */
+        #messageContainer {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        /* 修复z-index问题 */
+        .modal {
+            z-index: 1050 !important;
+        }
+        .modal-backdrop {
+            z-index: 1040 !important;
         }
     </style>`;
     
@@ -1588,7 +1612,7 @@ function initMessageModal() {
                                         </div>
                                     </div>
                                 </div>
-                                <div id="noConversationSelected" class="no-conversation" style="height: 400px;">
+                                <div id="noConversationSelected" class="no-conversation">
                                     <i class="fas fa-comments"></i>
                                     <p>选择一个会话开始聊天</p>
                                 </div>
@@ -1763,8 +1787,10 @@ function loadConversations() {
                             var userId = $(this).data('user-id');
                             var username = $(this).find('h6').text();
                             
-                            // 显示消息区域
-                            $('#messageContainer').show();
+                            console.log('点击会话项:', userId, username);
+                            
+                            // 显示消息区域，隐藏"无会话"提示
+                            $('#messageContainer').css('display', 'flex').show();
                             $('#noConversationSelected').hide();
                             
                             // 加载与该用户的消息
@@ -1776,14 +1802,25 @@ function loadConversations() {
                             
                             // 清除未读标记
                             $(this).find('.badge').remove();
+                            
+                            // 移除可能导致ARIA错误的属性
+                            $('.modal').removeAttr('aria-hidden');
                         });
                     } else {
                         // 没有会话时显示提示
                         $('#conversationList').html('<div class="text-center text-muted py-3">暂无会话</div>');
+                        
+                        // 显示"无会话"提示
+                        $('#messageContainer').hide();
+                        $('#noConversationSelected').show();
                     }
                 } else {
                     // 没有消息时显示提示
                     $('#conversationList').html('<div class="text-center text-muted py-3">暂无会话</div>');
+                    
+                    // 显示"无会话"提示
+                    $('#messageContainer').hide();
+                    $('#noConversationSelected').show();
                 }
             } else {
                 // 显示错误信息
