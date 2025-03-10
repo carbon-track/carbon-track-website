@@ -41,12 +41,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $checkRelationship = $pdo->prepare("
             SELECT COUNT(*) as message_count 
             FROM messages 
-            WHERE (sender_id = :user_id AND receiver_id = :partner_id)
-            OR (sender_id = :partner_id AND receiver_id = :user_id)
+            WHERE (sender_id = ? AND receiver_id = ?)
+            OR (sender_id = ? AND receiver_id = ?)
         ");
         $checkRelationship->execute([
-            ':user_id' => $userId,
-            ':partner_id' => $partnerId
+            $userId, $partnerId,   // 第一组条件 (sender_id = ? AND receiver_id = ?)
+            $partnerId, $userId    // 第二组条件 (sender_id = ? AND receiver_id = ?)
         ]);
         $relationship = $checkRelationship->fetch(PDO::FETCH_ASSOC);
         
@@ -60,14 +60,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt = $pdo->prepare("
             SELECT message_id 
             FROM messages 
-            WHERE sender_id = :sender_id 
-            AND receiver_id = :receiver_id 
+            WHERE sender_id = ? 
+            AND receiver_id = ? 
             AND is_read = 1
         ");
-        $stmt->execute([
-            ':sender_id' => $userId,
-            ':receiver_id' => $partnerId
-        ]);
+        $stmt->execute([$userId, $partnerId]);
         $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
         // 提取消息ID到数组
