@@ -870,40 +870,32 @@ function ensureMessageStyles() {
         const messageStyles = `
         <style>
             .message-container {
-                margin-bottom: 15px;
-                display: flex;
-                flex-direction: column;
+                display: flex; /* 使用 Flexbox 布局 */
+                margin-bottom: 10px;
             }
             .message-bubble {
-                max-width: 80%;
                 padding: 10px 15px;
-                border-radius: 18px;
-                position: relative;
-                box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-                word-break: break-word;
-                color: #000; /* 确保文字颜色为黑色 */
+                border-radius: 20px;
+                background-color: #f0f0f0; /* 默认背景色 */
+                word-wrap: break-word;
+                max-width: 70%; /* 限制消息气泡的最大宽度 */
             }
             .message-bubble.sent {
-                background-color: #dcf8c6;
-                align-self: flex-end;
-                margin-left: auto;
-                border-bottom-right-radius: 5px;
+                background-color: #DCF8C6; /* 发送消息的背景色，例如浅绿色 */
+                margin-left: auto; /* 将发送消息推到右侧 */
             }
             .message-bubble.received {
-                background-color: #f1f0f0;
-                align-self: flex-start;
-                margin-right: auto;
-                border-bottom-left-radius: 5px;
+                background-color: #E5E5EA; /* 接收消息的背景色，例如浅灰色 */
+                margin-right: auto; /* 将接收消息推到左侧 */
             }
             .message-time {
                 font-size: 0.7rem;
-                color: #999;
+                color: #888;
                 margin-top: 5px;
-                text-align: right;
+                text-align: right; /* 时间显示在气泡右下角 */
             }
             .message-read-status {
-                font-size: 0.7rem;
-                color: #999;
+                font-size: 0.75rem;
                 text-align: right;
                 margin-top: 2px;
             }
