@@ -805,11 +805,11 @@ function displayMessages(messages, sender) {
         // 创建消息气泡
         const bubbleClass = isSent ? 'sent' : 'received';
         
-        // 使用innerHTML添加消息
+        // 使用innerHTML添加消息，添加强制显示的内联样式
         messageContainer.innerHTML = `
-            <div class="message-bubble ${bubbleClass}" style="color: #000 !important; visibility: visible !important; display: block !important;">
-                ${safeContent || '<span class="text-muted">(空消息)</span>'}
-                <div class="message-time">${formattedTime}</div>
+            <div class="message-bubble ${bubbleClass}" style="color: #000 !important; visibility: visible !important; display: block !important; opacity: 1 !important; position: relative !important; z-index: 1 !important;">
+                <span style="color: #000 !important; visibility: visible !important; display: inline !important;">${safeContent || '<span class="text-muted">(空消息)</span>'}</span>
+                <div class="message-time" style="visibility: visible !important; display: block !important;">${formattedTime}</div>
             </div>
         `;
         
@@ -832,48 +832,60 @@ function ensureMessageStyles() {
         <style>
             .message-container {
                 margin-bottom: 15px;
-                display: flex;
-                flex-direction: column;
+                display: flex !important;
+                flex-direction: column !important;
+                width: 100% !important;
             }
             .message-bubble {
-                max-width: 80%;
-                padding: 10px 15px;
-                border-radius: 18px;
-                position: relative;
-                box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-                word-break: break-word;
-                color: #000; /* 确保文字颜色为黑色 */
+                max-width: 80% !important;
+                padding: 10px 15px !important;
+                border-radius: 18px !important;
+                position: relative !important;
+                box-shadow: 0 1px 2px rgba(0,0,0,0.1) !important;
+                word-break: break-word !important;
+                color: #000 !important; 
+                display: block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+                z-index: 1 !important;
             }
             .message-bubble.sent {
-                background-color: #dcf8c6;
-                align-self: flex-end;
-                margin-left: auto;
-                border-bottom-right-radius: 5px;
+                background-color: #dcf8c6 !important;
+                align-self: flex-end !important;
+                margin-left: auto !important;
+                border-bottom-right-radius: 5px !important;
             }
             .message-bubble.received {
-                background-color: #f1f0f0;
-                align-self: flex-start;
-                margin-right: auto;
-                border-bottom-left-radius: 5px;
+                background-color: #f1f0f0 !important;
+                align-self: flex-start !important;
+                margin-right: auto !important;
+                border-bottom-left-radius: 5px !important;
+            }
+            .message-bubble * {
+                color: #000 !important;
+                visibility: visible !important;
+                display: inline !important;
             }
             .message-time {
-                font-size: 0.7rem;
-                color: #999;
-                margin-top: 5px;
-                text-align: right;
+                font-size: 0.7rem !important;
+                color: #999 !important;
+                margin-top: 5px !important;
+                text-align: right !important;
+                display: block !important;
+                visibility: visible !important;
             }
             .conversation-item {
-                cursor: pointer;
-                transition: background-color 0.2s;
-                border-radius: 8px;
-                margin-bottom: 5px;
+                cursor: pointer !important;
+                transition: background-color 0.2s !important;
+                border-radius: 8px !important;
+                margin-bottom: 5px !important;
             }
             .conversation-item:hover {
-                background-color: #f5f5f5;
+                background-color: #f5f5f5 !important;
             }
             .conversation-item.active {
-                background-color: #e9ecef;
-                border-left: 3px solid #007bff;
+                background-color: #e9ecef !important;
+                border-left: 3px solid #007bff !important;
             }
         </style>`;
         $('head').append(messageStyles);
@@ -1491,8 +1503,9 @@ function initMessageModal() {
     <style>
         .message-container {
             margin-bottom: 15px;
-            display: flex;
-            flex-direction: column;
+            display: flex !important;
+            flex-direction: column !important;
+            width: 100% !important;
         }
         .message-bubble {
             max-width: 80%;
@@ -1501,25 +1514,36 @@ function initMessageModal() {
             position: relative;
             box-shadow: 0 1px 2px rgba(0,0,0,0.1);
             word-break: break-word;
-            color: #000; /* 确保文字显示为黑色 */
+            color: #000 !important; /* 确保文字显示为黑色 */
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            z-index: 1 !important;
+        }
+        .message-bubble * {
+            color: #000 !important;
+            visibility: visible !important;
+            display: inline !important;
         }
         .message-bubble.sent {
-            background-color: #dcf8c6;
-            align-self: flex-end;
-            margin-left: auto;
-            border-bottom-right-radius: 5px;
+            background-color: #dcf8c6 !important;
+            align-self: flex-end !important;
+            margin-left: auto !important;
+            border-bottom-right-radius: 5px !important;
         }
         .message-bubble.received {
-            background-color: #f1f0f0;
-            align-self: flex-start;
-            margin-right: auto;
-            border-bottom-left-radius: 5px;
+            background-color: #f1f0f0 !important;
+            align-self: flex-start !important;
+            margin-right: auto !important;
+            border-bottom-left-radius: 5px !important;
         }
         .message-time {
-            font-size: 0.7rem;
-            color: #999;
-            margin-top: 5px;
-            text-align: right;
+            font-size: 0.7rem !important;
+            color: #999 !important;
+            margin-top: 5px !important;
+            text-align: right !important;
+            display: block !important;
+            visibility: visible !important;
         }
         .conversation-item {
             cursor: pointer;
@@ -1562,8 +1586,8 @@ function initMessageModal() {
         /* 确保消息区域正确显示 */
         #messageContainer {
             height: 100%;
-            display: flex;
-            flex-direction: column;
+            display: flex !important;
+            flex-direction: column !important;
         }
         /* 修复z-index问题 */
         .modal {
