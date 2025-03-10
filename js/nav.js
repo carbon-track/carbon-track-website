@@ -807,6 +807,7 @@ function displayMessages(messages, sender) {
                     ${safeContent}
                     <div class="message-time">${formattedTime}</div>
                 </div>
+                <div style="clear: both;"></div>
             `;
             
             // 添加到消息列表
@@ -1430,6 +1431,9 @@ function initMessageModal() {
             margin-bottom: 15px;
             display: flex;
             flex-direction: column;
+            width: 100%;
+            clear: both;
+            overflow: hidden; /* Add this to contain floated elements */
         }
         .message-bubble {
             max-width: 80%;
@@ -1438,18 +1442,23 @@ function initMessageModal() {
             position: relative;
             box-shadow: 0 1px 2px rgba(0,0,0,0.1);
             word-break: break-word;
+            display: inline-block; /* Add this to ensure proper sizing */
         }
         .message-bubble.sent {
             background-color: #dcf8c6;
             align-self: flex-end;
             margin-left: auto;
             border-bottom-right-radius: 5px;
+            float: right; /* Add this to ensure right alignment */
+            clear: both; /* Add this to prevent wrapping issues */
         }
         .message-bubble.received {
             background-color: #f1f0f0;
             align-self: flex-start;
             margin-right: auto;
             border-bottom-left-radius: 5px;
+            float: left; /* Add this to ensure left alignment */
+            clear: both; /* Add this to prevent wrapping issues */
         }
         .message-time {
             font-size: 0.7rem;
