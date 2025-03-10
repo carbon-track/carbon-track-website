@@ -722,16 +722,16 @@ Object.values(conversations).forEach(function(conversation) {
 }
 
 
-function displayMessages(messages, sender) {
-    console.log('开始显示消息，消息数量:', messages ? messages.length : 0, '发送者ID:', sender);
+function displayMessages(messages, partnerId, currentUserId) {
+    console.log('开始显示消息，消息数量:', messages ? messages.length : 0, '伙伴ID:', partnerId);
     
-    // 保存当前聊天的发送者ID，用于发送回复消息
-    localStorage.setItem('currentChatPartnerId', sender);
+    // 保存当前聊天的伙伴ID，用于发送回复消息
+    localStorage.setItem('currentChatPartnerId', partnerId);
     
     // 获取messageList元素
     let messageList = document.getElementById('messageList');
     if (!messageList) {
-        console.error('无法创建messageList元素，可能存在DOM结构问题');
+        console.error('无法找到messageList元素');
         showAlert('无法加载消息界面，请刷新页面重试', 'error');
         return;
     }
@@ -745,9 +745,11 @@ function displayMessages(messages, sender) {
         return;
     }
     
-    // 获取当前用户ID
-    const currentUserId = localStorage.getItem('userId');
-    console.log('当前用户ID (localStorage):', currentUserId);
+    // 如果没有明确提供currentUserId，从localStorage获取
+    if (!currentUserId) {
+        currentUserId = localStorage.getItem('userId');
+        console.log('从localStorage获取currentUserId:', currentUserId);
+    }
     
     // 对消息按时间排序
     messages.sort(function(a, b) {
@@ -785,18 +787,19 @@ function displayMessages(messages, sender) {
             const isSent = message.sender_id == currentUserId;
             console.log(`消息 ${index+1} 是否为发送消息:`, isSent, '(sender_id:', message.sender_id, ', currentUserId:', currentUserId, ')');
             
-            // 获取安全的消息内容
-            let safeContent;
-            try {
-                // 安全处理HTML内容
-                safeContent = sanitizeHTML(message.content || '');
-                console.log(`消息 ${index+1} 内容类型:`, typeof message.content);
-                console.log(`消息 ${index+1} 原始内容:`, message.content);
-                console.log(`消息 ${index+1} 安全处理后的内容:`, safeContent);
-            } catch (err) {
-                console.error(`处理消息 ${index+1} 内容时出错:`, err);
-                safeContent = '<p>消息内容无法显示</p>';
+            // 获取发送者名称
+            let senderName = '';
+            if (message.sender_id == '1000') {
+                senderName = '客户服务';
+            } else if (message.sender_name) {
+                senderName = message.sender_name;
+            } else {
+                senderName = '用户 ' + message.sender_id;
             }
+            
+            // 获取消息内容 - 直接使用原始内容，不进行额外处理
+            let messageContent = message.content || '';
+            console.log(`消息 ${index+1} 内容:`, messageContent);
             
             // 创建消息气泡
             const bubbleClass = isSent ? 'sent' : 'received';
@@ -804,7 +807,8 @@ function displayMessages(messages, sender) {
             // 设置消息内容
             messageContainer.innerHTML = `
                 <div class="message-bubble ${bubbleClass}" style="overflow-wrap: break-word;">
-                    ${safeContent}
+                    ${!isSent ? `<div class="sender-name" style="font-size: 0.8rem; color: #666; margin-bottom: 4px;">${senderName}</div>` : ''}
+                    ${messageContent}
                     <div class="message-time">${formattedTime}</div>
                 </div>
             `;
@@ -1697,6 +1701,11 @@ function loadConversations() {
                             conversation.last_message = content.length > 15 ? content.substring(0, 15) + '...' : content;
                             conversation.last_time = latestMessage.send_time || latestMessage.created_at || '';
                         }
+                        
+                        // 如果是系统消息(ID 1000)，显示为"客户服务"
+                        if (conversation.user_id == "1000") {
+                            conversation.username = "客户服务";
+                        }
                     });
                     
                     // 将对话转换为数组并按最新消息时间排序
@@ -1991,6 +2000,10 @@ function sanitizeHTML(html) {
 function loadMessages(userId, username) {
     console.log('加载与用户ID为 ' + userId + ' 的消息');
     
+    if (userId == "10000") {
+        username = "Customer Services";
+    }
+    
     // 获取登录token
     var token = localStorage.getItem('token');
     if (!token) {
@@ -2023,23 +2036,30 @@ function loadMessages(userId, username) {
             
             if (response.success) {
                 // 获取当前用户ID
-                const currentUserId = response.debug?.user_id || "";
+                const currentUserId = response.debug?.user_id || localStorage.getItem('userId') || "";
                 console.log('当前用户ID:', currentUserId);
                 
-                // 过滤获取与特定用户的消息
-                const filteredMessages = response.messages.filter(function(message) {
-                    const isRelevant = (message.sender_id == userId && message.receiver_id == currentUserId) || 
-                                      (message.sender_id == currentUserId && message.receiver_id == userId);
-                    if (isRelevant) {
-                        console.log('相关消息:', message);
-                    }
-                    return isRelevant;
-                });
+                // 获取与特定用户相关的消息
+                let relevantMessages = [];
                 
-                console.log('过滤后的消息数量:', filteredMessages.length);
+                // 先尝试过滤特定用户的消息
+                if (userId && userId !== "all") {
+                    relevantMessages = response.messages.filter(function(message) {
+                        const isRelevant = (message.sender_id == userId && message.receiver_id == currentUserId) || 
+                                          (message.sender_id == currentUserId && message.receiver_id == userId);
+                        return isRelevant;
+                    });
+                    console.log('过滤后的消息数量(针对用户ID):', relevantMessages.length);
+                }
                 
-                // 显示过滤后的消息
-                displayMessages(filteredMessages, userId);
+                // 如果没有过滤到消息，或者要显示所有消息
+                if (relevantMessages.length === 0 || userId === "all") {
+                    console.log('显示所有消息');
+                    relevantMessages = response.messages;
+                }
+                
+                // 显示相关消息
+                displayMessages(relevantMessages, userId, currentUserId);
                 
                 // 注意：getmsg.php已经将消息标记为已读
             } else {
