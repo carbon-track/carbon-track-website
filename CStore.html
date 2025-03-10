@@ -2,35 +2,126 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Credits Mall - CarbonTrack</title>
   <link rel="icon" href="/img/team.jpg" type="image/JPG">
-  <link rel="stylesheet" href="./css/bootstrap.min.css">
-  <script src="js/jquery.min.js"></script>
-  <script src="js/bootstrap.min.js"></script>
+  
+  <!-- CDN References -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+  
   <!-- SF Pro font -->
   <link href="https://fonts.cdnfonts.com/css/sf-pro-display" rel="stylesheet">
-  <!-- Intersection Observer polyfill for older browsers -->
-  <script src="https://cdn.jsdelivr.net/npm/intersection-observer@0.12.2/intersection-observer.js"></script>
-  <!-- iOS设计CSS -->
+  
+  <!-- Custom CSS -->
   <link rel="stylesheet" href="./css/ios-design.css">
+  <link rel="stylesheet" href="./css/index.css">
+  
+  <!-- JavaScript libraries -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="js/utils.js"></script>
   <script src="js/nav.js"></script>
-  <link rel="stylesheet" href="/css/index.css">
+  
   <style>
+    :root {
+      --card-bg-light: rgba(255, 255, 255, 0.8);
+      --card-bg-dark: rgba(44, 44, 46, 0.8);
+      --text-color-light: #000;
+      --text-color-dark: #FFFFFF;
+      --store-gradient-start: var(--ios-orange);
+      --store-gradient-end: var(--ios-pink);
+    }
+    
+    body {
+      background-color: var(--ios-secondary-system-background, #F2F2F7);
+      color: var(--text-color-light);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      position: relative;
+      min-height: 100vh;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    
+    /* Frosted glass background effect */
+    .frosted-glass {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: -2;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      background: rgba(255, 255, 255, 0.05);
+    }
+    
+    /* Add ambient glow effects */
+    .glow-effect {
+      position: fixed;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      filter: blur(50px);
+      z-index: -1;
+      opacity: 0.5;
+      animation: pulse 8s infinite alternate cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+    
+    .glow-orange {
+      top: 10%;
+      right: 10%;
+      background: radial-gradient(circle, rgba(255, 149, 0, 0.2), transparent 70%);
+    }
+    
+    .glow-pink {
+      bottom: 10%;
+      left: 5%;
+      background: radial-gradient(circle, rgba(255, 45, 85, 0.15), transparent 70%);
+      animation-delay: 2s;
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1) translate(0, 0); opacity: 0.5; }
+      50% { transform: scale(1.05) translate(20px, -10px); opacity: 0.7; }
+      100% { transform: scale(1) translate(0, 0); opacity: 0.5; }
+    }
+    
     .store-header {
-      background: linear-gradient(135deg, var(--ios-orange), var(--ios-pink));
+      background: linear-gradient(135deg, var(--store-gradient-start), var(--store-gradient-end));
       color: white;
       padding: 120px 0 80px;
       text-align: center;
       border-radius: 0 0 24px 24px;
       margin-bottom: 40px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    /* Add shimmer effect */
+    .store-header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
+      transform: rotate(30deg);
+      animation: shimmer 10s infinite linear;
+      pointer-events: none;
+    }
+    
+    @keyframes shimmer {
+      0% { transform: translateX(-50%) rotate(0deg); }
+      100% { transform: translateX(0%) rotate(360deg); }
     }
     
     .store-header h1 {
       font-weight: 700;
       color: white;
       margin-bottom: 16px;
+      position: relative;
+      z-index: 2;
     }
     
     .store-header p {
@@ -38,6 +129,8 @@
       opacity: 0.9;
       max-width: 700px;
       margin: 0 auto;
+      position: relative;
+      z-index: 2;
     }
     
     .user-credits {
@@ -47,18 +140,40 @@
       padding: 24px;
       margin-bottom: 30px;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .user-credits::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent 70%);
+      pointer-events: none;
     }
     
     .user-credits h2 {
       color: white;
       margin-bottom: 16px;
       font-weight: 700;
+      position: relative;
+      z-index: 1;
     }
     
     .credits-amount {
       font-size: 2.5rem;
       font-weight: 700;
       margin-bottom: 8px;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .user-credits p {
+      position: relative;
+      z-index: 1;
     }
     
     .product-card {
@@ -68,7 +183,10 @@
       margin-bottom: 30px;
       transition: transform 0.4s var(--animation-timing-apple),
                   box-shadow 0.4s var(--animation-timing-apple);
-      background-color: var(--ios-system-background);
+      background-color: var(--card-bg-light);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      height: 100%;
     }
     
     .product-card:hover {
@@ -80,6 +198,11 @@
       width: 100%;
       height: 200px;
       object-fit: cover;
+      transition: transform 0.4s var(--animation-timing-apple);
+    }
+    
+    .product-card:hover .product-img {
+      transform: scale(1.03);
     }
     
     .product-body {
@@ -89,6 +212,10 @@
     .product-title {
       font-weight: 700;
       margin-bottom: 8px;
+      background: linear-gradient(135deg, var(--ios-pink), var(--ios-orange));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
     
     .product-description {
@@ -119,6 +246,7 @@
       padding: 10px 16px;
       font-weight: 600;
       transition: all 0.3s var(--animation-timing-apple);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
     
     .exchange-btn:hover {
@@ -133,6 +261,25 @@
       background: linear-gradient(120deg, var(--ios-orange), var(--ios-pink));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      position: relative;
+      display: inline-block;
+    }
+    
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 3px;
+      background: linear-gradient(120deg, var(--ios-orange), var(--ios-pink));
+      border-radius: 1.5px;
+    }
+    
+    .section-title-container {
+      text-align: center;
+      margin-bottom: 2rem;
     }
     
     .loading-spinner {
@@ -141,155 +288,157 @@
       align-items: center;
       height: 200px;
     }
+    
+    .stock {
+      padding: 6px 12px;
+      border-radius: 10px;
+      background-color: rgba(0, 122, 255, 0.1);
+      color: var(--ios-blue);
+      font-weight: 600;
+      font-size: 0.9rem;
+      display: inline-block;
+    }
+    
+    /* Theme toggle button */
+    .theme-toggle {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      width: 50px;
+      height: 50px;
+      border-radius: 25px;
+      background: var(--ios-system-background);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      cursor: pointer;
+      z-index: 100;
+      transition: all 0.3s var(--animation-timing-apple);
+    }
+    
+    .theme-toggle:hover {
+      transform: scale(1.05);
+    }
+    
+    .theme-toggle i {
+      font-size: 24px;
+      color: var(--ios-gray);
+    }
+    
+    /* Animation classes */
+    .fade-in-up {
+      animation: fadeInUp 0.6s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+      opacity: 0;
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+    .delay-4 { animation-delay: 0.4s; }
+    .delay-5 { animation-delay: 0.5s; }
+    
+    /* Dark mode adaptations */
+    @media (prefers-color-scheme: dark) {
+      body.auto-theme {
+        background-color: #1C1C1E;
+        color: var(--text-color-dark);
+      }
+      
+      body.auto-theme .product-card {
+        background-color: var(--card-bg-dark);
+      }
+      
+      body.auto-theme .product-description {
+        color: #AEAEB2;
+      }
+      
+      body.auto-theme .price-tag {
+        color: #30D158;
+      }
+      
+      body.auto-theme .stock {
+        background-color: rgba(10, 132, 255, 0.2);
+        color: #64D2FF;
+      }
+      
+      body.auto-theme .theme-toggle {
+        background-color: rgba(44, 44, 46, 0.8);
+      }
+      
+      body.auto-theme .theme-toggle i {
+        color: #AEAEB2;
+      }
+    }
+    
+    /* Manual theme classes */
+    body.dark-theme {
+      background-color: #1C1C1E;
+      color: var(--text-color-dark);
+    }
+    
+    body.dark-theme .product-card {
+      background-color: var(--card-bg-dark);
+    }
+    
+    body.dark-theme .product-description {
+      color: #AEAEB2;
+    }
+    
+    body.dark-theme .price-tag {
+      color: #30D158;
+    }
+    
+    body.dark-theme .stock {
+      background-color: rgba(10, 132, 255, 0.2);
+      color: #64D2FF;
+    }
+    
+    body.dark-theme .theme-toggle {
+      background-color: rgba(44, 44, 46, 0.8);
+    }
+    
+    body.dark-theme .theme-toggle i {
+      color: #AEAEB2;
+    }
+    
+    body.light-theme {
+      background-color: #F2F2F7;
+      color: var(--text-color-light);
+    }
   </style>
-  <script>
-    $(document).ready(function () {
-      var token = localStorage.getItem('token')
-      if (token) {
-      } else {
-        $('#userPoints').text('未登录')
-        showAlert('请先登录。', 'warning', function() {
-          window.location.href = 'index.html'
-        })
-      }
-      // 获取用户积分
-      fetchUserPoints()
-
-      // 从PHP接口获取商品数据
-      fetchProducts()
-
-      // 兑换商品
-      $('#productsList').on('click', '.exchange-btn', function () {
-        var productId = $(this).data('id')
-        var token = localStorage.getItem('token')
-        exchangeProduct(productId, token)
-      })
-    })
-
-    function fetchProducts() {
-      var token = localStorage.getItem('token')
-      $('#loading').show() // 显示加载动画
-      $.ajax({
-        type: 'POST',
-        url: 'product.php',
-        data: {
-          token: token
-        },
-        dataType: 'json',
-        success: function (response) {
-          $('#loading').hide() // 隐藏加载动画
-          if (response.success) {
-            displayProducts(response.products)
-          } else {
-            $('#productsList').html('<div class="alert alert-danger">Error: ' + response.message + '</div>')
-          }
-        },
-        error: function () {
-          $('#loading').hide() // 隐藏加载动画
-          $('#productsList').html('<div class="alert alert-danger">Failed to fetch products. Please try again later.</div>')
-        }
-      })
-    }
-
-    function fetchUserPoints() {
-      var uid = localStorage.getItem('id')
-      var token = localStorage.getItem('token')
-      $.ajax({
-        type: 'POST',
-        url: 'get_user_points.php',
-        data: {
-          uid: uid,
-          token: token
-        },
-        dataType: 'json',
-        success: function (response) {
-          if (response.success) {
-            $('#userPoints').text(response.points)
-          } else {
-            console.error('Error getting user points:', response.message)
-          }
-        },
-        error: function () {
-          console.error('AJAX请求失败')
-        }
-      })
-    }
-
-    function displayProducts(products) {
-      var productsHtml = ''
-      if (products.length === 0) {
-        $('#productsList').html('<div class="alert alert-info">No products available at the moment.</div>')
-        return
-      }
-
-      // 创建每行的产品列表
-      var productsRow = '<div class="row">'
-      products.forEach(function (product, index) {
-        // 每行显示3个产品
-        if (index > 0 && index % 3 === 0) {
-          productsRow += '</div><div class="row mt-4">'
-        }
-
-        productsRow += `
-          <div class="col-md-4">
-            <div class="product-card ios-hover-effect">
-              <img src="${product.image_url}" alt="${product.name}" class="product-img">
-              <div class="product-body">
-                <h3 class="product-title">${product.name}</h3>
-                <p class="product-description">${product.description}</p>
-                <div class="product-price">
-                  <span class="price-tag">${product.price} Credits</span>
-                  <button class="exchange-btn" data-id="${product.id}">Exchange</button>
-                </div>
-                <div class="stock">Stock: ${product.stock}</div>
-              </div>
-            </div>
-          </div>
-        `
-      })
-      productsRow += '</div>'
-      $('#productsList').html(productsRow)
-    }
-
-    function exchangeProduct(productId, token) {
-      $.ajax({
-        type: 'POST',
-        url: 'exchange_product.php',
-        data: {
-          product_id: productId,
-          token: token
-        },
-        dataType: 'json',
-        success: function (response) {
-          if (response.success) {
-            showAlert('兑换成功！' + response.message, 'success');
-            // 更新用户积分和产品列表
-            fetchUserPoints()
-            fetchProducts()
-          } else {
-            showAlert('兑换失败：' + response.message, 'error');
-          }
-        },
-        error: function () {
-          showAlert('兑换请求失败，请稍后再试。', 'error');
-        }
-      })
-    }
-  </script>
 </head>
-<body>
+<body class="auto-theme">
+<!-- Add frosted glass background -->
+<div class="frosted-glass"></div>
+
+<!-- Add ambient glow effects -->
+<div class="glow-effect glow-orange"></div>
+<div class="glow-effect glow-pink"></div>
+
 <!-- 导航栏容器，将由JavaScript加载 -->
 <div id="navbar-container"></div>
 
 <header class="store-header">
   <div class="container">
-    <h1>Carbon Credits Mall</h1>
-    <p>Exchange your hard-earned carbon credits for eco-friendly rewards and exclusive benefits.</p>
+    <h1 class="fade-in-up">Carbon Credits Mall</h1>
+    <p class="fade-in-up delay-1">Exchange your hard-earned carbon credits for eco-friendly rewards and exclusive benefits.</p>
   </div>
 </header>
 
 <div class="container">
-  <div class="user-credits ios-depth-effect ios-shine-effect">
+  <div class="user-credits ios-depth-effect ios-shine-effect fade-in-up delay-2">
     <div class="row">
       <div class="col-md-8">
         <h2>Your Carbon Credits</h2>
@@ -302,7 +451,9 @@
     </div>
   </div>
   
-  <h2 class="section-title">Available Rewards</h2>
+  <div class="section-title-container fade-in-up delay-3">
+    <h2 class="section-title">Available Rewards</h2>
+  </div>
   
   <div id="loading" class="loading-spinner">
     <div class="spinner-border text-primary" role="status">
@@ -315,7 +466,195 @@
   </div>
 </div>
 
+<!-- Theme toggle button -->
+<div class="theme-toggle" id="themeToggle">
+  <i class="fas fa-moon"></i>
+</div>
+
 <!-- 页脚 -->
 <div id="footer-placeholder"></div>
+
+<script>
+  // Theme toggling functionality
+  document.addEventListener('DOMContentLoaded', function() {
+    const themeToggle = document.getElementById('themeToggle');
+    const body = document.body;
+    const icon = themeToggle.querySelector('i');
+    
+    // Check if user has a saved preference
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      body.className = savedTheme;
+      updateIcon(savedTheme);
+    }
+    
+    themeToggle.addEventListener('click', () => {
+      if (body.classList.contains('auto-theme')) {
+        body.classList.remove('auto-theme');
+        body.classList.add('dark-theme');
+        localStorage.setItem('theme', 'dark-theme');
+      } else if (body.classList.contains('dark-theme')) {
+        body.classList.remove('dark-theme');
+        body.classList.add('light-theme');
+        localStorage.setItem('theme', 'light-theme');
+      } else {
+        body.classList.remove('light-theme');
+        body.classList.add('auto-theme');
+        localStorage.setItem('theme', 'auto-theme');
+      }
+      
+      updateIcon(body.className);
+    });
+    
+    function updateIcon(theme) {
+      if (theme === 'dark-theme') {
+        icon.className = 'fas fa-sun';
+      } else if (theme === 'light-theme') {
+        icon.className = 'fas fa-adjust';
+      } else {
+        icon.className = 'fas fa-moon';
+      }
+    }
+  });
+  
+  $(document).ready(function () {
+    var token = localStorage.getItem('token')
+    if (token) {
+    } else {
+      $('#userPoints').text('未登录')
+      showAlert('请先登录。', 'warning', function() {
+        window.location.href = 'index.html'
+      })
+    }
+    // 获取用户积分
+    fetchUserPoints()
+
+    // 从PHP接口获取商品数据
+    fetchProducts()
+
+    // 兑换商品
+    $('#productsList').on('click', '.exchange-btn', function () {
+      var productId = $(this).data('id')
+      var token = localStorage.getItem('token')
+      exchangeProduct(productId, token)
+    })
+  })
+
+  function fetchProducts() {
+    var token = localStorage.getItem('token')
+    $('#loading').show() // 显示加载动画
+    $.ajax({
+      type: 'POST',
+      url: 'product.php',
+      data: {
+        token: token
+      },
+      dataType: 'json',
+      success: function (response) {
+        $('#loading').hide() // 隐藏加载动画
+        if (response.success) {
+          displayProducts(response.products)
+        } else {
+          $('#productsList').html('<div class="alert alert-danger">Error: ' + response.message + '</div>')
+        }
+      },
+      error: function () {
+        $('#loading').hide() // 隐藏加载动画
+        $('#productsList').html('<div class="alert alert-danger">Failed to fetch products. Please try again later.</div>')
+      }
+    })
+  }
+
+  function fetchUserPoints() {
+    var uid = localStorage.getItem('id')
+    var token = localStorage.getItem('token')
+    $.ajax({
+      type: 'POST',
+      url: 'get_user_points.php',
+      data: {
+        uid: uid,
+        token: token
+      },
+      dataType: 'json',
+      success: function (response) {
+        if (response.success) {
+          $('#userPoints').text(response.points)
+        } else {
+          console.error('Error getting user points:', response.message)
+        }
+      },
+      error: function () {
+        console.error('AJAX请求失败')
+      }
+    })
+  }
+
+  function displayProducts(products) {
+    var productsHtml = ''
+    if (products.length === 0) {
+      $('#productsList').html('<div class="alert alert-info">No products available at the moment.</div>')
+      return
+    }
+
+    // 添加动画效果的类
+    var animationClasses = ['fade-in-up delay-2', 'fade-in-up delay-3', 'fade-in-up delay-4'];
+
+    // 创建每行的产品列表
+    var productsRow = '<div class="row">'
+    products.forEach(function (product, index) {
+      // 每行显示3个产品
+      if (index > 0 && index % 3 === 0) {
+        productsRow += '</div><div class="row mt-4">'
+      }
+      
+      // 轮换使用动画类
+      var animationClass = animationClasses[index % animationClasses.length];
+
+      productsRow += `
+        <div class="col-md-4 mb-4">
+          <div class="product-card ios-hover-effect ${animationClass}">
+            <img src="${product.image_url}" alt="${product.name}" class="product-img">
+            <div class="product-body">
+              <h3 class="product-title">${product.name}</h3>
+              <p class="product-description">${product.description}</p>
+              <div class="product-price">
+                <span class="price-tag">${product.price} Credits</span>
+                <button class="exchange-btn" data-id="${product.id}">Exchange</button>
+              </div>
+              <div class="stock">Stock: ${product.stock}</div>
+            </div>
+          </div>
+        </div>
+      `
+    })
+    productsRow += '</div>'
+    $('#productsList').html(productsRow)
+  }
+
+  function exchangeProduct(productId, token) {
+    $.ajax({
+      type: 'POST',
+      url: 'exchange_product.php',
+      data: {
+        product_id: productId,
+        token: token
+      },
+      dataType: 'json',
+      success: function (response) {
+        if (response.success) {
+          showAlert('兑换成功！' + response.message, 'success');
+          // 更新用户积分和产品列表
+          fetchUserPoints()
+          fetchProducts()
+        } else {
+          showAlert('兑换失败：' + response.message, 'error');
+        }
+      },
+      error: function () {
+        showAlert('兑换请求失败，请稍后再试。', 'error');
+      }
+    })
+  }
+</script>
 </body>
 </html>

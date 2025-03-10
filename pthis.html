@@ -2,35 +2,126 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Carbon Reduction Records - CarbonTrack</title>
   <link rel="icon" href="/img/team.jpg" type="image/JPG">
-  <!-- 引入Bootstrap和jQuery的CDN链接 -->
-  <link rel="stylesheet" href="./css/bootstrap.min.css">
-  <script src="js/jquery.min.js"></script>
-  <script src="js/bootstrap.min.js"></script>
-  <script src="js/utils.js"></script>
-  <script src="js/nav.js"></script>
-  <!-- SF Pro 字体 -->
-  <link href="https://fonts.cdnfonts.com/css/sf-pro-display" rel="stylesheet">
+  
+  <!-- CDN References -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
-  <!-- Intersection Observer polyfill -->
-  <script src="https://cdn.jsdelivr.net/npm/intersection-observer@0.12.2/intersection-observer.js"></script>
-  <!-- iOS设计CSS -->
+  
+  <!-- SF Pro font -->
+  <link href="https://fonts.cdnfonts.com/css/sf-pro-display" rel="stylesheet">
+  
+  <!-- Custom CSS -->
   <link rel="stylesheet" href="./css/ios-design.css">
   <link rel="stylesheet" href="./css/index.css">
+  
+  <!-- JavaScript libraries -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/nav.js"></script>
+  
   <style>
+    :root {
+      --card-bg-light: rgba(255, 255, 255, 0.8);
+      --card-bg-dark: rgba(44, 44, 46, 0.8);
+      --text-color-light: #000;
+      --text-color-dark: #FFFFFF;
+      --records-gradient-start: var(--ios-green);
+      --records-gradient-end: var(--ios-teal);
+      --animation-timing-apple: cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+    
+    body {
+      background-color: var(--ios-secondary-system-background, #F2F2F7);
+      color: var(--text-color-light);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      position: relative;
+      min-height: 100vh;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    
+    /* Frosted glass background effect */
+    .frosted-glass {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: -2;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      background: rgba(255, 255, 255, 0.05);
+    }
+    
+    /* Add ambient glow effects */
+    .glow-effect {
+      position: fixed;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      filter: blur(50px);
+      z-index: -1;
+      opacity: 0.5;
+      animation: pulse 8s infinite alternate cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+    
+    .glow-green {
+      top: 10%;
+      right: 10%;
+      background: radial-gradient(circle, rgba(52, 199, 89, 0.2), transparent 70%);
+    }
+    
+    .glow-teal {
+      bottom: 10%;
+      left: 5%;
+      background: radial-gradient(circle, rgba(48, 176, 199, 0.15), transparent 70%);
+      animation-delay: 2s;
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1) translate(0, 0); opacity: 0.5; }
+      50% { transform: scale(1.05) translate(20px, -10px); opacity: 0.7; }
+      100% { transform: scale(1) translate(0, 0); opacity: 0.5; }
+    }
+    
     .records-header {
-      background: linear-gradient(135deg, var(--ios-green), var(--ios-teal));
+      background: linear-gradient(135deg, var(--records-gradient-start), var(--records-gradient-end));
       color: white;
       padding: 120px 0 60px;
       text-align: center;
       border-radius: 0 0 24px 24px;
       margin-bottom: 40px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    /* Add shimmer effect */
+    .records-header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
+      transform: rotate(30deg);
+      animation: shimmer 10s infinite linear;
+      pointer-events: none;
+    }
+    
+    @keyframes shimmer {
+      0% { transform: translateX(-50%) rotate(0deg); }
+      100% { transform: translateX(0%) rotate(360deg); }
     }
     
     .records-header h1 {
       font-weight: 700;
       margin-bottom: 16px;
+      position: relative;
+      z-index: 2;
     }
     
     .records-header p {
@@ -38,16 +129,27 @@
       max-width: 600px;
       margin: 0 auto;
       font-size: 1.1rem;
+      position: relative;
+      z-index: 2;
     }
     
     .user-info {
-      background: var(--ios-system-background);
+      background-color: var(--card-bg-light);
       border-radius: 24px;
       padding: 24px;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
       margin-bottom: 30px;
       display: flex;
       align-items: center;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      transition: transform 0.3s var(--animation-timing-apple),
+                box-shadow 0.3s var(--animation-timing-apple);
+    }
+    
+    .user-info:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
     }
     
     .user-info-label {
@@ -59,6 +161,9 @@
     .user-info-value {
       font-weight: 600;
       color: var(--ios-blue);
+      padding: 6px 12px;
+      background-color: rgba(0, 122, 255, 0.1);
+      border-radius: 8px;
     }
     
     .record-card {
@@ -69,7 +174,9 @@
       transition: transform 0.4s var(--animation-timing-apple),
                   box-shadow 0.4s var(--animation-timing-apple);
       height: 100%;
-      background-color: var(--ios-system-background);
+      background-color: var(--card-bg-light);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
     }
     
     .record-card:hover {
@@ -81,6 +188,11 @@
       width: 100%;
       height: 200px;
       object-fit: cover;
+      transition: transform 0.4s var(--animation-timing-apple);
+    }
+    
+    .record-card:hover .record-img {
+      transform: scale(1.03);
     }
     
     .record-body {
@@ -91,6 +203,10 @@
       font-weight: 700;
       margin-bottom: 12px;
       font-size: 1.3rem;
+      background: linear-gradient(135deg, var(--ios-blue), var(--ios-indigo));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
     
     .record-row {
@@ -108,6 +224,7 @@
     
     .record-value {
       flex-grow: 1;
+      word-break: break-word;
     }
     
     .auth-status {
@@ -120,6 +237,9 @@
       width: 100%;
       margin-top: 16px;
       transition: all 0.3s var(--animation-timing-apple);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
     
     .auth-yes {
@@ -132,6 +252,37 @@
     
     .auth-non {
       background: linear-gradient(135deg, var(--ios-orange), var(--ios-yellow));
+    }
+    
+    /* Add shine effect to auth-status */
+    .auth-status::before {
+      content: '';
+      position: absolute;
+      top: -180%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      opacity: 0;
+      transform: rotate(30deg);
+      background: rgba(255, 255, 255, 0.13);
+      background: linear-gradient(
+        to right, 
+        rgba(255, 255, 255, 0.13) 0%,
+        rgba(255, 255, 255, 0.13) 77%,
+        rgba(255, 255, 255, 0.5) 92%,
+        rgba(255, 255, 255, 0.0) 100%
+      );
+    }
+    
+    .auth-status:hover::before {
+      opacity: 1;
+      animation: shine 1.5s var(--animation-timing-apple);
+    }
+    
+    @keyframes shine {
+      to {
+        transform: translateX(250%);
+      }
     }
     
     .loading-container {
@@ -178,10 +329,196 @@
       background: linear-gradient(to right, var(--ios-green), var(--ios-teal));
       border-radius: 2px;
     }
+    
+    /* Empty state message */
+    .empty-state {
+      text-align: center;
+      padding: 60px 0;
+      color: var(--ios-gray);
+    }
+    
+    .empty-state i {
+      font-size: 48px;
+      margin-bottom: 20px;
+      color: var(--ios-green);
+      opacity: 0.6;
+    }
+    
+    .empty-state h3 {
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: var(--ios-label);
+    }
+    
+    /* Theme toggle button */
+    .theme-toggle {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      width: 50px;
+      height: 50px;
+      border-radius: 25px;
+      background: var(--ios-system-background);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      cursor: pointer;
+      z-index: 100;
+      transition: all 0.3s var(--animation-timing-apple);
+    }
+    
+    .theme-toggle:hover {
+      transform: scale(1.05);
+    }
+    
+    .theme-toggle i {
+      font-size: 24px;
+      color: var(--ios-gray);
+    }
+    
+    /* Animation classes */
+    .fade-in-up {
+      animation: fadeInUp 0.6s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+      opacity: 0;
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+    .delay-4 { animation-delay: 0.4s; }
+    .delay-5 { animation-delay: 0.5s; }
+    
+    /* Dark mode adaptations */
+    @media (prefers-color-scheme: dark) {
+      body.auto-theme {
+        background-color: #1C1C1E;
+        color: var(--text-color-dark);
+      }
+      
+      body.auto-theme .record-card,
+      body.auto-theme .user-info {
+        background-color: var(--card-bg-dark);
+      }
+      
+      body.auto-theme .user-info-label {
+        color: #AEAEB2;
+      }
+      
+      body.auto-theme .user-info-value {
+        color: #64D2FF;
+        background-color: rgba(10, 132, 255, 0.2);
+      }
+      
+      body.auto-theme .record-title {
+        background: linear-gradient(135deg, #64D2FF, #5E5CE6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      
+      body.auto-theme .record-label {
+        color: #8E8E93;
+      }
+      
+      body.auto-theme .record-value {
+        color: #FFFFFF;
+      }
+      
+      body.auto-theme .theme-toggle {
+        background-color: rgba(44, 44, 46, 0.8);
+      }
+      
+      body.auto-theme .theme-toggle i {
+        color: #AEAEB2;
+      }
+      
+      body.auto-theme .empty-state i {
+        color: #30D158;
+      }
+      
+      body.auto-theme .empty-state h3 {
+        color: #FFFFFF;
+      }
+    }
+    
+    /* Manual theme classes */
+    body.dark-theme {
+      background-color: #1C1C1E;
+      color: var(--text-color-dark);
+    }
+    
+    body.dark-theme .record-card,
+    body.dark-theme .user-info {
+      background-color: var(--card-bg-dark);
+    }
+    
+    body.dark-theme .user-info-label {
+      color: #AEAEB2;
+    }
+    
+    body.dark-theme .user-info-value {
+      color: #64D2FF;
+      background-color: rgba(10, 132, 255, 0.2);
+    }
+    
+    body.dark-theme .record-title {
+      background: linear-gradient(135deg, #64D2FF, #5E5CE6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    body.dark-theme .record-label {
+      color: #8E8E93;
+    }
+    
+    body.dark-theme .record-value {
+      color: #FFFFFF;
+    }
+    
+    body.dark-theme .theme-toggle {
+      background-color: rgba(44, 44, 46, 0.8);
+    }
+    
+    body.dark-theme .theme-toggle i {
+      color: #AEAEB2;
+    }
+    
+    body.dark-theme .empty-state i {
+      color: #30D158;
+    }
+    
+    body.dark-theme .empty-state h3 {
+      color: #FFFFFF;
+    }
+    
+    body.light-theme {
+      background-color: #F2F2F7;
+      color: var(--text-color-light);
+    }
   </style>
 </head>
-<body>
-<div id="loading" class="loading-container">
+<body class="auto-theme">
+<!-- Add frosted glass background -->
+<div class="frosted-glass"></div>
+
+<!-- Add ambient glow effects -->
+<div class="glow-effect glow-green"></div>
+<div class="glow-effect glow-teal"></div>
+
+<div id="loading" class="loading-container fade-in-up">
   <div class="loader"></div>
   <p>Loading records...</p>
 </div>
@@ -191,24 +528,74 @@
 
 <header class="records-header">
   <div class="container">
-    <h1>Carbon Reduction Records</h1>
-    <p>View and manage carbon accounting records for verification and approval</p>
+    <h1 class="fade-in-up">Carbon Reduction Records</h1>
+    <p class="fade-in-up delay-1">View and manage carbon accounting records for verification and approval</p>
   </div>
 </header>
 
 <div class="container">
-  <div class="user-info ios-depth-effect">
+  <div class="user-info ios-depth-effect fade-in-up delay-2">
     <div class="user-info-label">Current User:</div>
     <div class="user-info-value" id="email">Loading...</div>
   </div>
   
-  <h2 class="section-title">Carbon Reduction Submissions</h2>
+  <h2 class="section-title fade-in-up delay-2">Carbon Reduction Submissions</h2>
   <div id="records" class="row">
     <!-- 交易记录将在这里动态生成 -->
   </div>
 </div>
 
+<!-- Theme toggle button -->
+<div class="theme-toggle" id="themeToggle">
+  <i class="fas fa-moon"></i>
+</div>
+
+<!-- 页脚 -->
+<div id="footer-placeholder"></div>
+
 <script>
+  // Theme toggling functionality
+  document.addEventListener('DOMContentLoaded', function() {
+    const themeToggle = document.getElementById('themeToggle');
+    const body = document.body;
+    const icon = themeToggle.querySelector('i');
+    
+    // Check if user has a saved preference
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      body.className = savedTheme;
+      updateIcon(savedTheme);
+    }
+    
+    themeToggle.addEventListener('click', () => {
+      if (body.classList.contains('auto-theme')) {
+        body.classList.remove('auto-theme');
+        body.classList.add('dark-theme');
+        localStorage.setItem('theme', 'dark-theme');
+      } else if (body.classList.contains('dark-theme')) {
+        body.classList.remove('dark-theme');
+        body.classList.add('light-theme');
+        localStorage.setItem('theme', 'light-theme');
+      } else {
+        body.classList.remove('light-theme');
+        body.classList.add('auto-theme');
+        localStorage.setItem('theme', 'auto-theme');
+      }
+      
+      updateIcon(body.className);
+    });
+    
+    function updateIcon(theme) {
+      if (theme === 'dark-theme') {
+        icon.className = 'fas fa-sun';
+      } else if (theme === 'light-theme') {
+        icon.className = 'fas fa-adjust';
+      } else {
+        icon.className = 'fas fa-moon';
+      }
+    }
+  });
+
   $(document).ready(function () {
     fetchTransactions();
   });
@@ -251,11 +638,20 @@
           });
           
           if (response.data.length === 0) {
-            recordsContainer.html('<div class="col-12 text-center py-5"><p>No records found.</p></div>');
+            recordsContainer.html(`
+              <div class="col-12 empty-state fade-in-up delay-3">
+                <i class="fas fa-leaf"></i>
+                <h3>No Records Found</h3>
+                <p>You haven't submitted any carbon reduction records yet.</p>
+              </div>
+            `);
             return;
           }
           
-          response.data.forEach(record => {
+          // 添加动画效果的类
+          var animationClasses = ['fade-in-up delay-3', 'fade-in-up delay-4', 'fade-in-up delay-5'];
+          
+          response.data.forEach((record, index) => {
             const authClass = getAuthClass(record.auth);
             const authStatus = getAuthStatus(record.auth);
             
@@ -265,9 +661,12 @@
             // 处理活动日期（如果为空则显示记录创建时间）
             const activityDate = record.activity_date ? record.activity_date : record.time.split(' ')[0];
             
+            // 轮换使用动画类
+            var animationClass = animationClasses[index % animationClasses.length];
+            
             const card = `
               <div class="col-md-4 mb-4">
-                <div class="record-card ios-hover-effect">
+                <div class="record-card ios-hover-effect ${animationClass}">
                   <img class="record-img" src="${record.img}" alt="Record Image">
                   <div class="record-body">
                     <h3 class="record-title">${record.username}</h3>
@@ -359,8 +758,5 @@
     }
   }
 </script>
-
-<!-- 页脚 -->
-<div id="footer-placeholder"></div>
 </body>
 </html>
