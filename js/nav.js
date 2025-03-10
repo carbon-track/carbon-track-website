@@ -51,46 +51,46 @@ $(document).ready(function() {
     logoutButton.style.border = '1px solid rgba(255, 255, 255, .5)';
     var username = localStorage.getItem('username');
     updateLoginStatus();
-    
-    // 开始定期检查未读消息 - 每30秒检查一次
-    // 这会立即执行一次检查，然后每30秒检查一次
+    // 检查未读消息
+    checkUnreadMessagesAndUpdate();
+    // 启动定时检查
     startUnreadChecksAndUpdates();
     
     // 模态框显示时加载消息
-$('#messagesModal').on('show.bs.modal', function(e) {
-    console.log('消息模态框正在打开');
-    
-    // 添加加载动画
-    var modalBody = $(this).find('.modal-body');
-    modalBody.prepend('<div id="loading"><div class="spinner-border text-primary" role="status"><span class="sr-only">加载中...</span></div></div>');
-    
-    // 清除新消息标志
-    localStorage.removeItem('hasNewMessages');
-    
-    // 获取消息
-    fetchMessages().then(function(data) {
-        $('#loading').remove(); // 移除加载动画
+    $('#messagesModal').on('show.bs.modal', function(e) {
+        console.log('消息模态框正在打开');
         
-        if (data.success) {
-            // 默认显示"选择一个会话"提示
-            $('#messageContainer').hide();
-            $('#noConversationSelected').show();
+        // 添加加载动画
+        var modalBody = $(this).find('.modal-body');
+        modalBody.prepend('<div id="loading"><div class="spinner-border text-primary" role="status"><span class="sr-only">加载中...</span></div></div>');
+        
+        // 清除新消息标志
+        localStorage.removeItem('hasNewMessages');
+        
+        // 获取消息
+        fetchMessages().then(function(data) {
+            $('#loading').remove(); // 移除加载动画
             
-            // 构建会话列表
-            buildConversationsList(data);
-        } else {
-            console.error('获取消息失败');
-            showAlert('加载消息失败：' + (data.message || '未知错误'), 'error');
-        }
-        
-        // 开始定期检查未读消息
-        startUnreadChecksAndUpdates();
-    }).catch(function(error) {
-        $('#loading').remove(); // 确保即使发生错误也要移除加载动画
-        console.error('加载消息出错:', error.message);
-        showAlert('加载消息出错：' + error.message, 'error');
-    });
-});  } else {
+            if (data.success) {
+                // 默认显示"选择一个会话"提示
+                $('#messageContainer').hide();
+                $('#noConversationSelected').show();
+                
+                // 构建会话列表
+                buildConversationsList(data);
+            } else {
+                console.error('获取消息失败');
+                showAlert('加载消息失败：' + (data.message || '未知错误'), 'error');
+            }
+            
+            // 开始定期检查未读消息
+            startUnreadChecksAndUpdates();
+        }).catch(function(error) {
+            $('#loading').remove(); // 确保即使发生错误也要移除加载动画
+            console.error('加载消息出错:', error.message);
+            showAlert('加载消息出错：' + error.message, 'error');
+        });
+    });  } else {
     logout(); // 如果过期或未登录，执行注销操作
     
   }
@@ -226,20 +226,10 @@ $('nav .fas.fa-envelope').css('color', 'rgba(255, 255, 255, .5)');
         // 显示模态框
         $('#messagesModal').modal('show');
     });
-    
-    // Check for unread messages when navbar is loaded (only if logged in)
-    if (localStorage.getItem('loggedIn')) {
-        // 使用改进的函数检查未读消息
-        checkUnreadMessagesAndUpdate();
-    }
-    
-    // Clear any previous body padding (to fix desktop whitespace)
-    $('body').css('padding-top', '0');
-
-    // 绑定发送按钮的点击事件
-    $('#sendMessage').on('click', function() {
-        sendMessage();
-    });
+// 绑定发送按钮的点击事件
+$('#sendMessage').on('click', function() {
+    sendMessage();
+});
 
 
 
@@ -276,75 +266,17 @@ function googleTranslateElementInit() {
 
 // 检查未读消息
 function checkUnreadMessages() {
-    console.log('检查未读消息');
-    
-    // 统一使用的存储方式，优先使用localStorage，然后尝试sessionStorage
-    var token = localStorage.getItem('token') || sessionStorage.getItem('token');
-    var userId = localStorage.getItem('userId') || localStorage.getItem('id') || sessionStorage.getItem('id');
-    
-    if (!token || !userId) {
-        console.log('未登录，跳过未读消息检查');
-        return; // 如果未登录，不检查
-    }
-    
-    console.log('发送未读消息检查请求，用户ID:', userId);
-    
-    $.ajax({
-            url: 'chkmsg.php',
-        type: 'POST',
-        data: {
-            token: token,
-            uid: userId
-        },
-            dataType: 'json',
-            success: function(response) {
-            console.log('未读消息检查响应:', response);
-            
-            if (response.success && response.unreadCount > 0) {
-                console.log('有 ' + response.unreadCount + ' 条未读消息');
-                
-                // 显示未读消息数量徽章
-                $('#unreadMessagesCount').text(response.unreadCount).show();
-                
-                // 更改图标颜色为红色
-                $('nav .fas.fa-envelope').css('color', 'red');
-                $('.msg-icon').addClass('text-danger');
-                
-                // 移除旧的消息计数徽章，添加新的
-                $('.msg-badge').remove();
-                $('.msg-icon').parent().append(`<span class="msg-badge position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">${response.unreadCount}</span>`);
-            } else {
-                // 无未读消息，恢复图标原始颜色和移除未读数量
-                $('#unreadMessagesCount').hide();
-                $('nav .fas.fa-envelope').css('color', 'rgba(255, 255, 255, .5)');
-                $('.msg-icon').removeClass('text-danger');
-                $('.msg-badge').remove();
-            }
-        },
-        // 即使请求失败也不显示错误，只记录到控制台
-        error: function(xhr, status, error) {
-            console.error('检查未读消息失败:', error, xhr.responseText);
-                $('#emailHelp').hide();
-                console.log('请求未读消息数量失败');
-            }
-    });
+    console.log('旧的checkUnreadMessages函数已弃用，调用新的checkUnreadMessagesAndUpdate函数');
+    // 调用新函数
+    checkUnreadMessagesAndUpdate();
 }
 
-// 定时检查未读消息 - 已弃用，改用startUnreadChecksAndUpdates
-/*
+// 定时检查未读消息
 function startUnreadMessageCheck() {
-    console.log('启动定时检查未读消息');
-    
-    // 立即检查一次
-    checkUnreadMessages();
-    
-    // 每30秒检查一次
-    setInterval(function() {
-        console.log('定时检查未读消息');
-        checkUnreadMessages();
-    }, 30000);
+    console.log('旧的startUnreadMessageCheck函数已弃用，调用新的startUnreadChecksAndUpdates函数');
+    // 调用新函数
+    startUnreadChecksAndUpdates();
 }
-*/
 
 // 更新页面显示登录状态的函数
 
@@ -1152,11 +1084,11 @@ function refreshMessages(receiverId) {
 // Function to load navbar from navbar.html
 function loadNavbar() {
     // 创建导航栏内容
-    var navbarContent = `
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark" id="main-navbar">
+    const navbarContent = `
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #002A5C;">
         <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="index.html">
-                <img src="carbon-footprint.png" alt="CarbonTrack Logo" width="30" height="30" class="d-inline-block align-top mr-2">
+            <a class="navbar-brand" href="index.html">
+                <img src="img/team.jpg" width="36" height="36" class="d-inline-block align-top rounded-circle" alt="Logo">
                 <span class="navbar-title-chinese">校园碳账户</span> | CarbonTrack
             </a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -1212,8 +1144,7 @@ function loadNavbar() {
     
     // Check for unread messages when navbar is loaded (only if logged in)
     if (localStorage.getItem('loggedIn')) {
-        // 使用改进的函数检查未读消息
-        checkUnreadMessagesAndUpdate();
+        checkUnreadMessages();
     }
     
     // Clear any previous body padding (to fix desktop whitespace)
@@ -1366,8 +1297,7 @@ function setupNavbarEventListeners() {
     
     // Check for unread messages when navbar is loaded (only if logged in)
     if (localStorage.getItem('loggedIn')) {
-        // 使用改进的函数检查未读消息
-        checkUnreadMessagesAndUpdate();
+        checkUnreadMessages();
     }
     
     // Clear any previous body padding (to fix desktop whitespace)
