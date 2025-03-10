@@ -61,6 +61,9 @@ $('#messagesModal').on('show.bs.modal', function(e) {
     var modalBody = $(this).find('.modal-body');
     modalBody.prepend('<div id="loading"><div class="spinner-border text-primary" role="status"><span class="sr-only">加载中...</span></div></div>');
     
+    // 清除新消息标志
+    localStorage.removeItem('hasNewMessages');
+    
     // 获取消息
     fetchMessages().then(function(data) {
         $('#loading').remove(); // 移除加载动画
@@ -76,9 +79,6 @@ $('#messagesModal').on('show.bs.modal', function(e) {
             console.error('获取消息失败');
             showAlert('加载消息失败：' + (data.message || '未知错误'), 'error');
         }
-        
-        // 检查未读消息
-        checkUnreadMessagesAndUpdate();
         
         // 开始定期检查未读消息
         startUnreadChecksAndUpdates();
@@ -2251,7 +2251,16 @@ function startUnreadChecksAndUpdates() {
     // 设置每30秒检查一次未读消息的定时器
     window.unreadMessageTimer = setInterval(function() {
         console.log('定时检查未读消息');
+        
+        // 检查未读消息，只更新图标
         checkUnreadMessagesAndUpdate();
+        
+        // 如果模态框已打开，并且有新消息标志，则刷新消息列表
+        if ($('#messagesModal').hasClass('show') && localStorage.getItem('hasNewMessages') === 'true') {
+            console.log('模态框已打开且有新消息，刷新消息列表');
+            localStorage.removeItem('hasNewMessages');
+            refreshMessagesAndConversations();
+        }
     }, 30000);
     
     // 当模态框关闭时，清除定时器
@@ -2263,9 +2272,9 @@ function startUnreadChecksAndUpdates() {
     });
 }
 
-// 检查未读消息并在有新消息时更新
+// 检查未读消息并更新图标
 function checkUnreadMessagesAndUpdate() {
-    console.log('检查未读消息并在有新消息时更新');
+    console.log('检查未读消息并更新图标');
     
     // 统一使用的存储方式，优先使用localStorage，然后尝试sessionStorage
     var token = localStorage.getItem('token') || sessionStorage.getItem('token');
@@ -2293,19 +2302,17 @@ function checkUnreadMessagesAndUpdate() {
                 const unreadCount = response.unreadCount || 0;
                 console.log('未读消息数量:', unreadCount);
                 
-                // 显示未读消息数量
+                // 显示未读消息数量和更新图标
                 updateUnreadMessageIndicators(unreadCount);
                 
-                // 如果有未读消息并且消息模态框当前显示，则刷新消息
-                if (unreadCount > 0 && $('#messagesModal').hasClass('show')) {
-                    console.log('发现新消息，刷新会话列表和消息');
-                    refreshMessagesAndConversations();
+                // 如果有未读消息，设置一个标志表示有新消息
+                if (unreadCount > 0) {
+                    localStorage.setItem('hasNewMessages', 'true');
                 }
             }
         },
         error: function(xhr, status, error) {
             console.error('检查未读消息失败:', error, xhr.responseText);
-            $('#emailHelp').hide();
             console.log('请求未读消息数量失败');
         }
     });
@@ -2341,13 +2348,22 @@ function updateUnreadMessageIndicators(unreadCount) {
 function refreshMessagesAndConversations() {
     // 如果模态框未显示，则不进行刷新
     if (!$('#messagesModal').hasClass('show')) {
+        console.log('模态框未显示，不刷新消息');
         return;
     }
     
     console.log('刷新消息和会话列表');
     
+    // 添加加载动画
+    var modalBody = $('#messagesModal').find('.modal-body');
+    if (!$('#loading').length) {
+        modalBody.prepend('<div id="loading"><div class="spinner-border text-primary" role="status"><span class="sr-only">加载中...</span></div></div>');
+    }
+    
     // 获取消息
     fetchMessages().then(function(data) {
+        $('#loading').remove(); // 移除加载动画
+        
         if (data.success) {
             // 重建会话列表
             buildConversationsList(data);
@@ -2360,9 +2376,12 @@ function refreshMessagesAndConversations() {
             }
         } else {
             console.error('获取消息失败:', data.message);
+            showAlert('刷新消息失败：' + (data.message || '未知错误'), 'error');
         }
     }).catch(function(error) {
+        $('#loading').remove(); // 确保即使发生错误也要移除加载动画
         console.error('刷新消息出错:', error);
+        showAlert('刷新消息出错：' + error.message, 'error');
     });
 }
 
