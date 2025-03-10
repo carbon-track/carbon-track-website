@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             handleApiError(401, 'Token不合法。');
         }
-        $userId = sanitizeInput($_POST['uid']);
+        $userId = getUid($pdo, $email);
 
         $sql = "SELECT COUNT(*) AS unread_count FROM `messages` WHERE `receiver_id` = ? AND `is_read` = 0";
         $stmt = $pdo->prepare($sql);

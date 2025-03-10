@@ -84,7 +84,7 @@ $('#messagesModal').on('show.bs.modal', function(e) {
         console.log('消息数据获取成功，开始构建对话列表');
         
         // 构建对话列表
-        buildConversationsList(data);
+            buildConversationsList(data);
     }).catch(function(error) {
         console.error('获取消息出错:', error);
         $('#conversationList').empty().html('<div class="alert alert-danger">加载消息失败</div>');
@@ -446,12 +446,12 @@ function fetchMessages() {
         console.log('正在获取消息，使用token进行身份验证');
         
         try {
-            $.ajax({
-                type: 'POST',
-                url: 'getmsg.php',
+        $.ajax({
+            type: 'POST',
+            url: 'getmsg.php',
                 data: JSON.stringify({ token: token }),
-                contentType: 'application/json',
-                success: function(data) {
+            contentType: 'application/json',
+            success: function(data) {
                     console.log('消息获取成功，原始响应:', data);
                     
                     // 检查数据结构
@@ -502,8 +502,8 @@ function fetchMessages() {
                         }
                     });
                     
-                    resolve(data);
-                },
+                resolve(data);
+            },
                 error: function(xhr, status, error) {
                     console.error('无法加载消息:', error);
                     // 记录详细错误信息
@@ -549,7 +549,7 @@ function buildConversationsList(data) {
         console.log('收到消息数量:', data.messages.length);
         
         // 按发送者ID分组消息
-        var conversations = {};
+    var conversations = {};
         data.messages.forEach(function(message, index) {
             console.log(`处理第 ${index+1} 条消息:`, message);
             
@@ -559,9 +559,9 @@ function buildConversationsList(data) {
             if (!conversations[senderId]) {
                 conversations[senderId] = {
                     sender_id: senderId,
-                    messages: []
-                };
-            }
+                messages: []
+            };
+        }
             
             conversations[senderId].messages.push(message);
         });
@@ -575,7 +575,7 @@ function buildConversationsList(data) {
         }
         
         // 为每个发送者创建一个对话项
-        Object.values(conversations).forEach(function(conversation) {
+Object.values(conversations).forEach(function(conversation) {
             var senderId = conversation.sender_id;
             
             // 创建对话项
@@ -592,7 +592,7 @@ function buildConversationsList(data) {
             `);
             
             // 样式设置
-            listItem.css({
+        listItem.css({
                 'border-bottom': '1px solid #e9ecef',
                 'cursor': 'pointer',
                 'transition': 'background-color 0.2s'
@@ -618,7 +618,7 @@ function buildConversationsList(data) {
             });
             
             // 添加到对话列表
-            conversationList.append(listItem);
+        conversationList.append(listItem);
         });
         
         // 默认选中第一个对话并显示其消息
@@ -707,7 +707,7 @@ function displayMessages(messages, sender) {
         });
         
         // 添加每条消息
-        messages.forEach((message, index) => {
+    messages.forEach((message, index) => {
             console.log(`处理第 ${index+1} 条消息:`, message);
             
             try {
@@ -735,7 +735,7 @@ function displayMessages(messages, sender) {
                     let date = new Date(timestamp);
                     // 使用textContent显示时间，因为这是纯文本内容
                     time.textContent = date.toLocaleString();
-                } else {
+} else {
                     time.textContent = '未知时间';
                 }
                 
@@ -842,7 +842,7 @@ function sendMessage() {
                         buildConversationsList(data);
                     }
                 });
-            } else {
+        } else {
                 // 显示发送失败
                 tempMessage.innerHTML = `
                     <div class="message-bubble error" style="background-color:#ffdddd;margin-left:auto;">
@@ -1434,10 +1434,9 @@ function loadConversations() {
     // 使用getmsg.php获取所有消息，然后从消息中构建会话列表
     $.ajax({
         url: 'getmsg.php',
-        type: 'GET',
-        data: {
-            token: token
-        },
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ token: token }),
         success: function(response) {
             if (response.success) {
                 // 清空列表
@@ -1445,7 +1444,7 @@ function loadConversations() {
                 
                 // 从消息中提取唯一的对话者
                 const conversations = {};
-                const currentUserId = response.user_id || "";
+                const currentUserId = response.debug?.user_id || "";
                 
                 if (response.messages && response.messages.length > 0) {
                     // 处理消息，构建会话列表
@@ -1453,21 +1452,19 @@ function loadConversations() {
                         // 确定对话者ID
                         let partnerId;
                         
-                        // 如果当前用户是发送者，那么接收者就是对话伙伴
-                        if (message.sender_id == currentUserId) {
-                            partnerId = message.receiver_id;
-                        } else {
-                            // 否则发送者是对话伙伴
+                        // 如果当前用户是接收者，那么发送者就是对话伙伴
+                        if (message.receiver_id == currentUserId) {
                             partnerId = message.sender_id;
+                        } else {
+                            // 否则接收者是对话伙伴
+                            partnerId = message.receiver_id;
                         }
                         
                         // 如果这个对话伙伴还没有记录，创建一个
                         if (!conversations[partnerId]) {
                             conversations[partnerId] = {
                                 user_id: partnerId,
-                                username: message.sender_id == currentUserId ? 
-                                          (message.receiver_name || '用户 ' + partnerId) : 
-                                          (message.sender_name || '用户 ' + partnerId),
+                                username: '用户 ' + partnerId,
                                 messages: [],
                                 unread_count: 0,
                                 last_message: '',
@@ -1478,8 +1475,8 @@ function loadConversations() {
                         // 添加消息到这个对话
                         conversations[partnerId].messages.push(message);
                         
-                        // 如果消息是未读的并且不是当前用户发送的，增加未读计数
-                        if (message.is_read == 0 && message.sender_id != currentUserId) {
+                        // 如果消息是未读的并且当前用户是接收者，增加未读计数
+                        if (message.is_read == 0 && message.receiver_id == currentUserId) {
                             conversations[partnerId].unread_count++;
                         }
                     });
@@ -1488,14 +1485,14 @@ function loadConversations() {
                     Object.values(conversations).forEach(function(conversation) {
                         // 按时间排序消息
                         conversation.messages.sort(function(a, b) {
-                            return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+                            return new Date(b.send_time || b.created_at || 0) - new Date(a.send_time || a.created_at || 0);
                         });
                         
                         // 设置最新消息
                         if (conversation.messages.length > 0) {
                             const latestMessage = conversation.messages[0];
                             conversation.last_message = latestMessage.content || '';
-                            conversation.last_time = latestMessage.created_at || '';
+                            conversation.last_time = latestMessage.send_time || latestMessage.created_at || '';
                         }
                     });
                     
@@ -1566,20 +1563,24 @@ function loadConversations() {
     });
     
     // 使用chkmsg.php检查是否有未读消息
-    $.ajax({
-        url: 'chkmsg.php',
-        type: 'GET',
-        data: {
-            token: token
-        },
-        success: function(response) {
-            if (response.success && response.unread_count > 0) {
-                // 显示未读消息数量
-                console.log('有 ' + response.unread_count + ' 条未读消息');
-                // 可以在这里添加代码来显示未读消息数量的通知
+    var userId = localStorage.getItem('userId');
+    if (userId) {
+        $.ajax({
+            url: 'chkmsg.php',
+            type: 'POST',
+            data: {
+                token: token,
+                uid: userId
+            },
+            success: function(response) {
+                if (response.success && response.unreadCount > 0) {
+                    // 显示未读消息数量
+                    console.log('有 ' + response.unreadCount + ' 条未读消息');
+                    // 可以在这里添加代码来显示未读消息数量的通知
+                }
             }
-        }
-    });
+        });
+    }
 }
 
 // 初始化登录模态框
@@ -1803,22 +1804,24 @@ function loadMessages(userId, username) {
     // 发送AJAX请求获取消息
     $.ajax({
         url: 'getmsg.php',
-        type: 'GET',
-        data: {
-            token: token,
-            receiver_id: userId
-        },
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ token: token }),
         success: function(response) {
             if (response.success) {
+                // 获取当前用户ID
+                const currentUserId = response.debug?.user_id || "";
+                
                 // 过滤获取与特定用户的消息
                 const filteredMessages = response.messages.filter(function(message) {
-                    return (message.sender_id == userId || message.receiver_id == userId);
+                    return (message.sender_id == userId && message.receiver_id == currentUserId) || 
+                           (message.sender_id == currentUserId && message.receiver_id == userId);
                 });
                 
                 // 显示过滤后的消息
                 displayMessages(filteredMessages, userId);
                 
-                // 注意：getmsg.php可能已经内置了将消息标记为已读的功能
+                // 注意：getmsg.php已经将消息标记为已读
             } else {
                 // 显示错误信息
                 showAlert(response.message || '加载消息失败', 'error');
