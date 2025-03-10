@@ -448,7 +448,7 @@ function fetchMessages() {
                     data.messages.forEach(function(message, index) {
                         // 确保每条消息都有content字段
                         if (!message.content && (message.message || message.text)) {
-                            // 不要处理HTML内容，直接赋值
+                            // 不需要在这里净化，displayMessages函数会处理
                             message.content = message.message || message.text;
                         }
                         
@@ -689,8 +689,8 @@ function displayMessages(messages, sender) {
                 
                 // 添加消息内容 - 检查所有可能的内容字段
                 const messageContent = message.content || message.message || message.text || JSON.stringify(message);
-                // 使用innerHTML而不是textContent，以便正确渲染HTML标签
-                bubble.innerHTML = messageContent || '(空消息)';
+                // 使用sanitizeHTML函数净化HTML内容，防止XSS攻击
+                bubble.innerHTML = sanitizeHTML(messageContent) || '(空消息)';
                 console.log('消息内容:', messageContent);
                 
                 // 创建时间显示
@@ -769,9 +769,11 @@ function sendMessage() {
     
     var tempMessage = document.createElement('div');
     tempMessage.className = 'message-container sending';
+    // 安全处理消息内容（仅用于显示）
+    var safeMessageDisplay = sanitizeHTML(message);
     tempMessage.innerHTML = `
         <div class="message-bubble sending" style="background-color:#e8f5ff;margin-left:auto;opacity:0.8;">
-            ${message}
+            ${safeMessageDisplay}
             <div class="message-time">发送中...</div>
         </div>
     `;
@@ -795,7 +797,7 @@ function sendMessage() {
                 // 显示发送成功的消息
                 tempMessage.innerHTML = `
                     <div class="message-bubble sent" style="background-color:#007bff;color:white;margin-left:auto;">
-                        ${message}
+                        ${safeMessageDisplay}
                         <div class="message-time" style="color:#ddd;">
                             ${new Date().toLocaleString()}
                         </div>
@@ -808,11 +810,11 @@ function sendMessage() {
                         buildConversationsList(data);
                     }
                 });
-        } else {
+            } else {
                 // 显示发送失败
                 tempMessage.innerHTML = `
                     <div class="message-bubble error" style="background-color:#ffdddd;margin-left:auto;">
-                        ${message}
+                        ${safeMessageDisplay}
                         <div class="message-time">发送失败</div>
                     </div>
                 `;
@@ -825,7 +827,7 @@ function sendMessage() {
             // 显示发送失败
             tempMessage.innerHTML = `
                 <div class="message-bubble error" style="background-color:#ffdddd;margin-left:auto;">
-                    ${message}
+                    ${safeMessageDisplay}
                     <div class="message-time">发送失败: ${error}</div>
                 </div>
             `;
