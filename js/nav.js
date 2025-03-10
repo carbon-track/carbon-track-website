@@ -111,18 +111,16 @@ $('nav .fas.fa-envelope').css('color', 'rgba(255, 255, 255, .5)');
             data: { username: username, password: password },
             dataType: 'json',
             success: function(response) {
+                $('#loading').hide();
                 if (response.success) {
-                    // 登录成功
-                    var now = new Date();
-                    var expiration = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000); // 设置7天后的时间
-                    localStorage.setItem('loggedIn', true); // 存储登录状态
-                    localStorage.setItem('username', response.real_username); // 存储用户名
-                    localStorage.setItem('expiration', expiration.getTime()); // 存储过期时间戳
-                    localStorage.setItem('email', response.email); // 存储email
+                    console.log('登录成功，身份：', response.real_username);
+                    $('#loginModal').modal('hide');
+                    localStorage.setItem('loggedIn', true);
+                    localStorage.setItem('username', response.real_username);
                     localStorage.setItem('token', response.token);
-                    localStorage.setItem('id', response.id);
-                    $('[data-target="#loginModal"]').hide();
-                    $('[data-target="#registerModal"]').hide();
+                    // 设置7天的到期时间
+                    localStorage.setItem('expiration', new Date().getTime() + 7 * 24 * 60 * 60 * 1000);
+                    updateLoginStatus();
                     var logoutButton = document.getElementById('logoutButton');
                     
                     // 移除"btn-danger"类
@@ -143,13 +141,50 @@ $('nav .fas.fa-envelope').css('color', 'rgba(255, 255, 255, .5)');
 
                     updateLoginStatus(); // 更新页面显示登录状态
                 } else {
-                    // 登录失败，显示错误信息
-                    alert('登录失败: ' + response.message);
+                    showAlert(response.message || '登录失败', 'error');
+                    var logoutButton = document.getElementById('logoutButton');
+                    
+                    // 移除"btn-danger"类
+                    logoutButton.classList.remove('btn-danger');
+                    
+                    // 设置按钮颜色
+                    logoutButton.style.color = 'rgba(255, 255, 255, .5)';
+                    logoutButton.style.border = '1px solid rgba(255, 255, 255, .5)';
+                    $('.logoutControl').show();
+                    $('a[href="center.html"]').hide();
+                    $('a[href="calculate.html"]').hide();
+                    $('a[href="CStore.html"]').hide();
+
+                    $('#loginModal').modal('hide').on('hidden.bs.modal', function() {
+                        // 这里的代码会在模态框完全关闭后执行
+                        $('.modal-backdrop').remove(); // 如果需要的话，手动移除遮罩
+                    });
+
+                    updateLoginStatus(); // 更新页面显示登录状态
                 }
             },
             error: function() {
-                alert('登录请求失败，请稍后再试。');
-                $('#refreshAlert').show();
+                $('#loading').hide();
+                showAlert('登录请求失败，请稍后再试。', 'error');
+                var logoutButton = document.getElementById('logoutButton');
+                
+                // 移除"btn-danger"类
+                logoutButton.classList.remove('btn-danger');
+                
+                // 设置按钮颜色
+                logoutButton.style.color = 'rgba(255, 255, 255, .5)';
+                logoutButton.style.border = '1px solid rgba(255, 255, 255, .5)';
+                $('.logoutControl').show();
+                $('a[href="center.html"]').hide();
+                $('a[href="calculate.html"]').hide();
+                $('a[href="CStore.html"]').hide();
+
+                $('#loginModal').modal('hide').on('hidden.bs.modal', function() {
+                    // 这里的代码会在模态框完全关闭后执行
+                    $('.modal-backdrop').remove(); // 如果需要的话，手动移除遮罩
+                });
+
+                updateLoginStatus(); // 更新页面显示登录状态
             }
         });
     });
@@ -161,11 +196,12 @@ $('nav .fas.fa-envelope').css('color', 'rgba(255, 255, 255, .5)');
     $('#messagesIcon, [data-target="#messagesModal"]').on('click', function(e) {
         e.preventDefault();
         
-        // 检查登录状态
         var loggedIn = localStorage.getItem('loggedIn');
         if (!loggedIn) {
-            alert('请先登录以访问消息');
-            return;
+            e.preventDefault();
+            e.stopPropagation();
+            showAlert('请先登录以访问消息', 'warning');
+            return false;
         }
         
         // 确保模态框已初始化
@@ -301,17 +337,25 @@ function registerUser() {
         dataType: 'json',
         success: function(response) {
             if (response.success) {
-                // 注册成功
-                $('#registerModal').modal('hide'); // 关闭模态框
-                alert('注册成功！Register success!');
+                // 关闭注册模态框，显示成功消息，然后打开登录模态框
+                $('#registerModal').modal('hide');
+                showAlert('注册成功！Register success!', 'success', function() {
+                    // 在用户关闭提示后显示登录模态框
+                    $('#loginModal').modal('show');
+                });
+                
+                // 清空表单
+                $('#regusername, #regpassword, #email, #verificationCode').val('');
+                $('#registerError').hide();
             } else {
-                // 注册失败，显示错误信息
-                $('#registerError').show().text('连接不稳定，请尝试直接登录! Connection unstable, please try to sign in directly!');
+                // 显示注册失败消息
+                $('#registerError').text(response.message).show();
             }
         },
         error: function() {
-            alert('注册请求失败，请稍后再试。Register request failed, please try later.');
-            $('#refreshAlert').show();
+            // 显示错误信息
+            showAlert('注册请求失败，请稍后再试。Register request failed, please try later.', 'error');
+            $('#registerError').text('注册请求失败，请稍后再试。Register request failed, please try later.').show();
         }
     });
 }
@@ -331,7 +375,7 @@ function sendVerificationCode() {
 
     // 如果有未填写的必填输入框，显示提示信息并终止函数执行
     if (!allFilled) {
-        alert('请填写所有必填信息后再发送验证码。');
+        showAlert('请填写所有必填信息后再发送验证码。', 'warning');
         return; // 终止函数执行
     }
     // 记录发送时间到localStorage
@@ -358,16 +402,16 @@ function sendVerificationCode() {
                     
                 } else {
                     $('#emailHelp').hide();
-                    alert('验证码发送失败: ' + response.error);
+                    showAlert('验证码发送失败: ' + response.error, 'error');
                 }
             },
             error: function() {
                 $('#emailHelp').hide();
-                alert('请求发送验证码失败，请稍后再试。');
+                showAlert('请求发送验证码失败，请稍后再试。', 'error');
             }
         });
     } else {
-        alert('请输入邮箱地址。');
+        showAlert('请输入邮箱地址。', 'warning');
     }
 }
 
@@ -460,15 +504,15 @@ function fetchMessages() {
                     
                     resolve(data);
                 },
-                error: function(jqXHR, textStatus, errorThrown) {
-                    console.error('无法加载消息:', textStatus, errorThrown);
+                error: function(xhr, status, error) {
+                    console.error('无法加载消息:', error);
                     // 记录详细错误信息
                     console.error('错误详情:', {
-                        status: jqXHR.status,
-                        statusText: jqXHR.statusText,
-                        responseText: jqXHR.responseText
+                        status: xhr.status,
+                        statusText: xhr.statusText,
+                        responseText: xhr.responseText
                     });
-                    reject(new Error('加载消息时发生错误: ' + errorThrown));
+                    reject(new Error('加载消息时发生错误: ' + error));
                 }
             });
         } catch (err) {
@@ -485,15 +529,9 @@ function buildConversationsList(data) {
     // 获取对话列表容器
     var conversationList = $('#conversationList');
     if (!conversationList.length) {
-        console.log('找不到对话列表容器，正在重新初始化消息模态框');
-        initMessageModal();
-        // 重新获取容器
-        conversationList = $('#conversationList');
-        if (!conversationList.length) {
-            console.error('无法创建对话列表容器，可能存在DOM结构问题');
-            alert('无法加载消息界面，请刷新页面重试');
-            return;
-        }
+        console.error('无法创建对话列表容器，可能存在DOM结构问题');
+        showAlert('无法加载消息界面，请刷新页面重试', 'error');
+        return;
     }
     
     // 清空现有列表
@@ -614,15 +652,9 @@ function displayMessages(messages, sender) {
     // 获取或创建messageList元素
     let messageList = document.getElementById('messageList');
     if (!messageList) {
-        console.log('找不到messageList元素，正在重新初始化消息模态框');
-        initMessageModal();
-        // 重新获取元素
-        messageList = document.getElementById('messageList');
-        if (!messageList) {
-            console.error('无法创建messageList元素，可能存在DOM结构问题');
-            alert('无法加载消息界面，请刷新页面重试');
-            return;
-        }
+        console.error('无法创建messageList元素，可能存在DOM结构问题');
+        showAlert('无法加载消息界面，请刷新页面重试', 'error');
+        return;
     }
     
     // 清空现有消息
@@ -744,7 +776,7 @@ function sendMessage() {
     
     if (!receiverId || !token) {
         console.error('缺少接收者ID或token', { receiverId, token });
-        alert('发送失败：无法确定接收者或未登录');
+        showAlert('发送失败：无法确定接收者或未登录', 'error');
         return;
     }
     
@@ -756,13 +788,13 @@ function sendMessage() {
     // 显示一个临时的发送中消息
     var messageList = document.getElementById('messageList');
     if (!messageList) {
-        console.log('找不到messageList元素，正在重新初始化消息模态框');
+        console.error('找不到messageList元素，正在重新初始化消息模态框');
         initMessageModal();
         // 重新获取元素
         messageList = document.getElementById('messageList');
         if (!messageList) {
             console.error('无法创建messageList元素，可能存在DOM结构问题');
-            alert('无法发送消息，请刷新页面重试');
+            showAlert('无法发送消息，请刷新页面重试', 'error');
             return;
         }
     }
@@ -822,15 +854,21 @@ function sendMessage() {
             }
         },
         error: function(xhr, status, error) {
-            console.error('发送消息时出错:', error);
+            console.error("Error sending message:", error);
             
-            // 显示发送失败
-            tempMessage.innerHTML = `
-                <div class="message-bubble error" style="background-color:#ffdddd;margin-left:auto;">
-                    ${safeMessageDisplay}
-                    <div class="message-time">发送失败: ${error}</div>
-                </div>
-            `;
+            // 将临时消息状态更新为发送失败
+            const messageBubble = document.querySelector(`[data-temp-id="${tempMessageId}"]`);
+            if (messageBubble) {
+                messageBubble.classList.add('failed');
+                const timeElement = messageBubble.querySelector('.message-time');
+                if (timeElement) {
+                    timeElement.textContent = '发送失败';
+                    timeElement.style.color = '#ff4d4f';
+                }
+            }
+            
+            // 显示错误提示
+            showAlert('消息发送失败，请稍后再试。', 'error');
         }
     });
 }
@@ -971,48 +1009,26 @@ function setupNavbarEventListeners() {
             data: { username: username, password: password },
             dataType: 'json',
         success: function(response) {
+            $('#loading').hide();
             if (response.success) {
-                    // 登录成功
-                    var now = new Date();
-                    var expiration = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000); // 设置7天后的时间
-                    localStorage.setItem('loggedIn', true); // 存储登录状态
-                    localStorage.setItem('username', response.real_username); // 存储用户名
-                    localStorage.setItem('expiration', expiration.getTime()); // 存储过期时间戳
-                    localStorage.setItem('email', response.email); // 存储email
+                    console.log('登录成功，身份：', response.real_username);
+                    $('#loginModal').modal('hide');
+                    localStorage.setItem('loggedIn', true);
+                    localStorage.setItem('username', response.real_username);
                     localStorage.setItem('token', response.token);
-                    localStorage.setItem('id', response.id);
-                    $('[data-target="#loginModal"]').hide();
-                    $('[data-target="#registerModal"]').hide();
-                    var logoutButton = document.getElementById('logoutButton');
-                    
-                    // 移除"btn-danger"类
-                    logoutButton.classList.remove('btn-danger');
-                    
-                    // 设置按钮颜色
-                    logoutButton.style.color = 'rgba(255, 255, 255, .5)';
-                    logoutButton.style.border = '1px solid rgba(255, 255, 255, .5)';
-                    $('.logoutControl').show();
-                    $('a[href="center.html"]').hide();
-                    $('a[href="calculate.html"]').hide();
-                    $('a[href="CStore.html"]').hide();
-
-                    $('#loginModal').modal('hide').on('hidden.bs.modal', function() {
-                        // 这里的代码会在模态框完全关闭后执行
-                        $('.modal-backdrop').remove(); // 如果需要的话，手动移除遮罩
-                    });
-
-                    updateLoginStatus(); // 更新页面显示登录状态
+                    // 设置7天的到期时间
+                    localStorage.setItem('expiration', new Date().getTime() + 7 * 24 * 60 * 60 * 1000);
+                    updateLoginStatus();
+                    $submitButton.prop('disabled', false).text('Login');
             } else {
-                    // Show error message
-                    alert('Login failed: ' + response.message);
+                    showAlert(response.message || '登录失败', 'error');
+                    $submitButton.prop('disabled', false).text('Login');
             }
         },
         error: function() {
-                alert('Login request failed. Please try again later.');
-            },
-            complete: function() {
-                // Re-enable the button regardless of success/failure
-                $submitButton.prop('disabled', false).html('Sign In');
+                $('#loading').hide();
+                showAlert('登录请求失败，请稍后再试。', 'error');
+                $submitButton.prop('disabled', false).text('Login');
             }
         });
     });
@@ -1065,11 +1081,12 @@ function setupNavbarEventListeners() {
     $('#messagesIcon, [data-target="#messagesModal"]').on('click', function(e) {
         e.preventDefault();
         
-        // 检查登录状态
         var loggedIn = localStorage.getItem('loggedIn');
         if (!loggedIn) {
-            alert('请先登录以访问消息');
-            return;
+            e.preventDefault();
+            e.stopPropagation();
+            showAlert('请先登录以访问消息', 'warning');
+            return false;
         }
         
         // 确保模态框已初始化
@@ -1315,69 +1332,88 @@ function initAllModals() {
     initRegisterModal();
 }
 
-// 初始化消息模态框结构
+// 初始化消息模态框
 function initMessageModal() {
     console.log('初始化消息模态框');
     
-    // 检查模态框是否已存在
-    if (document.getElementById('messagesModal')) {
+    // 检查模态框是否已经存在
+    if ($('#messagesModal').length) {
         console.log('消息模态框已存在，无需重新创建');
         return;
     }
     
-    // 创建模态框HTML
-    const modalHTML = `
-    <div class="modal fade" id="messagesModal" tabindex="-1" role="dialog" aria-labelledby="messagesModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="messagesModalLabel">Messages</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-4" id="conversationList">
-                            <!-- 对话列表将在这里动态加载 -->
-                        </div>
-                        <div class="col-8">
-                            <div id="messageList" style="height: 400px; overflow-y: auto;">
-                                <!-- 消息列表将在这里动态加载 -->
+    // 创建模态框HTML结构
+    var modalHTML = `
+        <div class="modal fade" id="messagesModal" tabindex="-1" aria-labelledby="messagesModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="messagesModalLabel">消息</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <!-- 左侧会话列表 -->
+                            <div class="col-md-4 border-end">
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" id="conversationSearch" placeholder="搜索会话...">
+                                </div>
+                                <div id="conversationList" class="overflow-auto" style="max-height: 400px;">
+                                    <!-- 会话列表将通过JS动态加载 -->
+                                </div>
                             </div>
-                            <div class="input-group mt-3">
-                                <input type="text" class="form-control" id="messageInput" placeholder="Enter Message...">
-                                <div class="input-group-append">
-                                    <button class="btn btn-primary" type="button" id="sendMessage">Send</button>
+                            <!-- 右侧消息内容 -->
+                            <div class="col-md-8">
+                                <div id="messageContainer" class="d-flex flex-column">
+                                    <div id="messageList" class="overflow-auto flex-grow-1" style="height: 350px; padding: 10px;">
+                                        <!-- 消息内容将通过JS动态加载 -->
+                                    </div>
+                                    <div class="message-input-container mt-3">
+                                        <div class="input-group">
+                                            <textarea id="messageInput" class="form-control" placeholder="输入消息..." rows="2"></textarea>
+                                            <button class="btn btn-primary" id="sendMessageBtn">发送</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                </div>
             </div>
         </div>
-    </div>`;
+    `;
     
     // 将模态框添加到body
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    $('body').append(modalHTML);
     
-    // 绑定发送按钮点击事件
-    $('#sendMessage').on('click', function() {
+    // 初始化后绑定事件
+    $('#sendMessageBtn').click(function() {
         sendMessage();
     });
     
-    // 绑定输入框回车事件
-    $('#messageInput').on('keypress', function(e) {
-        if (e.which === 13) {
-            sendMessage();
-            return false;
+    // 在输入框中按Enter键发送消息
+    $('#messageInput').keypress(function(e) {
+        if (e.which === 13 && !e.shiftKey) { // 按下Enter键且未按Shift键
+            e.preventDefault(); // 阻止默认行为（换行）
+            sendMessage(); // 发送消息
         }
     });
     
-    console.log('消息模态框已创建并初始化完成');
+    // 为模态框显示事件添加处理程序，当模态框显示时加载会话列表
+    $('#messagesModal').on('shown.bs.modal', function() {
+        console.log('消息模态框已显示，加载会话列表');
+        loadConversations();
+        
+        // 确保消息列表滚动到底部
+        const messageList = document.getElementById('messageList');
+        if (messageList) {
+            setTimeout(() => {
+                messageList.scrollTop = messageList.scrollHeight;
+            }, 100);
+        }
+    });
+    
+    console.log('消息模态框初始化完成');
 }
 
 // 初始化登录模态框
@@ -1576,8 +1612,4 @@ function sanitizeHTML(html) {
     
     return sanitized;
 }
-
-
-
-
 

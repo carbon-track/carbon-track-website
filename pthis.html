@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="./css/bootstrap.min.css">
   <script src="js/jquery.min.js"></script>
   <script src="js/bootstrap.min.js"></script>
+  <script src="js/utils.js"></script>
   <script src="js/nav.js"></script>
   <!-- SF Pro 字体 -->
   <link href="https://fonts.cdnfonts.com/css/sf-pro-display" rel="stylesheet">
@@ -216,15 +217,17 @@
   if (token) {
   } else {
     $('#email').text('Not logged in');
-    alert('Please login first.');
-    window.location.href = 'index.html';
+    showAlert('请先登录', 'warning', function() {
+      window.location.href = 'index.html';
+    });
   }
 
   function fetchTransactions() {
     var token = localStorage.getItem('token');
     if (!token) {
-      alert('Please login first.');
-      window.location.href = 'index.html';
+      showAlert('请先登录', 'warning', function() {
+        window.location.href = 'index.html';
+      });
       return; // 如果没有token，停止执行
     }
     
@@ -319,13 +322,13 @@
           });
         } else {
           // 处理错误消息
-          alert('Error: ' + response.message);
+          showAlert('错误: ' + response.message, 'error');
         }
       },
       error: function (jqXHR, textStatus, errorThrown) {
         $('#loading').hide(); // 隐藏加载动画
         console.error('AJAX error: ' + textStatus + ' - ' + errorThrown);
-        alert('Request failed: ' + textStatus);
+        showAlert('请求失败: ' + textStatus, 'error');
       },
     });
   }

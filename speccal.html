@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="./css/bootstrap.min.css">
   <script src="js/jquery.min.js"></script>
   <script src="js/bootstrap.min.js"></script>
+  <script src="js/utils.js"></script>
   <script src="js/nav.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
   <!-- SF Pro 字体 -->
@@ -326,7 +327,7 @@
         <p>This is an estimate based on your input. Final credits may vary after review.</p>
       </div>
       
-      <button type="submit" class="submit-btn">
+      <button type="submit" class="submit-btn" id="submitBtn">
         <i class="fas fa-leaf mr-2"></i> Submit Activity
       </button>
     </form>
@@ -362,9 +363,9 @@
   $(document).ready(function () {
     var token = localStorage.getItem('token');
     if (!token) {
-      $('#userPoints').text('Not logged in');
-      alert('Please login first.');
-      window.location.href = 'index.html';
+      showAlert('请先登录', 'warning', function() {
+        window.location.href = 'index.html';
+      });
       return;
     }
     
@@ -397,18 +398,24 @@
       e.preventDefault();
       
       // Validate form
-      if (!$('#activity').val()) {
-        alert('Please select an activity.');
+      var activity = $('#activity').val();
+      var dataInputValue = $('#dataInput').val();
+      var dataInput = parseFloat(dataInputValue);
+      var quantity = dataInput;
+      var evidenceFile = $('#imageUpload').val();
+      
+      if (!activity) {
+        showAlert('请选择一个活动', 'warning');
         return;
       }
       
-      if (!$('#dataInput').val() || isNaN(parseFloat($('#dataInput').val()))) {
-        alert('Please enter a valid quantity.');
+      if (!quantity || isNaN(quantity) || quantity <= 0) {
+        showAlert('请输入有效的数量', 'warning');
         return;
       }
       
-      if (!$('#imageUpload').val()) {
-        alert('Please upload evidence for your activity.');
+      if (!evidenceFile) {
+        showAlert('请上传活动证明', 'warning');
         return;
       }
       
@@ -436,40 +443,39 @@
         contentType: false,
         dataType: 'json',
         success: function (response) {
-          // Reset button state
-          submitBtn.html(originalText);
-          submitBtn.prop('disabled', false);
+          // 隐藏加载状态
+          $('#submitBtn').html('Submit').prop('disabled', false);
           
           if (response.success) {
-            alert('Submission successful: ' + response.message + '\nEstimated credits: ' + response.points);
-            sendEmail(token);
-            
-            // Reset form
-            $('#carbonForm')[0].reset();
-            $('#selectedFilename').hide();
-            $('#notes').val('');
-            document.getElementById('activityDate').valueAsDate = new Date();
-            calculateAndDisplayReduction();
+            showAlert('提交成功: ' + response.message + '\n预计积分: ' + response.points, 'success', function() {
+              // 重置表单
+              $('#carbonForm')[0].reset();
+              $('#selectedFilename').hide();
+              $('#notes').val('');
+              $('#activityDate').val(new Date().toISOString().split('T')[0]);
+              calculateAndDisplayReduction();
+            });
           } else {
-            if (response.message === '令牌无效或已过期。') {
-              alert('Your session has expired. Please login again.');
-              window.location.href = 'index.html';
+            if (response.message === 'Invalid token') {
+              showAlert('您的会话已过期，请重新登录', 'error', function() {
+                window.location.href = 'index.html';
+              });
             } else {
-              alert('Submission failed: ' + response.message);
+              showAlert('提交失败: ' + response.message, 'error');
             }
           }
         },
-        error: function (xhr) {
-          // Reset button state
-          submitBtn.html(originalText);
-          submitBtn.prop('disabled', false);
+        error: function (xhr, status, error) {
+          // 隐藏加载状态
+          $('#submitBtn').html('Submit').prop('disabled', false);
           
-          var errorMsg = 'Submission failed. Please try again.';
+          var errorMsg = '提交失败，请稍后再试';
           if (xhr.responseJSON && xhr.responseJSON.message) {
-            errorMsg += ' Error: ' + xhr.responseJSON.message;
+            errorMsg += ': ' + xhr.responseJSON.message;
           }
-          alert(errorMsg);
-        },
+          
+          showAlert(errorMsg, 'error');
+        }
       });
     });
   });

@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="./css/bootstrap.min.css">
   <script src="js/jquery.min.js"></script>
   <script src="js/bootstrap.min.js"></script>
+  <script src="js/utils.js"></script>
   <script src="js/nav.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
   <!-- SF Pro 字体 -->
@@ -186,18 +187,18 @@
           if (response.success) {
             $('#passwordResetModal').modal('show') // Show the password reset modal
           } else {
-            alert('Failed to send verification code: ' + response.error)
+            showAlert('验证码发送失败：' + response.error, 'error')
           }
         },
         error: function () {
           // Reset button state
           $('#sendRecoveryCode').html('<i class="fas fa-paper-plane mr-2"></i> Send Verification Code')
           $('#sendRecoveryCode').prop('disabled', false)
-          alert('Request failed. Please try again later.')
+          showAlert('请求失败，请稍后再试。', 'error')
         },
       })
     } else {
-      alert('Please enter your email address.')
+      showAlert('请输入您的邮箱地址。', 'warning')
     }
   })
 
@@ -227,21 +228,22 @@
         $('#passwordResetForm').find('button[type="submit"]').prop('disabled', false)
         
         if (response.success) {
-          alert('Password reset successful! You can now login with your new password.')
-          $('#passwordResetModal').modal('hide')
-          // Redirect to login page after successful reset
-          setTimeout(function() {
-            window.location.href = 'index.html'
-          }, 1500)
+          showAlert('密码重置成功！您现在可以使用新密码登录。', 'success', function() {
+            $('#passwordResetModal').modal('hide')
+            // Redirect to login page after successful reset
+            setTimeout(function() {
+              window.location.href = 'index.html'
+            }, 500)
+          })
         } else {
-          alert('Password reset failed: ' + response.error)
+          showAlert('密码重置失败：' + response.error, 'error')
         }
       },
       error: function () {
         // Reset button state
         $('#passwordResetForm').find('button[type="submit"]').html('<i class="fas fa-key mr-2"></i> Reset Password')
         $('#passwordResetForm').find('button[type="submit"]').prop('disabled', false)
-        alert('Request failed. Please try again later.')
+        showAlert('请求失败，请稍后再试。', 'error')
       },
     })
   })

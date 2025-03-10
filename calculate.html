@@ -15,6 +15,7 @@
   <script src="https://cdn.jsdelivr.net/npm/intersection-observer@0.12.2/intersection-observer.js"></script>
   <!-- iOS设计CSS -->
   <link rel="stylesheet" href="./css/ios-design.css">
+  <script src="js/utils.js"></script>
   <script src="js/nav.js"></script>
   <link rel="stylesheet" href="./css/index.css">
   <style>
@@ -120,8 +121,9 @@
         // 用户已登录
       } else {
         $('#userPoints').text('未登录')
-        alert('请先登录。')
-        window.location.href = 'index.html'
+        showAlert('请先登录。', 'warning', function() {
+          window.location.href = 'index.html'
+        })
       }
       // 初始化活动小类选项
       updateActivityOptions($('#category').val())
@@ -194,9 +196,10 @@
               
               // 如果是令牌失效，提示用户重新登录
               if (response.message === '令牌无效或已过期。') {
-                alert('令牌无效或已过期，请重新登录。');
-                // 重定向到登录页面
-                window.location.href = 'index.html';
+                showAlert('令牌无效或已过期，请重新登录。', 'error', function() {
+                  // 重定向到登录页面
+                  window.location.href = 'index.html';
+                });
               }
             }
           },

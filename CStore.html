@@ -14,6 +14,7 @@
   <script src="https://cdn.jsdelivr.net/npm/intersection-observer@0.12.2/intersection-observer.js"></script>
   <!-- iOS设计CSS -->
   <link rel="stylesheet" href="./css/ios-design.css">
+  <script src="js/utils.js"></script>
   <script src="js/nav.js"></script>
   <link rel="stylesheet" href="/css/index.css">
   <style>
@@ -147,8 +148,9 @@
       if (token) {
       } else {
         $('#userPoints').text('未登录')
-        alert('请先登录。')
-        window.location.href = 'index.html'
+        showAlert('请先登录。', 'warning', function() {
+          window.location.href = 'index.html'
+        })
       }
       // 获取用户积分
       fetchUserPoints()
@@ -260,16 +262,16 @@
         dataType: 'json',
         success: function (response) {
           if (response.success) {
-            alert('Exchange successful! ' + response.message)
+            showAlert('兑换成功！' + response.message, 'success');
             // 更新用户积分和产品列表
             fetchUserPoints()
             fetchProducts()
           } else {
-            alert('Exchange failed: ' + response.message)
+            showAlert('兑换失败：' + response.message, 'error');
           }
         },
         error: function () {
-          alert('Exchange request failed. Please try again later.')
+          showAlert('兑换请求失败，请稍后再试。', 'error');
         }
       })
     }

@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
   <script src="js/jquery.min.js"></script>
   <script src="js/bootstrap.min.js"></script>
+  <script src="js/utils.js"></script>
   <script src="js/nav.js"></script>
   <!-- SF Pro 字体 -->
   <link href="https://fonts.cdnfonts.com/css/sf-pro-display" rel="stylesheet">
@@ -172,8 +173,9 @@
     // 检查管理员权限
     var token = localStorage.getItem('token');
     if (!token) {
-      alert('请先登录');
-      window.location.href = 'index.html';
+      showAlert('请先登录', 'warning', function() {
+        window.location.href = 'index.html';
+      });
       return;
     }
     
@@ -188,13 +190,15 @@
       dataType: 'json',
       success: function(response) {
         if (!response.success) {
-          alert('您没有管理员权限，无法访问此页面');
-          window.location.href = 'index.html';
+          showAlert('您没有管理员权限，无法访问此页面', 'error', function() {
+            window.location.href = 'index.html';
+          });
         }
       },
       error: function() {
-        alert('验证权限失败，请重试');
-        window.location.href = 'index.html';
+        showAlert('验证权限失败，请重试', 'error', function() {
+          window.location.href = 'index.html';
+        });
       }
     });
   }

@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="./css/bootstrap.min.css">
   <script src="./js/jquery.min.js"></script>
   <script src="https://cdn.staticfile.org/twitter-bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="js/utils.js"></script>
   <script src="js/nav.js"></script>
   <!-- SF Pro 字体 -->
   <link href="https://fonts.cdnfonts.com/css/sf-pro-display" rel="stylesheet">
@@ -285,8 +286,9 @@
   $(document).ready(function () {
     var token = localStorage.getItem('token'); // Use localStorage instead of sessionStorage
     if (!token) {
-      alert('Please login first!');
-      window.location.href = 'index.html'; // Redirect to login page if token is not present
+      showAlert('请先登录！', 'warning', function() {
+        window.location.href = 'index.html'; // Redirect to login page if token is not present
+      });
       return;
     }
     
@@ -335,29 +337,32 @@
                 submitBtn.prop('disabled', false);
                 
                 if (response.success) {
-                  alert('Product added successfully!');
-                  $('#addProductForm')[0].reset();
-                  fetchProducts();
+                  showAlert('商品添加成功！', 'success', function() {
+                    $('#addProductForm')[0].reset();
+                    fetchProducts();
+                  });
                 } else {
-                  alert('Failed to add product: ' + response.message);
+                  showAlert('添加商品失败：' + response.message, 'error');
                 }
               },
               error: function (xhr) {
                 // Reset button state
                 submitBtn.html(originalText);
                 submitBtn.prop('disabled', false);
-                alert('Request failed. Please try again: ' + xhr.responseText);
+                showAlert('请求失败，请重试：' + xhr.responseText, 'error');
               },
             });
           });
         } else {
-          alert('Access denied. You are not an administrator.');
-          window.location.href = 'index.html';
+          showAlert('访问被拒绝。您不是管理员。', 'error', function() {
+            window.location.href = 'index.html';
+          });
         }
       },
       error: function () {
-        alert('Verification failed. Please try again.');
-        window.location.href = 'index.html';
+        showAlert('验证失败，请重试。', 'error', function() {
+          window.location.href = 'index.html';
+        });
       },
     });
   }
@@ -390,17 +395,18 @@
         submitBtn.prop('disabled', false);
         
         if (response.success) {
-          alert('Product updated successfully!');
-          fetchProducts();
+          showAlert('商品更新成功！', 'success', function() {
+            fetchProducts();
+          });
         } else {
-          alert('Failed to update product: ' + response.message);
+          showAlert('更新商品失败：' + response.message, 'error');
         }
       },
       error: function (xhr) {
         // Reset button state
         submitBtn.html(originalText);
         submitBtn.prop('disabled', false);
-        alert('Request failed. Please try again.');
+        showAlert('请求失败，请重试。', 'error');
       },
     });
   }
@@ -431,18 +437,19 @@
         submitBtn.prop('disabled', false);
         
         if (response.success) {
-          alert('Product deleted successfully!');
-          $('#updateDeleteProductForm')[0].reset();
-          fetchProducts();
+          showAlert('商品删除成功！', 'success', function() {
+            $('#updateDeleteProductForm')[0].reset();
+            fetchProducts();
+          });
         } else {
-          alert('Failed to delete product: ' + response.message);
+          showAlert('删除商品失败：' + response.message, 'error');
         }
       },
       error: function (xhr) {
         // Reset button state
         submitBtn.html(originalText);
         submitBtn.prop('disabled', false);
-        alert('Request failed. Please try again.');
+        showAlert('请求失败，请重试。', 'error');
       },
     });
   }
