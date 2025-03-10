@@ -19,6 +19,32 @@
   
   <!-- 页面特定的样式，补充ios-design.css中没有的样式 -->
   <style>
+    /* 覆盖一些Bootstrap默认样式 */
+    body {
+      background-color: var(--ios-secondary-system-background, #F2F2F7);
+      color: #000;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+    
+    /* 用户信息卡片样式调整 */
+    .info-card {
+      border-radius: 20px;
+      border: none;
+      background-color: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+      overflow: hidden;
+      transition: transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1), 
+                  box-shadow 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+      margin-bottom: 25px;
+    }
+    
+    .info-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+    }
+    
     /* 排名图标样式 */
     .rank-icon {
       display: inline-block;
@@ -27,17 +53,17 @@
     
     /* 前三名样式 */
     .rank-1 {
-      background: linear-gradient(to right, rgba(255, 204, 0, 0.1), transparent);
+      background: linear-gradient(to right, rgba(255, 204, 0, 0.1), transparent 90%);
       font-weight: 700;
     }
     
     .rank-2 {
-      background: linear-gradient(to right, rgba(142, 142, 147, 0.1), transparent);
+      background: linear-gradient(to right, rgba(142, 142, 147, 0.1), transparent 90%);
       font-weight: 600;
     }
     
     .rank-3 {
-      background: linear-gradient(to right, rgba(52, 199, 89, 0.1), transparent);
+      background: linear-gradient(to right, rgba(52, 199, 89, 0.1), transparent 90%);
       font-weight: 500;
     }
     
@@ -48,24 +74,246 @@
     }
     
     /* 点数显示样式 */
-    .card-text span {
-      color: #000;
+    .info-value {
       font-weight: 600;
-      background: linear-gradient(120deg, var(--ios-blue), var(--ios-indigo));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      color: #007AFF;
+      font-size: 1.1rem;
+      display: inline-block;
       margin-left: 5px;
+      position: relative;
+      padding: 3px 12px;
+      border-radius: 10px;
+      background: rgba(0, 122, 255, 0.1);
+    }
+    
+    /* 信息标题样式 */
+    .info-title {
+      font-weight: 600;
+      color: #8E8E93;
+      margin-bottom: 8px;
+      position: relative;
+      display: inline-block;
+    }
+    
+    .info-title::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 30px;
+      height: 2px;
+      background: linear-gradient(to right, #007AFF, #5856D6);
+      border-radius: 1px;
     }
     
     /* 按钮激活状态 */
     .btn-group .btn-secondary.active {
-      background-color: var(--ios-blue);
+      background-color: #007AFF;
+      color: white;
+      box-shadow: 0 4px 12px rgba(0, 122, 255, 0.15);
+    }
+    
+    /* 按钮组样式美化 */
+    .ios-btn-group {
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      margin-bottom: 20px;
+    }
+    
+    .ios-btn-group .btn {
+      border: none;
+      padding: 10px 20px;
+      background-color: rgba(255, 255, 255, 0.8);
+      color: #8E8E93;
+      font-weight: 500;
+      transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+    
+    .ios-btn-group .btn:hover {
+      background-color: rgba(0, 122, 255, 0.1);
+      color: #007AFF;
+    }
+    
+    .ios-btn-group .btn.active {
+      background-color: #007AFF;
       color: white;
     }
     
+    /* 历史记录按钮样式 */
+    .history-btn {
+      position: relative;
+      right: 0;
+      min-width: 200px; 
+      padding: 12px 20px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #007AFF, #5856D6);
+      color: white;
+      font-weight: 600;
+      border: none;
+      box-shadow: 0 6px 16px rgba(0, 122, 255, 0.2);
+      transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+      margin-right: 0;
+      text-align: center;
+      overflow: hidden;
+    }
+    
+    .history-btn::before {
+      content: '';
+      position: absolute;
+      top: -10px;
+      left: -10px;
+      right: -10px;
+      bottom: -10px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+      transform: rotate(45deg) translateX(-200%);
+      transition: transform 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+    
+    .history-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(0, 122, 255, 0.25);
+      color: white;
+    }
+    
+    .history-btn:hover::before {
+      transform: rotate(45deg) translateX(200%);
+    }
+    
+    /* 排行榜表格样式 */
+    .leaderboard-table {
+      background-color: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+    }
+    
+    .leaderboard-table thead th {
+      border-top: none;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      color: #8E8E93;
+      font-weight: 600;
+      padding: 16px;
+    }
+    
+    .leaderboard-table tbody tr {
+      transition: background-color 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+    
+    .leaderboard-table tbody tr:hover {
+      background-color: rgba(0, 122, 255, 0.05);
+    }
+    
+    /* 页面内容容器 */
+    .content-container {
+      padding: 25px;
+      border-radius: 20px;
+      background-color: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+      margin-top: 25px;
+      margin-bottom: 25px;
+    }
+    
+    /* 标题样式 */
+    .ios-section-heading {
+      font-weight: 700;
+      margin-bottom: 25px;
+      color: #000;
+      position: relative;
+      display: inline-block;
+    }
+    
+    .ios-section-heading::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 0;
+      width: 60px;
+      height: 3px;
+      background: linear-gradient(to right, #007AFF, #5856D6);
+      border-radius: 1.5px;
+    }
+    
+    /* 添加动画效果 */
+    .fade-in-up {
+      animation: fadeInUp 0.6s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+      opacity: 0;
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    /* 添加延迟效果 */
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+    .delay-4 { animation-delay: 0.4s; }
+    .delay-5 { animation-delay: 0.5s; }
+    
+    /* 霓虹效果 */
+    .glow-effect {
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      filter: blur(50px);
+      z-index: -1;
+      animation: pulse 8s infinite alternate cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+    
+    .glow-blue {
+      top: 10%;
+      right: 10%;
+      background: radial-gradient(circle, rgba(0, 122, 255, 0.2), transparent 70%);
+    }
+    
+    .glow-purple {
+      bottom: 10%;
+      left: 5%;
+      background: radial-gradient(circle, rgba(88, 86, 214, 0.15), transparent 70%);
+      animation-delay: 2s;
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1) translate(0, 0); opacity: 0.5; }
+      50% { transform: scale(1.05) translate(20px, -10px); opacity: 0.7; }
+      100% { transform: scale(1) translate(0, 0); opacity: 0.5; }
+    }
+    
+    /* 适配深色模式 */
     @media (prefers-color-scheme: dark) {
-      .card-text span {
-        background: linear-gradient(120deg, var(--ios-blue), var(--ios-cyan));
+      body {
+        background-color: #1C1C1E;
+        color: #FFFFFF;
+      }
+      
+      .info-card, .content-container, .leaderboard-table {
+        background-color: rgba(44, 44, 46, 0.8);
+      }
+      
+      .info-title {
+        color: #8E8E93;
+      }
+      
+      .info-value {
+        background: rgba(0, 122, 255, 0.2);
+      }
+      
+      .ios-btn-group .btn {
+        background-color: rgba(44, 44, 46, 0.8);
+        color: #8E8E93;
       }
     }
   </style>
@@ -75,67 +323,72 @@
 <div class="frosted-glass"></div>
 
 <!-- 添加霓虹灯光效果 -->
-<div class="glow-effect glow-effect-1"></div>
-<div class="glow-effect glow-effect-2"></div>
+<div class="glow-effect glow-blue"></div>
+<div class="glow-effect glow-purple"></div>
 
 <!-- 导航栏容器，将由JavaScript加载 -->
 <div id="navbar-container"></div>
 
 <!-- Main content starts here -->
-<div class="container ios-depth-effect animation-fade-in">
-  <h2 class="section-heading my-4">User Center</h2>
+<div class="container content-container fade-in-up delay-1">
+  <h2 class="ios-section-heading">User Center</h2>
   <div class="row">
     <div class="col-md-12">
-      <div class="card ios-hover-effect">
+      <div class="info-card fade-in-up delay-2">
         <div class="card-body">
-          <h5 class="card-title">My School</h5>
-          <p class="card-text">Your school is: <span id="userSchool">加载中Loading...</span></p>
-          <h5 class="card-title">My Region</h5>
-          <p class="card-text">You are at: <span id="userLocation">加载中Loading...</span></p>
-          <h5 class="card-title">My Carbon Credits</h5>
-          <p class="card-text">Your current carbon credits balance is: <span id="userPoints">加载中Loading...</span></p>
-          <h5 class="card-title">My Carbon Reduction (CO₂ in kg)</h5>
-          <p class="card-text">You have saved a total of: <span id="userReduction">加载中Loading...</span></p>
-          <button type="button" class="btn btn-ios-primary float-right" data-toggle="modal" data-target="#editUserModal">
-            Edit My Profile
+          <h5 class="info-title">My School</h5>
+          <p class="card-text">Your school is: <span class="info-value" id="userSchool">加载中Loading...</span></p>
+          
+          <h5 class="info-title">My Region</h5>
+          <p class="card-text">You are at: <span class="info-value" id="userLocation">加载中Loading...</span></p>
+          
+          <h5 class="info-title">My Carbon Credits</h5>
+          <p class="card-text">Your current carbon credits balance is: <span class="info-value" id="userPoints">加载中Loading...</span></p>
+          
+          <h5 class="info-title">My Carbon Reduction (CO₂ in kg)</h5>
+          <p class="card-text">You have saved a total of: <span class="info-value" id="userReduction">加载中Loading...</span></p>
+          
+          <button type="button" class="btn btn-ios-primary float-right ios-float" data-toggle="modal" data-target="#editUserModal">
+            <i class="fas fa-user-edit mr-2"></i>Edit My Profile
           </button>
         </div>
       </div>
     </div>
-    <div class="row">
-      <div class="col">
-        <h1 class="d-inline-block"></h1>
-      </div>
-      <div class="col">
-        <button type="button" class="btn btn-ios-secondary ios-float float-right" id="navigateButton">
-          Carbon Reduction Accounting History
-        </button>
-        <script>
-          document.getElementById('navigateButton').addEventListener('click', function () {
-            window.location.href = 'pthis.html' // 指定要跳转的页面
-          })</script>
-      </div>
+  </div>
+  <div class="row mt-3 mb-3 fade-in-up delay-3">
+    <div class="col-12 text-right">
+      <button type="button" class="history-btn ios-float" id="navigateButton">
+        <i class="fas fa-history mr-2"></i>Carbon Reduction History
+      </button>
     </div>
   </div>
 </div>
-<div class="container ios-depth-effect mt-4 animation-fade-in" style="animation-delay: 0.3s;">
-  <h2 class="section-heading">Carbon Credits Leaderboards</h2>
+
+<div class="container content-container fade-in-up delay-4">
+  <h2 class="ios-section-heading">Carbon Credits Leaderboards</h2>
   <!-- 排行榜切换按钮 -->
-  <div class="btn-group" role="group" aria-label="Ranking Filters">
-    <button type="button" class="btn btn-secondary active" id="allRankingBtn">全服排行榜Global Leaderboard</button>
-    <button type="button" class="btn btn-secondary" id="localRankingBtn">同地区排行榜Regional Leaderboard</button>
-    <button type="button" class="btn btn-secondary" id="schoolRankingBtn">同学校排行榜School Leaderboard</button>
+  <div class="btn-group ios-btn-group mb-4" role="group" aria-label="Ranking Filters">
+    <button type="button" class="btn active" id="allRankingBtn">
+      <i class="fas fa-globe-asia mr-2"></i>Global Leaderboard
+    </button>
+    <button type="button" class="btn" id="localRankingBtn">
+      <i class="fas fa-map-marker-alt mr-2"></i>Regional Leaderboard
+    </button>
+    <button type="button" class="btn" id="schoolRankingBtn">
+      <i class="fas fa-school mr-2"></i>School Leaderboard
+    </button>
   </div>
-  <table class="table table-striped table-hover mt-3 ios-shine-effect">
+  
+  <table class="table table-hover leaderboard-table fade-in-up delay-5">
     <thead>
-    <tr>
-      <th>Ranking</th>
-      <th>Username</th>
-      <th>Carbon Credits</th>
-    </tr>
+      <tr>
+        <th width="15%">Ranking</th>
+        <th width="50%">Username</th>
+        <th width="35%">Carbon Credits</th>
+      </tr>
     </thead>
     <tbody id="leaderboard">
-    <!-- 排行榜数据将通过 JavaScript 动态填充 -->
+      <!-- 排行榜数据将通过 JavaScript 动态填充 -->
     </tbody>
   </table>
 </div>
@@ -186,12 +439,18 @@
 
 <!-- 复制您主页的页脚 -->
 <div id="footer-placeholder"></div>
+
 <script>
   // 添加按钮点击状态切换
   $(document).ready(function() {
     $('.btn-group .btn').click(function() {
       $('.btn-group .btn').removeClass('active');
       $(this).addClass('active');
+    });
+    
+    // 导航到历史页面
+    document.getElementById('navigateButton').addEventListener('click', function () {
+      window.location.href = 'pthis.html' // 指定要跳转的页面
     });
   });
 
@@ -505,6 +764,7 @@
 
   function Redirect(webpage) {
     window.location = webpage
-  }</script>
+  }
+</script>
 </body>
 </html>
