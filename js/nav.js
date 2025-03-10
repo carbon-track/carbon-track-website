@@ -747,6 +747,7 @@ function displayMessages(messages, sender) {
     
     // 获取当前用户ID
     const currentUserId = localStorage.getItem('userId');
+    console.log('当前用户ID (localStorage):', currentUserId);
     
     // 对消息按时间排序
     messages.sort(function(a, b) {
@@ -757,8 +758,10 @@ function displayMessages(messages, sender) {
     let lastDate = '';
     
     // 显示消息
-    messages.forEach(function(message) {
+    messages.forEach(function(message, index) {
         try {
+            console.log(`处理第 ${index+1}/${messages.length} 条消息:`, message);
+            
             // 处理时间戳
             const timestamp = message.send_time || message.created_at || new Date().toISOString();
             const messageDate = new Date(timestamp);
@@ -780,16 +783,18 @@ function displayMessages(messages, sender) {
             
             // 确定消息类型（发送/接收）
             const isSent = message.sender_id == currentUserId;
+            console.log(`消息 ${index+1} 是否为发送消息:`, isSent, '(sender_id:', message.sender_id, ', currentUserId:', currentUserId, ')');
             
             // 获取安全的消息内容
             let safeContent;
             try {
                 // 安全处理HTML内容
                 safeContent = sanitizeHTML(message.content || '');
-                console.log('消息内容类型:', typeof message.content);
-                console.log('安全处理后的内容:', safeContent);
+                console.log(`消息 ${index+1} 内容类型:`, typeof message.content);
+                console.log(`消息 ${index+1} 原始内容:`, message.content);
+                console.log(`消息 ${index+1} 安全处理后的内容:`, safeContent);
             } catch (err) {
-                console.error('处理消息内容时出错:', err);
+                console.error(`处理消息 ${index+1} 内容时出错:`, err);
                 safeContent = '<p>消息内容无法显示</p>';
             }
             
@@ -807,12 +812,16 @@ function displayMessages(messages, sender) {
             // 添加到消息列表
             messageList.appendChild(messageContainer);
         } catch (err) {
-            console.error('处理单条消息时出错:', err, message);
+            console.error(`处理消息 ${index+1} 时出错:`, err, message);
         }
     });
     
     // 滚动到底部
     scrollToBottom(messageList);
+    
+    // 确保消息容器可见
+    $('#messageContainer').removeClass('d-none').addClass('d-flex');
+    $('#noConversationSelected').addClass('d-none');
 }
 
 // 滚动消息列表到底部
@@ -1542,7 +1551,7 @@ function initMessageModal() {
                             </div>
                             <!-- 右侧消息内容 -->
                             <div class="col-md-8">
-                                <div id="messageContainer" class="d-flex flex-column" style="display: none;">
+                                <div id="messageContainer" class="d-none d-flex flex-column">
                                     <div id="messageList" class="overflow-auto flex-grow-1" style="height: 350px; padding: 10px;">
                                         <!-- 消息内容将通过JS动态加载 -->
                                     </div>
@@ -1600,8 +1609,8 @@ function initMessageModal() {
         console.log('消息模态框已显示，加载会话列表');
         
         // 默认显示"选择一个会话"提示
-        $('#messageContainer').hide();
-        $('#noConversationSelected').show();
+        $('#messageContainer').addClass('d-none').removeClass('d-flex');
+        $('#noConversationSelected').removeClass('d-none');
         
         // 加载会话列表
         loadConversations();
@@ -1726,9 +1735,11 @@ function loadConversations() {
                             var userId = $(this).data('user-id');
                             var username = $(this).find('h6').text();
                             
-                            // 显示消息区域
-                            $('#messageContainer').show();
-                            $('#noConversationSelected').hide();
+                            console.log('点击会话项，用户ID:', userId, '用户名:', username);
+                            
+                            // 显示消息区域，隐藏提示
+                            $('#messageContainer').removeClass('d-none').addClass('d-flex');
+                            $('#noConversationSelected').addClass('d-none');
                             
                             // 加载与该用户的消息
                             loadMessages(userId, username);
@@ -1999,6 +2010,10 @@ function loadMessages(userId, username) {
     // 显示加载状态
     $('#messageList').html('<div class="text-center mt-3"><div class="spinner-border text-primary" role="status"></div><div class="mt-2">加载消息中...</div></div>');
     
+    // 确保消息容器可见
+    $('#messageContainer').removeClass('d-none').addClass('d-flex');
+    $('#noConversationSelected').addClass('d-none');
+    
     // 发送AJAX请求获取消息
     $.ajax({
         url: 'getmsg.php',
@@ -2006,15 +2021,24 @@ function loadMessages(userId, username) {
         contentType: 'application/json',
         data: JSON.stringify({ token: token }),
         success: function(response) {
+            console.log('获取消息响应:', response);
+            
             if (response.success) {
                 // 获取当前用户ID
                 const currentUserId = response.debug?.user_id || "";
+                console.log('当前用户ID:', currentUserId);
                 
                 // 过滤获取与特定用户的消息
                 const filteredMessages = response.messages.filter(function(message) {
-                    return (message.sender_id == userId && message.receiver_id == currentUserId) || 
-                           (message.sender_id == currentUserId && message.receiver_id == userId);
+                    const isRelevant = (message.sender_id == userId && message.receiver_id == currentUserId) || 
+                                      (message.sender_id == currentUserId && message.receiver_id == userId);
+                    if (isRelevant) {
+                        console.log('相关消息:', message);
+                    }
+                    return isRelevant;
                 });
+                
+                console.log('过滤后的消息数量:', filteredMessages.length);
                 
                 // 显示过滤后的消息
                 displayMessages(filteredMessages, userId);
