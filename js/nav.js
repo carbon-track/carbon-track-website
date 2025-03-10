@@ -118,13 +118,6 @@ $('nav .fas.fa-envelope').css('color', 'rgba(255, 255, 255, .5)');
                     localStorage.setItem('loggedIn', true);
                     localStorage.setItem('username', response.real_username);
                     localStorage.setItem('token', response.token);
-                    
-                    // 如果响应中包含用户ID，保存它
-                    if (response.user_id) {
-                        localStorage.setItem('userId', response.user_id);
-                        console.log('已保存用户ID:', response.user_id);
-                    }
-                    
                     // 设置7天的到期时间
                     localStorage.setItem('expiration', new Date().getTime() + 7 * 24 * 60 * 60 * 1000);
                     updateLoginStatus();
@@ -261,25 +254,11 @@ function googleTranslateElementInit() {
 function checkUnreadMessages() {
     console.log('检查未读消息');
     var token = localStorage.getItem('token');
-    var username = localStorage.getItem('username');
-    
-    if (!token || !username) {
-        console.log('未登录，不检查未读消息');
-        return; // 如果未登录，不检查
-    }
-    
-    // 尝试从localStorage获取userId
     var userId = localStorage.getItem('userId');
     
-    // 如果没有userId，尝试从token中解析
-    if (!userId) {
-        console.log('从localStorage中获取userId失败，尝试通过getUserInfo获取');
-        // 向服务器请求用户信息
-        getUserInfo(token);
-        return;
+    if (!token || !userId) {
+        return; // 如果未登录，不检查
     }
-    
-    console.log('使用userId检查未读消息:', userId);
     
     $.ajax({
             url: 'chkmsg.php',
@@ -289,7 +268,6 @@ function checkUnreadMessages() {
             uid: userId
         },
             success: function(response) {
-            console.log('未读消息检查结果:', response);
             if (response.success) {
                 const unreadCount = response.unreadCount || 0;
                 
@@ -312,28 +290,10 @@ function checkUnreadMessages() {
                 }
             }
         },
+        // 即使请求失败也不显示错误，只记录到控制台
         error: function(xhr, status, error) {
             console.error('检查未读消息失败:', error);
             }
-    });
-}
-
-// 获取用户信息
-function getUserInfo(token) {
-    $.ajax({
-        url: 'get_user_info.php',
-        type: 'POST',
-        data: { token: token },
-        success: function(response) {
-            if (response.success && response.user_id) {
-                localStorage.setItem('userId', response.user_id);
-                // 获取到用户ID后，再次检查未读消息
-                checkUnreadMessages();
-            }
-        },
-        error: function(xhr, status, error) {
-            console.error('获取用户信息失败:', error);
-        }
     });
 }
 
@@ -378,11 +338,9 @@ function updateLoginStatus() {
         $('a[href="calculate.html"]').show();
         $('a[href="CStore.html"]').show();
         $('.logoutControl').show();
-        
-        // 开始检查未读消息
-        startUnreadMessageCheck();
-        
-        // 其他已登录状态的UI更新...
+        $('#loginButton').hide();
+        $('[data-target="#loginModal"]').hide();
+        $('[data-target="#registerModal"]').hide();
     } else {
         $('.logoutControl').hide();
         $('#userStatus').text('Please login or register:');
@@ -758,57 +716,43 @@ function displayMessages(messages, sender) {
     
     // 显示消息
     messages.forEach(function(message) {
-        try {
-            // 处理时间戳
-            const timestamp = message.send_time || message.created_at || new Date().toISOString();
-            const messageDate = new Date(timestamp);
-            const formattedDate = messageDate.toLocaleDateString();
-            const formattedTime = messageDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            
-            // 如果日期变化了，添加日期分隔线
-            if (formattedDate !== lastDate) {
-                const dateDiv = document.createElement('div');
-                dateDiv.className = 'text-center my-3';
-                dateDiv.innerHTML = `<span class="badge bg-secondary px-3 py-2">${formattedDate}</span>`;
-                messageList.appendChild(dateDiv);
-                lastDate = formattedDate;
-            }
-            
-            // 创建消息容器
-            const messageContainer = document.createElement('div');
-            messageContainer.className = 'message-container';
-            
-            // 确定消息类型（发送/接收）
-            const isSent = message.sender_id == currentUserId;
-            
-            // 获取安全的消息内容
-            let safeContent;
-            try {
-                // 安全处理HTML内容
-                safeContent = sanitizeHTML(message.content || '');
-                console.log('消息内容类型:', typeof message.content);
-                console.log('安全处理后的内容:', safeContent);
-            } catch (err) {
-                console.error('处理消息内容时出错:', err);
-                safeContent = '<p>消息内容无法显示</p>';
-            }
-            
-            // 创建消息气泡
-            const bubbleClass = isSent ? 'sent' : 'received';
-            
-            // 设置消息内容
-            messageContainer.innerHTML = `
-                <div class="message-bubble ${bubbleClass}" style="overflow-wrap: break-word;">
-                    ${safeContent}
-                    <div class="message-time">${formattedTime}</div>
-                </div>
-            `;
-            
-            // 添加到消息列表
-            messageList.appendChild(messageContainer);
-        } catch (err) {
-            console.error('处理单条消息时出错:', err, message);
+        // 处理时间戳
+        const timestamp = message.send_time || message.created_at || new Date().toISOString();
+        const messageDate = new Date(timestamp);
+        const formattedDate = messageDate.toLocaleDateString();
+        const formattedTime = messageDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        
+        // 如果日期变化了，添加日期分隔线
+        if (formattedDate !== lastDate) {
+            const dateDiv = document.createElement('div');
+            dateDiv.className = 'text-center my-3';
+            dateDiv.innerHTML = `<span class="badge bg-secondary px-3 py-2">${formattedDate}</span>`;
+            messageList.appendChild(dateDiv);
+            lastDate = formattedDate;
         }
+        
+        // 创建消息容器
+        const messageContainer = document.createElement('div');
+        messageContainer.className = 'message-container';
+        
+        // 确定消息类型（发送/接收）
+        const isSent = message.sender_id == currentUserId;
+        
+        // 获取安全的消息内容
+        const safeContent = sanitizeHTML(message.content || '');
+        
+        // 创建消息气泡
+        const bubbleClass = isSent ? 'sent' : 'received';
+        
+        messageContainer.innerHTML = `
+            <div class="message-bubble ${bubbleClass}">
+                ${safeContent}
+                <div class="message-time">${formattedTime}</div>
+            </div>
+        `;
+        
+        // 添加到消息列表
+        messageList.appendChild(messageContainer);
     });
     
     // 滚动到底部
@@ -1081,13 +1025,6 @@ function setupNavbarEventListeners() {
                     localStorage.setItem('loggedIn', true);
                     localStorage.setItem('username', response.real_username);
                     localStorage.setItem('token', response.token);
-                    
-                    // 如果响应中包含用户ID，保存它
-                    if (response.user_id) {
-                        localStorage.setItem('userId', response.user_id);
-                        console.log('已保存用户ID:', response.user_id);
-                    }
-                    
                     // 设置7天的到期时间
                     localStorage.setItem('expiration', new Date().getTime() + 7 * 24 * 60 * 60 * 1000);
                     updateLoginStatus();
@@ -1484,35 +1421,6 @@ function initMessageModal() {
             margin-bottom: 1rem;
             opacity: 0.5;
         }
-        
-        /* 添加HTML内容样式 */
-        .message-bubble p {
-            margin-bottom: 0.5rem;
-            line-height: 1.4;
-        }
-        .message-bubble p:last-child {
-            margin-bottom: 0;
-        }
-        .message-bubble ul, .message-bubble ol {
-            padding-left: 1.5rem;
-            margin-bottom: 0.5rem;
-        }
-        .message-bubble li {
-            margin-bottom: 0.2rem;
-        }
-        .message-bubble a {
-            color: #0d6efd;
-            text-decoration: underline;
-        }
-        .message-bubble.sent a {
-            color: #0d6efd;
-        }
-        .message-bubble img {
-            max-width: 100%;
-            height: auto;
-            margin: 0.5rem 0;
-            border-radius: 4px;
-        }
     </style>`;
     
     // 将样式添加到头部
@@ -1885,24 +1793,17 @@ function initRegisterModal() {
 function sanitizeHTML(html) {
     if (!html) return '';
     
-    // 检查是否已经是HTML格式（包含标签）
-    const containsHTML = /<[a-z][\s\S]*>/i.test(html);
+    // 创建一个临时元素
+    const tempElement = document.createElement('div');
+    // 将内容设置为文本，避免解析
+    tempElement.textContent = html;
+    // 获取编码后的内容
+    let sanitized = tempElement.innerHTML;
     
-    if (!containsHTML) {
-        // 如果不是HTML，按纯文本处理
-        const tempElement = document.createElement('div');
-        tempElement.textContent = html;
-        return tempElement.innerHTML;
-    }
-    
-    // 创建DOMParser处理HTML
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(`<div>${html}</div>`, 'text/html');
-    const container = doc.body.firstChild;
-    
-    // 允许的标签和属性
+    // 现在将安全标签转换回HTML
+    // 只允许安全的标签: p, br, b, i, strong, em, u, ul, ol, li, span
     const allowedTags = {
-        'p': { allowedAttrs: ['style'] },
+        'p': { allowedAttrs: [] },
         'br': { allowedAttrs: [] },
         'b': { allowedAttrs: [] },
         'i': { allowedAttrs: [] },
@@ -1912,70 +1813,59 @@ function sanitizeHTML(html) {
         'ul': { allowedAttrs: [] },
         'ol': { allowedAttrs: [] },
         'li': { allowedAttrs: [] },
-        'span': { allowedAttrs: ['class', 'style'] },
-        'div': { allowedAttrs: ['class', 'style'] },
-        'a': { allowedAttrs: ['href', 'target'] },
-        'img': { allowedAttrs: ['src', 'alt', 'width', 'height'] }
+        'span': { allowedAttrs: ['class'] },
+        'div': { allowedAttrs: ['class'] }
     };
     
-    // 递归清理节点
-    function cleanNode(node) {
-        // 如果是文本节点，直接返回
-        if (node.nodeType === Node.TEXT_NODE) {
-            return;
-        }
+    // 为每个允许的标签处理开标签和闭标签
+    Object.keys(allowedTags).forEach(tag => {
+        const openTagPattern = new RegExp(`&lt;${tag}(\\s+[^&>]*)?(/?&gt;)`, 'gi');
+        const closeTagPattern = new RegExp(`&lt;/${tag}&gt;`, 'gi');
         
-        // 处理元素节点
-        if (node.nodeType === Node.ELEMENT_NODE) {
-            const tagName = node.tagName.toLowerCase();
-            
-            // 如果标签不在允许列表中，替换为其内容
-            if (!allowedTags[tagName]) {
-                // 创建文档片段
-                const fragment = document.createDocumentFragment();
-                
-                // 将所有子节点移动到片段中
-                while (node.firstChild) {
-                    const child = node.firstChild;
-                    node.removeChild(child);
-                    fragment.appendChild(child);
-                }
-                
-                // 替换节点
-                node.parentNode.replaceChild(fragment, node);
-                return;
+        // 替换开标签
+        sanitized = sanitized.replace(openTagPattern, (match, attributes, closeTag) => {
+            if (!attributes) {
+                return `<${tag}${closeTag.replace('&gt;', '>')}`;
             }
             
-            // 检查并清理属性
-            const attrs = Array.from(node.attributes);
-            attrs.forEach(attr => {
-                const attrName = attr.name.toLowerCase();
-                const attrValue = attr.value;
-                
-                // 检查属性是否允许
-                const tagConfig = allowedTags[tagName];
-                if (!tagConfig.allowedAttrs.includes(attrName)) {
-                    node.removeAttribute(attrName);
-                    return;
-                }
-                
-                // 检查属性值是否安全
-                if (attrValue.toLowerCase().includes('javascript:') || 
-                    (attrName === 'src' && attrValue.toLowerCase().includes('data:')) ||
-                    attrName.startsWith('on')) {
-                    node.removeAttribute(attrName);
-                }
-            });
+            // 处理属性
+            let safeAttributes = '';
+            const tagConfig = allowedTags[tag];
             
-            // 处理子节点
-            Array.from(node.childNodes).forEach(cleanNode);
-        }
-    }
+            // 如果有允许的属性，检查并保留它们
+            if (tagConfig.allowedAttrs.length > 0) {
+                // 解码属性
+                const decodedAttrs = attributes.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&');
+                
+                // 提取属性
+                const attrPattern = /(\w+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|(\w+)))?/g;
+                let attrMatch;
+                
+                while ((attrMatch = attrPattern.exec(decodedAttrs)) !== null) {
+                    const attrName = attrMatch[1];
+                    
+                    // 如果属性名在允许列表中
+                    if (tagConfig.allowedAttrs.includes(attrName)) {
+                        const attrValue = attrMatch[2] || attrMatch[3] || attrMatch[4] || '';
+                        
+                        // 确保属性值不包含JavaScript
+                        if (!attrValue.toLowerCase().includes('javascript:') && 
+                            !attrValue.toLowerCase().includes('data:') &&
+                            !attrValue.match(/on\w+/i)) {
+                            safeAttributes += ` ${attrName}="${attrValue.replace(/"/g, '&quot;')}"`;
+                        }
+                    }
+                }
+            }
+            
+            return `<${tag}${safeAttributes}${closeTag.replace('&gt;', '>')}`;
+        });
+        
+        // 替换闭标签
+        sanitized = sanitized.replace(closeTagPattern, `</${tag}>`);
+    });
     
-    // 清理所有子节点
-    Array.from(container.childNodes).forEach(cleanNode);
-    
-    return container.innerHTML;
+    return sanitized;
 }
 
 // 加载与特定用户的消息

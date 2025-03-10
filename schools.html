@@ -2,146 +2,270 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>CarbonTrack Map with “Join Us” Below</title>
+  <title>CarbonTrack Global Network</title>
+  <!-- SF Pro 字体 -->
+  <link href="https://fonts.cdnfonts.com/css/sf-pro-display" rel="stylesheet">
+  <link rel="icon" href="/img/team.jpg" type="image/JPG">
+  <link rel="stylesheet" href="./css/bootstrap.min.css">
+  <script src="js/jquery.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/nav.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+  <!-- Intersection Observer polyfill -->
+  <script src="https://cdn.jsdelivr.net/npm/intersection-observer@0.12.2/intersection-observer.js"></script>
+  <!-- iOS设计CSS -->
+  <link rel="stylesheet" href="./css/ios-design.css">
   <style>
     html, body {
       margin: 0;
       padding: 0;
-      background: #fff;
-      font-family: sans-serif;
+      background: var(--ios-system-background);
+      font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
     }
-    #header {
-      width: 100%;
-      padding: 40px 20px 20px;
-      box-sizing: border-box;
+    
+    .map-header {
+      background: linear-gradient(135deg, var(--ios-blue), var(--ios-indigo));
+      color: white;
+      padding: 120px 0 60px;
       text-align: center;
-      font-family:'Times New Roman', Times, serif;
-    #header h1 {
-      margin: 0;
-      font-size: 48px;
-      font-weight: bold;
+      border-radius: 0 0 24px 24px;
+      margin-bottom: 40px;
     }
-    #header h2 {
-      margin: 20px 0 10px;
-      font-size: 24px;
-      font-weight: normal;
+    
+    .map-header h1 {
+      font-weight: 700;
+      margin-bottom: 16px;
+      font-size: 2.5rem;
     }
-    #header p {
-      max-width: 800px;
-      margin: 10px auto;
-      line-height: 1.4;
-      font-size: 16px;
+    
+    .map-header p {
+      opacity: 0.9;
+      max-width: 700px;
+      margin: 0 auto 20px;
+      font-size: 1.1rem;
+      line-height: 1.6;
     }
-    #header h3 {
-      margin: 30px 0 10px;
-      font-size: 24px;
-      font-weight: normal;
-    }
-    }
-    #map-container {
+    
+    .map-container {
       width: 100%;
       height: 70vh;
       position: relative;
       margin-top: 20px; 
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
     }
+    
     svg {
       width: 100%;
       height: 100%;
       display: block;
     }
+    
     .country {
-      fill: #444;
-      stroke: #fff;
+      fill: var(--ios-gray6);
+      stroke: var(--ios-system-background);
       stroke-width: 0.5;
     }
+    
     .state-boundary {
       fill: none;
-      stroke: #888;
+      stroke: var(--ios-gray5);
       stroke-width: 0.5;
     }
+    
     .marker {
-     fill: greenyellow;
-     stroke: none;
+      fill: var(--ios-green);
+      stroke: white;
+      stroke-width: 1.5;
      cursor: pointer;
-   }
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+      transition: transform 0.3s var(--animation-timing-apple);
+    }
+    
+    .marker:hover {
+      transform: scale(1.2);
+    }
+    
     #popup {
       position: absolute;
-      background: rgba(255, 255, 255, 0.97);
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      padding: 10px;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 16px;
+      padding: 16px;
       max-width: 300px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       display: none;
       z-index: 10;
-      animation: bounce 0.4s ease-out;
+      animation: bounce 0.4s var(--animation-timing-apple);
+      border: 1px solid rgba(255, 255, 255, 0.2);
     }
+    
     @keyframes bounce {
       0% { transform: translateY(-20px); opacity: 0; }
       60% { transform: translateY(10px); opacity: 1; }
       100% { transform: translateY(0); }
     }
+    
     #popup h3 {
-      margin: 0 0 5px 0;
+      margin: 0 0 8px 0;
       font-size: 18px;
+      font-weight: 700;
+      color: var(--ios-label);
     }
+    
     #popup p, #popup li {
-      margin: 0;
+      margin: 0 0 8px 0;
       font-size: 14px;
+      color: var(--ios-gray);
+      line-height: 1.5;
     }
-    #footer {
-      width: 100%;
-      padding: 40px 20px;
-      box-sizing: border-box;
+    
+    #popup ul {
+      padding-left: 20px;
+    }
+    
+    #popup li {
+      margin-bottom: 12px;
+    }
+    
+    #popup li strong {
+      display: block;
+      color: var(--ios-label);
+      margin-bottom: 4px;
+    }
+    
+    .join-section {
+      background: linear-gradient(135deg, var(--ios-blue), var(--ios-indigo));
+      color: white;
+      padding: 80px 0;
       text-align: center;
-      font-family:'Times New Roman', Times, serif;
-      font-size: large;
+      border-radius: 24px;
+      margin: 60px auto;
+      max-width: 1140px;
     }
-    #footer h3 {
-      margin: 0 0 10px 0;
-      font-size: 24px;
-      font-weight: normal;
+    
+    .join-section h2 {
+      font-weight: 700;
+      margin-bottom: 20px;
+      font-size: 2.2rem;
     }
-    #footer p {
+    
+    .join-section p {
+      max-width: 600px;
+      margin: 0 auto 30px;
+      font-size: 1.1rem;
+      line-height: 1.6;
+      opacity: 0.9;
+    }
+    
+    .join-btn {
+      display: inline-block;
+      background: white;
+      color: var(--ios-blue);
+      font-weight: 700;
+      padding: 16px 32px;
+      border-radius: 16px;
+      text-decoration: none;
+      transition: all 0.3s var(--animation-timing-apple);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    }
+    
+    .join-btn:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.15);
+      text-decoration: none;
+      color: var(--ios-blue);
+    }
+    
+    .network-section {
+      padding: 40px 0;
+      max-width: 1140px;
+      margin: 0 auto;
+    }
+    
+    .section-title {
+      font-weight: 700;
+      margin-bottom: 24px;
+      position: relative;
+      padding-bottom: 12px;
+      text-align: center;
+      font-size: 1.8rem;
+    }
+    
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 4px;
+      background: linear-gradient(to right, var(--ios-blue), var(--ios-indigo));
+      border-radius: 2px;
+    }
+    
+    .section-text {
+      text-align: center;
       max-width: 800px;
-      margin: 10px auto;
-      line-height: 1.4;
-      font-size: 16px;
+      margin: 0 auto 30px;
+      color: var(--ios-gray);
+      line-height: 1.6;
     }
-
   </style>
 </head>
 <body>
 
-  <div id="header">
-    <h1>CarbonTrack Contributor Network 🌎</h1>
-    <h2>Global Youth, Creating a Sustainable Future Together</h2>
-    <p>
-      CarbonTrack is empowering environmentally conscious youth from around the world. 
-      We cultivate a common drive across schools and communities, using CarbonTrack to track their carbon footprint, 
-      promote sustainable living styles, and drive real impact in their surroundings.
+<!-- 导航栏容器，将由JavaScript加载 -->
+<div id="navbar-container"></div>
+  
+<header class="map-header">
+  <div class="container">
+    <h1>CarbonTrack Global Network 🌎</h1>
+    <p>Connecting environmentally conscious youth from around the world to create a sustainable future together</p>
+  </div>
+</header>
+
+<div class="network-section">
+  <div class="container">
+    <h2 class="section-title">Our Global Impact</h2>
+    <p class="section-text">
+      CarbonTrack is empowering environmentally conscious youth from schools and communities worldwide. 
+      We cultivate a common drive to track carbon footprints, promote sustainable living styles, 
+      and drive real impact in their surroundings.
     </p>
-    <h3>Where Our Contributors Are From</h3>
-    <p>
+    
+    <h3 class="section-title">Where Our Contributors Are From</h3>
+    <p class="section-text">
       On this map, you can see the schools and communities our contributors come from. 
-      They actively promote sustainability within their campuses and engage in various initiatives 
-      within the CarbonTrack community.
+      Hover over the markers to learn more about each participating institution and their 
+      sustainability initiatives within the CarbonTrack community.
     </p>
   </div>
-
-  <div id="map-container">
+</div>
+  
+<div class="container">
+  <div id="map-container" class="map-container ios-depth-effect">
     <svg id="map"></svg>
     <div id="popup"></div>
   </div>
-
-  <div id="footer">
-    <h3>Join Us</h3>
-    <p>
-      If you’re passionate about sustainability and want to be part of a global network of changemakers, 
-      we welcome you to join us!
-    </p>
-  </div>
+</div>
   
+<section class="join-section ios-depth-effect ios-shine-effect">
+  <div class="container">
+    <h2>Join Our Global Movement</h2>
+    <p>
+      If you're passionate about sustainability and want to be part of our global network of changemakers, 
+      we welcome you and your school to join us! Together, we can make a significant impact on our planet's future.
+    </p>
+    <a href="mailto:carbontrack666@gmail.com" class="join-btn">
+      <i class="fas fa-envelope mr-2"></i> Contact Us to Join
+    </a>
+  </div>
+</section>
+
+  <!-- D3.js from CDN -->
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script>
     const container = document.getElementById("map-container");
@@ -217,90 +341,134 @@
       }
     ];
 
-    const popup = d3.select("#popup");
+  const popup = d3.select("#popup");
     function showPopup(x, y, htmlContent) {
       popup.html(htmlContent)
            .style("left", x + "px")
            .style("top", y + "px")
            .style("display", "block");
     }
+  
     function hidePopup() {
       popup.style("display", "none");
     }
 
     function markerHovered(event, d) {
-      event.stopPropagation();
-      
-      const [baseX, baseY] = projection(d.coords);
-      const screenX = baseX;
-      const screenY = baseY;
-      
-      const cluster = [];
-      mapGroup.selectAll("circle.marker").each(function(d2) {
-        const [bx, by] = projection(d2.coords);
-        const dx = bx - screenX;
-        const dy = by - screenY;
-        if (Math.sqrt(dx * dx + dy * dy) < 30) {
-          cluster.push(d2);
-        }
-      });
-      
-      if (cluster.length > 1) {
-        let html = "<h3>Schools in this area:</h3><ul>";
-        cluster.forEach(school => {
-          html += `<li><strong>${school.name}</strong><br>${school.info}</li>`;
-        });
-        html += "</ul>";
-        showPopup(screenX + 10, screenY + 10, html);
-      } else {
-        const html = `<h3>${d.name}</h3><p>${d.info}</p>`;
-        showPopup(screenX + 10, screenY + 10, html);
-      }
+  event.stopPropagation();
+
+  const [baseX, baseY] = projection(d.coords);
+  const transform = d3.zoomTransform(svg.node());
+  const screenX = transform.applyX(baseX);
+  const screenY = transform.applyY(baseY);
+
+  const cluster = [];
+  mapGroup.selectAll("circle.marker").each(function(d2) {
+    const [bx, by] = projection(d2.coords);
+    const sx = transform.applyX(bx);
+    const sy = transform.applyY(by);
+    const dx = sx - screenX;
+    const dy = sy - screenY;
+    if (Math.sqrt(dx*dx + dy*dy) < 30) {
+      cluster.push(d2);
     }
+  });
+  
+  if (cluster.length > 1) {
+    let html = "<h3>Schools in this area:</h3><ul>";
+    cluster.forEach(school => {
+      html += `<li><strong>${school.name}</strong><br>${school.info}</li>`;
+    });
+    html += "</ul>";
+    showPopup(screenX + 10, screenY + 10, html);
+  } else {
+    const html = `<h3>${d.name}</h3><p>${d.info}</p>`;
+    showPopup(screenX + 10, screenY + 10, html);
+  }
+}
 
     svg.on("click", event => {
       if(event.target.tagName !== "circle") hidePopup();
     });
 
+    const zoomBehavior = d3.zoom()
+    .scaleExtent([1, 50])
+    .translateExtent([[-width, -height], [2*width, 2*height]])
+    .on("zoom", (event) => {
+    let t = event.transform;
+    if (t.k === 1) {
+      t.x = 0;
+      t.y = 0;
+    }
+    mapGroup.attr("transform", t);
+    mapGroup.selectAll("circle.marker").attr("r", 5 / t.k);
+    hidePopup();
+  });
+    
+    svg.call(zoomBehavior);
+
     Promise.all([
       d3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson"),
       d3.json("https://raw.githubusercontent.com/PublicaMundi/MappingAPI/master/data/geojson/us-states.json")
-]).then(([world, states]) => {
+    ]).then(([world, states]) => {
       worldData = world.features.filter(d => d.properties.name !== "Antarctica");
       usStates = states.features;
 
-    const worldFC = { type: "FeatureCollection", features: worldData };
-    projection.fitSize([width, height], worldFC);
+      const worldFC = { type: "FeatureCollection", features: worldData };
+      projection.fitSize([width, height], worldFC);
 
+      mapGroup.selectAll("path.country")
+        .data(worldData)
+        .enter()
+        .append("path")
+        .attr("class", "country")
+        .attr("d", path);
 
-    projection.scale(projection.scale() * 1.1);
+      mapGroup.append("g")
+        .selectAll("path.state-boundary")
+        .data(usStates)
+        .enter()
+        .append("path")
+        .attr("class", "state-boundary")
+        .attr("d", path);
 
-    mapGroup.selectAll("path.country")
-      .data(worldData)
-      .enter()
-      .append("path")
-      .attr("class", "country")
-      .attr("d", path);
+        mapGroup.selectAll("circle.marker")
+         .data(schools)
+         .enter()
+         .append("circle")
+         .attr("class", "marker")
+         .attr("cx", d => projection(d.coords)[0])
+         .attr("cy", d => projection(d.coords)[1])
+      .attr("r", 6)
+         .on("mouseover", markerHovered)
+         .on("mouseout", hidePopup);
 
-    mapGroup.append("g")
-      .selectAll("path.state-boundary")
-      .data(usStates)
-      .enter()
-      .append("path")
-      .attr("class", "state-boundary")
-      .attr("d", path);
+      svg.call(zoomBehavior.transform, d3.zoomIdentity);
+    });
 
-    mapGroup.selectAll("circle.marker")
-      .data(schools)
-      .enter()
-      .append("circle")
-      .attr("class", "marker")
-      .attr("cx", d => projection(d.coords)[0])
-      .attr("cy", d => projection(d.coords)[1])
-      .attr("r", 5)
-      .on("mouseover", markerHovered)
-      .on("mouseout", hidePopup);
+    window.addEventListener("resize", () => {
+      width = container.clientWidth;
+      height = container.clientHeight;
+      svg.attr("width", width).attr("height", height);
+      svg.select("clipPath rect")
+         .attr("width", width)
+         .attr("height", height);
+
+      if(worldData) {
+        const worldFC = { type: "FeatureCollection", features: worldData };
+        projection.fitSize([width, height], worldFC);
+
+        mapGroup.selectAll("path.country").attr("d", path);
+        mapGroup.selectAll("path.state-boundary").attr("d", path);
+        mapGroup.selectAll("circle.marker")
+          .attr("cx", d => projection(d.coords)[0])
+          .attr("cy", d => projection(d.coords)[1]);
+
+        svg.call(zoomBehavior.transform, d3.zoomIdentity);
+      }
     });
   </script>
+
+<!-- 页脚 -->
+<div id="footer-placeholder"></div>
 </body>
 </html>
