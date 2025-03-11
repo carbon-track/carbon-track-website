@@ -2,7 +2,6 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Accounting Portal - CarbonTrack</title>
   <link rel="icon" href="/img/team.jpg" type="image/JPG">
   <!-- 引入Bootstrap和jQuery的CDN链接 -->
@@ -20,668 +19,99 @@
   <script src="js/nav.js"></script>
   <link rel="stylesheet" href="./css/index.css">
   <style>
-    :root {
-      --card-bg-light: rgba(255, 255, 255, 0.8);
-      --card-bg-dark: rgba(44, 44, 46, 0.8);
-      --text-color-light: #000;
-      --text-color-dark: #FFFFFF;
-      --calc-gradient-start: var(--ios-green);
-      --calc-gradient-end: var(--ios-mint);
-      --animation-timing-apple: cubic-bezier(0.25, 0.1, 0.25, 1);
-    }
-    
-    body {
-      background-color: var(--ios-secondary-system-background, #F2F2F7);
-      color: var(--text-color-light);
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      position: relative;
-      min-height: 100vh;
-      transition: background-color 0.5s var(--animation-timing-apple), 
-                  color 0.5s var(--animation-timing-apple);
-    }
-    
-    /* 增强毛玻璃背景效果 */
-    .frosted-glass {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      z-index: -10;
-      backdrop-filter: blur(20px) saturate(180%);
-      -webkit-backdrop-filter: blur(20px) saturate(180%);
-      background: rgba(255, 255, 255, 0.05);
-      transition: background-color 0.5s var(--animation-timing-apple);
-    }
-    
-    body.dark-theme .frosted-glass,
-    body.auto-theme.dark-mode .frosted-glass {
-      background: rgba(0, 0, 0, 0.05);
-    }
-    
-    /* 增强光晕效果 */
-    .glow-effect {
-      position: fixed;
-      width: 350px;
-      height: 350px;
-      border-radius: 50%;
-      filter: blur(80px);
-      z-index: -9;
-      opacity: 0.4;
-      transition: opacity 1s var(--animation-timing-apple),
-                  transform 1s var(--animation-timing-apple);
-      animation: pulse 12s infinite alternate var(--animation-timing-apple);
-    }
-    
-    .glow-green {
-      top: 10%;
-      right: 10%;
-      background: radial-gradient(circle, rgba(52, 199, 89, 0.4), transparent 70%);
-    }
-    
-    .glow-mint {
-      bottom: 10%;
-      left: 5%;
-      background: radial-gradient(circle, rgba(0, 199, 190, 0.3), transparent 70%);
-      animation-delay: 3s;
-    }
-    
-    .glow-blue {
-      top: 60%;
-      right: 25%;
-      width: 250px;
-      height: 250px;
-      background: radial-gradient(circle, rgba(0, 122, 255, 0.2), transparent 70%);
-      animation-delay: 6s;
-    }
-    
-    @keyframes pulse {
-      0% { transform: scale(1) translate(0, 0); opacity: 0.4; }
-      50% { transform: scale(1.1) translate(30px, -15px); opacity: 0.6; }
-      100% { transform: scale(1) translate(0, 0); opacity: 0.4; }
-    }
-    
-    /* 增强头部样式 */
     .calc-header {
-      background: linear-gradient(135deg, var(--calc-gradient-start), var(--calc-gradient-end));
+      background: linear-gradient(135deg, var(--ios-green), var(--ios-mint));
       color: white;
       padding: 120px 0 80px;
       text-align: center;
-      border-radius: 0 0 30px 30px;
+      border-radius: 0 0 24px 24px;
       margin-bottom: 40px;
-      position: relative;
-      overflow: hidden;
-      z-index: 2;
-      box-shadow: 0 10px 30px rgba(52, 199, 89, 0.2);
-      transition: box-shadow 0.5s var(--animation-timing-apple);
-    }
-    
-    /* 增强交互闪光效果 */
-    .calc-header::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 60%);
-      transform: rotate(30deg);
-      animation: shimmer 15s infinite linear;
-      pointer-events: none;
-    }
-    
-    @keyframes shimmer {
-      0% { transform: translateX(-50%) rotate(0deg); }
-      100% { transform: translateX(0%) rotate(360deg); }
     }
     
     .calc-header h1 {
-      font-weight: 800;
+      font-weight: 700;
       color: white;
       margin-bottom: 16px;
-      position: relative;
-      z-index: 2;
-      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      letter-spacing: -0.5px;
-      animation: fadeInDown 1s var(--animation-timing-apple);
     }
     
     .calc-header p {
       font-size: 1.2rem;
-      opacity: 0;
+      opacity: 0.9;
       max-width: 700px;
       margin: 0 auto;
-      position: relative;
-      z-index: 2;
-      animation: fadeInUp 1s var(--animation-timing-apple) forwards;
-      animation-delay: 0.3s;
-      letter-spacing: -0.2px;
     }
     
-    @keyframes fadeInDown {
-      from {
-        opacity: 0;
-        transform: translateY(-20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 0.9;
-        transform: translateY(0);
-      }
-    }
-    
-    /* 增强计算器卡片样式 */
     .calculator-card {
       border-radius: 24px;
       overflow: hidden;
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
-      background-color: var(--card-bg-light);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+      background-color: var(--ios-system-background);
       margin-bottom: 30px;
-      backdrop-filter: blur(30px) saturate(180%);
-      -webkit-backdrop-filter: blur(30px) saturate(180%);
-      position: relative;
-      z-index: 2;
-      transition: transform 0.4s var(--animation-timing-apple),
-                  box-shadow 0.4s var(--animation-timing-apple),
-                  background-color 0.5s var(--animation-timing-apple);
-      animation: slideInUp 0.8s var(--animation-timing-apple);
-    }
-    
-    @keyframes slideInUp {
-      from {
-        opacity: 0;
-        transform: translateY(40px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    
-    .calculator-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
     }
     
     .calculator-header {
-      background: linear-gradient(135deg, var(--calc-gradient-start), var(--calc-gradient-end));
-      color: white;
+      background-color: var(--ios-gray6);
       padding: 20px 24px;
-      font-weight: 700;
-      position: relative;
-      overflow: hidden;
-      transition: background 0.5s var(--animation-timing-apple);
-    }
-    
-    .calculator-header::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent 80%);
-      pointer-events: none;
+      border-bottom: 1px solid var(--ios-gray5);
     }
     
     .calculator-header h2 {
       margin: 0;
       font-weight: 700;
       font-size: 1.5rem;
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-      letter-spacing: -0.3px;
     }
     
     .calculator-body {
       padding: 24px;
-      transition: background-color 0.5s var(--animation-timing-apple);
     }
     
-    /* 增强表单控件样式 */
-    .form-group {
-      margin-bottom: 1.5rem;
-      animation: fadeIn 0.5s var(--animation-timing-apple);
-      animation-fill-mode: both;
-    }
-    
-    .form-group:nth-child(1) { animation-delay: 0.1s; }
-    .form-group:nth-child(2) { animation-delay: 0.2s; }
-    .form-group:nth-child(3) { animation-delay: 0.3s; }
-    .form-group:nth-child(4) { animation-delay: 0.4s; }
-    .form-group:nth-child(5) { animation-delay: 0.5s; }
-    .form-group:nth-child(6) { animation-delay: 0.6s; }
-    
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    
-    label {
-      font-weight: 600;
-      color: var(--ios-label);
-      margin-bottom: 8px;
-      font-size: 0.95rem;
-      letter-spacing: -0.2px;
-      transition: color 0.5s var(--animation-timing-apple);
-    }
-    
-    .form-control {
-      border-radius: 12px;
-      padding: 12px 16px;
-      border: 1px solid var(--ios-gray5);
-      font-size: 1rem;
-      transition: all 0.3s var(--animation-timing-apple);
-      letter-spacing: -0.2px;
-    }
-    
-    .form-control:focus {
-      border-color: var(--ios-green);
-      box-shadow: 0 0 0 4px rgba(52, 199, 89, 0.2);
-      outline: none;
-    }
-    
-    /* iOS风格按钮 */
-    .btn-ios-primary {
-      background: linear-gradient(135deg, var(--ios-green), var(--ios-mint));
-      border: none;
-      border-radius: 14px;
-      padding: 14px 24px;
-      font-weight: 600;
-      color: white;
-      transition: all 0.3s var(--animation-timing-apple);
-      box-shadow: 0 6px 16px rgba(52, 199, 89, 0.3);
-      letter-spacing: -0.3px;
-      position: relative;
-      overflow: hidden;
-      transform: translateZ(0);
-    }
-    
-    .btn-ios-primary:hover {
-      transform: translateY(-2px) scale(1.02);
-      box-shadow: 0 8px 20px rgba(52, 199, 89, 0.4);
-    }
-    
-    .btn-ios-primary:active {
-      transform: translateY(1px) scale(0.98);
-      box-shadow: 0 4px 10px rgba(52, 199, 89, 0.3);
-    }
-    
-    /* 按钮点击波纹效果 */
-    .btn-ios-primary::after {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 5px;
-      height: 5px;
-      background: rgba(255, 255, 255, 0.5);
-      opacity: 0;
-      border-radius: 100%;
-      transform: scale(1, 1) translate(-50%, -50%);
-      transform-origin: 50% 50%;
-    }
-    
-    .btn-ios-primary:focus:not(:active)::after {
-      animation: ripple 1s var(--animation-timing-apple);
-    }
-    
-    @keyframes ripple {
-      0% {
-        transform: scale(0, 0) translate(-50%, -50%);
-        opacity: 0.5;
-      }
-      100% {
-        transform: scale(30, 30) translate(-50%, -50%);
-        opacity: 0;
-      }
-    }
-    
-    /* 增强结果卡片 */
     .result-card {
       background: linear-gradient(135deg, var(--ios-blue), var(--ios-indigo));
       color: white;
       border-radius: 24px;
-      padding: 28px;
-      box-shadow: 0 12px 30px rgba(10, 132, 255, 0.25);
-      text-align: center;
-      margin-top: 30px;
-      position: relative;
-      overflow: hidden;
-      transform: translateZ(0);
-      opacity: 0;
-      transform: translateY(20px);
-      animation: fadeInResult 0.6s var(--animation-timing-apple) forwards;
-      animation-delay: 0.7s;
-    }
-    
-    @keyframes fadeInResult {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    
-    .result-card::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent 80%);
-      pointer-events: none;
+      padding: 24px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      margin-top: 24px;
     }
     
     .result-card h3 {
       color: white;
       margin-bottom: 16px;
       font-weight: 700;
-      position: relative;
-      z-index: 1;
-      font-size: 1.3rem;
-      letter-spacing: -0.3px;
     }
     
     .result-value {
-      font-size: 3rem;
-      font-weight: 800;
-      margin: 20px 0;
-      position: relative;
-      z-index: 1;
-      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      transition: all 0.3s var(--animation-timing-apple);
-    }
-    
-    .result-value:hover {
-      transform: scale(1.05);
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 8px;
     }
     
     .result-unit {
       font-size: 1.1rem;
       opacity: 0.9;
-      position: relative;
-      z-index: 1;
-      letter-spacing: -0.2px;
     }
     
-    /* 账户卡片样式增强 */
     .activity-card {
-      background-color: var(--card-bg-light);
-      border-radius: 18px;
-      padding: 24px;
-      margin-top: 24px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      transition: transform 0.4s var(--animation-timing-apple),
-                box-shadow 0.4s var(--animation-timing-apple),
-                background-color 0.5s var(--animation-timing-apple);
-      animation: fadeInStagger 0.6s var(--animation-timing-apple) both;
-      animation-delay: 0.9s;
-    }
-    
-    @keyframes fadeInStagger {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    
-    .activity-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+      background-color: var(--ios-gray6);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+      border: 1px solid var(--ios-gray5);
     }
     
     .activity-card h4 {
-      font-weight: 700;
+      font-weight: 600;
       margin-bottom: 16px;
-      color: var(--ios-green);
-      letter-spacing: -0.3px;
-      transition: color 0.5s var(--animation-timing-apple);
     }
     
-    .activity-card p {
-      line-height: 1.6;
-      color: var(--ios-gray);
-      margin-bottom: 0;
-      transition: color 0.5s var(--animation-timing-apple);
-    }
-    
-    /* 上传进度条样式增强 */
     .progress {
-      height: 8px;
+      height: 10px;
       margin: 10px 0;
-      border-radius: 4px;
-      background-color: rgba(52, 199, 89, 0.1);
-      overflow: hidden;
+      border-radius: 5px;
     }
     
     .progress-bar {
-      background: linear-gradient(to right, var(--ios-green), var(--ios-mint));
-      transition: width 0.3s var(--animation-timing-apple);
-      border-radius: 4px;
-    }
-    
-    /* 图片预览增强 */
-    #imagePreview {
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      transition: all 0.3s var(--animation-timing-apple);
-    }
-    
-    #imagePreview:hover {
-      transform: scale(1.02);
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-    }
-    
-    /* 主题切换按钮增强 */
-    .theme-toggle {
-      position: fixed;
-      right: 20px;
-      bottom: 20px;
-      width: 56px;
-      height: 56px;
-      border-radius: 28px;
-      background: var(--ios-system-background);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-      cursor: pointer;
-      z-index: 100;
-      transition: all 0.3s var(--animation-timing-apple);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-    }
-    
-    .theme-toggle:hover {
-      transform: translateY(-3px) scale(1.05);
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-    }
-    
-    .theme-toggle:active {
-      transform: translateY(0) scale(0.98);
-    }
-    
-    .theme-toggle i {
-      font-size: 24px;
-      color: var(--ios-gray);
-      transition: transform 0.5s var(--animation-timing-apple),
-                  color 0.5s var(--animation-timing-apple);
-    }
-    
-    .theme-toggle:hover i {
-      transform: rotate(30deg);
-    }
-    
-    /* 模态框增强 */
-    .modal-content {
-      border-radius: 20px;
-      border: none;
-      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
-      overflow: hidden;
-      transition: background-color 0.5s var(--animation-timing-apple);
-    }
-    
-    .modal-header {
-      border-bottom: 1px solid var(--ios-gray5);
-      padding: 20px 24px;
-      transition: border-color 0.5s var(--animation-timing-apple);
-    }
-    
-    .modal-body {
-      padding: 24px;
-    }
-    
-    .modal-footer {
-      border-top: 1px solid var(--ios-gray5);
-      padding: 20px 24px;
-      transition: border-color 0.5s var(--animation-timing-apple);
-    }
-    
-    .modal-title {
-      font-weight: 700;
-      letter-spacing: -0.3px;
-    }
-    
-    .close {
-      text-shadow: none;
-      opacity: 0.7;
-      transition: opacity 0.3s var(--animation-timing-apple);
-    }
-    
-    .close:hover {
-      opacity: 1;
-    }
-    
-    /* 增强深色模式适配 */
-    body.dark-theme,
-    body.auto-theme.dark-mode {
-      background-color: #1C1C1E;
-      color: var(--text-color-dark);
-    }
-    
-    body.dark-theme .calculator-card,
-    body.auto-theme.dark-mode .calculator-card,
-    body.dark-theme .activity-card,
-    body.auto-theme.dark-mode .activity-card {
-      background-color: var(--card-bg-dark);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    
-    body.dark-theme .form-control,
-    body.auto-theme.dark-mode .form-control {
-      background-color: rgba(44, 44, 46, 0.8);
-      border-color: rgba(80, 80, 85, 0.8);
-      color: #FFFFFF;
-    }
-    
-    body.dark-theme .form-control:focus,
-    body.auto-theme.dark-mode .form-control:focus {
-      background-color: rgba(60, 60, 65, 0.9);
-      border-color: var(--ios-green);
-      box-shadow: 0 0 0 4px rgba(52, 199, 89, 0.25);
-      color: #FFFFFF;
-    }
-    
-    body.dark-theme label,
-    body.auto-theme.dark-mode label,
-    body.dark-theme .activity-card p,
-    body.auto-theme.dark-mode .activity-card p {
-      color: #FFFFFF;
-    }
-    
-    body.dark-theme .activity-card h4,
-    body.auto-theme.dark-mode .activity-card h4 {
-      color: #30D158;
-    }
-    
-    body.dark-theme .progress,
-    body.auto-theme.dark-mode .progress {
-      background-color: rgba(48, 209, 88, 0.2);
-    }
-    
-    body.dark-theme .progress-bar,
-    body.auto-theme.dark-mode .progress-bar {
-      background: linear-gradient(to right, #30D158, #64D2FF);
-    }
-    
-    body.dark-theme .theme-toggle,
-    body.auto-theme.dark-mode .theme-toggle {
-      background-color: rgba(44, 44, 46, 0.8);
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
-    }
-    
-    body.dark-theme .theme-toggle i,
-    body.auto-theme.dark-mode .theme-toggle i {
-      color: #AEAEB2;
-    }
-    
-    body.dark-theme .modal-content,
-    body.auto-theme.dark-mode .modal-content {
-      background-color: #2C2C2E;
-      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
-    }
-    
-    body.dark-theme .modal-header,
-    body.auto-theme.dark-mode .modal-header {
-      border-bottom-color: #3A3A3C;
-    }
-    
-    body.dark-theme .modal-footer,
-    body.auto-theme.dark-mode .modal-footer {
-      border-top-color: #3A3A3C;
-    }
-    
-    body.dark-theme .alert-info,
-    body.auto-theme.dark-mode .alert-info {
-      background-color: rgba(59, 130, 246, 0.2);
-      border-color: rgba(59, 130, 246, 0.3);
-      color: #FFFFFF;
-    }
-    
-    /* 确保深色模式下的文本可见 */
-    body.dark-theme .form-text.text-muted,
-    body.auto-theme.dark-mode .form-text.text-muted {
-      color: rgba(255, 255, 255, 0.7) !important;
-    }
-    
-    body.dark-theme select.form-control option,
-    body.auto-theme.dark-mode select.form-control option {
-      background-color: #2C2C2E;
-      color: #FFFFFF;
-    }
-    
-    /* 按钮样式修改 */
-    body.dark-theme .btn-ios-primary,
-    body.auto-theme.dark-mode .btn-ios-primary {
-      background: linear-gradient(135deg, #30D158, #64D2FF);
-    }
-    
-    body.dark-theme .btn-outline-info,
-    body.auto-theme.dark-mode .btn-outline-info {
-      color: #64D2FF;
-      border-color: #64D2FF;
-    }
-    
-    body.dark-theme .btn-outline-info:hover,
-    body.auto-theme.dark-mode .btn-outline-info:hover {
-      background-color: rgba(100, 210, 255, 0.2);
-      color: #FFFFFF;
+      background-color: var(--ios-green);
     }
   </style>
   <script>
@@ -956,48 +386,16 @@
         }
       });
     }
-
-    // 添加检测系统暗模式的代码
-    document.addEventListener('DOMContentLoaded', function() {
-      // 检查系统是否为暗模式
-      function isDarkMode() {
-        return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-      }
-      
-      // 如果系统是暗模式且用户使用自动主题，添加dark-mode类
-      if (isDarkMode() && document.body.classList.contains('auto-theme')) {
-        document.body.classList.add('dark-mode');
-      }
-      
-      // 监听系统暗模式变化
-      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
-        if (document.body.classList.contains('auto-theme')) {
-          if (e.matches) {
-            document.body.classList.add('dark-mode');
-          } else {
-            document.body.classList.remove('dark-mode');
-          }
-        }
-      });
-    });
   </script>
 </head>
-<body class="auto-theme">
-<!-- Add frosted glass background -->
-<div class="frosted-glass"></div>
-
-<!-- Add ambient glow effects -->
-<div class="glow-effect glow-green"></div>
-<div class="glow-effect glow-mint"></div>
-<div class="glow-effect glow-blue"></div>
-
+<body>
 <!-- 导航栏容器，将由JavaScript加载 -->
 <div id="navbar-container"></div>
 
 <header class="calc-header">
   <div class="container">
-    <h1>Carbon Reduction Calculator</h1>
-    <p>Track and reduce your carbon footprint by recording your sustainable activities and see the positive impact you're making on our planet.</p>
+    <h1>Carbon Accounting Portal</h1>
+    <p>Record your sustainable actions and track your positive impact on the environment. Every small action counts towards a greener future.</p>
   </div>
 </header>
 
@@ -1120,261 +518,7 @@
   </div>
 </div>
 
-<!-- Theme toggle button -->
-<div class="theme-toggle" id="themeToggle">
-  <i class="fas fa-moon"></i>
-</div>
-
 <!-- 页脚 -->
 <div id="footer-placeholder"></div>
-
-<script>
-  // Theme toggling functionality
-  document.addEventListener('DOMContentLoaded', function() {
-    const themeToggle = document.getElementById('themeToggle');
-    const body = document.body;
-    const icon = themeToggle.querySelector('i');
-    
-    // Check if user has a saved preference
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme) {
-      body.className = savedTheme;
-      updateIcon(savedTheme);
-    } else {
-      body.classList.add('auto-theme');
-    }
-    
-    themeToggle.addEventListener('click', () => {
-      if (body.classList.contains('auto-theme')) {
-        body.classList.remove('auto-theme');
-        body.classList.add('dark-theme');
-        localStorage.setItem('theme', 'dark-theme');
-      } else if (body.classList.contains('dark-theme')) {
-        body.classList.remove('dark-theme');
-        body.classList.add('light-theme');
-        localStorage.setItem('theme', 'light-theme');
-      } else {
-        body.classList.remove('light-theme');
-        body.classList.add('auto-theme');
-        localStorage.setItem('theme', 'auto-theme');
-      }
-      
-      updateIcon(body.className);
-      
-      // 添加主题切换动画
-      addThemeTransitionEffect();
-    });
-    
-    function updateIcon(theme) {
-      if (theme === 'dark-theme') {
-        icon.className = 'fas fa-sun';
-      } else if (theme === 'light-theme') {
-        icon.className = 'fas fa-adjust';
-      } else {
-        icon.className = 'fas fa-moon';
-      }
-    }
-    
-    // 添加主题切换特效
-    function addThemeTransitionEffect() {
-      // 创建一个覆盖全屏的div元素
-      const overlay = document.createElement('div');
-      overlay.style.position = 'fixed';
-      overlay.style.top = '0';
-      overlay.style.left = '0';
-      overlay.style.width = '100%';
-      overlay.style.height = '100%';
-      overlay.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-      overlay.style.zIndex = '9999';
-      overlay.style.opacity = '0';
-      overlay.style.pointerEvents = 'none';
-      overlay.style.transition = 'opacity 0.5s var(--animation-timing-apple)';
-      
-      document.body.appendChild(overlay);
-      
-      // 淡入淡出效果
-      setTimeout(() => {
-        overlay.style.opacity = '0.2';
-        
-        setTimeout(() => {
-          overlay.style.opacity = '0';
-          
-          setTimeout(() => {
-            document.body.removeChild(overlay);
-          }, 500);
-        }, 300);
-      }, 10);
-    }
-  });
-  
-  $(document).ready(function() {
-    // 检查用户是否已登录
-    if (!localStorage.getItem('token')) {
-      showAlert('请先登录后再使用碳排放计算器', 'warning', function() {
-        window.location.href = 'index.html';
-      });
-      return;
-    }
-    
-    // 活动类型选择
-    $('.activity-option').click(function() {
-      $('.activity-option').removeClass('selected');
-      $(this).addClass('selected');
-      
-      const activityType = $(this).data('type');
-      $('#activityType').val(activityType);
-      
-      // 隐藏所有字段，然后显示选定的活动类型的字段
-      $('.activity-fields').hide();
-      $(`#${activityType}Fields`).fadeIn();
-    });
-    
-    // 处理表单提交
-    $('#calculatorForm').submit(function(e) {
-      e.preventDefault();
-      
-      const activityType = $('#activityType').val();
-      if (!activityType) {
-        showAlert('请选择一个活动类型', 'warning');
-        return;
-      }
-      
-      // 基于活动类型收集数据
-      let data = {
-        activity_type: activityType,
-        notes: $('#notes').val(),
-        token: localStorage.getItem('token')
-      };
-      
-      // 添加特定活动类型的数据
-      switch (activityType) {
-        case 'commuting':
-          data.transport_type = $('#transportType').val();
-          data.distance = $('#distance').val();
-          
-          if (!data.distance) {
-            showAlert('请输入距离', 'warning');
-            return;
-          }
-          break;
-          
-        case 'cooking':
-          data.cooking_method = $('#cookingMethod').val();
-          data.cooking_time = $('#cookingTime').val();
-          
-          if (!data.cooking_time) {
-            showAlert('请输入烹饪时间', 'warning');
-            return;
-          }
-          break;
-          
-        case 'electricity':
-          data.appliance_type = $('#applianceType').val();
-          data.usage_time = $('#usageTime').val();
-          
-          if (!data.usage_time) {
-            showAlert('请输入使用时间', 'warning');
-            return;
-          }
-          break;
-          
-        case 'shopping':
-          data.product_type = $('#productType').val();
-          data.amount = $('#amount').val();
-          
-          if (!data.amount) {
-            showAlert('请输入金额', 'warning');
-            return;
-          }
-          break;
-      }
-      
-      // 发送计算请求
-      $.ajax({
-        type: 'POST',
-        url: 'calculate.php',
-        data: data,
-        dataType: 'json',
-        success: function(response) {
-          if (response.success) {
-            // 显示结果
-            $('.result-value').text(response.emission.toFixed(2) + ' kg CO₂e');
-            $('#resultCard').addClass('show');
-            
-            // 滚动到结果卡片
-            $('html, body').animate({
-              scrollTop: $('#resultCard').offset().top - 100
-            }, 500);
-            
-            // 保存计算结果的数据，用于"保存到我的账户"按钮
-            $('#saveResultBtn').data('emission', response.emission);
-            $('#saveResultBtn').data('activity', response.activity);
-            $('#saveResultBtn').data('rawData', response.raw_data);
-          } else {
-            showAlert('计算错误: ' + response.message, 'error');
-          }
-        },
-        error: function() {
-          showAlert('请求失败，请稍后再试', 'error');
-        }
-      });
-    });
-    
-    // 保存结果到账户
-    $('#saveResultBtn').click(function() {
-      const emission = $(this).data('emission');
-      const activity = $(this).data('activity');
-      const rawData = $(this).data('rawData');
-      
-      if (!emission) {
-        showAlert('没有可保存的计算结果', 'warning');
-        return;
-      }
-      
-      const notes = $('#notes').val();
-      
-      $.ajax({
-        type: 'POST',
-        url: 'calculate.php',
-        data: {
-          action: 'save',
-          token: localStorage.getItem('token'),
-          emission: emission,
-          activity: activity,
-          raw_data: rawData,
-          notes: notes
-        },
-        dataType: 'json',
-        success: function(response) {
-          if (response.success) {
-            showAlert('您的碳排放记录已成功保存', 'success');
-          } else {
-            showAlert('保存失败: ' + response.message, 'error');
-          }
-        },
-        error: function() {
-          showAlert('保存请求失败，请稍后再试', 'error');
-        }
-      });
-    });
-    
-    // 重置计算器
-    $('#resetBtn').click(function() {
-      // 重置表单
-      $('#calculatorForm')[0].reset();
-      $('#activityType').val('');
-      $('.activity-option').removeClass('selected');
-      $('.activity-fields').hide();
-      
-      // 隐藏结果卡片
-      $('#resultCard').removeClass('show');
-      
-      // 滚动回顶部
-      $('html, body').animate({
-        scrollTop: $('.calculator-card').offset().top - 100
-      }, 500);
-    });
-  });
-</script>
 </body>
 </html>
