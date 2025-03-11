@@ -987,25 +987,409 @@
       text-align: center;
     }
     
-    .ios-spinner {
-      display: inline-block;
-      width: 24px;
-      height: 24px;
-      border: 2px solid rgba(0, 122, 255, 0.3);
-      border-radius: 50%;
-      border-top-color: var(--ios-blue-light);
-      animation: ios-spin 1s linear infinite;
+    /* 优化的iOS风格加载动画 */
+    .ios-loader {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      padding: 30px;
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      background-color: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s var(--animation-timing-apple);
+      margin: 20px auto;
+      width: 200px;
     }
     
-    body.dark-theme .ios-spinner,
-    body.auto-theme.dark-mode .ios-spinner {
-      border-color: rgba(10, 132, 255, 0.3);
+    /* 加载动画圆环 */
+    .ios-loader-ring {
+      position: relative;
+      width: 60px;
+      height: 60px;
+      margin-bottom: 20px;
+    }
+    
+    .ios-loader-ring::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 3px solid rgba(0, 122, 255, 0.2);
+    }
+    
+    .ios-loader-ring::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 3px solid transparent;
+      border-top-color: var(--ios-blue-light);
+      animation: ios-loader-rotate 1.5s linear infinite;
+    }
+    
+    @keyframes ios-loader-rotate {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+    
+    .ios-loader-dots {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 16px 0;
+    }
+    
+    .ios-loader-dot {
+      width: 10px;
+      height: 10px;
+      margin: 0 5px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--ios-blue-light), var(--ios-purple-light));
+      opacity: 0;
+      transform: scale(0.8);
+      animation: ios-loader-pulse 1.5s infinite ease-in-out;
+    }
+    
+    .ios-loader-dot:nth-child(1) {
+      animation-delay: 0s;
+    }
+    
+    .ios-loader-dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+    
+    .ios-loader-dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+    
+    .ios-loader-text {
+      font-size: 16px;
+      font-weight: 500;
+      margin-top: 8px;
+      color: var(--muted-text-light);
+      opacity: 0.9;
+      background: linear-gradient(135deg, var(--ios-blue-light), var(--ios-purple-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: ios-loader-text-pulse 1.5s infinite ease-in-out;
+    }
+    
+    @keyframes ios-loader-pulse {
+      0%, 100% {
+        opacity: 0.3;
+        transform: scale(0.8);
+      }
+      50% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+    
+    @keyframes ios-loader-text-pulse {
+      0%, 100% {
+        opacity: 0.7;
+      }
+      50% {
+        opacity: 1;
+      }
+    }
+    
+    /* 气泡动画效果 */
+    .bubble {
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(0, 122, 255, 0.3), rgba(88, 86, 214, 0.1));
+      box-shadow: 0 0 10px rgba(0, 122, 255, 0.2);
+      animation: bubble-float 3s ease-in infinite;
+      opacity: 0;
+      z-index: -1;
+    }
+    
+    @keyframes bubble-float {
+      0% {
+        opacity: 0;
+        transform: translateY(0) scale(0.5);
+      }
+      50% {
+        opacity: 0.6;
+        transform: translateY(-40px) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-80px) scale(0.5);
+      }
+    }
+    
+    /* 加载器周围的光晕效果 */
+    .ios-loader::after {
+      content: '';
+      position: absolute;
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0, 122, 255, 0.1) 0%, transparent 70%);
+      z-index: -1;
+      animation: ios-loader-glow 2s infinite alternate ease-in-out;
+    }
+    
+    @keyframes ios-loader-glow {
+      0% {
+        opacity: 0.5;
+        transform: scale(0.9);
+      }
+      100% {
+        opacity: 0.8;
+        transform: scale(1.1);
+      }
+    }
+    
+    body.dark-theme .ios-loader-ring::before,
+    body.auto-theme.dark-mode .ios-loader-ring::before {
+      border-color: rgba(10, 132, 255, 0.15);
+    }
+    
+    body.dark-theme .ios-loader-ring::after,
+    body.auto-theme.dark-mode .ios-loader-ring::after {
       border-top-color: var(--ios-blue-dark);
     }
     
-    @keyframes ios-spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+    body.dark-theme .ios-loader,
+    body.auto-theme.dark-mode .ios-loader {
+      background-color: rgba(44, 44, 46, 0.3);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    }
+    
+    /* 美化用户信息卡片 */
+    .info-card {
+      overflow: visible;
+      transform-style: preserve-3d;
+      perspective: 1000px;
+    }
+    
+    .info-card .card-body {
+      padding: 30px;
+      transition: all 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+    
+    .info-card:hover .card-body {
+      transform: translateZ(10px);
+    }
+    
+    /* 信息值标签的美化 */
+    .info-value {
+      transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+      box-shadow: 0 4px 10px rgba(0, 122, 255, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .info-value::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(
+        to bottom right,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.15) 50%,
+        rgba(255, 255, 255, 0) 100%
+      );
+      transform: rotate(45deg) translateY(-100%);
+      transition: transform 0.7s ease;
+      pointer-events: none;
+    }
+    
+    .info-value:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0, 122, 255, 0.15);
+    }
+    
+    .info-value:hover::after {
+      transform: rotate(45deg) translateY(100%);
+    }
+    
+    body.dark-theme .info-value,
+    body.auto-theme.dark-mode .info-value {
+      box-shadow: 0 4px 10px rgba(10, 132, 255, 0.15);
+    }
+    
+    body.dark-theme .info-value:hover,
+    body.auto-theme.dark-mode .info-value:hover {
+      box-shadow: 0 8px 20px rgba(10, 132, 255, 0.25);
+    }
+    
+    /* 标题增强 */
+    .ios-section-heading {
+      font-size: 2rem;
+      letter-spacing: -0.02em;
+      transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+    
+    .ios-section-heading:hover {
+      transform: scale(1.02);
+    }
+    
+    .ios-section-heading::after {
+      transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+      height: 4px;
+    }
+    
+    .ios-section-heading:hover::after {
+      width: 80px;
+    }
+    
+    /* 改进排行榜表格样式 */
+    .ios-card-table {
+      transition: transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1),
+                  box-shadow 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+    
+    .ios-card-table:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    body.dark-theme .ios-card-table:hover,
+    body.auto-theme.dark-mode .ios-card-table:hover {
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+    }
+    
+    /* 排行榜行悬停效果增强 */
+    .ios-table-row {
+      transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .ios-table-row::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(
+        to right,
+        rgba(0, 122, 255, 0.05) 0%,
+        rgba(0, 122, 255, 0) 100%
+      );
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    
+    .ios-table-row:hover::after {
+      opacity: 1;
+    }
+    
+    body.dark-theme .ios-table-row::after,
+    body.auto-theme.dark-mode .ios-table-row::after {
+      background: linear-gradient(
+        to right,
+        rgba(10, 132, 255, 0.1) 0%,
+        rgba(10, 132, 255, 0) 100%
+      );
+    }
+    
+    /* 排行榜徽章的美化 */
+    .rank-medal {
+      transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+    
+    .rank-medal.gold {
+      box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+    }
+    
+    .rank-medal.silver {
+      box-shadow: 0 5px 15px rgba(192, 192, 192, 0.3);
+    }
+    
+    .rank-medal.bronze {
+      box-shadow: 0 5px 15px rgba(205, 127, 50, 0.3);
+    }
+    
+    .ios-table-row:hover .rank-medal {
+      transform: scale(1.1) rotate(5deg);
+    }
+    
+    /* 内容容器美化 */
+    .content-container {
+      transition: all 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+      overflow: visible;
+    }
+    
+    .content-container:hover {
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+    }
+    
+    body.dark-theme .content-container:hover,
+    body.auto-theme.dark-mode .content-container:hover {
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+    }
+    
+    /* 主题切换按钮增强 */
+    .theme-toggle {
+      transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+    
+    .theme-toggle:hover {
+      transform: scale(1.1) rotate(5deg);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+    
+    body.dark-theme .theme-toggle:hover,
+    body.auto-theme.dark-mode .theme-toggle:hover {
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    }
+    
+    .theme-toggle i {
+      transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+    
+    .theme-toggle:hover i {
+      transform: scale(1.1);
+    }
+    
+    /* 分段控制器美化 */
+    .ios-segment-control {
+      transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    .ios-segment-control:hover {
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+    }
+    
+    body.dark-theme .ios-segment-control:hover,
+    body.auto-theme.dark-mode .ios-segment-control:hover {
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    .segment-selector {
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+    
+    body.dark-theme .segment-selector,
+    body.auto-theme.dark-mode .segment-selector {
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     }
   </style>
 </head>
@@ -1076,8 +1460,21 @@
   <div class="ios-card-table fade-in-up delay-5">
     <!-- 加载动画 -->
     <div class="ios-loading">
-      <div class="ios-spinner"></div>
-          </div>
+      <div class="ios-loader">
+        <div class="ios-loader-ring"></div>
+        <div class="ios-loader-dots">
+          <div class="ios-loader-dot"></div>
+          <div class="ios-loader-dot"></div>
+          <div class="ios-loader-dot"></div>
+        </div>
+        <div class="ios-loader-text">加载排行榜数据...</div>
+        <!-- 气泡效果 -->
+        <div class="bubble" style="left: 20%; animation-delay: 0s;"></div>
+        <div class="bubble" style="left: 40%; animation-delay: 1s;"></div>
+        <div class="bubble" style="left: 60%; animation-delay: 0.5s;"></div>
+        <div class="bubble" style="left: 80%; animation-delay: 1.5s;"></div>
+      </div>
+    </div>
     
     <!-- 排行榜内容区域 -->
     <div id="leaderboard-content">
@@ -1266,6 +1663,28 @@
         }
       });
     });
+
+    // 创建气泡动画效果
+    function createBubbles() {
+      const loader = document.querySelector('.ios-loader');
+      if (loader) {
+        setInterval(() => {
+          const bubble = document.createElement('div');
+          bubble.classList.add('bubble');
+          bubble.style.left = Math.floor(Math.random() * 100) + '%';
+          bubble.style.animationDuration = (Math.random() * 2 + 2) + 's';
+          loader.appendChild(bubble);
+          
+          // 动画结束后移除气泡
+          setTimeout(() => {
+            bubble.remove();
+          }, 3000);
+        }, 300);
+      }
+    }
+    
+    // 初始化气泡效果
+    createBubbles();
   });
   
   // 加载用户数据
