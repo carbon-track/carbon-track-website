@@ -31,13 +31,13 @@
       --border-color-light: #d1d1d6;
       --border-color-dark: #3a3a3c;
       
-      /* 主题色 */
+      /* 主题颜色 */
       --ios-blue-light: #007AFF;
       --ios-blue-dark: #0A84FF;
       --ios-purple-light: #5856D6;
       --ios-purple-dark: #5E5CE6;
       
-      /* 辅助色 */
+      /* 辅助颜色 */
       --muted-text-light: #8E8E93;
       --muted-text-dark: #98989D;
       --highlight-bg-light: rgba(0, 122, 255, 0.1);
@@ -906,28 +906,27 @@
       font-size: 14px;
       color: white;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), transparent) no-repeat;
-      background-size: 200% 200%;
-      background-position: 0% 0%;
       position: relative;
-      z-index: 1;
     }
     
     .rank-medal.gold {
       background-color: #FFD700;
+      background-image: linear-gradient(135deg, #FFD700, #FFC107);
     }
     
     .rank-medal.silver {
       background-color: #C0C0C0;
+      background-image: linear-gradient(135deg, #E0E0E0, #9E9E9E);
     }
     
     .rank-medal.bronze {
       background-color: #CD7F32;
+      background-image: linear-gradient(135deg, #D4A676, #A56C50);
     }
     
     .rank-medal.normal {
-      background-color: var(--muted-text-light);
-      font-size: 13px;
+      background-color: #8E8E93;
+      font-size: 12px;
       width: 24px;
       height: 24px;
       margin-right: 12px;
@@ -935,7 +934,8 @@
     
     body.dark-theme .rank-medal.normal,
     body.auto-theme.dark-mode .rank-medal.normal {
-      background-color: var(--muted-text-dark);
+      background-color: #636366;
+      color: white;
     }
     
     /* 当前用户突出显示 */
@@ -1025,7 +1025,7 @@
           <h5 class="info-title">My Carbon Credits</h5>
           <p class="card-text">Your current carbon credits balance is: <span class="info-value" id="userPoints">加载中Loading...</span></p>
           
-          <h5 class="info-title">My Carbon Reduction (CO₂ in kg)</h5>
+          <h5 class="info-title">My Carbon Reduction (CO2 in kg)</h5>
           <p class="card-text">You have saved a total of: <span class="info-value" id="userReduction">加载中Loading...</span></p>
           
           <button type="button" class="btn btn-ios-primary float-right ios-float" data-toggle="modal" data-target="#editUserModal">
@@ -1051,7 +1051,7 @@
   <div class="ios-segment-control">
     <button class="segment active" data-type="all">
       <i class="fas fa-globe-asia"></i>Global
-    </button>
+        </button>
     <button class="segment" data-type="local">
       <i class="fas fa-map-marker-alt"></i>Regional
     </button>
@@ -1059,21 +1059,21 @@
       <i class="fas fa-school"></i>School
     </button>
     <div class="segment-selector"></div>
-  </div>
+      </div>
   
   <!-- iOS风格卡片表格 -->
   <div class="ios-card-table fade-in-up delay-5">
     <!-- 加载动画 -->
     <div class="ios-loading">
       <div class="ios-spinner"></div>
-    </div>
+          </div>
     
     <!-- 排行榜内容区域 -->
     <div id="leaderboard-content">
       <!-- 内容将由JavaScript动态生成 -->
-    </div>
-  </div>
-</div>
+            </div>
+              </div>
+            </div>
 
 <!-- 添加编辑个人资料的模态窗口 -->
 <div class="modal fade" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserModalLabel" aria-hidden="true">
@@ -1090,11 +1090,11 @@
           <div class="form-group">
             <label for="userCountrySelect">国家/地区 Country/Region</label>
             <select class="form-control" id="userCountrySelect">
-              <option value="">加载中 Loading...</option>
+              <option value="">加载中Loading...</option>
             </select>
           </div>
           <div class="form-group">
-            <label for="userStateSelect">省份/州 State/Province</label>
+            <label for="userStateSelect">省份/省 State/Province</label>
             <select class="form-control" id="userStateSelect">
               <option value="">请先选择国家 Please select a country first</option>
             </select>
@@ -1102,12 +1102,12 @@
           <div class="form-group">
             <label for="userSchoolSelect">学校 School</label>
             <select class="form-control" id="userSchoolSelect">
-              <option value="">加载中 Loading...</option>
+              <option value="">加载中Loading...</option>
             </select>
           </div>
           <div class="form-group" id="userSchoolInputGroup" style="display: none;">
             <label for="userSchoolInput">输入学校名称 Enter School Name</label>
-            <input type="text" class="form-control" id="userSchoolInput" placeholder="请输入学校名称 Enter school name">
+            <input type="text" class="form-control" id="userSchoolInput" placeholder="请输入学校名">
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">取消 Cancel</button>
@@ -1132,6 +1132,9 @@
     // 主题切换功能
     initThemeToggle();
     
+    // 初始化iOS风格分段控制器 - 不再单独调用，由bindRankingButtons替代
+    // initSegmentControl();
+    
     // 添加按钮点击状态切换
     $('.ios-btn-group .btn').click(function() {
       $('.ios-btn-group .btn').removeClass('active');
@@ -1140,128 +1143,448 @@
     
     // 导航到历史页面
     document.getElementById('navigateButton').addEventListener('click', function () {
-      window.location.href = 'pthis.html' // 指定要跳转的页面
+      window.location.href = 'pthis.html'; // 指定要跳转的页面
     });
     
     // 初始化
     bindRankingButtons();
     switchRanking('all');
     
-    var token = localStorage.getItem('token') // 假设用户的 token 存储在 localStorage
-    if (token) {
-      $.ajax({
-        type: 'POST',
-        url: 'get_user_points.php', // PHP 文件处理积分获取
-        data: { token: token },
-        dataType: 'json',
-        success: function (response) {
-          if (response.success) {
-            $('#userPoints').text(response.userPoints) // 设置用户积分
-            $('#userReduction').text(response.userPoints / 10)
-            $('#userSchool').text(response.school) // 假设你有一个ID为userSchool的元素
-            $('#userLocation').text(response.location) // 假设你有一个ID为userLocation的元素
-            // 清空排行榜表格
-            $('#leaderboard').empty()
-
-// 根据排名获取相应的行的 CSS 类
-            function getRowClass(rank) {
-              var classes = ['rank-1', 'rank-2', 'rank-3']
-              return rank <= 3 ? classes[rank - 1] : ''
-            }
-
-// 遍历排行榜数据并添加到表格中
-            $.each(response.leaderboard, function (index, user) {
-              var rank = index + 1 // 排名是索引加1
-              var rankIcon = getRankIcon(rank) // 获取排名图标
-              var rowClass = getRowClass(rank) // 获取行的 CSS 类
-              var row = $('<tr>').addClass(rowClass).append(
-                $('<td>').html(rankIcon),
-                $('<td>').text(user.username),
-                $('<td>').text(user.points)
-              )
-              $('#leaderboard').append(row)
-            })
-
-            function getRankIcon(rank) {
-              var icons = ['<i class="fas fa-crown text-warning"></i>', '<i class="fas fa-medal text-secondary"></i>', '<i class="fas fa-trophy text-success"></i>']
-              if (rank <= 3) {
-                return icons[rank - 1] + ' ' + rank // 前三名使用特殊图标
-              }
-              return rank // 其他排名只显示数字
-            }
-          } else {
-            $('#userPoints').text('无法加载积分')
-            alert('获取积分失败: ' + response.error)
-          }
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-          console.log('服务器响应内容:', jqXHR.responseText) // 打印服务器响应内容
-          $('#userPoints').text('无法加载积分')
-          alert('请求积分数据失败，请稍后再试。错误信息：' + textStatus)
-        },
-      })
-    } else {
-      $('#userPoints').text('未登录')
-      alert('请先登录。')
-      window.location.href = 'index.html'
-    }
+    // 加载用户数据
+    loadUserData();
     
-    // 加载国家和学校数据
-    loadCountries()
-    loadSchools()
+    // 监听模态窗口打开事件，预填充用户资料
+    $('#editUserModal').on('show.bs.modal', function () {
+      prepopulateUserForm();
+    });
 
     // 监听学校选择框的变化
     $('#userSchoolSelect').change(function () {
       if ($(this).val() == 'other') {
-        $('#userSchoolInputGroup').show()
+        $('#userSchoolInputGroup').show();
       } else {
-        $('#userSchoolInputGroup').hide()
+        $('#userSchoolInputGroup').hide();
       }
-    })
+    });
 
     // 监听表单提交事件
     $('#editUserForm').submit(function (e) {
-      e.preventDefault()
-      var school = $('#userSchoolSelect').val()
-      var schoolName = '' // 用于存储学校名称
-      var isNewSchool = false
+      e.preventDefault();
+      
+      // 显示加载状态
+      const submitBtn = $(this).find('button[type="submit"]');
+      const originalBtnText = submitBtn.html();
+      submitBtn.html('<i class="fas fa-spinner fa-spin mr-2"></i>保存中...');
+      submitBtn.prop('disabled', true);
+      
+      var school = $('#userSchoolSelect').val();
+      var schoolName = ''; // 用于存储学校名称
+      var isNewSchool = false;
 
       // 检查用户是否选择了"其他"选项
       if (school === 'other') {
-        schoolName = $('#userSchoolInput').val() // 从输入框获取学校名称
-        isNewSchool = true
-      } else {
+        schoolName = $('#userSchoolInput').val(); // 从输入框获取学校名称
+        if (!schoolName || schoolName.trim() === '') {
+          // 显示错误提示
+          showIosAlert('请输入学校名称 / Please enter a school name');
+          submitBtn.html(originalBtnText);
+          submitBtn.prop('disabled', false);
+          return;
+        }
+        isNewSchool = true;
+      } else if (school) {
         // 从下拉列表中获取学校名称
-        schoolName = $('#userSchoolSelect option:selected').text()
+        schoolName = $('#userSchoolSelect option:selected').text();
+        if (schoolName === '请选择学校Select school') {
+          schoolName = '';
+        }
       }
-      if (schoolName == '请选择学校Select school') {
-        schoolName = undefined
-      }
-      var state = $('#userStateSelect').val()
-      var isNewSchool = $('#userSchoolSelect').val() == 'other'
-      var token = localStorage.getItem('token')
+      
+      var country = $('#userCountrySelect').val();
+      var state = $('#userStateSelect').val();
+      var token = localStorage.getItem('token');
+      
+      // 构建请求数据
+      var requestData = {
+        token: token
+      };
+      
+      // 只包含有值的字段
+      if (schoolName) requestData.school = schoolName;
+      if (state) requestData.state = state;
+      if (country) requestData.country = country;
+      if (isNewSchool) requestData.new_sch = true;
+      
       // 提交数据到后端
       $.ajax({
         type: 'POST',
         url: 'edit_user_info.php',
-        data: {
-          token: token,
-          school: schoolName ? schoolName : undefined,
-          state: state ? state : undefined,
-          new_sch: isNewSchool,
-        },
+        data: requestData,
+        dataType: 'json',
         success: function (response) {
-          // 处理响应
-          alert('信息更新成功！')
-          $('#editUserModal').modal('hide')
+          // 恢复按钮状态
+          submitBtn.html(originalBtnText);
+          submitBtn.prop('disabled', false);
+          
+          if (response.success) {
+            // 显示成功消息
+            showIosAlert('信息更新成功！Profile updated successfully!');
+            $('#editUserModal').modal('hide');
+            
+            // 刷新用户数据
+            loadUserData();
+          } else {
+            // 显示错误消息
+            showIosAlert('更新失败: ' + (response.error || '未知错误'));
+          }
         },
-        error: function (error) {
-          alert('信息更新错误：' + error)
-        },
-      })
-    })
+        error: function (xhr, status, error) {
+          // 恢复按钮状态
+          submitBtn.html(originalBtnText);
+          submitBtn.prop('disabled', false);
+          
+          console.error('更新用户信息失败:', xhr.responseText);
+          showIosAlert('更新信息时出错，请稍后再试');
+        }
+      });
+    });
   });
+  
+  // 加载用户数据
+  function loadUserData() {
+    var token = localStorage.getItem('token');
+    if (!token) {
+      $('#userPoints').text('未登录');
+      alert('请先登录！');
+      window.location.href = 'index.html';
+      return;
+    }
+    
+    $.ajax({
+      type: 'POST',
+      url: 'get_user_points.php',
+      data: { token: token },
+      dataType: 'json',
+      success: function (response) {
+        if (response.success) {
+          // 更新页面上的用户信息
+          $('#userPoints').text(response.userPoints);
+          $('#userReduction').text(response.userPoints / 10);
+          $('#userSchool').text(response.school || '未设置');
+          $('#userLocation').text(response.location || '未设置');
+          
+          // 保存用户数据到本地存储，方便表单预填充
+          localStorage.setItem('userSchool', response.school || '');
+          localStorage.setItem('userLocation', response.location || '');
+          localStorage.setItem('userCountry', response.country || '');
+          localStorage.setItem('userState', response.state || '');
+        } else {
+          $('#userPoints').text('无法加载积分');
+          console.error('获取积分失败:', response.error);
+        }
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        console.log('服务器响应内容', jqXHR.responseText);
+        $('#userPoints').text('无法加载积分');
+        showIosAlert('请求用户数据失败，请稍后再试');
+      }
+    });
+  }
+  
+  // 预填充用户表单
+  function prepopulateUserForm() {
+    // 确保国家和学校数据已加载
+    loadCountries().then(function() {
+      const userCountry = localStorage.getItem('userCountry');
+      if (userCountry) {
+        $('#userCountrySelect').val(userCountry);
+        // 加载并选择用户的州/省
+        updateStates(userCountry).then(function() {
+          const userState = localStorage.getItem('userState');
+          if (userState) {
+            $('#userStateSelect').val(userState);
+          }
+        });
+      }
+    });
+    
+    // 加载学校列表后设置用户的学校
+    loadSchools().then(function() {
+      const userSchool = localStorage.getItem('userSchool');
+      if (userSchool) {
+        // 检查下拉列表中是否有该学校
+        let schoolFound = false;
+        $('#userSchoolSelect option').each(function() {
+          if ($(this).text() === userSchool) {
+            $('#userSchoolSelect').val($(this).val());
+            schoolFound = true;
+            return false; // 跳出循环
+          }
+        });
+        
+        // 如果下拉列表中没有该学校，选择"其他"并填充输入框
+        if (!schoolFound && userSchool !== '') {
+          $('#userSchoolSelect').val('other');
+          $('#userSchoolInputGroup').show();
+          $('#userSchoolInput').val(userSchool);
+        }
+      }
+    });
+  }
+  
+  // 修改loadCountries函数为Promise形式
+  function loadCountries() {
+    return new Promise((resolve, reject) => {
+      fetch('./countries.json')
+        .then(response => response.json())
+        .then(data => {
+          const countrySelect = document.getElementById('userCountrySelect');
+          if (countrySelect) {
+            countrySelect.innerHTML = ''; // 清空现有选项
+            data.forEach(country => {
+              const option = document.createElement('option');
+              option.value = country.code;
+              option.textContent = country.name;
+              countrySelect.appendChild(option);
+            });
+            resolve();
+          } else {
+            console.error('userCountrySelect element not found');
+            reject('Element not found');
+          }
+        })
+        .catch(error => {
+          console.error('Error loading countries:', error);
+          reject(error);
+        });
+    });
+  }
+  
+  // 修改updateStates函数为Promise形式
+  function updateStates(countryCode) {
+    return new Promise((resolve, reject) => {
+      fetch('./countries.json')
+        .then(response => response.json())
+        .then(data => {
+          const statesSelect = document.getElementById('userStateSelect');
+          if (statesSelect) {
+            statesSelect.innerHTML = ''; // Clear current states/provinces
+            const selectedCountry = data.find(country => country.code === countryCode);
+            if (selectedCountry && selectedCountry.states) {
+              selectedCountry.states.forEach(state => {
+                const option = document.createElement('option');
+                option.value = state.code;
+                option.textContent = state.name;
+                statesSelect.appendChild(option);
+              });
+            }
+            resolve();
+          } else {
+            console.error('userStateSelect element not found');
+            reject('Element not found');
+          }
+        })
+        .catch(error => {
+          console.error('Error updating states:', error);
+          reject(error);
+        });
+    });
+  }
+  
+  // 修改loadSchools函数为Promise形式
+  function loadSchools() {
+    return new Promise((resolve, reject) => {
+      var token = localStorage.getItem('token');
+      
+      $.ajax({
+        url: 'get_schools.php',
+        type: 'POST',
+        dataType: 'json',
+        data: { token: token },
+        success: function (data) {
+          var schoolSelect = document.getElementById('userSchoolSelect');
+          if (schoolSelect) {
+            var schoolOptions = '<option value="">请选择学校Select school</option>';
+            $.each(data, function (index, school) {
+              schoolOptions += '<option value="' + school.id + '">' + school.name + '</option>';
+            });
+            schoolOptions += '<option value="other">其他Other（自行输入Enter new）</option>';
+            $('#userSchoolSelect').html(schoolOptions);
+            resolve();
+          } else {
+            console.error('userSchoolSelect element not found');
+            reject('Element not found');
+          }
+        },
+        error: function (xhr, status, error) {
+          console.error('加载学校列表失败:', error);
+          reject(error);
+        }
+      });
+    });
+  }
+  
+  // 绑定排行榜按钮事件
+  function bindRankingButtons() {
+    $('.ios-segment-control .segment').off('click');
+    
+    $('.ios-segment-control .segment').on('click', function() {
+      const type = $(this).data('type');
+      
+      // 更新active状态
+      $('.ios-segment-control .segment').removeClass('active');
+      $(this).addClass('active');
+      
+      // 更新选择器位置
+      const index = $(this).index();
+      const totalSegments = $('.ios-segment-control .segment').length;
+      updateSelectorPosition($('.segment-selector')[0], index, totalSegments);
+      
+      // 加载对应排行榜
+      if (type === 'local') {
+        var userLocation = $('#userLocation').text().trim();
+        if (!userLocation || userLocation === '未设置') {
+          showIosAlert('用户地区信息未设置，请先编辑个人资料');
+          return;
+        }
+      } else if (type === 'school') {
+        var userSchool = $('#userSchool').text().trim();
+        if (!userSchool || userSchool === '未设置') {
+          showIosAlert('用户学校信息未设置，请先编辑个人资料');
+          return;
+        }
+      }
+      
+      switchRanking(type);
+    });
+  }
+  
+  // 更新选择器位置
+  function updateSelectorPosition(selector, activeIndex, totalSegments) {
+    if (!selector) return;
+    
+    const segmentWidth = 100 / totalSegments;
+    const position = segmentWidth * activeIndex;
+    selector.style.transform = `translateX(${position}%)`;
+    selector.style.width = segmentWidth + '%';
+  }
+  
+  // 切换排行榜类型
+  function switchRanking(type) {
+    console.log('切换排行榜类型', type);
+    
+    // 显示加载动画
+    $('#leaderboard-content').hide();
+    $('.ios-loading').show();
+    
+    var token = localStorage.getItem('token');
+    var userLocation = $('#userLocation').text().trim();
+    var userSchool = $('#userSchool').text().trim();
+    var data = {
+      token: token,
+      type: type,
+    };
 
+    // 根据排行榜类型，设置请求参数
+    if (type === 'local') {
+      data.location = userLocation;
+    } else if (type === 'school') {
+      data.school = userSchool;
+    }
+
+    // 向后端发送请求，获取排行榜数据
+    $.ajax({
+      url: 'get_rank.php',
+      type: 'POST',
+      dataType: 'json',
+      data: data,
+      success: function (response) {
+        // 隐藏加载动画
+        $('.ios-loading').hide();
+        $('#leaderboard-content').show();
+        
+        if (response.success) {
+          // 清空现有排行榜
+          $('#leaderboard-content').empty();
+          
+          if (response.ranking && response.ranking.length > 0) {
+            // 添加表格头部
+            const tableHeader = $('<div class="ios-table-header">').append(
+              $('<div class="col-rank">').text('Rank'),
+              $('<div class="col-user">').text('Username'),
+              $('<div class="col-points">').text('Credits')
+            );
+            $('#leaderboard-content').append(tableHeader);
+            
+            var currentUsername = localStorage.getItem('username');
+            
+            // 遍历排行榜数据并添加到表格中
+            $.each(response.ranking, function (index, user) {
+              var rank = index + 1;
+              var rankClass = '';
+              var rankHtml = '';
+              
+              if (rank <= 3) {
+                rankClass = 'top-rank rank-' + rank;
+                
+                // 修复徽章视觉问题
+                if (rank === 1) {
+                  rankHtml = '<div class="rank-medal gold"><i class="fas fa-trophy"></i></div>';
+                } else if (rank === 2) {
+                  rankHtml = '<div class="rank-medal silver"><i class="fas fa-medal"></i></div>';
+                } else {
+                  rankHtml = '<div class="rank-medal bronze"><i class="fas fa-award"></i></div>';
+                }
+              } else {
+                rankHtml = '<div class="rank-medal normal">' + rank + '</div>';
+              }
+              
+              // 如果是当前用户，添加高亮类
+              if (user.username === currentUsername) {
+                rankClass += ' current-user';
+              }
+              
+              // 创建行元素
+              const row = $('<div class="ios-table-row ' + rankClass + '">').append(
+                $('<div class="col-rank">').html(rankHtml),
+                $('<div class="col-user">').text(user.username),
+                $('<div class="col-points">').text(user.points)
+              );
+              
+              $('#leaderboard-content').append(row);
+            });
+          } else {
+            // 显示无数据状态
+            const emptyState = $('<div class="ios-empty-state">').append(
+              $('<i class="fas fa-trophy"></i>'),
+              $('<p>').text('No ranking data available.')
+            );
+            $('#leaderboard-content').append(emptyState);
+          }
+        } else {
+          // 显示错误信息
+          const errorState = $('<div class="ios-empty-state">').append(
+            $('<i class="fas fa-exclamation-circle"></i>'),
+            $('<p>').text('Failed to load ranking data: ' + (response.error || 'Unknown error'))
+          );
+          $('#leaderboard-content').append(errorState);
+        }
+      },
+      error: function () {
+        // 隐藏加载动画
+        $('.ios-loading').hide();
+        $('#leaderboard-content').show();
+        
+        // 显示错误信息
+        const errorState = $('<div class="ios-empty-state">').append(
+          $('<i class="fas fa-exclamation-circle"></i>'),
+          $('<p>').text('Failed to connect to the server. Please try again later.')
+        );
+        $('#leaderboard-content').append(errorState);
+      }
+    });
+  }
+  
   // 主题切换功能初始化
   function initThemeToggle() {
     const body = document.body;
@@ -1334,248 +1657,23 @@
       }
     }
   }
-
+  
+  // 登出功能
   function logout() {
-    localStorage.removeItem('token') // 确保移除正确的 localStorage 项
+    localStorage.removeItem('token'); // 确保移除正确的 localStorage 键
     // 更新UI为未登录状态
-    $('#userStatus').text('')
-    $('#logoutButton').hide()
-    $('#loginButton').show()
-    Redirect('index.html')
-  }
-
-  function Redirect(webpage) {
-    window.location = webpage
-  }
-
-  // Step 1: Load countries into the country select element
-  function loadCountries() {
-    fetch('./countries.json')
-      .then(response => response.json())
-      .then(data => {
-        const countrySelect = document.getElementById('userCountrySelect')
-        if (countrySelect) {
-        countrySelect.innerHTML = '' // 清空现有选项
-        data.forEach(country => {
-          const option = document.createElement('option')
-          option.value = country.code
-          option.textContent = country.name
-          countrySelect.appendChild(option)
-        })
-        } else {
-          console.log('userCountrySelect element not found')
-        }
-      })
-      .catch(error => console.error('Error loading countries:', error))
-  }
-
-  // Step 2: Listen for changes on the country select element
-  $(document).ready(function() {
-    $(document).on('change', '#userCountrySelect', function() {
-    const selectedCountryCode = this.value
-    updateStates(selectedCountryCode)
-    })
-  })
-
-  // Step 3: Populate states/provinces based on the selected country
-  function updateStates(countryCode) {
-    fetch('./countries.json')
-      .then(response => response.json())
-      .then(data => {
-        const statesSelect = document.getElementById('userStateSelect')
-        if (statesSelect) {
-        statesSelect.innerHTML = '' // Clear current states/provinces
-        const selectedCountry = data.find(country => country.code === countryCode)
-        if (selectedCountry && selectedCountry.states) {
-          selectedCountry.states.forEach(state => {
-            const option = document.createElement('option')
-            option.value = state.code
-            option.textContent = state.name
-            statesSelect.appendChild(option)
-          })
-          }
-        } else {
-          console.log('userStateSelect element not found')
-        }
-      })
-      .catch(error => console.error('Error updating states:', error))
-  }
-
-
-  function loadSchools() {
-    // 从 localStorage 获取 token
-    var token = localStorage.getItem('token')
-
-    // 向后端发送请求，获取学校列表
-    $.ajax({
-      url: 'get_schools.php', // 假设您的后端接口URL是这个
-      type: 'POST',
-      dataType: 'json',
-      data: { token: token }, // 将 token 作为请求参数发送
-      success: function (data) {
-        var schoolSelect = document.getElementById('userSchoolSelect')
-        if (schoolSelect) {
-        var schoolOptions = '<option value="">请选择学校Select school</option>'
-        $.each(data, function (index, school) {
-          schoolOptions += '<option value="' + school.id + '">' + school.name + '</option>'
-        })
-          schoolOptions += '<option value="other">其他Other（自行输入Enter new）</option>' // 添加一个"其他"选项
-        $('#userSchoolSelect').html(schoolOptions)
-        } else {
-          console.log('userSchoolSelect element not found')
-        }
-      },
-      error: function (xhr, status, error) {
-        console.log('加载学校列表失败: ', error)
-      },
-    })
-  }
-
-  // 切换排行榜类型的事件处理函数
-  function switchRanking(type) {
-    console.log('切换排行榜类型:', type);
-    
-    // 显示加载动画
-    $('#leaderboard-content').hide();
-    $('.ios-loading').show();
-    
-    var token = localStorage.getItem('token')
-    var userLocation = $('#userLocation').text().trim();
-    var userSchool = $('#userSchool').text().trim();
-    var data = {
-      token: token,
-      type: type,
-    }
-
-    // 根据排行榜类型，设置请求参数
-    if (type === 'local') {
-      data.location = userLocation
-    } else if (type === 'school') {
-      data.school = userSchool
-    }
-
-    // 向后端发送请求，获取排行榜数据
-    $.ajax({
-      url: 'get_rank.php',
-      type: 'POST',
-      dataType: 'json',
-      data: data,
-      success: function (response) {
-        // 隐藏加载动画
-        $('.ios-loading').hide();
-        $('#leaderboard-content').show();
-        
-        if (response.success) {
-          // 清空现有排行榜
-          $('#leaderboard-content').empty();
-          
-          if (response.ranking && response.ranking.length > 0) {
-            // 添加表格头部
-            const tableHeader = $('<div class="ios-table-header">').append(
-              $('<div class="col-rank">').text('Rank'),
-              $('<div class="col-user">').text('Username'),
-              $('<div class="col-points">').text('Credits')
-            );
-            $('#leaderboard-content').append(tableHeader);
-            
-            var currentUsername = localStorage.getItem('username');
-            
-            // 遍历排行榜数据并添加到表格中
-            $.each(response.ranking, function (index, user) {
-              var rank = index + 1;
-              var rankClass = '';
-              var rankHtml = '';
-              
-              if (rank <= 3) {
-                rankClass = 'top-rank rank-' + rank;
-                
-                // 使用iOS风格徽章而不是图标
-                if (rank === 1) {
-                  rankHtml = '<div class="rank-medal gold"><i class="fas fa-trophy"></i></div>';
-                } else if (rank === 2) {
-                  rankHtml = '<div class="rank-medal silver"><i class="fas fa-medal"></i></div>';
-                } else {
-                  rankHtml = '<div class="rank-medal bronze"><i class="fas fa-award"></i></div>';
-                }
-              } else {
-                rankHtml = '<div class="rank-medal normal">' + rank + '</div>';
-              }
-              
-              // 如果是当前用户，添加高亮类
-              if (user.username === currentUsername) {
-                rankClass += ' current-user';
-              }
-              
-              // 创建行元素
-              const row = $('<div class="ios-table-row ' + rankClass + '">').append(
-                $('<div class="col-rank">').html(rankHtml),
-                $('<div class="col-user">').text(user.username),
-                $('<div class="col-points">').text(user.points)
-              );
-              
-              $('#leaderboard-content').append(row);
-            });
-          } else {
-            // 显示无数据状态
-            const emptyState = $('<div class="ios-empty-state">').append(
-              $('<i class="fas fa-trophy"></i>'),
-              $('<p>').text('No ranking data available.')
-            );
-            $('#leaderboard-content').append(emptyState);
-          }
-        } else {
-          // 显示错误信息
-          const errorState = $('<div class="ios-empty-state">').append(
-            $('<i class="fas fa-exclamation-circle"></i>'),
-            $('<p>').text('Failed to load ranking data: ' + (response.error || 'Unknown error'))
-          );
-          $('#leaderboard-content').append(errorState);
-        }
-      },
-      error: function () {
-        // 隐藏加载动画
-        $('.ios-loading').hide();
-        $('#leaderboard-content').show();
-        
-        // 显示错误信息
-        const errorState = $('<div class="ios-empty-state">').append(
-          $('<i class="fas fa-exclamation-circle"></i>'),
-          $('<p>').text('Failed to connect to the server. Please try again later.')
-        );
-        $('#leaderboard-content').append(errorState);
-      },
-    });
-  }
-
-  function bindRankingButtons() {
-    $('.ios-segment-control .segment').off('click');
-    
-    $('.ios-segment-control .segment').on('click', function() {
-      const type = $(this).data('type');
-      
-      // 更新active状态
-      $('.ios-segment-control .segment').removeClass('active');
-      $(this).addClass('active');
-      
-      // 更新选择器位置
-      const index = $(this).index();
-      const totalSegments = $('.ios-segment-control .segment').length;
-      updateSelectorPosition($('.segment-selector')[0], index, totalSegments);
-      
-      // 加载对应排行榜
-      if (type === 'local') {
-        var userLocation = $('#userLocation').text().trim();
-        if (!userLocation) {
-          showIosAlert('用户地区信息未加载，请稍后再试。');
-          return;
-        }
-      }
-      
-      switchRanking(type);
-    });
+    $('#userStatus').text('');
+    $('#logoutButton').hide();
+    $('#loginButton').show();
+    Redirect('index.html');
   }
   
-  // iOS风格提示框
+  // 页面跳转功能
+  function Redirect(webpage) {
+    window.location = webpage;
+  }
+  
+  // iOS风格提示框改进版
   function showIosAlert(message) {
     // 创建iOS风格的提示框
     const alertDiv = $('<div>').addClass('ios-alert')
@@ -1593,9 +1691,17 @@
         'z-index': '9999',
         'font-size': '15px',
         'opacity': '0',
-        'transition': 'opacity 0.2s ease'
+        'transition': 'opacity 0.2s ease',
+        'backdrop-filter': 'blur(10px)',
+        '-webkit-backdrop-filter': 'blur(10px)'
       })
       .text(message);
+    
+    // 为深色模式调整样式
+    if (document.body.classList.contains('dark-theme') || 
+        (document.body.classList.contains('auto-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      alertDiv.css('background-color', 'rgba(70, 70, 77, 0.8)');
+    }
     
     // 添加到页面
     $('body').append(alertDiv);
