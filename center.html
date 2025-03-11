@@ -673,7 +673,7 @@
       margin-bottom: 30px;
     }
     
-    /* iOS标准分段控制器 */
+    /* iOS标准分段控制器样式修复 */
     .ios-segment-control {
       display: flex;
       background-color: rgba(120, 120, 128, 0.12);
@@ -723,10 +723,13 @@
       color: var(--text-color-dark);
     }
     
-    .ios-segment-control .segment-selector {
+    /* 分段控制器选择器修复 */
+    .segment-selector {
       position: absolute;
       height: calc(100% - 4px);
       top: 2px;
+      left: 0; /* 添加左侧基准位置 */
+      width: 33.333%; /* 默认宽度，会被JS覆盖 */
       z-index: 0;
       border-radius: 6px;
       background-color: white;
@@ -734,8 +737,8 @@
       transition: transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
     }
     
-    body.dark-theme .ios-segment-control .segment-selector,
-    body.auto-theme.dark-mode .ios-segment-control .segment-selector {
+    body.dark-theme .segment-selector,
+    body.auto-theme.dark-mode .segment-selector {
       background-color: rgba(30, 30, 30, 0.8);
       box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
     }
@@ -1051,7 +1054,7 @@
   <div class="ios-segment-control">
     <button class="segment active" data-type="all">
       <i class="fas fa-globe-asia"></i>Global
-        </button>
+    </button>
     <button class="segment" data-type="local">
       <i class="fas fa-map-marker-alt"></i>Regional
     </button>
@@ -1059,7 +1062,7 @@
       <i class="fas fa-school"></i>School
     </button>
     <div class="segment-selector"></div>
-      </div>
+  </div>
   
   <!-- iOS风格卡片表格 -->
   <div class="ios-card-table fade-in-up delay-5">
@@ -1132,9 +1135,6 @@
     // 主题切换功能
     initThemeToggle();
     
-    // 初始化iOS风格分段控制器 - 不再单独调用，由bindRankingButtons替代
-    // initSegmentControl();
-    
     // 添加按钮点击状态切换
     $('.ios-btn-group .btn').click(function() {
       $('.ios-btn-group .btn').removeClass('active');
@@ -1146,8 +1146,13 @@
       window.location.href = 'pthis.html'; // 指定要跳转的页面
     });
     
-    // 初始化
+    // 初始化排行榜选择器
     bindRankingButtons();
+    
+    // 初始化选择器位置 - 添加这一行修复错位问题
+    initSegmentSelector();
+    
+    // 加载全球排行榜
     switchRanking('all');
     
     // 加载用户数据
@@ -1445,12 +1450,24 @@
         var userLocation = $('#userLocation').text().trim();
         if (!userLocation || userLocation === '未设置') {
           showIosAlert('用户地区信息未设置，请先编辑个人资料');
+          
+          // 恢复到全球排行榜
+          setTimeout(function() {
+            $('.ios-segment-control .segment[data-type="all"]').click();
+          }, 300);
+          
           return;
         }
       } else if (type === 'school') {
         var userSchool = $('#userSchool').text().trim();
         if (!userSchool || userSchool === '未设置') {
           showIosAlert('用户学校信息未设置，请先编辑个人资料');
+          
+          // 恢复到全球排行榜
+          setTimeout(function() {
+            $('.ios-segment-control .segment[data-type="all"]').click();
+          }, 300);
+          
           return;
         }
       }
@@ -1718,6 +1735,22 @@
         alertDiv.remove();
       }, 300);
     }, 3000);
+  }
+
+  // 初始化选择器位置函数 - 新增函数修复错位
+  function initSegmentSelector() {
+    // 获取活跃的段落索引
+    const activeSegment = document.querySelector('.ios-segment-control .segment.active');
+    if (!activeSegment) return;
+    
+    const segments = document.querySelectorAll('.ios-segment-control .segment');
+    const activeIndex = Array.from(segments).indexOf(activeSegment);
+    const totalSegments = segments.length;
+    const selector = document.querySelector('.segment-selector');
+    
+    if (selector) {
+      updateSelectorPosition(selector, activeIndex, totalSegments);
+    }
   }
 </script>
 </body>
