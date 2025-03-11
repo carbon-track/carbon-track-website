@@ -296,6 +296,52 @@
     .progress-bar {
       background-color: var(--ios-green);
     }
+
+    /* 成功模态框样式 */
+    .success-modal .modal-header {
+      background: linear-gradient(135deg, var(--ios-green), var(--ios-mint));
+      color: white;
+      border-bottom: none;
+    }
+    
+    .success-modal .modal-body {
+      padding: 25px;
+    }
+    
+    .success-modal .modal-footer {
+      border-top: none;
+      justify-content: center;
+    }
+    
+    .success-icon {
+      font-size: 48px;
+      color: var(--ios-green);
+      margin-bottom: 15px;
+    }
+    
+    body.dark-theme .success-icon,
+    body.auto-theme.dark-mode .success-icon {
+      color: #30D158;
+    }
+    
+    .points-value {
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--ios-green);
+      margin: 15px 0;
+    }
+    
+    body.dark-theme .points-value,
+    body.auto-theme.dark-mode .points-value {
+      color: #30D158;
+    }
+    
+    /* 确保模态框中的按钮在深色模式下可见 */
+    body.dark-theme .success-modal .btn-success,
+    body.auto-theme.dark-mode .success-modal .btn-success {
+      background-color: #30D158;
+      border-color: #30D158;
+    }
   </style>
   <script>
     $(document).ready(function () {
@@ -359,7 +405,11 @@
             if (response.success === true) {
               // 提交成功，更新用户积分
               console.log('Carbon footprint recorded successfully. Carbon reduction: ' + response.points);
-              $('#submissionResult').html('<div class="alert alert-success">Success! ' + response.points + ' points recorded! The information has been added to the review queue.</div>');
+              
+              // 显示成功模态框而不是内联提示
+              $('#successPoints').text(response.points);
+              $('#successModal').modal('show');
+              
               getUserPoints(); // 更新用户积分显示
               
               // 清空表单
@@ -771,6 +821,31 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 成功提交模态框 -->
+<div class="modal fade" id="successModal" tabindex="-1" role="dialog" aria-labelledby="successModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content success-modal">
+      <div class="modal-header">
+        <h5 class="modal-title" id="successModalLabel">Submission Successful</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body text-center">
+        <div class="success-icon">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <h4>Carbon Reduction Recorded!</h4>
+        <div class="points-value"><span id="successPoints">0</span> points</div>
+        <p>Your contribution has been recorded and added to the review queue. Thank you for making a difference!</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success" data-dismiss="modal">Continue</button>
       </div>
     </div>
   </div>
