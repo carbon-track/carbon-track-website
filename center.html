@@ -707,6 +707,7 @@
       transition: color 0.3s ease;
       outline: none;
       cursor: pointer;
+      margin: 0; /* 确保无边距 */
     }
     
     body.dark-theme .ios-segment-control .segment,
@@ -734,7 +735,8 @@
       border-radius: 6px;
       background-color: white;
       box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
-      transition: transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+      transition: transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1), width 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+      will-change: transform, width; /* 优化性能 */
     }
     
     body.dark-theme .segment-selector,
@@ -1443,7 +1445,12 @@
       // 更新选择器位置
       const index = $(this).index();
       const totalSegments = $('.ios-segment-control .segment').length;
-      updateSelectorPosition($('.segment-selector')[0], index, totalSegments);
+      const selector = document.querySelector('.segment-selector');
+      
+      // 使用requestAnimationFrame确保DOM更新后再计算位置
+      window.requestAnimationFrame(function() {
+        updateSelectorPosition(selector, index, totalSegments);
+      });
       
       // 加载对应排行榜
       if (type === 'local') {
@@ -1480,10 +1487,19 @@
   function updateSelectorPosition(selector, activeIndex, totalSegments) {
     if (!selector) return;
     
+    // 确保计算基于可见的节点
+    if (document.hidden) {
+      // 如果页面不可见，延迟更新
+      return setTimeout(() => updateSelectorPosition(selector, activeIndex, totalSegments), 100);
+    }
+    
+    // 获取精确的段落宽度百分比
     const segmentWidth = 100 / totalSegments;
     const position = segmentWidth * activeIndex;
-    selector.style.transform = `translateX(${position}%)`;
+    
+    // 应用动画变换
     selector.style.width = segmentWidth + '%';
+    selector.style.transform = `translateX(${position}%)`;
   }
   
   // 切换排行榜类型
@@ -1751,6 +1767,24 @@
     if (selector) {
       updateSelectorPosition(selector, activeIndex, totalSegments);
     }
+  }
+  
+  // 监听窗口大小变化，重新计算选择器位置
+  $(window).on('resize', function() {
+    debounce(initSegmentSelector, 150)();
+  });
+  
+  // 防抖函数，避免窗口大小频繁变化时过多计算
+  function debounce(func, wait) {
+    let timeout;
+    return function() {
+      const context = this;
+      const args = arguments;
+      clearTimeout(timeout);
+      timeout = setTimeout(function() {
+        func.apply(context, args);
+      }, wait);
+    };
   }
 </script>
 </body>
