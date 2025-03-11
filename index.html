@@ -1699,6 +1699,359 @@
       background-color: var(--ios-tertiary-background);
       color: var(--ios-green);
     }
+    
+    /* 深色模式下卡片和公告栏的强化样式 */
+    body.auto-theme.dark-mode .card,
+    body.auto-theme.dark-mode .announcement-card,
+    body.auto-theme.dark-mode .info-card {
+      background-color: #1C1C1E !important; /* 更深的背景色 */
+      color: #FFFFFF !important; /* 白色文字 */
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* 特别增强公告栏的深色效果 */
+    body.auto-theme.dark-mode .announcements-section {
+      background-color: #2C2C2E !important;
+    }
+    
+    /* 卡片标题和强调文本 */
+    body.auto-theme.dark-mode .card-title,
+    body.auto-theme.dark-mode .card h3,
+    body.auto-theme.dark-mode .card h4,
+    body.auto-theme.dark-mode .card h5 {
+      color: #FFFFFF !important;
+    }
+    
+    /* 图标颜色调整 */
+    body.auto-theme.dark-mode .card i.fas,
+    body.auto-theme.dark-mode .card i.far,
+    body.auto-theme.dark-mode .card i.fab {
+      color: #0A84FF !important; /* iOS蓝色 */
+    }
+    
+    /* 链接颜色强化 */
+    body.auto-theme.dark-mode .card a,
+    body.auto-theme.dark-mode a.card-link {
+      color: #0A84FF !important; /* iOS蓝色 */
+      text-decoration: none;
+    }
+    
+    body.auto-theme.dark-mode .card a:hover,
+    body.auto-theme.dark-mode a.card-link:hover {
+      color: #64D2FF !important; /* 浅蓝色 */
+      text-decoration: underline;
+    }
+    
+    /* 次要文本颜色调整 */
+    body.auto-theme.dark-mode .card .text-muted,
+    body.auto-theme.dark-mode .card .card-subtitle {
+      color: #98989D !important; /* 灰色文字 */
+    }
+    
+    /* 公告标题 */
+    body.auto-theme.dark-mode .announcement-title,
+    body.auto-theme.dark-mode .section-title {
+      color: #FFFFFF !important;
+    }
+    
+    /* 卡片内部元素 */
+    body.auto-theme.dark-mode .card-header {
+      background-color: #2C2C2E !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    body.auto-theme.dark-mode .card-footer {
+      background-color: #2C2C2E !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    /* 确保背景覆盖整个页面 */
+    body.auto-theme.dark-mode {
+      background-color: #000000 !important;
+    }
+    
+    /* 调整首页标题颜色 */
+    body.auto-theme.dark-mode .main-heading,
+    body.auto-theme.dark-mode .welcome-text {
+      color: #FFFFFF !important;
+    }
+    
+    /* 特殊图标颜色调整 */
+    body.auto-theme.dark-mode .icon-light {
+      color: #FFFFFF !important;
+    }
+    
+    body.auto-theme.dark-mode .icon-primary {
+      color: #0A84FF !important;
+    }
+    
+    body.auto-theme.dark-mode .icon-success {
+      color: #30D158 !important;
+    }
+    
+    body.auto-theme.dark-mode .icon-warning {
+      color: #FFD60A !important;
+    }
+    
+    body.auto-theme.dark-mode .icon-danger {
+      color: #FF453A !important;
+    }
+    
+    /* 针对首页公告卡片的具体样式 */
+    body.auto-theme.dark-mode .announcement-item,
+    body.auto-theme.dark-mode .announcement-card,
+    body.auto-theme.dark-mode .welcome-card {
+      background-color: #2C2C2E !important; 
+      color: #FFFFFF !important;
+      border-radius: 12px;
+      margin-bottom: 15px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    }
+    
+    /* 增强卡片的视觉层次感 */
+    body.auto-theme.dark-mode .card {
+      border: none !important;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    
+    /* 针对emoji和图标的颜色调整 */
+    body.auto-theme.dark-mode .announcement-item .emoji,
+    body.auto-theme.dark-mode .card .emoji {
+      filter: brightness(1.2);
+    }
+    
+    /* 针对页面顶部的主容器 */
+    body.auto-theme.dark-mode .main-container,
+    body.auto-theme.dark-mode .container-fluid,
+    body.auto-theme.dark-mode .container {
+      background-color: #000000 !important;
+    }
+    
+    /* 修复特定的页面元素背景 */
+    body.auto-theme.dark-mode #announcements,
+    body.auto-theme.dark-mode .main-content,
+    body.auto-theme.dark-mode #main-content {
+      background-color: transparent !important;
+    }
+    
+    /* 调整标题和强调文本 */
+    body.auto-theme.dark-mode h1,
+    body.auto-theme.dark-mode h2,
+    body.auto-theme.dark-mode h3,
+    body.auto-theme.dark-mode .display-4,
+    body.auto-theme.dark-mode .lead {
+      color: #FFFFFF !important;
+    }
+    
+    /* 强调文本的可读性 */
+    body.auto-theme.dark-mode .card p,
+    body.auto-theme.dark-mode .card li {
+      color: #EBEBF5 !important;
+    }
+    
+    /* 页脚文本 */
+    body.auto-theme.dark-mode footer,
+    body.auto-theme.dark-mode footer p,
+    body.auto-theme.dark-mode footer a {
+      color: #EBEBF5 !important;
+    }
+    
+    /* 覆盖页面主背景以防有遗漏 */
+    body.auto-theme.dark-mode main,
+    body.auto-theme.dark-mode .content-wrapper,
+    body.auto-theme.dark-mode .page-wrapper {
+      background-color: #000000 !important;
+    }
+    
+    /* 针对announcement-card类的深色模式样式 */
+    body.auto-theme.dark-mode .announcement-card,
+    body.auto-theme.dark-mode .announcement-item {
+      background-color: #1C1C1E !important;
+      color: #FFFFFF !important;
+      border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+    
+    /* 更新卡片内部的标题和文本 */
+    body.auto-theme.dark-mode .announcement-card .announcement-title,
+    body.auto-theme.dark-mode .announcement-item h3,
+    body.auto-theme.dark-mode .announcement-item h4,
+    body.auto-theme.dark-mode .announcement-card h3,
+    body.auto-theme.dark-mode .announcement-card h4 {
+      color: #FFFFFF !important;
+    }
+    
+    body.auto-theme.dark-mode .announcement-card p,
+    body.auto-theme.dark-mode .announcement-item p,
+    body.auto-theme.dark-mode .announcement-card .card-text,
+    body.auto-theme.dark-mode .announcement-item .card-text {
+      color: #EBEBF5 !important;
+    }
+    
+    /* 调整iOS深度效果在深色模式下的表现 */
+    body.auto-theme.dark-mode .ios-depth-effect::before {
+      background: linear-gradient(180deg, 
+        rgba(50, 50, 50, 0.1) 0%, 
+        rgba(30, 30, 30, 0) 100%);
+    }
+    
+    /* 调整iOS卡片光泽效果 */
+    body.auto-theme.dark-mode .ios-shine-effect::after {
+      background: linear-gradient(
+        45deg,
+        transparent 0%,
+        rgba(50, 50, 50, 0) 30%,
+        rgba(50, 50, 50, 0.1) 50%,
+        rgba(50, 50, 50, 0) 70%,
+        transparent 100%
+      );
+    }
+    
+    /* 针对公告条的深色模式优化 */
+    body.auto-theme.dark-mode .announcement-header,
+    body.auto-theme.dark-mode .announcement-body,
+    body.auto-theme.dark-mode .announcement-footer {
+      background-color: #2C2C2E !important;
+      color: #FFFFFF !important;
+    }
+    
+    /* 卡片徽标和标记 */
+    body.auto-theme.dark-mode .badge {
+      background-color: #3A3A3C !important;
+      color: #FFFFFF !important;
+    }
+    
+    body.auto-theme.dark-mode .badge-primary {
+      background-color: #0A84FF !important;
+    }
+    
+    body.auto-theme.dark-mode .badge-success {
+      background-color: #30D158 !important;
+    }
+    
+    body.auto-theme.dark-mode .badge-warning {
+      background-color: #FFD60A !important;
+      color: #000000 !important;
+    }
+    
+    body.auto-theme.dark-mode .badge-danger {
+      background-color: #FF453A !important;
+    }
+    
+    /* 公告图标 */
+    body.auto-theme.dark-mode .announcement-icon {
+      color: #0A84FF !important;
+    }
+    
+    /* 主容器 */
+    body.auto-theme.dark-mode .main-container {
+      background-color: #000000 !important;
+    }
+    
+    /* 强制应用于任何白色背景的元素 */
+    body.auto-theme.dark-mode [class*="bg-white"],
+    body.auto-theme.dark-mode .bg-white,
+    body.auto-theme.dark-mode [style*="background-color: white"],
+    body.auto-theme.dark-mode [style*="background-color: #fff"],
+    body.auto-theme.dark-mode [style*="background-color:#fff"],
+    body.auto-theme.dark-mode [style*="background-color: rgb(255, 255, 255)"],
+    body.auto-theme.dark-mode [style*="background-color:rgb(255,255,255)"] {
+      background-color: #1C1C1E !important;
+      color: #FFFFFF !important;
+    }
+    
+    /* 特定针对灰色背景容器 */
+    body.auto-theme.dark-mode .container-gray,
+    body.auto-theme.dark-mode .gray-bg,
+    body.auto-theme.dark-mode .bg-light,
+    body.auto-theme.dark-mode .light-bg {
+      background-color: #000000 !important;
+    }
+    
+    /* 首页欢迎区域 */
+    body.auto-theme.dark-mode .welcome-area,
+    body.auto-theme.dark-mode .welcome-section,
+    body.auto-theme.dark-mode .welcome-container {
+      background-color: #000000 !important;
+      color: #FFFFFF !important;
+    }
+    
+    /* 主页hero区域 */
+    body.auto-theme.dark-mode .hero-section {
+      background-color: #1C1C1E !important;
+    }
+    
+    /* 首页公告卡片内容的深色模式微调 */
+    body.auto-theme.dark-mode .content-card,
+    body.auto-theme.dark-mode #announcementList .card,
+    body.auto-theme.dark-mode .announcements-list .card {
+      background-color: #2C2C2E !important;
+      border: none !important;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3) !important;
+    }
+    
+    /* 主卡片容器背景 */
+    body.auto-theme.dark-mode .main-card-container,
+    body.auto-theme.dark-mode .page-container,
+    body.auto-theme.dark-mode .app-container {
+      background-color: #000000 !important;
+    }
+    
+    /* 公告项目标题加粗 */
+    body.auto-theme.dark-mode .announcement-title,
+    body.auto-theme.dark-mode .card-title {
+      color: #FFFFFF !important;
+      font-weight: 600 !important;
+    }
+    
+    /* 针对截图中的图标处理 */
+    body.auto-theme.dark-mode .emoji-icon,
+    body.auto-theme.dark-mode .card .emoji {
+      /* 保持原始颜色，无需暗化 */
+      filter: none !important;
+      opacity: 1 !important;
+    }
+    
+    /* 主页卡片中链接文本的可见性 */
+    body.auto-theme.dark-mode .card a:not(.btn) {
+      color: #0A84FF !important;
+      text-decoration: none;
+    }
+    
+    body.auto-theme.dark-mode .card a:not(.btn):hover {
+      text-decoration: underline;
+    }
+    
+    /* 针对灰色背景的圆角卡片 */
+    body.auto-theme.dark-mode .rounded-card,
+    body.auto-theme.dark-mode .gray-card,
+    body.auto-theme.dark-mode .bg-light.card {
+      background-color: #2C2C2E !important;
+      color: #FFFFFF !important;
+    }
+    
+    /* 首页标题强调 */
+    body.auto-theme.dark-mode .welcome-text,
+    body.auto-theme.dark-mode .site-title,
+    body.auto-theme.dark-mode .main-title {
+      color: #FFFFFF !important;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* 全局页面背景固定为黑色 */
+    body.auto-theme.dark-mode {
+      background-color: #000000 !important;
+    }
+    
+    /* 确保深色模式下所有卡片有一致的视觉效果 */
+    body.auto-theme.dark-mode .card,
+    body.auto-theme.dark-mode .card-body,
+    body.auto-theme.dark-mode [class*="card-"] {
+      background-color: #2C2C2E !important;
+      color: #FFFFFF !important;
+      border-color: rgba(255, 255, 255, 0.1) !important;
+    }
   </style>
 </head>
 <body class="auto-theme">
