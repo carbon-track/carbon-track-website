@@ -25,7 +25,7 @@ curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
 $result = curl_exec($ch);
 if (curl_errno($ch)) {
     http_response_code(500);
-    echo json_encode(["message" => "CURL Error: " . curl_error($ch)]);
+    echo json_encode(["message" => "Internal Server Error."]);
     curl_close($ch);
     exit();
 }

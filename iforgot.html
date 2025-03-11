@@ -13,6 +13,9 @@
   <!-- SF Pro font -->
   <link href="https://fonts.cdnfonts.com/css/sf-pro-display" rel="stylesheet">
   
+  <!-- Cloudflare Turnstile -->
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  
   <!-- Custom CSS -->
   <link rel="stylesheet" href="./css/ios-design.css">
   <link rel="stylesheet" href="./css/index.css">
@@ -266,9 +269,9 @@
     }
     
     .verification-code .form-control {
-      width: 50px;
+      width: 42px;
       height: 60px;
-      margin: 0 5px;
+      margin: 0 3px;
       text-align: center;
       font-size: 1.5rem;
       font-weight: 600;
@@ -524,6 +527,7 @@
         <label for="email">Email Address</label>
         <input type="email" class="form-control" id="email" placeholder="Enter your registered email">
       </div>
+      <div class="cf-turnstile" id="turnstile-step1" data-sitekey="0x4AAAAAAA0wcgSIUML5Ocs3"></div>
       <div class="text-right mt-4">
         <button type="button" class="btn btn-primary" id="nextToStep2">Send Verification Code</button>
       </div>
@@ -532,13 +536,15 @@
     <!-- Step 2: Enter Verification Code -->
     <div class="form-step" id="step2-content">
       <h3 class="mb-4">Enter Verification Code</h3>
-      <p class="mb-4">We've sent a 4-digit verification code to your email. Please enter it below.</p>
+      <p class="mb-4">We've sent a 6-digit verification code to your email. Please enter it below.</p>
       <div class="form-group">
         <div class="verification-code">
           <input type="text" class="form-control digit" id="digit1" maxlength="1" autofocus>
           <input type="text" class="form-control digit" id="digit2" maxlength="1">
           <input type="text" class="form-control digit" id="digit3" maxlength="1">
           <input type="text" class="form-control digit" id="digit4" maxlength="1">
+          <input type="text" class="form-control digit" id="digit5" maxlength="1">
+          <input type="text" class="form-control digit" id="digit6" maxlength="1">
         </div>
       </div>
       <div class="text-right mt-4">
@@ -558,6 +564,7 @@
         <label for="confirmPassword">Confirm Password</label>
         <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm new password">
       </div>
+      <div class="cf-turnstile" id="turnstile-step3" data-sitekey="0x4AAAAAAA0wcgSIUML5Ocs3"></div>
       <div class="text-right mt-4">
         <button type="button" class="btn btn-link" id="backToStep2">Back</button>
         <button type="button" class="btn btn-primary" id="resetPassword">Reset Password</button>
@@ -584,6 +591,19 @@
     const themeToggle = document.getElementById('themeToggle');
     const body = document.body;
     const icon = themeToggle.querySelector('i');
+    
+    // Turnstile widget IDs and tokens
+    let turnstileWidgets = {
+      step1: null,
+      step3: null
+    };
+    
+    // Function to reset Turnstile widget
+    function resetTurnstile() {
+      if (window.turnstile) {
+        turnstile.reset();
+      }
+    }
     
     // Check if user has a saved preference
     const savedTheme = localStorage.getItem('theme');
@@ -628,22 +648,40 @@
         return;
       }
       
+      // Get Cloudflare token
+      const cfToken = document.querySelector('#turnstile-step1 [name="cf-turnstile-response"]').value;
+      if (!cfToken) {
+        showAlert('Please complete the anti-bot verification', 'warning');
+        return;
+      }
+      
       // Send verification code
       $.ajax({
         type: 'POST',
         url: 'sendRecoveryCode.php',
-        data: { email: email },
+        data: { 
+          email: email,
+          cf_token: cfToken
+        },
         dataType: 'json',
         success: function(response) {
           if (response.success) {
             goToStep(2);
             showAlert('Verification code sent to your email', 'success');
+            resetTurnstile();
           } else {
-            showAlert(response.message || 'Error sending verification code', 'error');
+            showAlert(response.message || response.error || 'Error sending verification code', 'error');
+            resetTurnstile();
           }
         },
-        error: function() {
-          showAlert('Error connecting to server. Please try again.', 'error');
+        error: function(xhr) {
+          let errorMessage = 'Error connecting to server. Please try again.';
+          try {
+            const response = JSON.parse(xhr.responseText);
+            errorMessage = response.message || response.error || errorMessage;
+          } catch(e) {}
+          showAlert(errorMessage, 'error');
+          resetTurnstile();
         }
       });
     });
@@ -658,10 +696,12 @@
       const digit2 = document.getElementById('digit2').value;
       const digit3 = document.getElementById('digit3').value;
       const digit4 = document.getElementById('digit4').value;
-      const code = digit1 + digit2 + digit3 + digit4;
+      const digit5 = document.getElementById('digit5').value;
+      const digit6 = document.getElementById('digit6').value;
+      const code = digit1 + digit2 + digit3 + digit4 + digit5 + digit6;
       
-      if (code.length !== 4) {
-        showAlert('Please enter all four digits of the verification code', 'warning');
+      if (code.length !== 6) {
+        showAlert('Please enter all six digits of the verification code', 'warning');
         return;
       }
       
@@ -670,17 +710,24 @@
       $.ajax({
         type: 'POST',
         url: 'recovery.php',
-        data: { email: email, code: code, action: 'verify' },
+        data: { email: email, verificationCode: code },
         dataType: 'json',
         success: function(response) {
           if (response.success) {
             goToStep(3);
           } else {
-            showAlert(response.message || 'Invalid verification code', 'error');
+            showAlert(response.message || response.error || 'Invalid verification code', 'error');
+            resetTurnstile();
           }
         },
-        error: function() {
-          showAlert('Error connecting to server. Please try again.', 'error');
+        error: function(xhr) {
+          let errorMessage = 'Error connecting to server. Please try again.';
+          try {
+            const response = JSON.parse(xhr.responseText);
+            errorMessage = response.message || response.error || errorMessage;
+          } catch(e) {}
+          showAlert(errorMessage, 'error');
+          resetTurnstile();
         }
       });
     });
@@ -708,16 +755,25 @@
       const digit2 = document.getElementById('digit2').value;
       const digit3 = document.getElementById('digit3').value;
       const digit4 = document.getElementById('digit4').value;
-      const code = digit1 + digit2 + digit3 + digit4;
+      const digit5 = document.getElementById('digit5').value;
+      const digit6 = document.getElementById('digit6').value;
+      const code = digit1 + digit2 + digit3 + digit4 + digit5 + digit6;
+      
+      // Get Cloudflare token
+      const cfToken = document.querySelector('#turnstile-step3 [name="cf-turnstile-response"]').value;
+      if (!cfToken) {
+        showAlert('Please complete the anti-bot verification', 'warning');
+        return;
+      }
       
       $.ajax({
         type: 'POST',
         url: 'recovery.php',
         data: { 
           email: email, 
-          code: code, 
-          new_password: newPassword,
-          action: 'reset'
+          verificationCode: code, 
+          newPassword: newPassword,
+          cf_token: cfToken
         },
         dataType: 'json',
         success: function(response) {
@@ -727,11 +783,18 @@
               window.location.href = 'index.html';
             }, 2000);
           } else {
-            showAlert(response.message || 'Password reset failed', 'error');
+            showAlert(response.message || response.error || 'Password reset failed', 'error');
+            resetTurnstile();
           }
         },
-        error: function() {
-          showAlert('Error connecting to server. Please try again.', 'error');
+        error: function(xhr) {
+          let errorMessage = 'Error connecting to server. Please try again.';
+          try {
+            const response = JSON.parse(xhr.responseText);
+            errorMessage = response.message || response.error || errorMessage;
+          } catch(e) {}
+          showAlert(errorMessage, 'error');
+          resetTurnstile();
         }
       });
     });
@@ -775,6 +838,13 @@
           content.classList.remove('active');
         }
       });
+      
+      // Reset Turnstile for the appropriate step
+      if (window.turnstile) {
+        setTimeout(function() {
+          resetTurnstile();
+        }, 300);
+      }
     }
   });
 </script>
