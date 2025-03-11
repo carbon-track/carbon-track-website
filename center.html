@@ -703,11 +703,11 @@
       border: none;
       background: transparent;
       position: relative;
-      z-index: 1;
+      z-index: 2;
       transition: color 0.3s ease;
       outline: none;
       cursor: pointer;
-      margin: 0; /* 确保无边距 */
+      margin: 0;
     }
     
     body.dark-theme .ios-segment-control .segment,
@@ -729,20 +729,20 @@
       position: absolute;
       height: calc(100% - 4px);
       top: 2px;
-      left: 0; /* 添加左侧基准位置 */
-      width: 33.333%; /* 默认宽度，会被JS覆盖 */
-      z-index: 0;
+      left: 0;
+      z-index: 1;
       border-radius: 6px;
       background-color: white;
       box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
-      transition: transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1), width 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
-      will-change: transform, width; /* 优化性能 */
+      transition: transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1), 
+                  width 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+      will-change: transform, width;
     }
     
     body.dark-theme .segment-selector,
     body.auto-theme.dark-mode .segment-selector {
-      background-color: rgba(30, 30, 30, 0.8);
-      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+      background-color: rgba(60, 60, 67, 0.3);
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
     }
     
     .ios-segment-control .segment i {
@@ -1137,11 +1137,8 @@
     // 主题切换功能
     initThemeToggle();
     
-    // 添加按钮点击状态切换
-    $('.ios-btn-group .btn').click(function() {
-      $('.ios-btn-group .btn').removeClass('active');
-      $(this).addClass('active');
-    });
+    // 加载导航栏
+    loadNavbar();
     
     // 导航到历史页面
     document.getElementById('navigateButton').addEventListener('click', function () {
@@ -1151,8 +1148,10 @@
     // 初始化排行榜选择器
     bindRankingButtons();
     
-    // 初始化选择器位置 - 添加这一行修复错位问题
-    initSegmentSelector();
+    // 初始化选择器位置 - 确保在DOM完全加载后运行
+    setTimeout(function() {
+      initSegmentSelector();
+    }, 100);
     
     // 加载全球排行榜
     switchRanking('all');
@@ -1732,7 +1731,7 @@
     
     // 为深色模式调整样式
     if (document.body.classList.contains('dark-theme') || 
-        (document.body.classList.contains('auto-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        (document.body.classList.contains('auto-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches))) {
       alertDiv.css('background-color', 'rgba(70, 70, 77, 0.8)');
     }
     
