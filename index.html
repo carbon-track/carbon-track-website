@@ -2496,24 +2496,108 @@
     }
     
     /* 所有emoji使用默认颜色，不受主题影响 */
-    .emoji, 
-    [data-emoji], 
-    .emoji-earth, 
-    .emoji-announce,
-    .emoji-bulb,
-    .emoji-medal,
-    .emoji-plant,
-    .emoji-scale {
-      color: initial !important; /* 使用初始默认颜色 */
+    .emoji {
+      /* 使用默认渲染，禁用任何可能修改颜色的效果 */
+      color: inherit !important;
+      text-shadow: none !important;
+      filter: none !important;
+      -webkit-text-fill-color: initial !important;
+      /* 确保emoji字体渲染正确 */
+      font-family: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", sans-serif !important;
+      /* 附加样式增强可见性 */
+      position: relative !important;
+      z-index: 5 !important;
+    }
+    
+    /* 标题中的emoji特殊处理 */
+    h1 .emoji, h2 .emoji, h3 .emoji, 
+    h4 .emoji, h5 .emoji, h6 .emoji,
+    p .emoji, span .emoji, div .emoji {
+      /* 在任何文本容器中强制使用emoji原始样式 */
+      color: initial !important;
+      -webkit-text-fill-color: initial !important;
       text-shadow: none !important;
     }
     
-    /* 特别针对标题中的emoji */
-    .announcement-heading .emoji,
-    .announcement-subheading .emoji {
-      color: initial !important;
+    /* 为欢迎标题中的emoji单独设置样式 */
+    .announcement-heading .emoji-earth {
+      font-size: 110% !important; /* 略大，增强可见性 */
+      vertical-align: middle !important;
+      margin-left: 5px !important;
+      display: inline-block !important;
+      color: transparent !important;
+      background: transparent !important;
+      -webkit-text-fill-color: initial !important;
+      text-shadow: none !important;
+    }
+    
+    /* 使用属性选择器专门针对emoji字符 */
+    [class*="emoji-"] {
+      /* 保持emoji原样 */
+      color: inherit !important;
+      text-shadow: none !important;
+      filter: none !important;
+    }
+    
+    /* 移除announcement-icon上的颜色样式以避免影响emoji */
+    body.auto-theme.dark-mode .announcement-icon {
+      color: inherit !important;
+      background: transparent !important;
+      filter: none !important;
+    }
+    
+    /* 单独为每个announcement图标创建彩色背景，而不是给emoji上色 */
+    .announcement-icon.emoji-bulb-container {
+      background-color: rgba(255, 204, 0, 0.2) !important;
+      border-radius: 50%;
+      padding: 12px;
+    }
+    
+    .announcement-icon.emoji-medal-container {
+      background-color: rgba(0, 122, 255, 0.2) !important;
+      border-radius: 50%;
+      padding: 12px;
+    }
+    
+    .announcement-icon.emoji-plant-container {
+      background-color: rgba(52, 199, 89, 0.2) !important;
+      border-radius: 50%;
+      padding: 12px;
+    }
+    
+    .announcement-icon.emoji-scale-container {
+      background-color: rgba(88, 86, 214, 0.2) !important;
+      border-radius: 50%;
+      padding: 12px;
     }
   </style>
+  
+  <!-- 添加内联脚本来修复emoji -->
+  <script>
+    // 页面加载后执行
+    document.addEventListener('DOMContentLoaded', function() {
+      // 处理标题中的emoji
+      const titleEmoji = document.querySelector('.announcement-heading .emoji');
+      if (titleEmoji) {
+        // 确保emoji正确显示
+        titleEmoji.style.fontFamily = '"Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", sans-serif';
+        titleEmoji.style.color = 'initial';
+        titleEmoji.style.webkitTextFillColor = 'initial';
+        titleEmoji.style.textShadow = 'none';
+        titleEmoji.style.filter = 'none';
+      }
+      
+      // 处理所有emoji
+      const allEmojis = document.querySelectorAll('.emoji');
+      allEmojis.forEach(emoji => {
+        emoji.style.fontFamily = '"Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", sans-serif';
+        emoji.style.color = 'initial';
+        emoji.style.webkitTextFillColor = 'initial';
+        emoji.style.textShadow = 'none';
+        emoji.style.filter = 'none';
+      });
+    });
+  </script>
 </head>
 <body class="auto-theme">
 <!-- 导航栏容器，将由JavaScript加载 -->
@@ -2586,25 +2670,25 @@
       <div class="announcement-divider animate-on-scroll fade-in delay-100"></div>
       <ul class="announcement-list">
         <li class="announcement-item ios-depth-effect ripple-effect animate-on-scroll slide-up delay-100">
-          <span class="announcement-icon announcement-icon-glow"><span class="emoji emoji-bulb">💡</span></span>
+          <span class="announcement-icon announcement-icon-glow emoji-bulb-container"><span class="emoji emoji-bulb">💡</span></span>
           <div class="announcement-content">
             <p><strong>We Value Your Feedback!</strong> Have suggestions? Email us at <a href="mailto:carbontrack666@gmail.com">carbontrack666@gmail.com</a>.</p>
         </div>
         </li>
         <li class="announcement-item ios-depth-effect ripple-effect animate-on-scroll slide-up delay-200">
-          <span class="announcement-icon announcement-icon-glow"><span class="emoji emoji-medal">🎖️</span></span>
+          <span class="announcement-icon announcement-icon-glow emoji-medal-container"><span class="emoji emoji-medal">🎖️</span></span>
           <div class="announcement-content">
             <p><strong>Earn Rewards!</strong> Log your sustainable actions and receive certificates, badges, and thank-you letters for your contributions.</p>
       </div>
         </li>
         <li class="announcement-item ios-depth-effect ripple-effect animate-on-scroll slide-up delay-300">
-          <span class="announcement-icon announcement-icon-glow"><span class="emoji emoji-plant">🌱</span></span>
+          <span class="announcement-icon announcement-icon-glow emoji-plant-container"><span class="emoji emoji-plant">🌱</span></span>
           <div class="announcement-content">
             <p><strong>Who Can Join?</strong> While CarbonTrack primarily serves students, anyone passionate about sustainability is welcome!</p>
     </div>
         </li>
         <li class="announcement-item ios-depth-effect ripple-effect animate-on-scroll slide-up delay-400">
-          <span class="announcement-icon announcement-icon-glow"><span class="emoji emoji-scale">⚖️</span></span>
+          <span class="announcement-icon announcement-icon-glow emoji-scale-container"><span class="emoji emoji-scale">⚖️</span></span>
           <div class="announcement-content">
             <p><strong>Fair Play Matters!</strong> Cheating for Carbon Credits is strictly prohibited. We are committed to a transparent and fair system.</p>
         </div>
