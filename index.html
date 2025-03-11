@@ -116,20 +116,20 @@
     
     /* 导航栏样式 */
     .navbar {
-      background-color: var(--card-bg-light) !important;
+      background-color: rgb(0, 42, 92) !important;
       transition: background-color 0.3s ease;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
     }
     
     body.dark-theme .navbar,
     body.auto-theme.dark-mode .navbar {
-      background-color: var(--card-bg-dark) !important;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      background-color: rgb(0, 42, 92) !important;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
     }
     
     /* 导航链接样式 */
     .navbar-light .navbar-nav .nav-link {
-      color: var(--text-color-light);
+      color: white !important;
       transition: color 0.3s ease;
     }
     
@@ -140,7 +140,7 @@
     
     /* 品牌样式 */
     .navbar-light .navbar-brand {
-      color: var(--text-color-light);
+      color: white !important;
       transition: color 0.3s ease;
     }
     
@@ -383,10 +383,16 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background-color: var(--ios-system-background);
+      background-color: var(--card-bg-light);
       transform: translateY(0);
-      transition: transform var(--animation-duration-medium) var(--animation-timing-apple);
+      transition: transform var(--animation-duration-medium) var(--animation-timing-apple), 
+                  background-color 0.3s ease;
       z-index: 1;
+    }
+    
+    body.dark-theme .section-reveal::before,
+    body.auto-theme.dark-mode .section-reveal::before {
+      background-color: var(--card-bg-dark);
     }
     
     .section-reveal.visible::before {
@@ -1631,23 +1637,40 @@
       bottom: 0;
       background: linear-gradient(180deg, 
         rgba(242, 242, 247, 0) 0%,
-        rgba(242, 242, 247, 0.8) 20%,
-        rgba(242, 242, 247, 1) 100%);
+        var(--card-bg-light) 20%,
+        var(--card-bg-light) 100%);
       z-index: -1;
+      transition: background 0.3s ease;
     }
-
+    
+    body.dark-theme .announcement-section::before,
+    body.auto-theme.dark-mode .announcement-section::before {
+      background: linear-gradient(180deg, 
+        rgba(28, 28, 30, 0) 0%,
+        var(--card-bg-dark) 20%,
+        var(--card-bg-dark) 100%);
+    }
+    
     /* Enhanced announcement items */
     .announcement-item {
       position: relative;
       overflow: hidden;
       transform-origin: left center;
+      background-color: var(--card-bg-light);
+      transition: background-color 0.3s ease, transform 0.3s var(--animation-timing-apple);
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 10px;
+      border: 1px solid rgba(0,0,0,0.05);
     }
-
-    .announcement-item:hover .announcement-icon {
-      transform: scale(1.2);
-      transition: transform 0.3s var(--animation-timing-bounce);
+    
+    body.dark-theme .announcement-item,
+    body.auto-theme.dark-mode .announcement-item {
+      background-color: var(--card-bg-dark);
+      border-color: rgba(255,255,255,0.1);
     }
-
+    
+    /* 公告图标颜色修复 */
     .announcement-icon {
       transition: transform 0.3s var(--animation-timing-apple);
       display: inline-flex;
@@ -1657,6 +1680,105 @@
       height: 40px;
       font-size: 24px;
       border-radius: 50%;
+      background-color: rgba(0, 122, 255, 0.1);
+      color: var(--ios-blue-light);
+    }
+    
+    body.dark-theme .announcement-icon,
+    body.auto-theme.dark-mode .announcement-icon {
+      background-color: rgba(10, 132, 255, 0.2);
+      color: var(--ios-blue-dark);
+    }
+    
+    /* 修复轮播指示器在暗模式下的颜色 */
+    .carousel-indicators li {
+      background-color: rgba(255, 255, 255, 0.5);
+    }
+    
+    .carousel-indicators li.active {
+      background-color: rgba(255, 255, 255, 0.9);
+    }
+    
+    /* 确保轮播标题在暗模式下可见 */
+    .carousel-caption {
+      background-color: rgba(0, 0, 0, 0.5);
+      border-radius: 10px;
+      padding: 15px;
+    }
+    
+    .carousel-caption h2, 
+    .carousel-caption p {
+      color: white;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    }
+    
+    /* 登录/注册按钮在暗色导航栏上的样式 */
+    .btn-outline-light {
+      color: white;
+      border-color: white;
+    }
+    
+    .btn-outline-light:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    /* 修复下拉菜单在导航栏上的颜色 */
+    .navbar .dropdown-menu {
+      background-color: rgb(0, 42, 92);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .navbar .dropdown-item {
+      color: white;
+    }
+    
+    .navbar .dropdown-item:hover, 
+    .navbar .dropdown-item:focus {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+    
+    /* 修复可能的白色背景闪烁问题 */
+    body.auto-theme {
+      transition: background-color 0.5s ease;
+    }
+    
+    body.auto-theme.dark-mode {
+      transition: background-color 0.5s ease;
+    }
+    
+    /* 确保所有公告项在暗模式下有正确的背景 */
+    .announcement-item {
+      position: relative;
+      overflow: hidden;
+      transform-origin: left center;
+      background-color: var(--card-bg-light);
+      transition: background-color 0.3s ease, transform 0.3s var(--animation-timing-apple);
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 10px;
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+    
+    .announcement-item:hover .announcement-icon {
+      transform: scale(1.2);
+      transition: transform 0.3s var(--animation-timing-bounce);
+    }
+    
+    .announcement-item:hover {
+      transform: translateX(5px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    }
+    
+    body.dark-theme .announcement-item,
+    body.auto-theme.dark-mode .announcement-item {
+      background-color: var(--card-bg-dark);
+      border-color: rgba(255,255,255,0.1);
+    }
+    
+    body.dark-theme .announcement-item:hover,
+    body.auto-theme.dark-mode .announcement-item:hover {
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     }
   </style>
 </head>
