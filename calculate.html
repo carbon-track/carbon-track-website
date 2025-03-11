@@ -342,6 +342,99 @@
       background-color: #30D158;
       border-color: #30D158;
     }
+
+    /* iOS风格的选择器样式 */
+    .form-control.ios-select {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      padding-right: 30px;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%238E8E93' viewBox='0 0 16 16'><path d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/></svg>");
+      background-repeat: no-repeat;
+      background-position: calc(100% - 12px) center;
+      background-size: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border-radius: 12px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      border: 1px solid var(--border-color-light);
+      font-weight: 500;
+      padding: 12px 16px;
+      height: auto;
+    }
+    
+    .form-control.ios-select:hover {
+      border-color: var(--ios-gray4);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+      transform: translateY(-1px);
+    }
+    
+    .form-control.ios-select:focus {
+      border-color: var(--ios-green);
+      box-shadow: 0 0 0 3px rgba(52, 199, 89, 0.25);
+      outline: none;
+    }
+    
+    /* 深色模式样式调整 */
+    body.dark-theme .form-control.ios-select,
+    body.auto-theme.dark-mode .form-control.ios-select {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23AEAEB2' viewBox='0 0 16 16'><path d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/></svg>");
+      border-color: var(--border-color-dark);
+      background-color: var(--input-bg-dark);
+      color: var(--text-color-dark);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    }
+    
+    body.dark-theme .form-control.ios-select:hover,
+    body.auto-theme.dark-mode .form-control.ios-select:hover {
+      border-color: var(--ios-gray3);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    
+    body.dark-theme .form-control.ios-select:focus,
+    body.auto-theme.dark-mode .form-control.ios-select:focus {
+      border-color: #30D158;
+      box-shadow: 0 0 0 3px rgba(48, 209, 88, 0.3);
+    }
+    
+    /* 下拉项样式 */
+    select.ios-select option {
+      padding: 12px;
+      font-weight: 400;
+    }
+    
+    /* 选择器标签样式 */
+    .ios-select-group label {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--ios-label);
+      margin-bottom: 8px;
+      transition: color 0.3s ease;
+    }
+    
+    /* 添加动画过渡 */
+    .form-group.ios-select-group {
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    
+    /* 标签单位徽章 */
+    .ios-unit-badge {
+      display: inline-block;
+      background-color: var(--ios-gray6);
+      color: var(--ios-gray);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 10px;
+      margin-left: 8px;
+      transition: all 0.3s ease;
+    }
+    
+    body.dark-theme .ios-unit-badge,
+    body.auto-theme.dark-mode .ios-unit-badge {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: var(--muted-text-dark);
+    }
   </style>
   <script>
     $(document).ready(function () {
@@ -549,6 +642,34 @@
           }
         }
       }
+
+      // 添加iOS选择器样式
+      $('#category, #activity').addClass('ios-select');
+      $('#category, #activity').closest('.form-group').addClass('ios-select-group');
+      
+      // 包装单位标签为徽章
+      $('#unitLabel').addClass('ios-unit-badge');
+      
+      // 添加选择器变化动画
+      $('#category').change(function() {
+        const activityGroup = $('#activity').closest('.form-group');
+        activityGroup.css('opacity', 0.5);
+        activityGroup.css('transform', 'translateY(-5px)');
+        
+        setTimeout(function() {
+          updateActivityOptions($('#category').val());
+          activityGroup.css('opacity', 1);
+          activityGroup.css('transform', 'translateY(0)');
+        }, 200);
+      });
+      
+      // 为数量输入添加iOS样式
+      $('#dataInput').addClass('ios-select');
+      $('#dataInput').closest('.form-group').addClass('ios-select-group');
+      
+      // 日期选择器iOS风格
+      $('#date').addClass('ios-select');
+      $('#date').closest('.form-group').addClass('ios-select-group');
     });
     
     // 发送邮件函数
