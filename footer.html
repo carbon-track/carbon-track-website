@@ -2,7 +2,7 @@
   <div class="container py-4">
     <div class="row">
       <div class="col-md-6">
-        <p class="mb-2">© 2025 CarbonTrack碳账户. All rights reserved.</p>
+        <p class="mb-2 copyright-text" style="color: #8E8E93 !important;">© 2025 CarbonTrack碳账户. All rights reserved.</p>
       </div>
       <div class="col-md-6 text-md-right">
         <ul class="list-inline mb-0">
@@ -26,12 +26,35 @@
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
   }
   
+  /* 版权文本专用样式 */
+  .copyright-text {
+    color: #8E8E93; /* iOS 辅助灰色文本 - 浅色模式 */
+    font-weight: 400;
+    transition: color 0.3s ease;
+  }
+  
   /* 黑夜模式适配 - 通过父元素类名 */
   body.dark-theme .footer,
   body.auto-theme.dark-mode .footer {
     background-color: #1C1C1E; /* iOS 深色背景 - 暗色模式 */
     color: #98989D; /* iOS 辅助灰色文本 - 暗色模式 */
     border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  /* 版权文本黑夜模式样式 */
+  body.dark-theme .copyright-text,
+  body.auto-theme.dark-mode .copyright-text {
+    color: #98989D !important; /* iOS 辅助灰色文本 - 暗色模式 */
+  }
+  
+  /* 明确设置footer中所有文本元素的颜色 */
+  body.dark-theme .footer p,
+  body.auto-theme.dark-mode .footer p,
+  body.dark-theme .footer span,
+  body.auto-theme.dark-mode .footer span,
+  body.dark-theme .footer div,
+  body.auto-theme.dark-mode .footer div {
+    color: #98989D !important; /* iOS 辅助灰色文本 - 暗色模式 */
   }
   
   /* 使用媒体查询自动检测系统颜色方案 */
@@ -41,6 +64,12 @@
       background-color: #1C1C1E !important; /* iOS 深色背景 - 暗色模式 */
       color: #98989D !important; /* iOS 辅助灰色文本 - 暗色模式 */
       border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+    
+    body:not(.light-theme) .footer:not(.footer-light) p,
+    body:not(.light-theme) .footer:not(.footer-light) span,
+    body:not(.light-theme) .footer:not(.footer-light) div {
+      color: #98989D !important; /* iOS 辅助灰色文本 - 暗色模式 */
     }
     
     body:not(.light-theme) .footer:not(.footer-light) .footer-link:not(:hover) {
@@ -57,6 +86,13 @@
     background-color: #1C1C1E !important; /* iOS 深色背景 - 暗色模式 */
     color: #98989D !important; /* iOS 辅助灰色文本 - 暗色模式 */
     border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+  }
+  
+  /* 明确设置auto-dark模式下所有文本元素的颜色 */
+  .footer.footer-auto-dark p,
+  .footer.footer-auto-dark span,
+  .footer.footer-auto-dark div {
+    color: #98989D !important; /* iOS 辅助灰色文本 - 暗色模式 */
   }
   
   .footer.footer-auto-dark .footer-link:not(:hover) {
@@ -168,6 +204,19 @@
             footer.classList.add('footer-auto-dark');
           } else {
             footer.classList.remove('footer-auto-dark');
+          }
+        }
+        
+        // 确保版权文本颜色正确
+        const copyrightText = footer.querySelector('.copyright-text');
+        if (copyrightText) {
+          if (isDarkMode || hasExplicitTheme && (body.classList.contains('dark-theme') || body.classList.contains('dark-mode'))) {
+            copyrightText.style.color = '#98989D !important';
+            // 使用setAttribute来确保style属性被设置
+            copyrightText.setAttribute('style', 'color: #98989D !important');
+          } else {
+            copyrightText.style.color = '#8E8E93 !important';
+            copyrightText.setAttribute('style', 'color: #8E8E93 !important');
           }
         }
         
