@@ -20,30 +20,7 @@
   <!-- Intersection Observer polyfill for older browsers - 使用jsDelivr替代polyfill.io -->
   <script src="https://cdn.jsdelivr.net/npm/intersection-observer@0.12.2/intersection-observer.js"></script>
   <style>
-    /* 颜色变量定义 */
     :root {
-      /* 基础颜色 */
-      --text-color-light: #000;
-      --text-color-dark: #fff;
-      --bg-color-light: #F2F2F7;
-      --bg-color-dark: #1C1C1E;
-      --card-bg-light: rgba(255, 255, 255, 0.8);
-      --card-bg-dark: rgba(44, 44, 46, 0.8);
-      --border-color-light: #d1d1d6;
-      --border-color-dark: #3a3a3c;
-      
-      /* 主题颜色 */
-      --ios-blue-light: #007AFF;
-      --ios-blue-dark: #0A84FF;
-      --ios-purple-light: #5856D6;
-      --ios-purple-dark: #5E5CE6;
-      
-      /* 辅助颜色 */
-      --muted-text-light: #8E8E93;
-      --muted-text-dark: #98989D;
-      --highlight-bg-light: rgba(0, 122, 255, 0.1);
-      --highlight-bg-dark: rgba(10, 132, 255, 0.2);
-      
       /* iOS System Colors */
       --ios-red: #FF3B30;
       --ios-orange: #FF9500;
@@ -52,7 +29,9 @@
       --ios-mint: #00C7BE;
       --ios-teal: #30B0C7;
       --ios-cyan: #32ADE6;
+      --ios-blue: #007AFF;
       --ios-indigo: #5856D6;
+      --ios-purple: #AF52DE;
       --ios-pink: #FF2D55;
       --ios-brown: #A2845E;
       
@@ -64,10 +43,21 @@
       --ios-gray5: #E5E5EA;
       --ios-gray6: #F2F2F7;
       
-      /* iOS Dynamic Background Colors */
+      /* iOS Dynamic Background Colors - Light Mode */
       --ios-system-background: #FFFFFF;
       --ios-secondary-background: #F2F2F7;
       --ios-tertiary-background: #FFFFFF;
+      
+      /* Text Colors - Light Mode */
+      --text-color: #000000;
+      --text-secondary-color: #3A3A3C;
+      --text-tertiary-color: #48484A;
+      --text-muted-color: #8E8E93;
+      
+      /* Card and Container Colors - Light Mode */
+      --card-background: rgba(255, 255, 255, 0.8);
+      --container-background: #FFFFFF;
+      --border-color: rgba(0, 0, 0, 0.1);
       
       /* Content width */
       --content-max-width: 1280px;
@@ -83,204 +73,101 @@
       --animation-timing-apple: cubic-bezier(0.25, 0.1, 0.25, 1);
     }
     
-    /* 基础样式 */
+    /* Dark Mode Colors - System Preference */
+    @media (prefers-color-scheme: dark) {
+      body.auto-theme {
+        --ios-system-background: #000000;
+        --ios-secondary-background: #1C1C1E;
+        --ios-tertiary-background: #2C2C2E;
+        
+        --text-color: #FFFFFF;
+        --text-secondary-color: #EBEBF5;
+        --text-tertiary-color: #EBEBF599;
+        --text-muted-color: #98989D;
+        
+        --card-background: rgba(44, 44, 46, 0.8);
+        --container-background: #1C1C1E;
+        --border-color: rgba(255, 255, 255, 0.1);
+        
+        /* iOS Dark Mode Colors */
+        --ios-red: #FF453A;
+        --ios-orange: #FF9F0A;
+        --ios-yellow: #FFD60A;
+        --ios-green: #30D158;
+        --ios-mint: #63E6E2;
+        --ios-teal: #40C8E0;
+        --ios-cyan: #64D2FF;
+        --ios-blue: #0A84FF;
+        --ios-indigo: #5E5CE6;
+        --ios-purple: #BF5AF2;
+        --ios-pink: #FF2D55;
+        --ios-brown: #AC8E68;
+      }
+    }
+    
+    /* Base styles with transitions for theme changes */
     body {
-      background-color: var(--bg-color-light);
-      color: var(--text-color-light);
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text-color);
+      background-color: var(--ios-system-background);
       transition: background-color 0.3s ease, color 0.3s ease;
     }
     
-    /* 暗色模式样式 */
-    body.dark-theme,
+    /* Add 'auto-theme' class to body for system theme detection */
+    body.auto-theme {
+      background-color: var(--ios-system-background);
+      color: var(--text-color);
+    }
+    
+    /* Apply dark mode styles to key elements */
     body.auto-theme.dark-mode {
-      background-color: var(--bg-color-dark);
-      color: var(--text-color-dark);
+      background-color: var(--ios-system-background);
+      color: var(--text-color);
     }
     
-    /* 卡片样式 */
-    .card {
-      background-color: var(--card-bg-light);
-      border: none;
-      transition: background-color 0.3s ease;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+    /* Card and container styles */
+    .card, .content-container, .hero-section {
+      background-color: var(--card-background);
+      color: var(--text-color);
+      transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
     }
     
-    body.dark-theme .card,
-    body.auto-theme.dark-mode .card {
-      background-color: var(--card-bg-dark);
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-    }
-    
-    /* 导航栏样式 */
+    /* Navigation styles */
     .navbar {
-      background-color: rgb(0, 42, 92) !important;
-      transition: background-color 0.3s ease;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+      background-color: var(--ios-system-background);
+      border-bottom: 1px solid var(--border-color);
+      transition: background-color 0.3s ease, border-color 0.3s ease;
     }
     
-    body.dark-theme .navbar,
-    body.auto-theme.dark-mode .navbar {
-      background-color: rgb(0, 42, 92) !important;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-    }
-    
-    /* 导航链接样式 */
-    .navbar-light .navbar-nav .nav-link {
-      color: white !important;
+    /* Text colors */
+    h1, h2, h3, h4, h5, h6, p {
+      color: var(--text-color);
       transition: color 0.3s ease;
     }
     
-    body.dark-theme .navbar-light .navbar-nav .nav-link,
-    body.auto-theme.dark-mode .navbar-light .navbar-nav .nav-link {
-      color: var(--text-color-dark);
-    }
-    
-    /* 品牌样式 */
-    .navbar-light .navbar-brand {
-      color: white !important;
+    .text-muted, .text-secondary {
+      color: var(--text-muted-color) !important;
       transition: color 0.3s ease;
     }
     
-    body.dark-theme .navbar-light .navbar-brand,
-    body.auto-theme.dark-mode .navbar-light .navbar-brand {
-      color: var(--text-color-dark);
+    /* Input and form styles */
+    .form-control, input, select, textarea {
+      background-color: var(--ios-secondary-background);
+      color: var(--text-color);
+      border-color: var(--border-color);
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
     }
     
-    /* 表单控件 */
-    .form-control {
-      background-color: var(--bg-color-light);
-      border-color: var(--border-color-light);
-      color: var(--text-color-light);
-      transition: all 0.3s ease;
-    }
-    
-    body.dark-theme .form-control,
-    body.auto-theme.dark-mode .form-control {
-      background-color: #3A3A3C;
-      border-color: var(--border-color-dark);
-      color: var(--text-color-dark);
-    }
-    
-    .form-control:focus {
-      box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.15);
-      border-color: var(--ios-blue-light);
-    }
-    
-    body.dark-theme .form-control:focus,
-    body.auto-theme.dark-mode .form-control:focus {
-      box-shadow: 0 0 0 4px rgba(10, 132, 255, 0.25);
-      border-color: var(--ios-blue-dark);
-    }
-    
-    /* 模态框样式 */
+    /* Modal styles */
     .modal-content {
-      background-color: var(--card-bg-light);
-      transition: background-color 0.3s ease;
-    }
-    
-    body.dark-theme .modal-content,
-    body.auto-theme.dark-mode .modal-content {
-      background-color: var(--card-bg-dark);
+      background-color: var(--ios-tertiary-background);
+      color: var(--text-color);
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
     
     .modal-header, .modal-footer {
-      border-color: var(--border-color-light);
+      border-color: var(--border-color);
       transition: border-color 0.3s ease;
-    }
-    
-    body.dark-theme .modal-header,
-    body.auto-theme.dark-mode .modal-header,
-    body.dark-theme .modal-footer,
-    body.auto-theme.dark-mode .modal-footer {
-      border-color: var(--border-color-dark);
-    }
-    
-    /* 文本和标题 */
-    h1, h2, h3, h4, h5, h6, p {
-      color: var(--text-color-light);
-      transition: color 0.3s ease;
-    }
-    
-    body.dark-theme h1, body.dark-theme h2, body.dark-theme h3, 
-    body.dark-theme h4, body.dark-theme h5, body.dark-theme h6, body.dark-theme p,
-    body.auto-theme.dark-mode h1, body.auto-theme.dark-mode h2, body.auto-theme.dark-mode h3, 
-    body.auto-theme.dark-mode h4, body.auto-theme.dark-mode h5, body.auto-theme.dark-mode h6, body.auto-theme.dark-mode p {
-      color: var(--text-color-dark);
-    }
-    
-    /* 按钮样式 */
-    .btn-primary {
-      background-color: var(--ios-blue-light);
-      border-color: var(--ios-blue-light);
-      transition: all 0.3s ease;
-    }
-    
-    body.dark-theme .btn-primary,
-    body.auto-theme.dark-mode .btn-primary {
-      background-color: var(--ios-blue-dark);
-      border-color: var(--ios-blue-dark);
-    }
-    
-    /* 霓虹效果 */
-    .glow-effect {
-      position: fixed;
-      width: 300px;
-      height: 300px;
-      border-radius: 50%;
-      filter: blur(50px);
-      z-index: -1;
-      animation: pulse 8s infinite alternate cubic-bezier(0.25, 0.1, 0.25, 1);
-    }
-    
-    .glow-blue {
-      top: 10%;
-      right: 10%;
-      background: radial-gradient(circle, rgba(0, 122, 255, 0.2), transparent 70%);
-    }
-    
-    .glow-purple {
-      bottom: 10%;
-      left: 5%;
-      background: radial-gradient(circle, rgba(88, 86, 214, 0.15), transparent 70%);
-      animation-delay: 2s;
-    }
-    
-    body.dark-theme .glow-blue,
-    body.auto-theme.dark-mode .glow-blue {
-      background: radial-gradient(circle, rgba(10, 132, 255, 0.2), transparent 70%);
-    }
-    
-    body.dark-theme .glow-purple,
-    body.auto-theme.dark-mode .glow-purple {
-      background: radial-gradient(circle, rgba(94, 92, 230, 0.15), transparent 70%);
-    }
-    
-    @keyframes pulse {
-      0% { transform: scale(1) translate(0, 0); opacity: 0.5; }
-      50% { transform: scale(1.05) translate(20px, -10px); opacity: 0.7; }
-      100% { transform: scale(1) translate(0, 0); opacity: 0.5; }
-    }
-    
-    /* 毛玻璃效果 */
-    .frosted-glass {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      z-index: -2;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      background: rgba(255, 255, 255, 0.05);
-      transition: background-color 0.5s ease;
-    }
-    
-    body.dark-theme .frosted-glass,
-    body.auto-theme.dark-mode .frosted-glass {
-      background: rgba(0, 0, 0, 0.05);
     }
     
     /* iOS-style animations */
@@ -383,16 +270,10 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background-color: var(--card-bg-light);
+      background-color: var(--ios-system-background);
       transform: translateY(0);
-      transition: transform var(--animation-duration-medium) var(--animation-timing-apple), 
-                  background-color 0.3s ease;
+      transition: transform var(--animation-duration-medium) var(--animation-timing-apple);
       z-index: 1;
-    }
-    
-    body.dark-theme .section-reveal::before,
-    body.auto-theme.dark-mode .section-reveal::before {
-      background-color: var(--card-bg-dark);
     }
     
     .section-reveal.visible::before {
@@ -1637,40 +1518,23 @@
       bottom: 0;
       background: linear-gradient(180deg, 
         rgba(242, 242, 247, 0) 0%,
-        var(--card-bg-light) 20%,
-        var(--card-bg-light) 100%);
+        rgba(242, 242, 247, 0.8) 20%,
+        rgba(242, 242, 247, 1) 100%);
       z-index: -1;
-      transition: background 0.3s ease;
     }
-    
-    body.dark-theme .announcement-section::before,
-    body.auto-theme.dark-mode .announcement-section::before {
-      background: linear-gradient(180deg, 
-        rgba(28, 28, 30, 0) 0%,
-        var(--card-bg-dark) 20%,
-        var(--card-bg-dark) 100%);
-    }
-    
+
     /* Enhanced announcement items */
     .announcement-item {
       position: relative;
       overflow: hidden;
       transform-origin: left center;
-      background-color: var(--card-bg-light);
-      transition: background-color 0.3s ease, transform 0.3s var(--animation-timing-apple);
-      border-radius: 10px;
-      padding: 15px;
-      margin-bottom: 10px;
-      border: 1px solid rgba(0,0,0,0.05);
     }
-    
-    body.dark-theme .announcement-item,
-    body.auto-theme.dark-mode .announcement-item {
-      background-color: var(--card-bg-dark);
-      border-color: rgba(255,255,255,0.1);
+
+    .announcement-item:hover .announcement-icon {
+      transform: scale(1.2);
+      transition: transform 0.3s var(--animation-timing-bounce);
     }
-    
-    /* 公告图标颜色修复 */
+
     .announcement-icon {
       transition: transform 0.3s var(--animation-timing-apple);
       display: inline-flex;
@@ -1680,116 +1544,164 @@
       height: 40px;
       font-size: 24px;
       border-radius: 50%;
-      background-color: rgba(0, 122, 255, 0.1);
-      color: var(--ios-blue-light);
+    }
+
+    /* 表单和输入元素的深色模式样式 */
+    body.auto-theme.dark-mode .form-control {
+      background-color: #333;
+      border-color: #555;
+      color: #fff;
     }
     
-    body.dark-theme .announcement-icon,
-    body.auto-theme.dark-mode .announcement-icon {
-      background-color: rgba(10, 132, 255, 0.2);
-      color: var(--ios-blue-dark);
+    body.auto-theme.dark-mode .form-control:focus {
+      border-color: var(--ios-blue);
+      box-shadow: 0 0 0 0.2rem rgba(10, 132, 255, 0.25);
     }
     
-    /* 修复轮播指示器在暗模式下的颜色 */
-    .carousel-indicators li {
-      background-color: rgba(255, 255, 255, 0.5);
+    body.auto-theme.dark-mode .input-group-text {
+      background-color: #333;
+      border-color: #555;
+      color: #fff;
     }
     
-    .carousel-indicators li.active {
-      background-color: rgba(255, 255, 255, 0.9);
+    body.auto-theme.dark-mode ::placeholder {
+      color: #999;
+      opacity: 1;
     }
     
-    /* 确保轮播标题在暗模式下可见 */
-    .carousel-caption {
-      background-color: rgba(0, 0, 0, 0.5);
-      border-radius: 10px;
-      padding: 15px;
+    /* 卡片内文本的可读性增强 */
+    body.auto-theme.dark-mode .card {
+      color: #fff;
     }
     
-    .carousel-caption h2, 
-    .carousel-caption p {
-      color: white;
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-    }
-    
-    /* 登录/注册按钮在暗色导航栏上的样式 */
-    .btn-outline-light {
-      color: white;
-      border-color: white;
-    }
-    
-    .btn-outline-light:hover {
-      background-color: rgba(255, 255, 255, 0.1);
-    }
-    
-    /* 修复下拉菜单在导航栏上的颜色 */
-    .navbar .dropdown-menu {
-      background-color: rgb(0, 42, 92);
+    body.auto-theme.dark-mode .card-header,
+    body.auto-theme.dark-mode .card-footer {
+      background-color: rgba(0, 0, 0, 0.2);
       border-color: rgba(255, 255, 255, 0.1);
     }
     
-    .navbar .dropdown-item {
-      color: white;
+    /* 按钮悬停状态 */
+    body.auto-theme.dark-mode .btn-primary:hover {
+      background-color: #0071e3;
+      border-color: #0071e3;
     }
     
-    .navbar .dropdown-item:hover, 
-    .navbar .dropdown-item:focus {
-      background-color: rgba(255, 255, 255, 0.1);
-      color: white;
+    body.auto-theme.dark-mode .btn-outline-primary:hover {
+      background-color: var(--ios-blue);
+      color: #fff;
     }
     
-    /* 修复可能的白色背景闪烁问题 */
-    body.auto-theme {
-      transition: background-color 0.5s ease;
+    /* 下拉菜单 */
+    body.auto-theme.dark-mode .dropdown-menu {
+      background-color: #333;
+      border-color: #555;
     }
     
-    body.auto-theme.dark-mode {
-      transition: background-color 0.5s ease;
+    body.auto-theme.dark-mode .dropdown-item {
+      color: #fff;
     }
     
-    /* 确保所有公告项在暗模式下有正确的背景 */
-    .announcement-item {
-      position: relative;
-      overflow: hidden;
-      transform-origin: left center;
-      background-color: var(--card-bg-light);
-      transition: background-color 0.3s ease, transform 0.3s var(--animation-timing-apple);
-      border-radius: 10px;
-      padding: 15px;
-      margin-bottom: 10px;
-      border: 1px solid rgba(0,0,0,0.05);
+    body.auto-theme.dark-mode .dropdown-item:hover,
+    body.auto-theme.dark-mode .dropdown-item:focus {
+      background-color: #444;
+      color: #fff;
     }
     
-    .announcement-item:hover .announcement-icon {
-      transform: scale(1.2);
-      transition: transform 0.3s var(--animation-timing-bounce);
+    /* 导航选中状态 */
+    body.auto-theme.dark-mode .navbar-light .navbar-nav .nav-link.active,
+    body.auto-theme.dark-mode .navbar-light .navbar-nav .nav-link:hover {
+      color: var(--ios-blue);
+    }
+
+    /* 特定元素的深色模式样式 */
+    
+    /* Hero section background */
+    body.auto-theme.dark-mode .hero-section {
+      background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('./img/hero-bg.jpg');
     }
     
-    .announcement-item:hover {
-      transform: translateX(5px);
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    /* Features section */
+    body.auto-theme.dark-mode .features-section .card {
+      background-color: var(--card-background);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
     }
     
-    body.dark-theme .announcement-item,
-    body.auto-theme.dark-mode .announcement-item {
-      background-color: var(--card-bg-dark);
-      border-color: rgba(255,255,255,0.1);
+    /* Testimonials */
+    body.auto-theme.dark-mode .testimonials-section {
+      background-color: var(--ios-secondary-background);
     }
     
-    body.dark-theme .announcement-item:hover,
-    body.auto-theme.dark-mode .announcement-item:hover {
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    body.auto-theme.dark-mode .testimonial-card {
+      background-color: var(--card-background);
+    }
+    
+    /* Footer */
+    body.auto-theme.dark-mode footer {
+      background-color: var(--ios-tertiary-background);
+      color: var(--text-color);
+      border-top: 1px solid var(--border-color);
+    }
+    
+    /* Buttons */
+    body.auto-theme.dark-mode .btn-primary {
+      background-color: var(--ios-blue);
+      border-color: var(--ios-blue);
+    }
+    
+    body.auto-theme.dark-mode .btn-outline-primary {
+      color: var(--ios-blue);
+      border-color: var(--ios-blue);
+    }
+    
+    /* Badges and highlights */
+    body.auto-theme.dark-mode .badge-primary {
+      background-color: var(--ios-blue);
+    }
+    
+    /* Logo and navigation */
+    body.auto-theme.dark-mode .navbar-light .navbar-brand,
+    body.auto-theme.dark-mode .navbar-light .navbar-nav .nav-link {
+      color: var(--text-color);
+    }
+    
+    /* Login/Signup Modal */
+    body.auto-theme.dark-mode #loginModal .modal-content,
+    body.auto-theme.dark-mode #signupModal .modal-content {
+      background-color: var(--ios-tertiary-background);
+    }
+    
+    /* Carousel indicators */
+    body.auto-theme.dark-mode .carousel-indicators li {
+      background-color: var(--ios-gray);
+    }
+    
+    body.auto-theme.dark-mode .carousel-indicators li.active {
+      background-color: var(--ios-blue);
+    }
+    
+    /* Tables */
+    body.auto-theme.dark-mode .table {
+      color: var(--text-color);
+    }
+    
+    body.auto-theme.dark-mode .table-striped tbody tr:nth-of-type(odd) {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+    
+    /* Callout sections */
+    body.auto-theme.dark-mode .callout-section {
+      background-color: var(--ios-secondary-background);
+    }
+    
+    /* Code blocks and pre tags */
+    body.auto-theme.dark-mode pre, 
+    body.auto-theme.dark-mode code {
+      background-color: var(--ios-tertiary-background);
+      color: var(--ios-green);
     }
   </style>
 </head>
 <body class="auto-theme">
-<!-- 添加毛玻璃背景 -->
-<div class="frosted-glass"></div>
-
-<!-- 添加霓虹灯光效果 -->
-<div class="glow-effect glow-blue"></div>
-<div class="glow-effect glow-purple"></div>
-
 <!-- 导航栏容器，将由JavaScript加载 -->
 <div id="navbar-container"></div>
 
@@ -2055,6 +1967,29 @@
     
     // Set up parallax scrolling effect with improved performance
     setupEnhancedParallaxEffect();
+
+    // 自动检测系统主题偏好
+    function checkSystemTheme() {
+      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark-mode');
+      } else {
+        document.body.classList.remove('dark-mode');
+      }
+    }
+    
+    // 初始化时检测一次
+    checkSystemTheme();
+    
+    // 监听系统主题偏好变化
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+      if (document.body.classList.contains('auto-theme')) {
+        if (e.matches) {
+          document.body.classList.add('dark-mode');
+        } else {
+          document.body.classList.remove('dark-mode');
+        }
+      }
+    });
   });
   
   // Enhanced carousel initialization with synchronized animations
@@ -2203,38 +2138,6 @@
     
     // Initial update
     updateParallax();
-  }
-
-  // 主题初始化
-  document.addEventListener('DOMContentLoaded', function() {
-    initTheme();
-  });
-  
-  // 初始化主题设置
-  function initTheme() {
-    const body = document.body;
-    
-    // 检查用户是否有保存的偏好
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme) {
-      body.className = savedTheme;
-    } else {
-      body.classList.add('auto-theme');
-      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        body.classList.add('dark-mode');
-      }
-    }
-    
-    // 监听系统暗模式变化
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
-      if (body.classList.contains('auto-theme')) {
-        if (e.matches) {
-          body.classList.add('dark-mode');
-        } else {
-          body.classList.remove('dark-mode');
-        }
-      }
-    });
   }
 </script>
 </body>

@@ -1062,7 +1062,7 @@
   <div class="ios-segment-control">
     <button class="segment active" data-type="all">
       <i class="fas fa-globe-asia"></i>Global
-    </button>
+        </button>
     <button class="segment" data-type="local">
       <i class="fas fa-map-marker-alt"></i>Regional
     </button>
@@ -1070,7 +1070,7 @@
       <i class="fas fa-school"></i>School
     </button>
     <div class="segment-selector"></div>
-  </div>
+      </div>
   
   <!-- iOS风格卡片表格 -->
   <div class="ios-card-table fade-in-up delay-5">
@@ -1283,7 +1283,7 @@
       url: 'get_user_points.php',
       data: { token: token },
       dataType: 'json',
-      success: function (response) {
+        success: function (response) {
         if (response.success) {
           // 更新页面上的用户信息
           $('#userPoints').text(response.userPoints);
@@ -1353,13 +1353,13 @@
   // 修改loadCountries函数为Promise形式
   function loadCountries() {
     return new Promise((resolve, reject) => {
-      fetch('./countries.json')
-        .then(response => response.json())
-        .then(data => {
+    fetch('./countries.json')
+      .then(response => response.json())
+      .then(data => {
           const countrySelect = document.getElementById('userCountrySelect');
           if (countrySelect) {
             countrySelect.innerHTML = ''; // 清空现有选项
-            data.forEach(country => {
+        data.forEach(country => {
               const option = document.createElement('option');
               option.value = country.code;
               option.textContent = country.name;
@@ -1381,15 +1381,15 @@
   // 修改updateStates函数为Promise形式
   function updateStates(countryCode) {
     return new Promise((resolve, reject) => {
-      fetch('./countries.json')
-        .then(response => response.json())
-        .then(data => {
+    fetch('./countries.json')
+      .then(response => response.json())
+      .then(data => {
           const statesSelect = document.getElementById('userStateSelect');
           if (statesSelect) {
             statesSelect.innerHTML = ''; // Clear current states/provinces
             const selectedCountry = data.find(country => country.code === countryCode);
-            if (selectedCountry && selectedCountry.states) {
-              selectedCountry.states.forEach(state => {
+        if (selectedCountry && selectedCountry.states) {
+          selectedCountry.states.forEach(state => {
                 const option = document.createElement('option');
                 option.value = state.code;
                 option.textContent = state.name;
@@ -1413,17 +1413,17 @@
   function loadSchools() {
     return new Promise((resolve, reject) => {
       var token = localStorage.getItem('token');
-      
-      $.ajax({
+
+    $.ajax({
         url: 'get_schools.php',
-        type: 'POST',
-        dataType: 'json',
+      type: 'POST',
+      dataType: 'json',
         data: { token: token },
-        success: function (data) {
+      success: function (data) {
           var schoolSelect = document.getElementById('userSchoolSelect');
           if (schoolSelect) {
             var schoolOptions = '<option value="">请选择学校Select school</option>';
-            $.each(data, function (index, school) {
+        $.each(data, function (index, school) {
               schoolOptions += '<option value="' + school.id + '">' + school.name + '</option>';
             });
             schoolOptions += '<option value="other">其他Other（自行输入Enter new）</option>';
@@ -1433,8 +1433,8 @@
             console.error('userSchoolSelect element not found');
             reject('Element not found');
           }
-        },
-        error: function (xhr, status, error) {
+      },
+      error: function (xhr, status, error) {
           console.error('加载学校列表失败:', error);
           reject(error);
         }
@@ -1574,7 +1574,7 @@
               var rankClass = '';
               var rankHtml = '';
               
-              if (rank <= 3) {
+            if (rank <= 3) {
                 rankClass = 'top-rank rank-' + rank;
                 
                 // 修复徽章视觉问题
@@ -1646,7 +1646,7 @@
     if (savedTheme) {
       body.className = savedTheme;
       updateThemeIcon(savedTheme);
-    } else {
+      } else {
       body.classList.add('auto-theme');
       if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
         body.classList.add('dark-mode');
