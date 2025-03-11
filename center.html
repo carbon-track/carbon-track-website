@@ -1585,23 +1585,6 @@
 <!-- 导航栏容器，将由JavaScript加载 -->
 <div id="navbar-container"></div>
 
-<!-- 添加顶部信息栏 -->
-<div class="top-user-info-bar">
-  <div class="container">
-    <div class="carbon-saved-info">
-      You have saved a total of: <span class="carbon-saved-value" id="topUserReduction">Loading...</span>
-    </div>
-    <div class="top-actions">
-      <button type="button" class="edit-profile-btn" data-toggle="modal" data-target="#editUserModal">
-        <i class="fas fa-user-edit mr-2"></i>Edit My Profile
-      </button>
-      <button type="button" class="reduction-history-btn" id="historyButton">
-        <i class="fas fa-history mr-2"></i>Carbon Reduction History
-      </button>
-    </div>
-  </div>
-</div>
-
 <!-- Main content starts here -->
 <div class="container content-container fade-in-up delay-1">
   <h2 class="ios-section-heading">User Center</h2>
@@ -1627,13 +1610,13 @@
             </button>
             <button type="button" class="btn btn-ios-success ios-float ml-2" id="viewHistoryBtn">
               <i class="fas fa-history mr-2"></i>View Carbon Reduction History
-            </button>
+        </button>
+      </div>
           </div>
+          </div>
+      </div>
         </div>
       </div>
-    </div>
-  </div>
-</div>
 
 <div class="container content-container fade-in-up delay-4">
   <h2 class="ios-section-heading">Carbon Credits Leaderboards</h2>
@@ -1662,22 +1645,22 @@
           <div class="ios-loader-dot"></div>
           <div class="ios-loader-dot"></div>
           <div class="ios-loader-dot"></div>
-        </div>
+          </div>
         <div class="ios-loader-text">加载排行榜数据...</div>
         <!-- 气泡效果 -->
         <div class="bubble" style="left: 20%; animation-delay: 0s;"></div>
         <div class="bubble" style="left: 40%; animation-delay: 1s;"></div>
         <div class="bubble" style="left: 60%; animation-delay: 0.5s;"></div>
         <div class="bubble" style="left: 80%; animation-delay: 1.5s;"></div>
-      </div>
-    </div>
-    
+          </div>
+            </div>
+
     <!-- 排行榜内容区域 -->
     <div id="leaderboard-content">
       <!-- 内容将由JavaScript动态生成 -->
-            </div>
-              </div>
-            </div>
+          </div>
+          </div>
+        </div>
 
 <!-- 添加编辑个人资料的模态窗口 -->
 <div class="modal fade" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserModalLabel" aria-hidden="true">

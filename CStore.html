@@ -861,7 +861,7 @@
         dataType: 'json',
         success: function (response) {
           if (response.success) {
-          $('#userPoints').text(response.points)
+          $('#userPoints').text(response.userPoints)
           } else {
           console.error('Error getting user points:', response.message)
         }

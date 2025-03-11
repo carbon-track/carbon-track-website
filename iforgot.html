@@ -631,7 +631,7 @@
       // Send verification code
       $.ajax({
         type: 'POST',
-        url: 'sendVerificationCode.php',
+        url: 'sendRecoveryCode.php',
         data: { email: email },
         dataType: 'json',
         success: function(response) {

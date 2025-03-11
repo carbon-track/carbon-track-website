@@ -69,11 +69,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
         logException($e);
         handleApiError(500, 'Database error');
+        exit;
     } catch (Exception $e) {
         logException($e);
         handleApiError(500, 'Internal server error');
+        exit;
     }
 } else {
     handleApiError(405, '不支持的请求方法。');
+    exit;
 }
 ?>
