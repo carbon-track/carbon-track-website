@@ -289,6 +289,148 @@
       height: 200px;
     }
     
+    /* iOS 风格加载动画 */
+    .ios-loader {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      padding: 30px;
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      background-color: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s var(--animation-timing-apple);
+    }
+    
+    /* 加载动画圆环 */
+    .ios-loader-ring {
+      position: relative;
+      width: 60px;
+      height: 60px;
+      margin-bottom: 20px;
+    }
+    
+    .ios-loader-ring::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 3px solid rgba(0, 122, 255, 0.2);
+    }
+    
+    .ios-loader-ring::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 3px solid transparent;
+      border-top-color: var(--ios-blue);
+      animation: ios-loader-rotate 1.5s linear infinite;
+    }
+    
+    @keyframes ios-loader-rotate {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+    
+    .ios-loader-dots {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 16px 0;
+    }
+    
+    .ios-loader-dot {
+      width: 10px;
+      height: 10px;
+      margin: 0 5px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--ios-blue), var(--ios-indigo));
+      opacity: 0;
+      transform: scale(0.8);
+      animation: ios-loader-pulse 1.5s infinite ease-in-out;
+    }
+    
+    .ios-loader-dot:nth-child(1) {
+      animation-delay: 0s;
+    }
+    
+    .ios-loader-dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+    
+    .ios-loader-dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+    
+    .ios-loader-text {
+      font-size: 16px;
+      font-weight: 500;
+      margin-top: 8px;
+      color: var(--ios-gray);
+      opacity: 0.9;
+      background: linear-gradient(135deg, var(--ios-blue), var(--ios-indigo));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: ios-loader-text-pulse 1.5s infinite ease-in-out;
+    }
+    
+    @keyframes ios-loader-pulse {
+      0%, 100% {
+        opacity: 0.3;
+        transform: scale(0.8);
+      }
+      50% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+    
+    @keyframes ios-loader-text-pulse {
+      0%, 100% {
+        opacity: 0.7;
+      }
+      50% {
+        opacity: 1;
+      }
+    }
+    
+    /* 加载器周围的光晕效果 */
+    .ios-loader::after {
+      content: '';
+      position: absolute;
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0, 122, 255, 0.1) 0%, transparent 70%);
+      z-index: -1;
+      animation: ios-loader-glow 2s infinite alternate ease-in-out;
+    }
+    
+    @keyframes ios-loader-glow {
+      0% {
+        opacity: 0.5;
+        transform: scale(0.9);
+      }
+      100% {
+        opacity: 0.8;
+        transform: scale(1.1);
+      }
+    }
+    
     .stock {
       padding: 6px 12px;
       border-radius: 10px;
@@ -402,6 +544,35 @@
         background-color: rgba(239, 68, 68, 0.2);
         border-color: rgba(239, 68, 68, 0.3);
       }
+      
+      body.auto-theme .ios-loader-text {
+        color: #AEAEB2;
+      }
+      
+      body.auto-theme .ios-loader::after {
+        background: radial-gradient(circle, rgba(10, 132, 255, 0.15) 0%, transparent 70%);
+      }
+      
+      body.auto-theme .ios-loader {
+        background-color: rgba(44, 44, 46, 0.3);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      }
+      
+      body.auto-theme .ios-loader-ring::before {
+        border-color: rgba(10, 132, 255, 0.15);
+      }
+      
+      body.auto-theme .ios-loader-ring::after {
+        border-top-color: var(--ios-blue);
+      }
+      
+      body.auto-theme .ios-loader-text {
+        color: #AEAEB2;
+      }
+      
+      body.auto-theme .ios-loader::after {
+        background: radial-gradient(circle, rgba(10, 132, 255, 0.15) 0%, transparent 70%);
+      }
     }
     
     /* Manual theme classes */
@@ -457,9 +628,45 @@
       border-color: rgba(239, 68, 68, 0.3);
     }
     
+    body.dark-theme .ios-loader-text {
+      color: #AEAEB2;
+    }
+    
+    body.dark-theme .ios-loader::after {
+      background: radial-gradient(circle, rgba(10, 132, 255, 0.15) 0%, transparent 70%);
+    }
+    
     body.light-theme {
       background-color: #F2F2F7;
       color: var(--text-color-light);
+    }
+    
+    /* 气泡动画效果 */
+    .bubble {
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(0, 122, 255, 0.3), rgba(88, 86, 214, 0.1));
+      box-shadow: 0 0 10px rgba(0, 122, 255, 0.2);
+      animation: bubble-float 3s ease-in infinite;
+      opacity: 0;
+      z-index: -1;
+    }
+    
+    @keyframes bubble-float {
+      0% {
+        opacity: 0;
+        transform: translateY(0) scale(0.5);
+      }
+      50% {
+        opacity: 0.6;
+        transform: translateY(-40px) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-80px) scale(0.5);
+      }
     }
   </style>
 </head>
@@ -500,8 +707,19 @@
   </div>
   
   <div id="loading" class="loading-spinner">
-    <div class="spinner-border text-primary" role="status">
-      <span class="sr-only">Loading...</span>
+    <div class="ios-loader">
+      <div class="ios-loader-ring"></div>
+      <div class="ios-loader-dots">
+        <div class="ios-loader-dot"></div>
+        <div class="ios-loader-dot"></div>
+        <div class="ios-loader-dot"></div>
+      </div>
+      <div class="ios-loader-text">加载商品中...</div>
+      <!-- 添加气泡效果 -->
+      <div class="bubble" style="left: 20%; animation-delay: 0s;"></div>
+      <div class="bubble" style="left: 40%; animation-delay: 1s;"></div>
+      <div class="bubble" style="left: 60%; animation-delay: 0.5s;"></div>
+      <div class="bubble" style="left: 80%; animation-delay: 1.5s;"></div>
     </div>
   </div>
   
@@ -521,6 +739,27 @@
   <script>
   // Theme toggling functionality
   document.addEventListener('DOMContentLoaded', function() {
+    // 创建加载动画气泡效果
+    function createBubbles() {
+      const loader = document.querySelector('.ios-loader');
+      if (loader) {
+        setInterval(() => {
+          const bubble = document.createElement('div');
+          bubble.classList.add('bubble');
+          bubble.style.left = Math.floor(Math.random() * 100) + '%';
+          bubble.style.animationDuration = (Math.random() * 2 + 2) + 's';
+          loader.appendChild(bubble);
+          
+          // 动画结束后移除气泡
+          setTimeout(() => {
+            bubble.remove();
+          }, 3000);
+        }, 300);
+      }
+    }
+    
+    createBubbles();
+    
     const themeToggle = document.getElementById('themeToggle');
     const body = document.body;
     const icon = themeToggle.querySelector('i');
