@@ -46,7 +46,7 @@
       left: 0;
       right: 0;
       bottom: 0;
-      z-index: -2;
+      z-index: -10;
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       background: rgba(255, 255, 255, 0.05);
@@ -59,7 +59,7 @@
       height: 300px;
       border-radius: 50%;
       filter: blur(50px);
-      z-index: -1;
+      z-index: -9;
       opacity: 0.5;
       animation: pulse 8s infinite alternate cubic-bezier(0.25, 0.1, 0.25, 1);
     }
@@ -92,6 +92,7 @@
       margin-bottom: 40px;
       position: relative;
       overflow: hidden;
+      z-index: 2;
     }
     
     /* Add shimmer effect */
@@ -133,13 +134,13 @@
     .calculator-card {
       border-radius: 24px;
       overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
       background-color: var(--card-bg-light);
       margin-bottom: 30px;
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
-      transition: transform 0.3s var(--animation-timing-apple),
-                box-shadow 0.3s var(--animation-timing-apple);
+      position: relative;
+      z-index: 1;
     }
     
     .calculator-card:hover {
@@ -363,6 +364,8 @@
       body.auto-theme .result-card,
       body.auto-theme .activity-option {
         background-color: var(--card-bg-dark);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
       }
       
       body.auto-theme label {
@@ -434,6 +437,8 @@
     body.dark-theme .result-card,
     body.dark-theme .activity-option {
       background-color: var(--card-bg-dark);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
     }
     
     body.dark-theme label {
@@ -497,6 +502,12 @@
     body.light-theme {
       background-color: #F2F2F7;
       color: var(--text-color-light);
+    }
+    
+    /* 确保所有主要内容都有适当的z-index */
+    .container {
+      position: relative;
+      z-index: 5;
     }
   </style>
   <script>
