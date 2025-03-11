@@ -673,67 +673,334 @@
       margin-bottom: 30px;
     }
     
-    /* iOS标准分段控制器 - 完全重构版 */
+    /* iOS标准分段控制器样式修复 */
     .ios-segment-control {
+      display: flex;
+      background-color: rgba(120, 120, 128, 0.12);
+      border-radius: 14px;
+      padding: 2px;
       margin-bottom: 20px;
+      max-width: 550px;
+      margin-left: auto;
+      margin-right: auto;
+      position: relative;
+      overflow: hidden;
+      transition: background-color 0.3s ease;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
     }
     
-    .segment-container {
-      display: inline-flex;
-      background-color: rgba(120, 120, 128, 0.16);
-      border-radius: 8px;
-      position: relative;
-      padding: 2px;
-      margin: 0 auto;
-      max-width: 550px;
+    body.dark-theme .ios-segment-control,
+    body.auto-theme.dark-mode .ios-segment-control {
+      background-color: rgba(120, 120, 128, 0.32);
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
     
-    body.dark-theme .segment-container,
-    body.auto-theme.dark-mode .segment-container {
-      background-color: rgba(120, 120, 128, 0.36);
-    }
-    
-    .segment-btn {
+    .ios-segment-control .segment {
+      flex: 1;
+      text-align: center;
+      padding: 10px 16px;
       font-size: 14px;
       font-weight: 500;
       color: var(--text-color-light);
-      background: transparent;
       border: none;
-      padding: 8px 20px;
+      background: transparent;
       position: relative;
-      z-index: 2;
+      z-index: 1;
+      transition: color 0.25s ease;
       outline: none;
       cursor: pointer;
-      transition: color 0.3s ease;
+      border-radius: 12px;
     }
     
-    body.dark-theme .segment-btn,
-    body.auto-theme.dark-mode .segment-btn {
+    body.dark-theme .ios-segment-control .segment,
+    body.auto-theme.dark-mode .ios-segment-control .segment {
       color: var(--text-color-dark);
     }
     
-    .segment-btn i {
+    .ios-segment-control .segment.active {
+      color: var(--text-color-light);
+    }
+    
+    body.dark-theme .ios-segment-control .segment.active,
+    body.auto-theme.dark-mode .ios-segment-control .segment.active {
+      color: var(--text-color-dark);
+    }
+    
+    /* 分段控制器选择器修复 */
+    .segment-selector {
+      position: absolute;
+      height: calc(100% - 4px);
+      top: 2px;
+      left: 0;
+      width: 33.333%;
+      z-index: 0;
+      border-radius: 12px;
+      background-color: white;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    
+    body.dark-theme .segment-selector,
+    body.auto-theme.dark-mode .segment-selector {
+      background-color: rgba(50, 50, 50, 0.95);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    .ios-segment-control .segment i {
       margin-right: 6px;
+      color: inherit;
       font-size: 13px;
     }
     
-    .segment-slider {
-      position: absolute;
-      top: 2px;
-      left: 2px;
-      bottom: 2px;
-      border-radius: 6px;
-      background-color: white;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-      transition: transform 0.3s ease, width 0.3s ease;
-      z-index: 1;
+    /* iOS表格卡片样式 */
+    .ios-card-table {
+      border-radius: 12px;
+      background-color: var(--card-bg-light);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      margin-bottom: 20px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
     }
     
-    body.dark-theme .segment-slider,
-    body.auto-theme.dark-mode .segment-slider {
-      background-color: rgba(50, 50, 54, 0.9);
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    body.dark-theme .ios-card-table,
+    body.auto-theme.dark-mode .ios-card-table {
+      background-color: var(--card-bg-dark);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+    
+    /* 表格头部样式 */
+    .ios-table-header {
+      padding: 15px;
+      border-bottom: 1px solid rgba(60, 60, 67, 0.1);
+      display: flex;
+      font-weight: 500;
+      color: var(--muted-text-light);
+      font-size: 13px;
+      letter-spacing: -0.08px;
+      transition: border-color 0.3s ease, color 0.3s ease;
+    }
+    
+    body.dark-theme .ios-table-header,
+    body.auto-theme.dark-mode .ios-table-header {
+      border-bottom-color: rgba(84, 84, 88, 0.3);
+      color: var(--muted-text-dark);
+    }
+    
+    .ios-table-header .col-rank {
+      width: 15%;
+      padding-left: 5px;
+    }
+    
+    .ios-table-header .col-user {
+      width: 50%;
+    }
+    
+    .ios-table-header .col-points {
+      width: 35%;
+      text-align: right;
+      padding-right: 15px;
+    }
+    
+    /* 表格内容样式 */
+    .ios-table-row {
+      display: flex;
+      padding: 14px 15px;
+      align-items: center;
+      border-bottom: 1px solid rgba(60, 60, 67, 0.1);
+      transition: background-color 0.2s ease, border-color 0.3s ease;
+      color: var(--text-color-light);
+    }
+    
+    .ios-table-row:last-child {
+      border-bottom: none;
+    }
+    
+    body.dark-theme .ios-table-row,
+    body.auto-theme.dark-mode .ios-table-row {
+      border-bottom-color: rgba(84, 84, 88, 0.3);
+      color: var(--text-color-dark);
+    }
+    
+    .ios-table-row:hover {
+      background-color: rgba(0, 122, 255, 0.05);
+    }
+    
+    body.dark-theme .ios-table-row:hover,
+    body.auto-theme.dark-mode .ios-table-row:hover {
+      background-color: rgba(10, 132, 255, 0.1);
+    }
+    
+    .ios-table-row .col-rank {
+      width: 15%;
+      font-weight: 600;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .ios-table-row .col-user {
+      width: 50%;
+      font-size: 16px;
+      font-weight: 400;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .ios-table-row .col-points {
+      width: 35%;
+      text-align: right;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--ios-blue-light);
+      padding-right: 15px;
+      transition: color 0.3s ease;
+    }
+    
+    body.dark-theme .ios-table-row .col-points,
+    body.auto-theme.dark-mode .ios-table-row .col-points {
+      color: var(--ios-blue-dark);
+    }
+    
+    /* 前三名特殊样式 */
+    .ios-table-row.top-rank {
+      position: relative;
+    }
+    
+    .ios-table-row.top-rank::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      opacity: 0.1;
+      pointer-events: none;
+      z-index: 0;
+      border-radius: 0 0 12px 12px;
+      transition: opacity 0.3s ease;
+    }
+    
+    body.dark-theme .ios-table-row.top-rank::before,
+    body.auto-theme.dark-mode .ios-table-row.top-rank::before {
+      opacity: 0.15;
+    }
+    
+    .ios-table-row.rank-1::before {
+      background: linear-gradient(to right, #FFD700, transparent 80%);
+    }
+    
+    .ios-table-row.rank-2::before {
+      background: linear-gradient(to right, #C0C0C0, transparent 80%);
+    }
+    
+    .ios-table-row.rank-3::before {
+      background: linear-gradient(to right, #CD7F32, transparent 80%);
+    }
+    
+    /* 排名标记 */
+    .rank-medal {
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      margin-right: 10px;
+      font-size: 14px;
+      color: white;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      position: relative;
+    }
+    
+    .rank-medal.gold {
+      background-color: #FFD700;
+      background-image: linear-gradient(135deg, #FFD700, #FFC107);
+    }
+    
+    .rank-medal.silver {
+      background-color: #C0C0C0;
+      background-image: linear-gradient(135deg, #E0E0E0, #9E9E9E);
+    }
+    
+    .rank-medal.bronze {
+      background-color: #CD7F32;
+      background-image: linear-gradient(135deg, #D4A676, #A56C50);
+    }
+    
+    .rank-medal.normal {
+      background-color: #8E8E93;
+      font-size: 12px;
+      width: 24px;
+      height: 24px;
+      margin-right: 12px;
+    }
+    
+    body.dark-theme .rank-medal.normal,
+    body.auto-theme.dark-mode .rank-medal.normal {
+      background-color: #636366;
+      color: white;
+    }
+    
+    /* 当前用户突出显示 */
+    .ios-table-row.current-user {
+      background-color: rgba(0, 122, 255, 0.08);
+      font-weight: 500;
+    }
+    
+    body.dark-theme .ios-table-row.current-user,
+    body.auto-theme.dark-mode .ios-table-row.current-user {
+      background-color: rgba(10, 132, 255, 0.15);
+    }
+    
+    /* 无数据提示 */
+    .ios-empty-state {
+      padding: 40px 20px;
+      text-align: center;
+      color: var(--muted-text-light);
+      font-size: 16px;
+      transition: color 0.3s ease;
+    }
+    
+    body.dark-theme .ios-empty-state,
+    body.auto-theme.dark-mode .ios-empty-state {
+      color: var(--muted-text-dark);
+    }
+    
+    .ios-empty-state i {
+      font-size: 40px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+    
+    /* 加载动画 */
+    .ios-loading {
+      display: none;
+      padding: 30px;
+      text-align: center;
+    }
+    
+    .ios-spinner {
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      border: 2px solid rgba(0, 122, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: var(--ios-blue-light);
+      animation: ios-spin 1s linear infinite;
+    }
+    
+    body.dark-theme .ios-spinner,
+    body.auto-theme.dark-mode .ios-spinner {
+      border-color: rgba(10, 132, 255, 0.3);
+      border-top-color: var(--ios-blue-dark);
+    }
+    
+    @keyframes ios-spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
   </style>
 </head>
@@ -786,20 +1053,18 @@
 <div class="container content-container fade-in-up delay-4">
   <h2 class="ios-section-heading">Carbon Credits Leaderboards</h2>
   
-  <!-- 用全新的结构替换iOS分段控制器 -->
-  <div class="ios-segment-control text-center">
-    <div class="segment-container">
-      <button class="segment-btn active" data-type="all">
-        <i class="fas fa-globe-asia"></i> Global
-      </button>
-      <button class="segment-btn" data-type="local">
-        <i class="fas fa-map-marker-alt"></i> Regional
-      </button>
-      <button class="segment-btn" data-type="school">
-        <i class="fas fa-school"></i> School
-      </button>
-      <div class="segment-slider"></div>
-    </div>
+  <!-- iOS风格分段控制器 -->
+  <div class="ios-segment-control">
+    <button class="segment active" data-type="all">
+      <i class="fas fa-globe-asia"></i>Global
+    </button>
+    <button class="segment" data-type="local">
+      <i class="fas fa-map-marker-alt"></i>Regional
+    </button>
+    <button class="segment" data-type="school">
+      <i class="fas fa-school"></i>School
+    </button>
+    <div class="segment-selector"></div>
   </div>
   
   <!-- iOS风格卡片表格 -->
@@ -807,14 +1072,14 @@
     <!-- 加载动画 -->
     <div class="ios-loading">
       <div class="ios-spinner"></div>
-    </div>
+          </div>
     
     <!-- 排行榜内容区域 -->
     <div id="leaderboard-content">
       <!-- 内容将由JavaScript动态生成 -->
-    </div>
-  </div>
-</div>
+            </div>
+              </div>
+            </div>
 
 <!-- 添加编辑个人资料的模态窗口 -->
 <div class="modal fade" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserModalLabel" aria-hidden="true">
@@ -1167,17 +1432,21 @@
     });
   }
   
-  // 绑定排行榜按钮事件 - 全新实现
+  // 绑定排行榜按钮事件
   function bindRankingButtons() {
-    $('.segment-btn').off('click').on('click', function() {
+    $('.ios-segment-control .segment').off('click');
+    
+    $('.ios-segment-control .segment').on('click', function() {
       const type = $(this).data('type');
       
       // 更新active状态
-      $('.segment-btn').removeClass('active');
+      $('.ios-segment-control .segment').removeClass('active');
       $(this).addClass('active');
       
       // 更新选择器位置
-      updateSegmentSlider();
+      const index = $(this).index();
+      const totalSegments = $('.ios-segment-control .segment').length;
+      updateSelectorPosition($('.segment-selector')[0], index, totalSegments);
       
       // 加载对应排行榜
       if (type === 'local') {
@@ -1187,7 +1456,7 @@
           
           // 恢复到全球排行榜
           setTimeout(function() {
-            $('.segment-btn[data-type="all"]').click();
+            $('.ios-segment-control .segment[data-type="all"]').click();
           }, 300);
           
           return;
@@ -1199,7 +1468,7 @@
           
           // 恢复到全球排行榜
           setTimeout(function() {
-            $('.segment-btn[data-type="all"]').click();
+            $('.ios-segment-control .segment[data-type="all"]').click();
           }, 300);
           
           return;
@@ -1210,39 +1479,15 @@
     });
   }
   
-  // 更新分段滑块位置
-  function updateSegmentSlider() {
-    const activeSegment = document.querySelector('.segment-btn.active');
-    if (!activeSegment) return;
+  // 更新选择器位置
+  function updateSelectorPosition(selector, activeIndex, totalSegments) {
+    if (!selector) return;
     
-    const slider = document.querySelector('.segment-slider');
-    if (!slider) return;
-    
-    // 获取活动段的位置和尺寸
-    const rect = activeSegment.getBoundingClientRect();
-    const container = document.querySelector('.segment-container');
-    const containerRect = container.getBoundingClientRect();
-    
-    // 设置滑块的宽度和位置
-    slider.style.width = rect.width + 'px';
-    slider.style.transform = `translateX(${rect.left - containerRect.left}px)`;
+    const segmentWidth = 100 / totalSegments;
+    const position = segmentWidth * activeIndex;
+    selector.style.transform = `translateX(${position}%)`;
+    selector.style.width = `${segmentWidth}%`;
   }
-  
-  // 初始化分段控制器
-  function initSegmentSelector() {
-    // 延迟执行，确保DOM已加载完成
-    setTimeout(updateSegmentSlider, 0);
-  }
-  
-  $(document).ready(function() {
-    // ... (保留原有代码)
-    
-    // 确保在页面加载后更新滑块位置
-    updateSegmentSlider();
-    
-    // 在窗口大小变化时更新
-    $(window).on('resize', debounce(updateSegmentSlider, 150));
-  });
   
   // 切换排行榜类型
   function switchRanking(type) {
@@ -1495,17 +1740,23 @@
     }, 3000);
   }
 
-  // 防抖函数，避免窗口大小频繁变化时过多计算
-  function debounce(func, wait) {
-    let timeout;
-    return function() {
-      const context = this;
-      const args = arguments;
-      clearTimeout(timeout);
-      timeout = setTimeout(function() {
-        func.apply(context, args);
-      }, wait);
-    };
+  // 初始化选择器位置函数 - 修复错位问题
+  function initSegmentSelector() {
+    // 获取活跃的段落索引
+    const activeSegment = document.querySelector('.ios-segment-control .segment.active');
+    if (!activeSegment) return;
+    
+    const segments = document.querySelectorAll('.ios-segment-control .segment');
+    const activeIndex = Array.from(segments).indexOf(activeSegment);
+    const totalSegments = segments.length;
+    const selector = document.querySelector('.segment-selector');
+    
+    if (selector) {
+      // 确保选择器初始位置正确
+      requestAnimationFrame(() => {
+        updateSelectorPosition(selector, activeIndex, totalSegments);
+      });
+    }
   }
 </script>
 </body>
