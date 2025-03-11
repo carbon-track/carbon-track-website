@@ -1391,6 +1391,158 @@
     body.auto-theme.dark-mode .segment-selector {
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     }
+    
+    /* 添加顶部信息栏样式 */
+    .top-user-info-bar {
+      background-color: #262628; /* 更深的背景色 */
+      color: #FFFFFF;
+      padding: 15px 0;
+      position: relative;
+      margin-bottom: 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    
+    .top-user-info-bar .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .carbon-saved-info {
+      font-size: 1.1rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+    }
+    
+    .carbon-saved-value {
+      color: var(--ios-blue-dark);
+      font-weight: 600;
+      margin-left: 10px;
+      background: rgba(10, 132, 255, 0.15);
+      padding: 5px 12px;
+      border-radius: 10px;
+      display: inline-block;
+      box-shadow: 0 2px 8px rgba(10, 132, 255, 0.2);
+    }
+    
+    .top-actions {
+      display: flex;
+      gap: 15px;
+    }
+    
+    .edit-profile-btn {
+      background: linear-gradient(135deg, var(--ios-blue-dark), var(--ios-indigo));
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(10, 132, 255, 0.2);
+      transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+    }
+    
+    .edit-profile-btn::before {
+      content: '';
+      position: absolute;
+      top: -10px;
+      left: -10px;
+      right: -10px;
+      bottom: -10px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+      transform: rotate(45deg) translateX(-200%);
+      transition: transform 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+    
+    .edit-profile-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(10, 132, 255, 0.25);
+      color: white;
+    }
+    
+    .edit-profile-btn:hover::before {
+      transform: rotate(45deg) translateX(200%);
+    }
+    
+    .reduction-history-btn {
+      background: linear-gradient(135deg, var(--ios-green), var(--ios-mint));
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(52, 199, 89, 0.2);
+      transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+    }
+    
+    .reduction-history-btn::before {
+      content: '';
+      position: absolute;
+      top: -10px;
+      left: -10px;
+      right: -10px;
+      bottom: -10px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+      transform: rotate(45deg) translateX(-200%);
+      transition: transform 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+    
+    .reduction-history-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(52, 199, 89, 0.25);
+      color: white;
+    }
+    
+    .reduction-history-btn:hover::before {
+      transform: rotate(45deg) translateX(200%);
+    }
+    
+    @media (max-width: 768px) {
+      .top-user-info-bar .container {
+        flex-direction: column;
+        gap: 15px;
+      }
+      
+      .top-actions {
+        width: 100%;
+        justify-content: space-between;
+      }
+      
+      .edit-profile-btn, .reduction-history-btn {
+        padding: 8px 15px;
+        font-size: 0.9rem;
+      }
+    }
+    
+    body.light-theme .top-user-info-bar {
+      background-color: #F2F2F7;
+      color: #000000;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+    
+    body.light-theme .carbon-saved-value {
+      color: var(--ios-blue-light);
+      background: rgba(0, 122, 255, 0.1);
+      box-shadow: 0 2px 8px rgba(0, 122, 255, 0.1);
+    }
+    
+    body.light-theme .edit-profile-btn {
+      background: linear-gradient(135deg, var(--ios-blue-light), var(--ios-purple-light));
+    }
+    
+    body.light-theme .reduction-history-btn {
+      background: linear-gradient(135deg, var(--ios-green), var(--ios-mint));
+    }
   </style>
 </head>
 <body class="auto-theme">
@@ -1403,6 +1555,23 @@
 
 <!-- 导航栏容器，将由JavaScript加载 -->
 <div id="navbar-container"></div>
+
+<!-- 添加顶部信息栏 -->
+<div class="top-user-info-bar">
+  <div class="container">
+    <div class="carbon-saved-info">
+      You have saved a total of: <span class="carbon-saved-value" id="topUserReduction">Loading...</span>
+    </div>
+    <div class="top-actions">
+      <button type="button" class="edit-profile-btn" data-toggle="modal" data-target="#editUserModal">
+        <i class="fas fa-user-edit mr-2"></i>Edit My Profile
+      </button>
+      <button type="button" class="reduction-history-btn" id="historyButton">
+        <i class="fas fa-history mr-2"></i>Carbon Reduction History
+      </button>
+    </div>
+  </div>
+</div>
 
 <!-- Main content starts here -->
 <div class="container content-container fade-in-up delay-1">
@@ -1423,21 +1592,16 @@
           <h5 class="info-title">My Carbon Reduction (CO2 in kg)</h5>
           <p class="card-text">You have saved a total of: <span class="info-value" id="userReduction">加载中Loading...</span></p>
           
-          <button type="button" class="btn btn-ios-primary float-right ios-float" data-toggle="modal" data-target="#editUserModal">
-            <i class="fas fa-user-edit mr-2"></i>Edit My Profile
-        </button>
-      </div>
+          <div class="text-right mt-4">
+            <button type="button" class="btn btn-ios-primary ios-float" data-toggle="modal" data-target="#editUserModal">
+              <i class="fas fa-user-edit mr-2"></i>Edit My Profile
+            </button>
           </div>
-          </div>
+        </div>
       </div>
-  <div class="row mt-3 mb-3 fade-in-up delay-3">
-    <div class="col-12 text-right">
-      <button type="button" class="history-btn ios-float" id="navigateButton">
-        <i class="fas fa-history mr-2"></i>Carbon Reduction History
-        </button>
-      </div>
-          </div>
-            </div>
+    </div>
+  </div>
+</div>
 
 <div class="container content-container fade-in-up delay-4">
   <h2 class="ios-section-heading">Carbon Credits Leaderboards</h2>
@@ -1547,7 +1711,7 @@
     });
     
     // 导航到历史页面
-    document.getElementById('navigateButton').addEventListener('click', function () {
+    document.getElementById('historyButton').addEventListener('click', function () {
       window.location.href = 'pthis.html'; // 指定要跳转的页面
     });
     
@@ -1692,6 +1856,7 @@
     var token = localStorage.getItem('token');
     if (!token) {
       $('#userPoints').text('未登录');
+      $('#topUserReduction').text('未登录');
       alert('请先登录！');
       window.location.href = 'index.html';
       return;
@@ -1706,7 +1871,9 @@
         if (response.success) {
           // 更新页面上的用户信息
           $('#userPoints').text(response.userPoints);
-          $('#userReduction').text(response.userPoints / 10);
+          var carbonReduction = response.userPoints / 10;
+          $('#userReduction').text(carbonReduction);
+          $('#topUserReduction').text(carbonReduction);
           $('#userSchool').text(response.school || '未设置');
           $('#userLocation').text(response.location || '未设置');
           
@@ -1717,12 +1884,14 @@
           localStorage.setItem('userState', response.state || '');
         } else {
           $('#userPoints').text('无法加载积分');
+          $('#topUserReduction').text('无法加载');
           console.error('获取积分失败:', response.error);
         }
       },
       error: function (jqXHR, textStatus, errorThrown) {
         console.log('服务器响应内容', jqXHR.responseText);
         $('#userPoints').text('无法加载积分');
+        $('#topUserReduction').text('无法加载');
         showIosAlert('请求用户数据失败，请稍后再试');
       }
     });
