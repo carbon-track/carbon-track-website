@@ -1149,7 +1149,7 @@
     // 初始化排行榜选择器
     bindRankingButtons();
     
-    // 初始化选择器位置 - 添加这一行修复错位问题
+    // 初始化选择器位置 - 修复选择器错位问题
     initSegmentSelector();
     
     // 加载全球排行榜
@@ -1746,6 +1746,7 @@
     const segments = document.querySelectorAll('.ios-segment-control .segment');
     const activeIndex = Array.from(segments).indexOf(activeSegment);
     const totalSegments = segments.length;
+    
     const selector = document.querySelector('.segment-selector');
     
     if (selector) {
