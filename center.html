@@ -676,47 +676,42 @@
     /* iOS标准分段控制器样式修复 */
     .ios-segment-control {
       display: flex;
-      background-color: rgba(120, 120, 128, 0.08);
-      border-radius: 12px;
-      padding: 3px;
-      margin-bottom: 24px;
+      background-color: rgba(120, 120, 128, 0.12);
+      border-radius: 8px;
+      padding: 2px;
+      margin-bottom: 20px;
       max-width: 550px;
       margin-left: auto;
       margin-right: auto;
       position: relative;
       overflow: hidden;
-      transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      transition: background-color 0.3s ease;
     }
     
     body.dark-theme .ios-segment-control,
     body.auto-theme.dark-mode .ios-segment-control {
-      background-color: rgba(120, 120, 128, 0.24);
+      background-color: rgba(120, 120, 128, 0.32);
     }
     
     .ios-segment-control .segment {
       flex: 1;
       text-align: center;
-      padding: 10px 16px;
-      font-size: 15px;
+      padding: 8px 16px;
+      font-size: 14px;
       font-weight: 500;
       color: var(--text-color-light);
       border: none;
       background: transparent;
       position: relative;
       z-index: 1;
-      transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+      transition: color 0.3s ease;
       outline: none;
       cursor: pointer;
-      overflow: hidden;
     }
     
-    .ios-segment-control .segment i {
-      margin-right: 8px;
-      font-size: 14px;
-      position: relative;
-      top: -1px;
+    body.dark-theme .ios-segment-control .segment,
+    body.auto-theme.dark-mode .ios-segment-control .segment {
+      color: var(--text-color-dark);
     }
     
     .ios-segment-control .segment.active {
@@ -731,21 +726,27 @@
     /* 分段控制器选择器修复 */
     .segment-selector {
       position: absolute;
-      height: calc(100% - 6px);
-      top: 3px;
-      left: 0;
-      width: 33.333%;
+      height: calc(100% - 4px);
+      top: 2px;
+      left: 0; /* 添加左侧基准位置 */
+      width: 33.333%; /* 默认宽度，会被JS覆盖 */
       z-index: 0;
-      border-radius: 10px;
+      border-radius: 6px;
       background-color: white;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), width 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+      transition: transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
     }
     
     body.dark-theme .segment-selector,
     body.auto-theme.dark-mode .segment-selector {
-      background-color: rgba(44, 44, 46, 0.95);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+      background-color: rgba(30, 30, 30, 0.8);
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+    }
+    
+    .ios-segment-control .segment i {
+      margin-right: 6px;
+      color: inherit;
+      font-size: 13px;
     }
     
     /* iOS表格卡片样式 */
@@ -1715,7 +1716,7 @@
     
     // 为深色模式调整样式
     if (document.body.classList.contains('dark-theme') || 
-        (document.body.classList.contains('auto-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches))) {
+        (document.body.classList.contains('auto-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
       alertDiv.css('background-color', 'rgba(70, 70, 77, 0.8)');
     }
     
@@ -1745,7 +1746,6 @@
     const segments = document.querySelectorAll('.ios-segment-control .segment');
     const activeIndex = Array.from(segments).indexOf(activeSegment);
     const totalSegments = segments.length;
-
     const selector = document.querySelector('.segment-selector');
     
     if (selector) {
