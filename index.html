@@ -2295,11 +2295,10 @@
     body.auto-theme.dark-mode #navbar-container,
     body.auto-theme.dark-mode #navbar-container * {
       /* 保持navbar原样，重置可能的黑暗模式影响 */
-      background-color: initial !important;
-      color: initial !important;
-      border-color: initial !important;
-      text-shadow: initial !important;
-      box-shadow: initial !important;
+      background-color: unset !important;
+      border-color: unset !important;
+      text-shadow: unset !important;
+      box-shadow: unset !important;
     }
     
     /* 2. 确保导航栏的JavaScript不会受到影响 */
@@ -2315,12 +2314,15 @@
     }
     
     body.auto-theme.dark-mode #navbar-container .navbar-brand,
-    body.auto-theme.dark-mode #navbar-container .nav-link {
-      color: rgba(255, 255, 255, 0.8) !important;
+    body.auto-theme.dark-mode #navbar-container .nav-link,
+    body.auto-theme.dark-mode #navbar-container .navbar-text,
+    body.auto-theme.dark-mode #navbar-container span,
+    body.auto-theme.dark-mode #navbar-container a {
+      color: rgba(255, 255, 255, 0.9) !important;
     }
     
     body.auto-theme.dark-mode #navbar-container .nav-link:hover,
-    body.auto-theme.dark-mode #navbar-container .nav-link.active {
+    body.auto-theme.dark-mode #navbar-container a:hover {
       color: white !important;
     }
     
@@ -2347,6 +2349,80 @@
     body.auto-theme.dark-mode #navbar-container .fas,
     body.auto-theme.dark-mode #navbar-container .fa-envelope {
       color: rgba(255, 255, 255, 0.5) !important;
+    }
+    
+    /* 幻灯片文字背景在黑暗模式下的样式 */
+    body.auto-theme.dark-mode .carousel-caption {
+      background-color: rgba(0, 0, 0, 0.7) !important;
+      color: white !important;
+      border-radius: 10px;
+      padding: 20px;
+      backdrop-filter: blur(5px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    /* 同时优化浅色模式下的幻灯片标题样式 */
+    .carousel-caption {
+      background-color: rgba(255, 255, 255, 0.8);
+      border-radius: 10px;
+      padding: 20px;
+      backdrop-filter: blur(5px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      max-width: 600px;
+      margin: 0 auto;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    body.auto-theme.dark-mode .carousel-caption h2 {
+      color: white !important;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+    
+    body.auto-theme.dark-mode .carousel-caption p {
+      color: rgba(255, 255, 255, 0.9) !important;
+      font-size: 18px;
+      line-height: 1.5;
+    }
+    
+    /* 导航栏按钮和特殊元素样式 */
+    body.auto-theme.dark-mode #navbar-container .btn {
+      /* 恢复按钮样式 */
+      background-color: unset;
+      border-color: unset;
+    }
+    
+    body.auto-theme.dark-mode #navbar-container .btn-danger,
+    body.auto-theme.dark-mode #navbar-container #logoutButton {
+      background-color: #dc3545 !important;
+      border-color: #dc3545 !important;
+      color: white !important;
+    }
+    
+    /* 消息通知徽章 */
+    body.auto-theme.dark-mode #navbar-container .badge-danger {
+      background-color: #dc3545 !important;
+      color: white !important;
+    }
+    
+    /* 导航栏下拉菜单 */
+    body.auto-theme.dark-mode #navbar-container .dropdown-menu {
+      background-color: #002A5C !important;
+      border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+    
+    body.auto-theme.dark-mode #navbar-container .dropdown-item {
+      color: rgba(255, 255, 255, 0.9) !important;
+    }
+    
+    body.auto-theme.dark-mode #navbar-container .dropdown-item:hover,
+    body.auto-theme.dark-mode #navbar-container .dropdown-item:focus {
+      background-color: rgba(255, 255, 255, 0.1) !important;
+      color: white !important;
     }
   </style>
 </head>
