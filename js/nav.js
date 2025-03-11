@@ -249,7 +249,17 @@ $('#sendMessage').on('click', function() {
         logout();
     });
   
-    $("#footer-placeholder").load("footer.html");
+    // 加载footer
+    $("#footer-placeholder").load("footer.html", function() {
+      // footer加载完成后，应用当前主题
+      const body = document.body;
+      if (body.classList.contains('dark-theme') || 
+          (body.classList.contains('auto-theme') && 
+           window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        // 如果是暗色主题，确保footer也适用暗色模式样式
+        $('#footer-placeholder .footer').addClass('footer-dark');
+      }
+    });
     
     // 将消息图标添加class便于操作
     $('.fa-envelope').addClass('msg-icon');

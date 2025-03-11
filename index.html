@@ -2254,6 +2254,37 @@
       box-shadow: 0 14px 30px rgba(0, 0, 0, 0.6);
       transition: all 0.3s ease;
     }
+    
+    /* 修复footer在深色模式下的样式 */
+    
+    /* 确保footer容器在深色模式下有正确的背景色 */
+    body.auto-theme.dark-mode #footer-placeholder,
+    body.auto-theme.dark-mode #footer-placeholder > .footer {
+      background-color: #1C1C1E;
+      color: #98989D;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    /* 确保footer内的所有元素在深色模式下有正确的颜色 */
+    body.auto-theme.dark-mode #footer-placeholder p,
+    body.auto-theme.dark-mode #footer-placeholder a:not(:hover) {
+      color: #98989D;
+    }
+    
+    /* 确保悬停状态的链接是主题蓝色 */
+    body.auto-theme.dark-mode #footer-placeholder a:hover {
+      color: var(--ios-blue);
+    }
+    
+    /* 添加过渡效果，确保主题切换平滑 */
+    #footer-placeholder {
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    
+    /* 确保footer加载完成前，占位符不显示为黑块 */
+    #footer-placeholder:empty {
+      display: none;
+    }
   </style>
 </head>
 <body class="auto-theme">

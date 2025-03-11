@@ -1,9 +1,70 @@
 <div class="footer">
-  <div class="container">
+  <div class="container py-4">
     <div class="row">
-      <div class="col-md-12">
-        <p>© 2025 CarbonTrack碳账户. All rights reserved.</p>
+      <div class="col-md-6">
+        <p class="mb-2">© 2025 CarbonTrack碳账户. All rights reserved.</p>
+      </div>
+      <div class="col-md-6 text-md-right">
+        <ul class="list-inline mb-0">
+          <li class="list-inline-item"><a href="#" class="footer-link">Privacy Policy</a></li>
+          <li class="list-inline-item"><a href="#" class="footer-link">Terms of Service</a></li>
+          <li class="list-inline-item"><a href="#" class="footer-link">Contact Us</a></li>
+        </ul>
       </div>
     </div>
   </div>
 </div>
+
+<style>
+  .footer {
+    background-color: #F2F2F7; /* iOS 灰色背景 - 浅色模式 */
+    color: #8E8E93; /* iOS 辅助灰色文本 - 浅色模式 */
+    padding: 20px 0;
+    font-size: 14px;
+    margin-top: 40px;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  }
+  
+  /* 黑夜模式适配 */
+  body.dark-theme .footer,
+  body.auto-theme.dark-mode .footer {
+    background-color: #1C1C1E; /* iOS 深色背景 - 暗色模式 */
+    color: #98989D; /* iOS 辅助灰色文本 - 暗色模式 */
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .footer-link {
+    color: #636366; /* iOS 文本颜色 - 浅色模式 */
+    transition: color 0.3s ease;
+    text-decoration: none;
+    margin-left: 15px;
+  }
+  
+  body.dark-theme .footer-link,
+  body.auto-theme.dark-mode .footer-link {
+    color: #AEAEB2; /* iOS 文本颜色 - 暗色模式 */
+  }
+  
+  .footer-link:hover {
+    color: #007AFF; /* iOS 蓝色 - 浅色模式 */
+    text-decoration: none;
+  }
+  
+  body.dark-theme .footer-link:hover,
+  body.auto-theme.dark-mode .footer-link:hover {
+    color: #0A84FF; /* iOS 蓝色 - 暗色模式 */
+  }
+  
+  @media (max-width: 767px) {
+    .footer .text-md-right {
+      text-align: left !important;
+      margin-top: 15px;
+    }
+    
+    .footer-link {
+      margin-left: 0;
+      margin-right: 15px;
+    }
+  }
+</style>
