@@ -435,6 +435,250 @@
       background-color: rgba(255, 255, 255, 0.1);
       color: var(--muted-text-dark);
     }
+
+    /* 文件上传拖拽区样式 */
+    .file-drop-area {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+      border: 2px dashed var(--border-color-light);
+      border-radius: 16px;
+      background: rgba(242, 242, 247, 0.5);
+      transition: all 0.3s ease;
+      cursor: pointer;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    
+    body.dark-theme .file-drop-area,
+    body.auto-theme.dark-mode .file-drop-area {
+      border-color: var(--border-color-dark);
+      background: rgba(44, 44, 46, 0.5);
+    }
+    
+    .file-drop-area.is-active {
+      border-color: var(--ios-green);
+      background: rgba(52, 199, 89, 0.1);
+    }
+    
+    body.dark-theme .file-drop-area.is-active,
+    body.auto-theme.dark-mode .file-drop-area.is-active {
+      border-color: #30D158;
+      background: rgba(48, 209, 88, 0.15);
+    }
+    
+    .file-upload-icon {
+      font-size: 36px;
+      color: var(--ios-green);
+      margin-bottom: 12px;
+      transition: all 0.3s ease;
+    }
+    
+    body.dark-theme .file-upload-icon,
+    body.auto-theme.dark-mode .file-upload-icon {
+      color: #30D158;
+    }
+    
+    .file-message {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text-color-light);
+      transition: color 0.3s ease;
+    }
+    
+    body.dark-theme .file-message,
+    body.auto-theme.dark-mode .file-message {
+      color: var(--text-color-dark);
+    }
+    
+    .file-input {
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 100%;
+      cursor: pointer;
+      opacity: 0;
+    }
+    
+    .file-input:focus + .file-message {
+      text-decoration: underline;
+    }
+    
+    .file-drop-info {
+      font-size: 14px;
+      color: var(--muted-text-light);
+      margin-top: 8px;
+      transition: color 0.3s ease;
+    }
+    
+    body.dark-theme .file-drop-info,
+    body.auto-theme.dark-mode .file-drop-info {
+      color: var(--muted-text-dark);
+    }
+    
+    /* 图片预览容器 */
+    .image-preview-container {
+      position: relative;
+      margin-top: 16px;
+      width: 100%;
+      max-width: 300px;
+      margin: 16px auto 0;
+      display: none;
+    }
+    
+    .image-preview-container img {
+      width: 100%;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    }
+    
+    body.dark-theme .image-preview-container img,
+    body.auto-theme.dark-mode .image-preview-container img {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    
+    .remove-image-btn {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: rgba(255, 59, 48, 0.9);
+      border: 2px solid white;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 14px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      transition: all 0.2s ease;
+    }
+    
+    .remove-image-btn:hover {
+      transform: scale(1.1);
+      background: rgba(255, 59, 48, 1);
+    }
+    
+    body.dark-theme .remove-image-btn,
+    body.auto-theme.dark-mode .remove-image-btn {
+      border-color: var(--card-bg-dark);
+    }
+    
+    .file-name {
+      font-size: 14px;
+      color: var(--ios-green);
+      text-align: center;
+      margin-top: 8px;
+      font-weight: 500;
+      word-break: break-all;
+      display: none;
+    }
+    
+    body.dark-theme .file-name,
+    body.auto-theme.dark-mode .file-name {
+      color: #30D158;
+    }
+    
+    /* 计算器卡片增强样式 */
+    .calculator-card {
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      transition: transform 0.4s ease, box-shadow 0.4s ease, background-color 0.3s ease;
+      margin-bottom: 30px;
+    }
+    
+    .calculator-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+    }
+    
+    body.dark-theme .calculator-card:hover,
+    body.auto-theme.dark-mode .calculator-card:hover {
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+    }
+    
+    .calculator-header {
+      background: linear-gradient(135deg, var(--ios-green), var(--ios-mint));
+      color: white;
+      padding: 24px 28px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .calculator-header h2 {
+      font-weight: 700;
+      margin: 0;
+      position: relative;
+      z-index: 1;
+    }
+    
+    /* 头部光晕效果 */
+    .calculator-header:after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent 80%);
+      pointer-events: none;
+    }
+    
+    .calculator-body {
+      padding: 28px;
+      background-color: var(--card-bg-light);
+      transition: background-color 0.3s ease;
+    }
+    
+    body.dark-theme .calculator-body,
+    body.auto-theme.dark-mode .calculator-body {
+      background-color: var(--card-bg-dark);
+    }
+    
+    /* 进度条美化 */
+    .progress {
+      height: 8px;
+      border-radius: 4px;
+      background-color: rgba(52, 199, 89, 0.1);
+      margin: 10px 0;
+      overflow: hidden;
+    }
+    
+    body.dark-theme .progress,
+    body.auto-theme.dark-mode .progress {
+      background-color: rgba(48, 209, 88, 0.15);
+    }
+    
+    .progress-bar {
+      background: linear-gradient(to right, var(--ios-green), var(--ios-mint));
+      border-radius: 4px;
+      transition: width 0.3s ease;
+    }
+    
+    body.dark-theme .progress-bar,
+    body.auto-theme.dark-mode .progress-bar {
+      background: linear-gradient(to right, #30D158, #64D2FF);
+    }
+
+    /* 拖拽动画 */
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.03); }
+      100% { transform: scale(1); }
+    }
+    
+    .file-drop-area.is-active {
+      animation: pulse 1.2s infinite ease-in-out;
+    }
   </style>
   <script>
     $(document).ready(function () {
@@ -553,17 +797,95 @@
       // 获取用户积分
       getUserPoints();
       
-      // 图片预览功能
-      $('#imageUpload').change(function() {
-        var file = this.files[0];
-        if (file) {
+      // 拖拽上传文件功能
+      initDragAndDropUpload();
+      
+      function initDragAndDropUpload() {
+        var dropArea = $('.file-drop-area');
+        var fileInput = $('#imageUpload');
+        var fileNameDisplay = $('.file-name');
+        var previewContainer = $('.image-preview-container');
+        var previewImage = $('#imagePreview');
+        
+        // 防止浏览器默认行为
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+          dropArea[0].addEventListener(eventName, preventDefaults, false);
+        });
+        
+        function preventDefaults(e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        
+        // 高亮拖拽区域
+        ['dragenter', 'dragover'].forEach(eventName => {
+          dropArea[0].addEventListener(eventName, highlight, false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+          dropArea[0].addEventListener(eventName, unhighlight, false);
+        });
+        
+        function highlight() {
+          dropArea.addClass('is-active');
+        }
+        
+        function unhighlight() {
+          dropArea.removeClass('is-active');
+        }
+        
+        // 处理拖放文件
+        dropArea[0].addEventListener('drop', handleDrop, false);
+        
+        function handleDrop(e) {
+          const dt = e.dataTransfer;
+          const files = dt.files;
+          if (files.length) {
+            fileInput[0].files = files;
+            updateFileInfo(files[0]);
+          }
+        }
+        
+        // 点击选择文件时也更新显示
+        fileInput.on('change', function() {
+          if (this.files.length) {
+            updateFileInfo(this.files[0]);
+          }
+        });
+        
+        // 更新文件信息和预览
+        function updateFileInfo(file) {
+          // 只接受图片文件
+          if (!file.type.match('image.*')) {
+            showAlert('Please select an image file', 'warning');
+            return;
+          }
+          
+          // 显示文件名
+          fileNameDisplay.text(file.name).show();
+          
+          // 预览图片
           var reader = new FileReader();
           reader.onload = function(e) {
-            $('#imagePreview').attr('src', e.target.result).show();
+            previewImage.attr('src', e.target.result);
+            previewContainer.show();
+            
+            // 隐藏初始上传图标和文本
+            $('.file-upload-icon, .file-message').hide();
+            $('.file-drop-info').text('To change the image, click or drop a new file');
           }
           reader.readAsDataURL(file);
         }
-      });
+        
+        // 移除图片按钮
+        $('.remove-image-btn').on('click', function() {
+          fileInput.val('');
+          previewContainer.hide();
+          fileNameDisplay.hide();
+          $('.file-upload-icon, .file-message').show();
+          $('.file-drop-info').text('Supports: JPG, PNG, GIF (Max 5MB)');
+        });
+      }
       
       // 默认隐藏进度条
       $('.progress').hide();
@@ -867,13 +1189,24 @@
           </div>
           <div class="form-group">
               <label for="imageUpload">Upload Photo Evidence</label>
-              <input type="file" class="form-control-file" id="imageUpload" name="image" accept="image/*" required>
-              <small class="form-text text-muted">Please upload a photo as evidence of your activity (max 5MB).</small>
+              <div class="file-drop-area">
+                <input type="file" class="file-input" id="imageUpload" name="image" accept="image/*" required>
+                <div class="file-upload-icon">
+                  <i class="fas fa-cloud-upload-alt"></i>
+                </div>
+                <div class="file-message">Drag and drop or click to upload</div>
+                <div class="file-drop-info">Supports: JPG, PNG, GIF (Max 5MB)</div>
+                
+                <div class="image-preview-container">
+                  <img id="imagePreview" src="" alt="Image Preview">
+                  <div class="remove-image-btn">
+                    <i class="fas fa-times"></i>
+                  </div>
+                </div>
+                <div class="file-name"></div>
+              </div>
               <div class="progress">
                 <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-              </div>
-              <div class="mt-2">
-                <img id="imagePreview" src="" alt="Image Preview" style="max-width:100%; max-height:200px; display:none;">
               </div>
             </div>
             <div class="form-group">
