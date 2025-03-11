@@ -2285,6 +2285,78 @@
     #footer-placeholder:empty {
       display: none;
     }
+    
+    /* 保留原始导航栏样式，不受黑夜模式影响 */
+    body.auto-theme.dark-mode #navbar-container,
+    body.auto-theme.dark-mode .original-navbar,
+    body.auto-theme.dark-mode .original-navbar .navbar-brand,
+    body.auto-theme.dark-mode .original-navbar .navbar-nav,
+    body.auto-theme.dark-mode .navbar-light {
+      /* 这里我们重置黑夜模式对导航栏产生的影响 */
+      background-color: var(--navbar-original-bg, #002A5C) !important; /* 使用原始导航栏的背景色 */
+      color: var(--navbar-original-text, white) !important;
+      border-color: var(--navbar-original-border, transparent) !important;
+    }
+    
+    /* 保持导航链接颜色不变 */
+    body.auto-theme.dark-mode .original-navbar .navbar-nav .nav-link,
+    body.auto-theme.dark-mode .original-navbar .navbar-brand {
+      color: rgba(255, 255, 255, 0.9) !important;
+    }
+    
+    body.auto-theme.dark-mode .original-navbar .navbar-nav .nav-link:hover {
+      color: white !important;
+    }
+    
+    /* 保留导航栏下拉菜单的原始样式 */
+    body.auto-theme.dark-mode .original-navbar .dropdown-menu {
+      background-color: white !important;
+      color: #212529 !important;
+      border: 1px solid rgba(0, 0, 0, 0.15) !important;
+    }
+    
+    body.auto-theme.dark-mode .original-navbar .dropdown-item {
+      color: #212529 !important;
+    }
+    
+    body.auto-theme.dark-mode .original-navbar .dropdown-item:hover,
+    body.auto-theme.dark-mode .original-navbar .dropdown-item:focus {
+      background-color: #f8f9fa !important;
+      color: #16181b !important;
+    }
+    
+    /* 添加原始导航栏样式 */
+    .original-navbar {
+      background-color: #002A5C !important;
+    }
+    
+    /* 确保在黑暗模式下保持原始导航栏样式 */
+    body.auto-theme.dark-mode .original-navbar {
+      background-color: #002A5C !important;
+    }
+    
+    /* 确保导航栏图标和按钮在黑暗模式下保持正确的样式 */
+    body.auto-theme.dark-mode .original-navbar .navbar-toggler-icon {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 0.8)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+    }
+    
+    body.auto-theme.dark-mode .original-navbar .btn-ios-primary {
+      background-color: #007AFF !important;
+      color: white !important;
+      border-color: #007AFF !important;
+    }
+    
+    body.auto-theme.dark-mode .original-navbar .btn-ios-secondary {
+      background-color: transparent !important;
+      color: #007AFF !important;
+      border-color: #007AFF !important;
+    }
+    
+    body.auto-theme.dark-mode .original-navbar .btn-outline-danger {
+      background-color: transparent !important;
+      color: #FF3B30 !important;
+      border-color: #FF3B30 !important;
+    }
   </style>
 </head>
 <body class="auto-theme">

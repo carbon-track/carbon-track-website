@@ -1173,7 +1173,7 @@ function refreshMessages(receiverId) {
 function loadNavbar() {
     // 创建导航栏内容
     const navbarContent = `
-    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #002A5C;">
+    <nav class="navbar navbar-expand-lg navbar-dark original-navbar">
         <div class="container">
             <a class="navbar-brand" href="index.html">
                 <img src="img/team.jpg" width="36" height="36" class="d-inline-block align-top rounded-circle" alt="Logo">
