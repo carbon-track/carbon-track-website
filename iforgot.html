@@ -578,10 +578,6 @@
     </div>
     <div class="step" id="step2">
       <div class="step-number">2</div>
-      <div class="step-label">Enter Code</div>
-    </div>
-    <div class="step" id="step3">
-      <div class="step-number">3</div>
       <div class="step-label">Reset Password</div>
     </div>
   </div>
@@ -600,11 +596,13 @@
       </div>
     </div>
     
-    <!-- Step 2: Enter Verification Code -->
+    <!-- Step 2: Enter Verification Code and Reset Password (Combined) -->
     <div class="form-step" id="step2-content">
-      <h3 class="mb-4">Enter Verification Code</h3>
-      <p class="mb-4">We've sent a 6-digit verification code to your email. Please enter it below.</p>
+      <h3 class="mb-4">Reset Your Password</h3>
+      <p class="mb-4">We've sent a 6-digit verification code to your email. Please enter it below along with your new password.</p>
+      
       <div class="form-group">
+        <label>Verification Code</label>
         <div class="verification-code">
           <input type="text" class="form-control digit" id="digit1" maxlength="1" inputmode="numeric" pattern="[0-9]*" autofocus>
           <input type="text" class="form-control digit" id="digit2" maxlength="1" inputmode="numeric" pattern="[0-9]*">
@@ -614,17 +612,8 @@
           <input type="text" class="form-control digit" id="digit6" maxlength="1" inputmode="numeric" pattern="[0-9]*">
         </div>
       </div>
-      <div class="cf-turnstile" id="turnstile-step2" data-sitekey="0x4AAAAAAA0wcgSIUML5Ocs3"></div>
-      <div class="d-flex justify-content-between mt-4">
-        <button type="button" class="btn btn-link" id="backToStep1">Back</button>
-        <button type="button" class="btn btn-primary btn-verify" id="nextToStep3">Verify Code</button>
-      </div>
-    </div>
-    
-    <!-- Step 3: Reset Password -->
-    <div class="form-step" id="step3-content">
-      <h3 class="mb-4">Reset Your Password</h3>
-      <div class="form-group">
+      
+      <div class="form-group mt-4">
         <label for="newPassword">New Password</label>
         <input type="password" class="form-control" id="newPassword" placeholder="Enter new password">
       </div>
@@ -632,9 +621,10 @@
         <label for="confirmPassword">Confirm Password</label>
         <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm new password">
       </div>
-      <div class="cf-turnstile" id="turnstile-step3" data-sitekey="0x4AAAAAAA0wcgSIUML5Ocs3"></div>
+      
+      <div class="cf-turnstile" id="turnstile-step2" data-sitekey="0x4AAAAAAA0wcgSIUML5Ocs3"></div>
       <div class="d-flex justify-content-between mt-4">
-        <button type="button" class="btn btn-link" id="backToStep2">Back</button>
+        <button type="button" class="btn btn-link" id="backToStep1">Back</button>
         <button type="button" class="btn btn-primary btn-verify" id="resetPassword">Reset Password</button>
       </div>
     </div>
@@ -663,14 +653,48 @@
     // Turnstile widget IDs and tokens
     let turnstileWidgets = {
       step1: null,
-      step2: null, 
-      step3: null
+      step2: null
     };
     
     // Function to reset Turnstile widget
     function resetTurnstile() {
       if (window.turnstile) {
         turnstile.reset();
+      }
+    }
+
+    // Function to safely get Turnstile token
+    function getTurnstileToken(stepId) {
+      const tokenElement = document.querySelector(`#turnstile-${stepId} [name="cf-turnstile-response"]`);
+      if (tokenElement) {
+        return tokenElement.value;
+      }
+      return null;
+    }
+    
+    // Function to render Turnstile widgets
+    function renderTurnstile(step) {
+      // Wait for Turnstile to be available
+      if (window.turnstile) {
+        // Reset existing widgets if any
+        turnstile.reset();
+        
+        // Only render the widget for the current step
+        const widgetId = `turnstile-step${step}`;
+        const container = document.getElementById(widgetId);
+        
+        if (container) {
+          // Clear any existing content
+          container.innerHTML = '';
+          
+          // Render new widget
+          turnstileWidgets[`step${step}`] = turnstile.render(`#${widgetId}`, {
+            sitekey: '0x4AAAAAAA0wcgSIUML5Ocs3',
+            theme: (body.classList.contains('dark-theme') || 
+                   (body.classList.contains('auto-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) 
+                  ? 'dark' : 'light'
+          });
+        }
       }
     }
     
@@ -718,7 +742,7 @@
       }
       
       // Get Cloudflare token
-      const cfToken = document.querySelector('#turnstile-step1 [name="cf-turnstile-response"]').value;
+      const cfToken = getTurnstileToken('step1');
       if (!cfToken) {
         showAlert('Please complete the anti-bot verification', 'warning');
         return;
@@ -759,59 +783,6 @@
       goToStep(1);
     });
     
-    document.getElementById('nextToStep3').addEventListener('click', function() {
-      // Verify the code
-      const digit1 = document.getElementById('digit1').value;
-      const digit2 = document.getElementById('digit2').value;
-      const digit3 = document.getElementById('digit3').value;
-      const digit4 = document.getElementById('digit4').value;
-      const digit5 = document.getElementById('digit5').value;
-      const digit6 = document.getElementById('digit6').value;
-      const code = digit1 + digit2 + digit3 + digit4 + digit5 + digit6;
-      
-      if (code.length !== 6) {
-        showAlert('Please enter all six digits of the verification code', 'warning');
-        return;
-      }
-      
-      // Get Cloudflare token
-      const cfToken = document.querySelector('#turnstile-step2 [name="cf-turnstile-response"]').value;
-      if (!cfToken) {
-        showAlert('Please complete the anti-bot verification', 'warning');
-        return;
-      }
-      
-      const email = document.getElementById('email').value;
-      
-      $.ajax({
-        type: 'POST',
-        url: 'recovery.php',
-        data: { email: email, verificationCode: code, cf_token: cfToken },
-        dataType: 'json',
-        success: function(response) {
-          if (response.success) {
-            goToStep(3);
-          } else {
-            showAlert(response.message || response.error || 'Invalid verification code', 'error');
-            resetTurnstile();
-          }
-        },
-        error: function(xhr) {
-          let errorMessage = 'Error connecting to server. Please try again.';
-          try {
-            const response = JSON.parse(xhr.responseText);
-            errorMessage = response.message || response.error || errorMessage;
-          } catch(e) {}
-          showAlert(errorMessage, 'error');
-          resetTurnstile();
-        }
-      });
-    });
-    
-    document.getElementById('backToStep2').addEventListener('click', function() {
-      goToStep(2);
-    });
-    
     document.getElementById('resetPassword').addEventListener('click', function() {
       const newPassword = document.getElementById('newPassword').value;
       const confirmPassword = document.getElementById('confirmPassword').value;
@@ -826,7 +797,6 @@
         return;
       }
       
-      const email = document.getElementById('email').value;
       const digit1 = document.getElementById('digit1').value;
       const digit2 = document.getElementById('digit2').value;
       const digit3 = document.getElementById('digit3').value;
@@ -835,8 +805,15 @@
       const digit6 = document.getElementById('digit6').value;
       const code = digit1 + digit2 + digit3 + digit4 + digit5 + digit6;
       
+      if (code.length !== 6) {
+        showAlert('Please enter all six digits of the verification code', 'warning');
+        return;
+      }
+      
+      const email = document.getElementById('email').value;
+      
       // Get Cloudflare token
-      const cfToken = document.querySelector('#turnstile-step3 [name="cf-turnstile-response"]').value;
+      const cfToken = getTurnstileToken('step2');
       if (!cfToken) {
         showAlert('Please complete the anti-bot verification', 'warning');
         return;
@@ -937,13 +914,16 @@
         }
       });
       
-      // Reset Turnstile for the appropriate step
-      if (window.turnstile) {
-        setTimeout(function() {
-          resetTurnstile();
-        }, 300);
-      }
+      // Render Turnstile for the current step
+      setTimeout(function() {
+        renderTurnstile(step);
+      }, 300);
     }
+    
+    // Initialize Turnstile for the first step when the page loads
+    setTimeout(function() {
+      renderTurnstile(1);
+    }, 1000);
   });
 </script>
 </body>
