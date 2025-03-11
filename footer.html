@@ -1,9 +1,45 @@
 <div class="footer">
   <div class="container">
     <div class="row">
-      <div class="col-md-12">
+      <div class="col-md-12 text-center">
         <p>© 2025 CarbonTrack碳账户. All rights reserved.</p>
       </div>
     </div>
   </div>
 </div>
+
+<style>
+  .footer {
+    background-color: var(--ios-secondary-background, #F2F2F7);
+    padding: 24px 0;
+    border-top: 1px solid var(--border-color, rgba(0, 0, 0, 0.1));
+    color: var(--text-color, #000000);
+    font-size: 14px;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    margin-top: 60px;
+  }
+  
+  .footer p {
+    margin-bottom: 0;
+    color: var(--text-muted-color, #8E8E93);
+  }
+  
+  /* Dark mode styles */
+  body.auto-theme.dark-mode .footer {
+    background-color: var(--ios-tertiary-background, #2C2C2E);
+    border-top: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  }
+  
+  body.auto-theme.dark-mode .footer p {
+    color: var(--text-tertiary-color, #EBEBF599);
+  }
+  
+  /* Add subtle footer animation on hover */
+  .footer p {
+    transition: opacity 0.3s var(--animation-timing-apple, cubic-bezier(0.25, 0.1, 0.25, 1));
+  }
+  
+  .footer:hover p {
+    opacity: 1;
+  }
+</style>

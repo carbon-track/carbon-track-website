@@ -1714,18 +1714,6 @@
     body.auto-theme.dark-mode .announcements-section {
       background-color: #2C2C2E !important;
     }
-
-    /* 修复feature-section在深色模式下的背景问题 */
-    body.auto-theme.dark-mode .feature-section {
-      background: #000000 !important;
-      color: #FFFFFF !important;
-    }
-    
-    /* 确保feature-section中的渐变伪元素也被覆盖 */
-    body.auto-theme.dark-mode .feature-section::before,
-    body.auto-theme.dark-mode .feature-section::after {
-      background: radial-gradient(circle, rgba(50, 50, 55, 0.2) 0%, rgba(30, 30, 35, 0) 70%) !important;
-    }
     
     /* 卡片标题和强调文本 */
     body.auto-theme.dark-mode .card-title,
@@ -2063,26 +2051,6 @@
       background-color: #2C2C2E !important;
       color: #FFFFFF !important;
       border-color: rgba(255, 255, 255, 0.1) !important;
-    }
-
-    /* 特别修复底部区域 */
-    body.auto-theme.dark-mode .section,
-    body.auto-theme.dark-mode footer,
-    body.auto-theme.dark-mode #footer-placeholder {
-      background-color: #000000 !important;
-    }
-
-    /* 修复section-reveal效果在深色模式下的问题 */
-    body.auto-theme.dark-mode .section-reveal::before {
-      background-color: #000000 !important;
-    }
-
-    /* 修复section-heading在深色模式下的问题 */
-    body.auto-theme.dark-mode .section-heading {
-      color: #FFFFFF !important;
-      background: linear-gradient(120deg, #0A84FF, #5E5CE6);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
     }
   </style>
 </head>
