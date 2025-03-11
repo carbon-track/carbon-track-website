@@ -2581,6 +2581,124 @@
       border-radius: 50%;
       padding: 12px;
     }
+    
+    /* 深色模式下的section-reveal和feature-section样式 */
+    body.auto-theme.dark-mode .section-reveal::before {
+      background-color: var(--ios-system-background); /* 使用深色模式变量 */
+    }
+    
+    body.auto-theme.dark-mode .feature-section {
+      background: linear-gradient(180deg, 
+        var(--ios-tertiary-background) 0%,
+        rgba(28, 28, 30, 0.8) 100%);
+    }
+    
+    body.auto-theme.dark-mode .feature-section::before {
+      background: radial-gradient(circle, rgba(10, 132, 255, 0.15) 0%, rgba(10, 132, 255, 0) 70%);
+    }
+    
+    body.auto-theme.dark-mode .feature-section::after {
+      background: radial-gradient(circle, rgba(94, 92, 230, 0.15) 0%, rgba(94, 92, 230, 0) 70%);
+    }
+    
+    /* 确保section-reveal在深色模式下正确显示 */
+    body.auto-theme.dark-mode .section-reveal > * {
+      color: var(--text-color); /* 使用深色模式文本颜色 */
+    }
+    
+    /* 修复section-reveal visible状态在深色模式下的问题 */
+    body.auto-theme.dark-mode .section-reveal.visible::before {
+      transform: translateY(-100%);
+      background-color: var(--ios-system-background);
+    }
+    
+    /* 修复所有section类型在深色模式下的样式问题 */
+    
+    /* 通用section背景修复 */
+    body.auto-theme.dark-mode .section {
+      background-color: var(--ios-system-background);
+    }
+    
+    /* 修复section-reveal的::before伪元素 */
+    body.auto-theme.dark-mode .section-reveal::before,
+    body.auto-theme.dark-mode .section-reveal.visible::before {
+      background-color: var(--ios-system-background);
+    }
+    
+    /* 修复feature-section的背景和伪元素 */
+    body.auto-theme.dark-mode .feature-section {
+      background: linear-gradient(180deg, 
+        var(--ios-system-background) 0%,
+        var(--ios-tertiary-background) 100%);
+    }
+    
+    /* 修复announcement-section的背景和伪元素 */
+    body.auto-theme.dark-mode .announcement-section::before {
+      background: linear-gradient(180deg, 
+        rgba(0, 0, 0, 0) 0%,
+        rgba(28, 28, 30, 0.8) 20%,
+        rgba(28, 28, 30, 1) 100%);
+    }
+    
+    /* 修复其他可能的section背景 */
+    body.auto-theme.dark-mode .hero-section,
+    body.auto-theme.dark-mode .testimonials-section,
+    body.auto-theme.dark-mode .callout-section,
+    body.auto-theme.dark-mode .welcome-section {
+      background-color: var(--ios-system-background);
+    }
+    
+    /* 确保所有section内容在深色模式下可见 */
+    body.auto-theme.dark-mode section {
+      color: var(--text-color);
+    }
+    
+    /* 修复section-reveal的伪元素在深色模式下的显示问题 */
+    body.auto-theme.dark-mode .section-reveal::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: var(--ios-system-background);
+      transform: translateY(0);
+      transition: transform var(--animation-duration-medium) var(--animation-timing-apple);
+      z-index: 1;
+    }
+    
+    /* 确保section-reveal在深色模式下的过渡效果正确 */
+    body.auto-theme.dark-mode .section-reveal.visible::before {
+      transform: translateY(-100%);
+    }
+    
+    /* 修复feature-section在深色模式下的伪元素 */
+    body.auto-theme.dark-mode .feature-section::before,
+    body.auto-theme.dark-mode .feature-section::after {
+      opacity: 0.5; /* 降低亮度，更适合深色模式 */
+    }
+    
+    /* 确保所有section的边界在深色模式下也是深色的 */
+    body.auto-theme.dark-mode section::before,
+    body.auto-theme.dark-mode section::after {
+      border-color: var(--border-color) !important;
+    }
+    
+    /* 特别处理section-reveal的可见性问题 */
+    body.auto-theme.dark-mode .section-reveal.visible {
+      background-color: var(--ios-system-background);
+    }
+    
+    /* 修复section-reveal在深色模式下的边界 */
+    body.auto-theme.dark-mode .section-reveal {
+      border-color: var(--border-color);
+    }
+    
+    /* 确保深色模式下section内的容器背景也是深色的 */
+    body.auto-theme.dark-mode section .container,
+    body.auto-theme.dark-mode section .container-fluid {
+      background-color: transparent;
+    }
   </style>
   
   <!-- 添加内联脚本来修复emoji -->
