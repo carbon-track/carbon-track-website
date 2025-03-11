@@ -1543,6 +1543,35 @@
     body.light-theme .reduction-history-btn {
       background: linear-gradient(135deg, var(--ios-green), var(--ios-mint));
     }
+    
+    /* 新增样式 - iOS风格成功按钮 */
+    .btn-ios-success {
+      background: linear-gradient(135deg, var(--ios-green), var(--ios-mint));
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(52, 199, 89, 0.2);
+      transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+    
+    .btn-ios-success:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(52, 199, 89, 0.25);
+      color: white;
+    }
+    
+    body.dark-theme .btn-ios-success,
+    body.auto-theme.dark-mode .btn-ios-success {
+      background: linear-gradient(135deg, #30D158, #39AD91);
+      box-shadow: 0 4px 12px rgba(48, 209, 88, 0.3);
+    }
+    
+    body.dark-theme .btn-ios-success:hover,
+    body.auto-theme.dark-mode .btn-ios-success:hover {
+      box-shadow: 0 8px 25px rgba(48, 209, 88, 0.4);
+    }
   </style>
 </head>
 <body class="auto-theme">
@@ -1595,6 +1624,9 @@
           <div class="text-right mt-4">
             <button type="button" class="btn btn-ios-primary ios-float" data-toggle="modal" data-target="#editUserModal">
               <i class="fas fa-user-edit mr-2"></i>Edit My Profile
+            </button>
+            <button type="button" class="btn btn-ios-success ios-float ml-2" id="viewHistoryBtn">
+              <i class="fas fa-history mr-2"></i>View Carbon Reduction History
             </button>
           </div>
         </div>
@@ -1710,9 +1742,9 @@
       $(this).addClass('active');
     });
     
-    // 导航到历史页面
-    document.getElementById('historyButton').addEventListener('click', function () {
-      window.location.href = 'pthis.html'; // 指定要跳转的页面
+    // 添加历史记录查看按钮点击事件
+    $('#viewHistoryBtn').on('click', function() {
+      window.location.href = 'pthis.html';
     });
     
     // 初始化排行榜选择器
