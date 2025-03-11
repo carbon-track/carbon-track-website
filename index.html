@@ -1616,10 +1616,12 @@
     }
     
     /* 导航选中状态 */
+    /* 注释掉以避免影响外部导航栏
     body.auto-theme.dark-mode .navbar-light .navbar-nav .nav-link.active,
     body.auto-theme.dark-mode .navbar-light .navbar-nav .nav-link:hover {
       color: var(--ios-blue);
     }
+    */
 
     /* 特定元素的深色模式样式 */
     
@@ -1667,10 +1669,12 @@
     }
     
     /* Logo and navigation */
+    /* 注释掉以避免影响外部导航栏
     body.auto-theme.dark-mode .navbar-light .navbar-brand,
     body.auto-theme.dark-mode .navbar-light .navbar-nav .nav-link {
       color: var(--text-color);
     }
+    */
     
     /* Login/Signup Modal */
     body.auto-theme.dark-mode #loginModal .modal-content,
@@ -2286,76 +2290,63 @@
       display: none;
     }
     
-    /* 保留原始导航栏样式，不受黑夜模式影响 */
+    /* 移除所有导航栏相关的黑暗模式样式，确保导航栏保持原样 */
+    /* 1. 先重置navbar-container内的所有元素，确保它们不受黑暗模式影响 */
     body.auto-theme.dark-mode #navbar-container,
-    body.auto-theme.dark-mode .original-navbar,
-    body.auto-theme.dark-mode .original-navbar .navbar-brand,
-    body.auto-theme.dark-mode .original-navbar .navbar-nav,
-    body.auto-theme.dark-mode .navbar-light {
-      /* 这里我们重置黑夜模式对导航栏产生的影响 */
-      background-color: var(--navbar-original-bg, #002A5C) !important; /* 使用原始导航栏的背景色 */
-      color: var(--navbar-original-text, white) !important;
-      border-color: var(--navbar-original-border, transparent) !important;
+    body.auto-theme.dark-mode #navbar-container * {
+      /* 保持navbar原样，重置可能的黑暗模式影响 */
+      background-color: initial !important;
+      color: initial !important;
+      border-color: initial !important;
+      text-shadow: initial !important;
+      box-shadow: initial !important;
     }
     
-    /* 保持导航链接颜色不变 */
-    body.auto-theme.dark-mode .original-navbar .navbar-nav .nav-link,
-    body.auto-theme.dark-mode .original-navbar .navbar-brand {
-      color: rgba(255, 255, 255, 0.9) !important;
+    /* 2. 确保导航栏的JavaScript不会受到影响 */
+    #navbar-container {
+      /* 指定z-index确保导航栏始终在页面内容之上 */
+      position: relative;
+      z-index: 1030;
     }
     
-    body.auto-theme.dark-mode .original-navbar .navbar-nav .nav-link:hover {
+    /* 3. 恢复导航栏的原始样式 */
+    body.auto-theme.dark-mode #navbar-container .navbar {
+      background-color: #002A5C !important;
+    }
+    
+    body.auto-theme.dark-mode #navbar-container .navbar-brand,
+    body.auto-theme.dark-mode #navbar-container .nav-link {
+      color: rgba(255, 255, 255, 0.8) !important;
+    }
+    
+    body.auto-theme.dark-mode #navbar-container .nav-link:hover,
+    body.auto-theme.dark-mode #navbar-container .nav-link.active {
       color: white !important;
     }
     
-    /* 保留导航栏下拉菜单的原始样式 */
-    body.auto-theme.dark-mode .original-navbar .dropdown-menu {
+    body.auto-theme.dark-mode #navbar-container .navbar-toggler-icon {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 0.8)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+    }
+    
+    /* 导航栏按钮样式 */
+    body.auto-theme.dark-mode #navbar-container .btn-danger,
+    body.auto-theme.dark-mode #navbar-container #logoutButton {
+      background-color: #dc3545 !important;
+      border-color: #dc3545 !important;
+      color: white !important;
+    }
+    
+    /* 导航栏下拉菜单 */
+    body.auto-theme.dark-mode #navbar-container .dropdown-menu {
       background-color: white !important;
       color: #212529 !important;
       border: 1px solid rgba(0, 0, 0, 0.15) !important;
     }
     
-    body.auto-theme.dark-mode .original-navbar .dropdown-item {
-      color: #212529 !important;
-    }
-    
-    body.auto-theme.dark-mode .original-navbar .dropdown-item:hover,
-    body.auto-theme.dark-mode .original-navbar .dropdown-item:focus {
-      background-color: #f8f9fa !important;
-      color: #16181b !important;
-    }
-    
-    /* 添加原始导航栏样式 */
-    .original-navbar {
-      background-color: #002A5C !important;
-    }
-    
-    /* 确保在黑暗模式下保持原始导航栏样式 */
-    body.auto-theme.dark-mode .original-navbar {
-      background-color: #002A5C !important;
-    }
-    
-    /* 确保导航栏图标和按钮在黑暗模式下保持正确的样式 */
-    body.auto-theme.dark-mode .original-navbar .navbar-toggler-icon {
-      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 0.8)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
-    }
-    
-    body.auto-theme.dark-mode .original-navbar .btn-ios-primary {
-      background-color: #007AFF !important;
-      color: white !important;
-      border-color: #007AFF !important;
-    }
-    
-    body.auto-theme.dark-mode .original-navbar .btn-ios-secondary {
-      background-color: transparent !important;
-      color: #007AFF !important;
-      border-color: #007AFF !important;
-    }
-    
-    body.auto-theme.dark-mode .original-navbar .btn-outline-danger {
-      background-color: transparent !important;
-      color: #FF3B30 !important;
-      border-color: #FF3B30 !important;
+    /* 导航栏图标 */
+    body.auto-theme.dark-mode #navbar-container .fas,
+    body.auto-theme.dark-mode #navbar-container .fa-envelope {
+      color: rgba(255, 255, 255, 0.5) !important;
     }
   </style>
 </head>
