@@ -266,15 +266,48 @@
     .verification-code {
       display: flex;
       justify-content: space-between;
+      margin: 20px auto;
+      max-width: 380px;
     }
     
     .verification-code .form-control {
-      width: 42px;
-      height: 60px;
-      margin: 0 3px;
+      width: 56px;
+      height: 68px;
+      margin: 0 5px;
       text-align: center;
-      font-size: 1.5rem;
+      font-size: 1.75rem;
       font-weight: 600;
+      border-radius: 16px;
+      padding: 0;
+      background-color: var(--ios-secondary-system-background, #F2F2F7);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      box-shadow: none;
+      transition: all 0.2s var(--animation-timing-apple);
+      outline: none;
+      caret-color: var(--ios-purple);
+    }
+    
+    .verification-code .form-control:focus {
+      border-color: var(--ios-purple);
+      box-shadow: 0 0 0 2px rgba(175, 82, 222, 0.2);
+      transform: scale(1.05);
+    }
+    
+    /* Highlight the currently active digit input with purple border */
+    .verification-code .form-control:focus {
+      border: 2px solid var(--ios-purple);
+      background-color: white;
+    }
+    
+    body.dark-theme .verification-code .form-control {
+      background-color: #2C2C2E;
+      border-color: rgba(255, 255, 255, 0.1);
+      color: #FFFFFF;
+    }
+    
+    body.dark-theme .verification-code .form-control:focus {
+      background-color: #3A3A3C;
+      border-color: #BF5AF2;
     }
     
     .form-step {
@@ -483,6 +516,40 @@
       background-color: #F2F2F7;
       color: var(--text-color-light);
     }
+    
+    .btn-link {
+      color: var(--ios-blue);
+      font-weight: 500;
+      text-decoration: none;
+      padding: 12px 24px;
+      transition: all 0.3s var(--animation-timing-apple);
+    }
+    
+    .btn-link:hover {
+      text-decoration: none;
+      opacity: 0.8;
+    }
+    
+    /* Button styles for back and verify code */
+    .btn-verify {
+      padding: 12px 32px;
+      font-size: 1.1rem;
+      border-radius: 16px;
+    }
+    
+    #backToStep1, #backToStep2 {
+      color: var(--ios-blue);
+      transition: all 0.2s var(--animation-timing-apple);
+    }
+    
+    #backToStep1:hover, #backToStep2:hover {
+      color: var(--ios-blue-dark, #0066CC);
+    }
+    
+    body.dark-theme #backToStep1, 
+    body.dark-theme #backToStep2 {
+      color: #0A84FF;
+    }
   </style>
 </head>
 <body class="auto-theme">
@@ -539,17 +606,18 @@
       <p class="mb-4">We've sent a 6-digit verification code to your email. Please enter it below.</p>
       <div class="form-group">
         <div class="verification-code">
-          <input type="text" class="form-control digit" id="digit1" maxlength="1" autofocus>
-          <input type="text" class="form-control digit" id="digit2" maxlength="1">
-          <input type="text" class="form-control digit" id="digit3" maxlength="1">
-          <input type="text" class="form-control digit" id="digit4" maxlength="1">
-          <input type="text" class="form-control digit" id="digit5" maxlength="1">
-          <input type="text" class="form-control digit" id="digit6" maxlength="1">
+          <input type="text" class="form-control digit" id="digit1" maxlength="1" inputmode="numeric" pattern="[0-9]*" autofocus>
+          <input type="text" class="form-control digit" id="digit2" maxlength="1" inputmode="numeric" pattern="[0-9]*">
+          <input type="text" class="form-control digit" id="digit3" maxlength="1" inputmode="numeric" pattern="[0-9]*">
+          <input type="text" class="form-control digit" id="digit4" maxlength="1" inputmode="numeric" pattern="[0-9]*">
+          <input type="text" class="form-control digit" id="digit5" maxlength="1" inputmode="numeric" pattern="[0-9]*">
+          <input type="text" class="form-control digit" id="digit6" maxlength="1" inputmode="numeric" pattern="[0-9]*">
         </div>
       </div>
-      <div class="text-right mt-4">
+      <div class="cf-turnstile" id="turnstile-step2" data-sitekey="0x4AAAAAAA0wcgSIUML5Ocs3"></div>
+      <div class="d-flex justify-content-between mt-4">
         <button type="button" class="btn btn-link" id="backToStep1">Back</button>
-        <button type="button" class="btn btn-primary" id="nextToStep3">Verify Code</button>
+        <button type="button" class="btn btn-primary btn-verify" id="nextToStep3">Verify Code</button>
       </div>
     </div>
     
@@ -565,9 +633,9 @@
         <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm new password">
       </div>
       <div class="cf-turnstile" id="turnstile-step3" data-sitekey="0x4AAAAAAA0wcgSIUML5Ocs3"></div>
-      <div class="text-right mt-4">
+      <div class="d-flex justify-content-between mt-4">
         <button type="button" class="btn btn-link" id="backToStep2">Back</button>
-        <button type="button" class="btn btn-primary" id="resetPassword">Reset Password</button>
+        <button type="button" class="btn btn-primary btn-verify" id="resetPassword">Reset Password</button>
       </div>
     </div>
   </div>
@@ -595,6 +663,7 @@
     // Turnstile widget IDs and tokens
     let turnstileWidgets = {
       step1: null,
+      step2: null, 
       step3: null
     };
     
@@ -705,12 +774,19 @@
         return;
       }
       
+      // Get Cloudflare token
+      const cfToken = document.querySelector('#turnstile-step2 [name="cf-turnstile-response"]').value;
+      if (!cfToken) {
+        showAlert('Please complete the anti-bot verification', 'warning');
+        return;
+      }
+      
       const email = document.getElementById('email').value;
       
       $.ajax({
         type: 'POST',
         url: 'recovery.php',
-        data: { email: email, verificationCode: code },
+        data: { email: email, verificationCode: code, cf_token: cfToken },
         dataType: 'json',
         success: function(response) {
           if (response.success) {
@@ -802,16 +878,38 @@
     // Auto focus next input in verification code
     const digitInputs = document.querySelectorAll('.digit');
     digitInputs.forEach(function(input, index) {
-      input.addEventListener('input', function() {
+      // Only allow numeric input
+      input.addEventListener('input', function(e) {
+        // Replace non-numeric characters with empty string
+        this.value = this.value.replace(/[^0-9]/g, '');
+        
+        // Auto-advance to next field
         if (this.value.length === this.maxLength && index < digitInputs.length - 1) {
           digitInputs[index + 1].focus();
         }
       });
       
       input.addEventListener('keydown', function(e) {
+        // Handle backspace to go to previous field
         if (e.key === 'Backspace' && !this.value && index > 0) {
           digitInputs[index - 1].focus();
         }
+        
+        // Handle left/right arrow keys for navigation
+        if (e.key === 'ArrowLeft' && index > 0) {
+          e.preventDefault();
+          digitInputs[index - 1].focus();
+        }
+        
+        if (e.key === 'ArrowRight' && index < digitInputs.length - 1) {
+          e.preventDefault();
+          digitInputs[index + 1].focus();
+        }
+      });
+      
+      // Select all text on focus
+      input.addEventListener('focus', function() {
+        this.select();
       });
     });
     
