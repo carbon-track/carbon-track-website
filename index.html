@@ -76,20 +76,28 @@
     /* Dark Mode Colors - System Preference */
     @media (prefers-color-scheme: dark) {
       body.auto-theme {
+        /* 更深的背景色 */
         --ios-system-background: #000000;
-        --ios-secondary-background: #1C1C1E;
-        --ios-tertiary-background: #2C2C2E;
+        --ios-secondary-background: #111111;
+        --ios-tertiary-background: #1C1C1E;
         
+        /* 增强对比度的文本颜色 */
         --text-color: #FFFFFF;
-        --text-secondary-color: #EBEBF5;
-        --text-tertiary-color: #EBEBF599;
-        --text-muted-color: #98989D;
+        --text-secondary-color: #F2F2F7;
+        --text-tertiary-color: #E5E5EA;
+        --text-muted-color: #AEAEB2;
         
-        --card-background: rgba(44, 44, 46, 0.8);
+        /* 更深的卡片背景，减少透明度 */
+        --card-background: rgba(28, 28, 30, 0.95);
         --container-background: #1C1C1E;
-        --border-color: rgba(255, 255, 255, 0.1);
+        --border-color: rgba(255, 255, 255, 0.15);
         
-        /* iOS Dark Mode Colors */
+        /* 卡片特殊颜色 */
+        --card-dark-bg: #1C1C1E;      /* 深灰卡片背景 */
+        --card-blue-bg: #0A3A6D;      /* 蓝色卡片背景 */
+        --card-purple-bg: #4B2D83;    /* 紫色卡片背景 */
+        
+        /* iOS深色模式颜色 */
         --ios-red: #FF453A;
         --ios-orange: #FF9F0A;
         --ios-yellow: #FFD60A;
@@ -2051,6 +2059,200 @@
       background-color: #2C2C2E !important;
       color: #FFFFFF !important;
       border-color: rgba(255, 255, 255, 0.1) !important;
+    }
+    
+    /* 增强深色模式下的卡片和公告栏样式 */
+    body.auto-theme.dark-mode .feature-card,
+    body.auto-theme.dark-mode .info-card {
+      background-color: var(--card-dark-bg);
+      color: var(--text-color);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* 针对特殊颜色卡片的深色模式样式 */
+    body.auto-theme.dark-mode .feature-card:nth-child(1),
+    body.auto-theme.dark-mode .info-card:nth-child(1) {
+      background-color: var(--card-dark-bg);
+    }
+    
+    body.auto-theme.dark-mode .feature-card:nth-child(2),
+    body.auto-theme.dark-mode .info-card:nth-child(2) {
+      background-color: var(--card-blue-bg);
+    }
+    
+    body.auto-theme.dark-mode .feature-card:nth-child(3),
+    body.auto-theme.dark-mode .info-card:nth-child(3) {
+      background-color: var(--card-dark-bg);
+    }
+    
+    body.auto-theme.dark-mode .join-card {
+      background-color: var(--card-purple-bg);
+    }
+    
+    /* 增强深色模式下的文本对比度 */
+    body.auto-theme.dark-mode .feature-card h2,
+    body.auto-theme.dark-mode .info-card h2,
+    body.auto-theme.dark-mode .join-card h2 {
+      color: #FFFFFF;
+    }
+    
+    body.auto-theme.dark-mode .feature-card p,
+    body.auto-theme.dark-mode .info-card p,
+    body.auto-theme.dark-mode .join-card p {
+      color: #F2F2F7;
+    }
+    
+    /* 调整深色模式下的图标色彩 */
+    body.auto-theme.dark-mode .feature-card i,
+    body.auto-theme.dark-mode .info-card i,
+    body.auto-theme.dark-mode .check-item i {
+      color: #64D2FF; /* 使用iOS深色模式的青色图标 */
+    }
+    
+    body.auto-theme.dark-mode .check-item i.fa-check-circle {
+      color: #30D158; /* 使用iOS深色模式的绿色图标 */
+    }
+    
+    /* 确保深色模式下公告和通知有足够对比度 */
+    body.auto-theme.dark-mode .announcement-card {
+      background-color: #1E3A5F;
+      color: #FFFFFF;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    body.auto-theme.dark-mode .notification {
+      background-color: #3A2E5F;
+      color: #FFFFFF;
+    }
+    
+    /* 改进特定元素的深色样式 */
+    body.auto-theme.dark-mode .check-item {
+      color: #F2F2F7;
+    }
+    
+    body.auto-theme.dark-mode .sub-text {
+      color: #E5E5EA;
+    }
+    
+    /* 针对按钮的增强对比度 */
+    body.auto-theme.dark-mode .btn-primary {
+      background-color: #0A84FF;
+      border-color: #0A84FF;
+      color: #FFFFFF;
+    }
+    
+    body.auto-theme.dark-mode .btn-outline-light {
+      border-color: #FFFFFF;
+      color: #FFFFFF;
+    }
+    
+    body.auto-theme.dark-mode .btn-outline-light:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    /* 首页特色卡片的深色模式增强 */
+    body.auto-theme.dark-mode .feature-card {
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    /* "What is a Carbon Account?" 卡片 */
+    body.auto-theme.dark-mode .feature-card:nth-child(1) {
+      background-color: #222222; /* 深灰色背景 */
+    }
+    
+    /* "How to Use CarbonTrack" 卡片 */
+    body.auto-theme.dark-mode .feature-card:nth-child(2) {
+      background-color: #003366; /* 深蓝色背景 */
+    }
+    
+    /* "Why Use a Carbon Account?" 卡片 */
+    body.auto-theme.dark-mode .feature-card:nth-child(3) {
+      background-color: #222222; /* 深灰色背景 */
+    }
+    
+    /* "Join Our Team!" 卡片 */
+    body.auto-theme.dark-mode .join-card {
+      background-color: #3B2B63; /* 深紫色背景 */
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    /* 卡片标题更高对比度 */
+    body.auto-theme.dark-mode .feature-card h2,
+    body.auto-theme.dark-mode .join-card h2 {
+      color: white;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+      font-weight: 600;
+    }
+    
+    /* 第二张卡片的蓝色标题增强 */
+    body.auto-theme.dark-mode .feature-card:nth-child(2) h2 {
+      color: #66CCFF;
+    }
+    
+    /* 卡片文本更高对比度 */
+    body.auto-theme.dark-mode .feature-card p,
+    body.auto-theme.dark-mode .join-card p {
+      color: rgba(255, 255, 255, 0.9);
+      font-weight: 400;
+    }
+    
+    /* 第二张卡片（蓝色）的检查项目样式 */
+    body.auto-theme.dark-mode .feature-card:nth-child(2) .check-item {
+      color: white;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: flex-start;
+    }
+    
+    /* 绿色卡片（右侧）的检查项目样式 */
+    body.auto-theme.dark-mode .feature-card:nth-child(3) .check-item {
+      color: white;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: flex-start;
+    }
+    
+    /* 检查图标样式增强 */
+    body.auto-theme.dark-mode .feature-card:nth-child(2) .check-item i {
+      color: white;
+      background-color: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 12px;
+      font-size: 14px;
+    }
+    
+    /* 绿色检查图标样式增强 */
+    body.auto-theme.dark-mode .feature-card:nth-child(3) .check-item i {
+      color: #30D158; /* iOS深色模式绿色 */
+      font-size: 20px;
+      margin-right: 12px;
+    }
+    
+    /* 卡片内部次要文本 */
+    body.auto-theme.dark-mode .feature-card .sub-text {
+      color: rgba(255, 255, 255, 0.7);
+    }
+    
+    /* 改进所有卡片的边距和填充 */
+    body.auto-theme.dark-mode .feature-card,
+    body.auto-theme.dark-mode .join-card {
+      padding: 25px;
+      border-radius: 20px;
+    }
+    
+    /* 为卡片添加细微的悬停效果 */
+    body.auto-theme.dark-mode .feature-card:hover,
+    body.auto-theme.dark-mode .join-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.6);
+      transition: all 0.3s ease;
     }
   </style>
 </head>
