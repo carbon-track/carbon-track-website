@@ -509,6 +509,176 @@
       position: relative;
       z-index: 5;
     }
+    
+    /* 增强深色模式下的文本对比度 */
+    body.dark-theme,
+    body.dark-theme .form-control,
+    body.dark-theme label,
+    body.dark-theme select,
+    body.dark-theme input,
+    body.dark-theme textarea,
+    body.dark-theme .form-text,
+    body.dark-theme p,
+    body.dark-theme small,
+    body.auto-theme.dark-mode,
+    body.auto-theme.dark-mode .form-control,
+    body.auto-theme.dark-mode label,
+    body.auto-theme.dark-mode select,
+    body.auto-theme.dark-mode input,
+    body.auto-theme.dark-mode textarea,
+    body.auto-theme.dark-mode .form-text,
+    body.auto-theme.dark-mode p,
+    body.auto-theme.dark-mode small {
+      color: #FFFFFF !important; /* 强制深色模式下所有文本为白色 */
+    }
+    
+    /* 确保表单标签在深色模式中高亮显示 */
+    body.dark-theme label,
+    body.auto-theme.dark-mode label {
+      color: #FFFFFF !important;
+      font-weight: 500;
+    }
+    
+    /* 确保选择框和输入框中的文本在深色模式下可见 */
+    body.dark-theme .form-control,
+    body.dark-theme select,
+    body.dark-theme input,
+    body.dark-theme textarea,
+    body.auto-theme.dark-mode .form-control,
+    body.auto-theme.dark-mode select,
+    body.auto-theme.dark-mode input,
+    body.auto-theme.dark-mode textarea {
+      background-color: rgba(44, 44, 46, 0.8);
+      border-color: rgba(80, 80, 85, 0.8);
+      color: #FFFFFF !important;
+    }
+    
+    /* 增强文本输入框的对比度 */
+    body.dark-theme .form-control:focus,
+    body.auto-theme.dark-mode .form-control:focus {
+      background-color: rgba(60, 60, 65, 0.9);
+      border-color: var(--ios-green);
+      box-shadow: 0 0 0 3px rgba(52, 199, 89, 0.25);
+      color: #FFFFFF !important;
+    }
+    
+    /* 确保占位符文本在深色模式下有足够的可见度 */
+    body.dark-theme .form-control::placeholder,
+    body.auto-theme.dark-mode .form-control::placeholder {
+      color: rgba(255, 255, 255, 0.6) !important;
+    }
+    
+    /* 为选择框添加更好的深色模式样式 */
+    body.dark-theme select.form-control,
+    body.auto-theme.dark-mode select.form-control {
+      background-image: linear-gradient(45deg, transparent 50%, #FFFFFF 50%), 
+                        linear-gradient(135deg, #FFFFFF 50%, transparent 50%);
+      background-position: calc(100% - 20px) calc(1em + 2px), 
+                           calc(100% - 15px) calc(1em + 2px);
+      background-size: 5px 5px, 5px 5px;
+      background-repeat: no-repeat;
+    }
+    
+    /* 确保表单说明文本可见 */
+    body.dark-theme .form-text.text-muted,
+    body.auto-theme.dark-mode .form-text.text-muted {
+      color: rgba(255, 255, 255, 0.7) !important;
+    }
+    
+    /* 确保警告框中的文本可见 */
+    body.dark-theme .alert,
+    body.auto-theme.dark-mode .alert {
+      color: #FFFFFF;
+    }
+    
+    body.dark-theme .alert-info,
+    body.auto-theme.dark-mode .alert-info {
+      background-color: rgba(59, 130, 246, 0.2);
+      border-color: rgba(59, 130, 246, 0.3);
+    }
+    
+    /* 确保结果卡片中的文本可见 */
+    body.dark-theme .calculator-card,
+    body.auto-theme.dark-mode .calculator-card {
+      color: #FFFFFF;
+    }
+    
+    /* 提高"环境影响"卡片的可读性 */
+    body.dark-theme .activity-card,
+    body.auto-theme.dark-mode .activity-card {
+      background-color: rgba(44, 44, 46, 0.8);
+      color: #FFFFFF;
+    }
+    
+    body.dark-theme .activity-card h4,
+    body.auto-theme.dark-mode .activity-card h4 {
+      color: #30D158; /* iOS绿色 */
+    }
+    
+    /* 改进模态框的可读性 */
+    body.dark-theme .modal-content,
+    body.auto-theme.dark-mode .modal-content {
+      background-color: #2C2C2E;
+      color: #FFFFFF;
+    }
+    
+    body.dark-theme .modal-header,
+    body.auto-theme.dark-mode .modal-header {
+      border-bottom-color: #3A3A3C;
+    }
+    
+    body.dark-theme .modal-footer,
+    body.auto-theme.dark-mode .modal-footer {
+      border-top-color: #3A3A3C;
+    }
+    
+    body.dark-theme .close,
+    body.auto-theme.dark-mode .close {
+      color: #FFFFFF;
+      text-shadow: none;
+    }
+    
+    /* 确保文件上传控件可见 */
+    body.dark-theme .form-control-file,
+    body.auto-theme.dark-mode .form-control-file {
+      color: #FFFFFF;
+    }
+    
+    /* 调整按钮样式以保持可见性 */
+    body.dark-theme .btn-outline-info,
+    body.auto-theme.dark-mode .btn-outline-info {
+      color: #64D2FF;
+      border-color: #64D2FF;
+    }
+    
+    body.dark-theme .btn-outline-info:hover,
+    body.auto-theme.dark-mode .btn-outline-info:hover {
+      background-color: #64D2FF;
+      color: #000000;
+    }
+    
+    body.dark-theme .btn-ios-primary,
+    body.auto-theme.dark-mode .btn-ios-primary {
+      background: linear-gradient(135deg, #64D2FF, #5E5CE6);
+      color: #FFFFFF;
+    }
+    
+    /* 为 iOS 设计按钮添加样式 */
+    .btn-ios-primary {
+      background: linear-gradient(135deg, var(--ios-green), var(--ios-mint));
+      border: none;
+      border-radius: 12px;
+      padding: 12px 24px;
+      font-weight: 600;
+      color: white;
+      transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+      box-shadow: 0 4px 12px rgba(52, 199, 89, 0.2);
+    }
+    
+    .btn-ios-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(52, 199, 89, 0.3);
+    }
   </style>
   <script>
     $(document).ready(function () {
@@ -782,6 +952,30 @@
         }
       });
     }
+
+    // 添加检测系统暗模式的代码
+    document.addEventListener('DOMContentLoaded', function() {
+      // 检查系统是否为暗模式
+      function isDarkMode() {
+        return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      }
+      
+      // 如果系统是暗模式且用户使用自动主题，添加dark-mode类
+      if (isDarkMode() && document.body.classList.contains('auto-theme')) {
+        document.body.classList.add('dark-mode');
+      }
+      
+      // 监听系统暗模式变化
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+        if (document.body.classList.contains('auto-theme')) {
+          if (e.matches) {
+            document.body.classList.add('dark-mode');
+          } else {
+            document.body.classList.remove('dark-mode');
+          }
+        }
+      });
+    });
   </script>
 </head>
 <body class="auto-theme">
