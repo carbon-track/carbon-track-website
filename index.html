@@ -2424,6 +2424,95 @@
       background-color: rgba(255, 255, 255, 0.1) !important;
       color: white !important;
     }
+    
+    /* 针对announcement-card类的深色模式样式 */
+    body.auto-theme.dark-mode .announcement-card,
+    body.auto-theme.dark-mode .announcement-item {
+      background-color: #1C1C1E !important;
+      color: #FFFFFF !important;
+      border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+    
+    /* 更新卡片内部的标题和文本 */
+    body.auto-theme.dark-mode .announcement-card .announcement-title,
+    body.auto-theme.dark-mode .announcement-item h3,
+    body.auto-theme.dark-mode .announcement-item h4,
+    body.auto-theme.dark-mode .announcement-card h3,
+    body.auto-theme.dark-mode .announcement-card h4 {
+      color: #FFFFFF !important;
+    }
+    
+    body.auto-theme.dark-mode .announcement-card p,
+    body.auto-theme.dark-mode .announcement-item p,
+    body.auto-theme.dark-mode .announcement-card .card-text,
+    body.auto-theme.dark-mode .announcement-item .card-text {
+      color: #EBEBF5 !important;
+    }
+    
+    /* 针对announcement-section的黑暗模式样式 */
+    body.auto-theme.dark-mode .announcement-section {
+      background-color: #000000 !important;
+    }
+    
+    body.auto-theme.dark-mode .announcement-section::before {
+      background: linear-gradient(180deg, 
+        rgba(0, 0, 0, 0) 0%,
+        rgba(0, 0, 0, 0.8) 20%,
+        rgba(0, 0, 0, 1) 100%) !important;
+    }
+    
+    /* 确保announcement-footer在黑暗模式下有正确的背景色 */
+    body.auto-theme.dark-mode .announcement-footer {
+      background-color: #1C1C1E !important;
+      color: #EBEBF5 !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+      padding: 15px !important;
+      border-radius: 0 0 10px 10px !important;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    /* 修复"How CarbonTrack Works"部分在黑暗模式下的样式 */
+    body.auto-theme.dark-mode h1, 
+    body.auto-theme.dark-mode h2, 
+    body.auto-theme.dark-mode h3 {
+      color: white !important;
+    }
+    
+    /* 为整个页面在黑暗模式下设置背景色 */
+    body.auto-theme.dark-mode {
+      background-color: #000000 !important;
+    }
+    
+    /* 确保所有区域的标题文本在黑暗模式下可见 */
+    body.auto-theme.dark-mode .section-title,
+    body.auto-theme.dark-mode .section-header {
+      color: white !important;
+    }
+    
+    /* 修复emoji在黑暗模式下变蓝的问题 */
+    body.auto-theme.dark-mode .announcement-heading,
+    body.auto-theme.dark-mode .announcement-subheading {
+      color: #FFFFFF !important;
+    }
+    
+    /* 所有emoji使用默认颜色，不受主题影响 */
+    .emoji, 
+    [data-emoji], 
+    .emoji-earth, 
+    .emoji-announce,
+    .emoji-bulb,
+    .emoji-medal,
+    .emoji-plant,
+    .emoji-scale {
+      color: initial !important; /* 使用初始默认颜色 */
+      text-shadow: none !important;
+    }
+    
+    /* 特别针对标题中的emoji */
+    .announcement-heading .emoji,
+    .announcement-subheading .emoji {
+      color: initial !important;
+    }
   </style>
 </head>
 <body class="auto-theme">
@@ -2492,30 +2581,30 @@
 <section class="announcement-section">
 <div class="container">
     <div class="announcement-card frosted-glass ios-depth-effect ios-shine-effect animate-on-scroll scale-in">
-      <h2 class="announcement-heading ios-float">Welcome to CarbonTrack! 🌍</h2>
-      <p class="announcement-subheading animate-on-scroll fade-in">📢 Announcements</p>
+      <h2 class="announcement-heading ios-float">Welcome to CarbonTrack! <span class="emoji emoji-earth">🌍</span></h2>
+      <p class="announcement-subheading animate-on-scroll fade-in"><span class="emoji emoji-announce">📢</span> Announcements</p>
       <div class="announcement-divider animate-on-scroll fade-in delay-100"></div>
       <ul class="announcement-list">
         <li class="announcement-item ios-depth-effect ripple-effect animate-on-scroll slide-up delay-100">
-          <span class="announcement-icon announcement-icon-glow" style="color: var(--ios-yellow);">💡</span>
+          <span class="announcement-icon announcement-icon-glow"><span class="emoji emoji-bulb">💡</span></span>
           <div class="announcement-content">
             <p><strong>We Value Your Feedback!</strong> Have suggestions? Email us at <a href="mailto:carbontrack666@gmail.com">carbontrack666@gmail.com</a>.</p>
         </div>
         </li>
         <li class="announcement-item ios-depth-effect ripple-effect animate-on-scroll slide-up delay-200">
-          <span class="announcement-icon announcement-icon-glow" style="color: var(--ios-blue);">🎖️</span>
+          <span class="announcement-icon announcement-icon-glow"><span class="emoji emoji-medal">🎖️</span></span>
           <div class="announcement-content">
             <p><strong>Earn Rewards!</strong> Log your sustainable actions and receive certificates, badges, and thank-you letters for your contributions.</p>
       </div>
         </li>
         <li class="announcement-item ios-depth-effect ripple-effect animate-on-scroll slide-up delay-300">
-          <span class="announcement-icon announcement-icon-glow" style="color: var(--ios-green);">🌱</span>
+          <span class="announcement-icon announcement-icon-glow"><span class="emoji emoji-plant">🌱</span></span>
           <div class="announcement-content">
             <p><strong>Who Can Join?</strong> While CarbonTrack primarily serves students, anyone passionate about sustainability is welcome!</p>
     </div>
         </li>
         <li class="announcement-item ios-depth-effect ripple-effect animate-on-scroll slide-up delay-400">
-          <span class="announcement-icon announcement-icon-glow" style="color: var(--ios-indigo);">⚖️</span>
+          <span class="announcement-icon announcement-icon-glow"><span class="emoji emoji-scale">⚖️</span></span>
           <div class="announcement-content">
             <p><strong>Fair Play Matters!</strong> Cheating for Carbon Credits is strictly prohibited. We are committed to a transparent and fair system.</p>
         </div>
