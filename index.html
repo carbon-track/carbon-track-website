@@ -2521,14 +2521,25 @@
     
     /* 为欢迎标题中的emoji单独设置样式 */
     .announcement-heading .emoji-earth {
-      font-size: 110% !important; /* 略大，增强可见性 */
+      font-size: 120% !important; /* 更大，增强可见性 */
       vertical-align: middle !important;
       margin-left: 5px !important;
       display: inline-block !important;
-      color: transparent !important;
+      color: inherit !important; /* 移除之前的transparent设置 */
       background: transparent !important;
       -webkit-text-fill-color: initial !important;
       text-shadow: none !important;
+      position: relative !important; 
+      z-index: 100 !important; /* 提高z-index确保显示 */
+    }
+    
+    /* 确保title中的emoji不会被文本颜色覆盖 */
+    body.auto-theme.dark-mode .announcement-heading span.emoji {
+      color: initial !important;
+      -webkit-text-fill-color: initial !important;
+      background-color: transparent !important;
+      opacity: 1 !important;
+      visibility: visible !important;
     }
     
     /* 使用属性选择器专门针对emoji字符 */
@@ -2585,6 +2596,37 @@
         titleEmoji.style.webkitTextFillColor = 'initial';
         titleEmoji.style.textShadow = 'none';
         titleEmoji.style.filter = 'none';
+        titleEmoji.style.display = 'inline-block';
+        titleEmoji.style.backgroundColor = 'transparent';
+        titleEmoji.style.fontSize = '1.2em';
+        titleEmoji.style.verticalAlign = 'middle';
+        titleEmoji.style.marginLeft = '8px';
+        
+        // 强制刷新emoji显示
+        const originalText = titleEmoji.innerHTML;
+        titleEmoji.innerHTML = '';
+        setTimeout(() => {
+          titleEmoji.innerHTML = originalText;
+        }, 50);
+      } else {
+        // 如果没有找到emoji，创建一个新的
+        const headingElement = document.querySelector('.announcement-heading');
+        if (headingElement) {
+          const emojiSpan = document.createElement('span');
+          emojiSpan.className = 'emoji emoji-earth';
+          emojiSpan.textContent = '🌍';
+          emojiSpan.style.fontFamily = '"Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", sans-serif';
+          emojiSpan.style.color = 'initial';
+          emojiSpan.style.webkitTextFillColor = 'initial';
+          emojiSpan.style.textShadow = 'none';
+          emojiSpan.style.filter = 'none';
+          emojiSpan.style.display = 'inline-block';
+          emojiSpan.style.fontSize = '1.2em';
+          emojiSpan.style.verticalAlign = 'middle';
+          emojiSpan.style.marginLeft = '8px';
+          headingElement.appendChild(document.createTextNode(' '));
+          headingElement.appendChild(emojiSpan);
+        }
       }
       
       // 处理所有emoji
@@ -2595,6 +2637,8 @@
         emoji.style.webkitTextFillColor = 'initial';
         emoji.style.textShadow = 'none';
         emoji.style.filter = 'none';
+        emoji.style.backgroundColor = 'transparent';
+        emoji.style.display = 'inline-block';
       });
     });
   </script>
@@ -2665,7 +2709,7 @@
 <section class="announcement-section">
 <div class="container">
     <div class="announcement-card frosted-glass ios-depth-effect ios-shine-effect animate-on-scroll scale-in">
-      <h2 class="announcement-heading ios-float">Welcome to CarbonTrack! <span class="emoji emoji-earth">🌍</span></h2>
+      <h2 class="announcement-heading ios-float">Welcome to CarbonTrack! <span class="emoji emoji-earth" style="display:inline-block; color:initial; -webkit-text-fill-color:initial;">🌍</span></h2>
       <p class="announcement-subheading animate-on-scroll fade-in"><span class="emoji emoji-announce">📢</span> Announcements</p>
       <div class="announcement-divider animate-on-scroll fade-in delay-100"></div>
       <ul class="announcement-list">
