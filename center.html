@@ -673,12 +673,12 @@
       margin-bottom: 30px;
     }
     
-    /* iOS标准分段控制器样式修复 */
+    /* iOS风格分段控制器 */
     .ios-segment-control {
       display: flex;
       background-color: rgba(120, 120, 128, 0.12);
-      border-radius: 8px;
-      padding: 2px;
+      border-radius: 10px;
+      padding: 3px;
       margin-bottom: 20px;
       max-width: 550px;
       margin-left: auto;
@@ -686,6 +686,7 @@
       position: relative;
       overflow: hidden;
       transition: background-color 0.3s ease;
+      height: 44px;
     }
     
     body.dark-theme .ios-segment-control,
@@ -695,6 +696,9 @@
     
     .ios-segment-control .segment {
       flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       text-align: center;
       padding: 8px 16px;
       font-size: 14px;
@@ -703,10 +707,11 @@
       border: none;
       background: transparent;
       position: relative;
-      z-index: 1;
+      z-index: 2;
       transition: color 0.3s ease;
       outline: none;
       cursor: pointer;
+      height: 100%;
     }
     
     body.dark-theme .ios-segment-control .segment,
@@ -723,18 +728,17 @@
       color: var(--text-color-dark);
     }
     
-    /* 分段控制器选择器修复 */
+    /* 分段控制器选择器 */
     .segment-selector {
       position: absolute;
-      height: calc(100% - 4px);
-      top: 2px;
-      left: 0; /* 添加左侧基准位置 */
-      width: 33.333%; /* 默认宽度，会被JS覆盖 */
-      z-index: 0;
-      border-radius: 6px;
+      height: calc(100% - 6px);
+      top: 3px;
+      left: 3px;
+      z-index: 1;
+      border-radius: 8px;
       background-color: white;
       box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
-      transition: transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+      transition: transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1), width 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
     }
     
     body.dark-theme .segment-selector,
@@ -746,7 +750,8 @@
     .ios-segment-control .segment i {
       margin-right: 6px;
       color: inherit;
-      font-size: 13px;
+      font-size: 14px;
+      line-height: 1;
     }
     
     /* iOS表格卡片样式 */
@@ -1150,7 +1155,12 @@
     bindRankingButtons();
     
     // 初始化选择器位置 - 修复选择器错位问题
-    initSegmentSelector();
+    setTimeout(initSegmentSelector, 100); // 添加小延迟确保DOM完全加载
+    
+    // 窗口大小变化时重新计算选择器位置
+    $(window).on('resize', function() {
+      initSegmentSelector();
+    });
     
     // 加载全球排行榜
     switchRanking('all');
@@ -1440,10 +1450,8 @@
       $('.ios-segment-control .segment').removeClass('active');
       $(this).addClass('active');
       
-      // 更新选择器位置
-      const index = $(this).index();
-      const totalSegments = $('.ios-segment-control .segment').length;
-      updateSelectorPosition($('.segment-selector')[0], index, totalSegments);
+      // 使用新方法计算并更新选择器位置
+      moveSelector(this);
       
       // 加载对应排行榜
       if (type === 'local') {
@@ -1476,14 +1484,36 @@
     });
   }
   
-  // 更新选择器位置
-  function updateSelectorPosition(selector, activeIndex, totalSegments) {
-    if (!selector) return;
+  // 移动选择器到指定元素位置
+  function moveSelector(target) {
+    const selector = document.querySelector('.segment-selector');
+    if (!selector || !target) return;
     
-    const segmentWidth = 100 / totalSegments;
-    const position = segmentWidth * activeIndex;
-    selector.style.transform = `translateX(${position}%)`;
-    selector.style.width = segmentWidth + '%';
+    // 获取控制器容器
+    const container = target.parentElement;
+    
+    // 获取目标按钮的位置信息
+    const targetRect = target.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+    
+    // 计算目标按钮在容器中的相对位置
+    const relativeLeft = targetRect.left - containerRect.left;
+    
+    // 设置选择器宽度与目标按钮一致（减去padding）
+    selector.style.width = `${targetRect.width - 6}px`;
+    
+    // 设置选择器的水平位置
+    selector.style.transform = `translateX(${relativeLeft}px)`;
+  }
+  
+  // 初始化选择器位置函数 - 新函数
+  function initSegmentSelector() {
+    // 获取活跃的段落
+    const activeSegment = document.querySelector('.ios-segment-control .segment.active');
+    if (!activeSegment) return;
+    
+    // 使用新方法移动选择器
+    moveSelector(activeSegment);
   }
   
   // 切换排行榜类型
@@ -1716,7 +1746,7 @@
     
     // 为深色模式调整样式
     if (document.body.classList.contains('dark-theme') || 
-        (document.body.classList.contains('auto-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        (document.body.classList.contains('auto-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches))) {
       alertDiv.css('background-color', 'rgba(70, 70, 77, 0.8)');
     }
     
@@ -1735,23 +1765,6 @@
         alertDiv.remove();
       }, 300);
     }, 3000);
-  }
-
-  // 初始化选择器位置函数 - 新增函数修复错位
-  function initSegmentSelector() {
-    // 获取活跃的段落索引
-    const activeSegment = document.querySelector('.ios-segment-control .segment.active');
-    if (!activeSegment) return;
-    
-    const segments = document.querySelectorAll('.ios-segment-control .segment');
-    const activeIndex = Array.from(segments).indexOf(activeSegment);
-    const totalSegments = segments.length;
-    
-    const selector = document.querySelector('.segment-selector');
-    
-    if (selector) {
-      updateSelectorPosition(selector, activeIndex, totalSegments);
-    }
   }
 </script>
 </body>
