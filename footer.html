@@ -26,12 +26,45 @@
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
   }
   
-  /* 黑夜模式适配 */
+  /* 黑夜模式适配 - 通过父元素类名 */
   body.dark-theme .footer,
   body.auto-theme.dark-mode .footer {
     background-color: #1C1C1E; /* iOS 深色背景 - 暗色模式 */
     color: #98989D; /* iOS 辅助灰色文本 - 暗色模式 */
     border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  /* 使用媒体查询自动检测系统颜色方案 */
+  @media (prefers-color-scheme: dark) {
+    /* 当系统为暗色模式且父元素没有明确指定主题时应用 */
+    body:not(.light-theme) .footer:not(.footer-light) {
+      background-color: #1C1C1E !important; /* iOS 深色背景 - 暗色模式 */
+      color: #98989D !important; /* iOS 辅助灰色文本 - 暗色模式 */
+      border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+    
+    body:not(.light-theme) .footer:not(.footer-light) .footer-link:not(:hover) {
+      color: #AEAEB2 !important; /* iOS 文本颜色 - 暗色模式 */
+    }
+    
+    body:not(.light-theme) .footer:not(.footer-light) .footer-link:hover {
+      color: #0A84FF !important; /* iOS 蓝色 - 暗色模式 */
+    }
+  }
+  
+  /* 由JavaScript添加的自动黑暗模式类 */
+  .footer.footer-auto-dark {
+    background-color: #1C1C1E !important; /* iOS 深色背景 - 暗色模式 */
+    color: #98989D !important; /* iOS 辅助灰色文本 - 暗色模式 */
+    border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+  }
+  
+  .footer.footer-auto-dark .footer-link:not(:hover) {
+    color: #AEAEB2 !important; /* iOS 文本颜色 - 暗色模式 */
+  }
+  
+  .footer.footer-auto-dark .footer-link:hover {
+    color: #0A84FF !important; /* iOS 蓝色 - 暗色模式 */
   }
   
   .footer-link {
@@ -68,3 +101,84 @@
     }
   }
 </style>
+
+<script>
+  // 自动检测系统颜色方案并应用相应主题
+  (function() {
+    // 检查浏览器是否支持matchMedia API
+    if (!window.matchMedia) {
+      console.log('Browser does not support matchMedia API, using fallback for footer theme');
+      return; // 如果不支持，则退出并依赖CSS的媒体查询
+    }
+    
+    try {
+      // 初始检测
+      applyThemeBasedOnSystemPreference();
+      
+      // 安全地添加事件监听器
+      const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      
+      // 检查是否支持addEventListener (较新的浏览器)
+      if (darkModeMediaQuery.addEventListener) {
+        darkModeMediaQuery.addEventListener('change', applyThemeBasedOnSystemPreference);
+      } else if (darkModeMediaQuery.addListener) {
+        // 兼容旧版API
+        darkModeMediaQuery.addListener(applyThemeBasedOnSystemPreference);
+      }
+      
+      // 当DOM内容改变时重新应用主题（处理动态加载的情况）
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+          // 确保在DOM完全加载后再次应用主题
+          setTimeout(applyThemeBasedOnSystemPreference, 100);
+        });
+      } else {
+        // 如果DOM已经加载完成，立即应用
+        setTimeout(applyThemeBasedOnSystemPreference, 100);
+      }
+      
+      // 当Window加载完成时确保主题应用正确
+      window.addEventListener('load', function() {
+        setTimeout(applyThemeBasedOnSystemPreference, 200);
+      });
+    } catch (error) {
+      console.error('Error setting up theme detection for footer:', error);
+    }
+    
+    function applyThemeBasedOnSystemPreference() {
+      try {
+        // 检查系统是否为暗色模式
+        const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        // 获取footer元素
+        const footer = document.querySelector('.footer');
+        if (!footer) return;
+        
+        // 检查页面是否已有明确的主题设置
+        const body = document.body;
+        if (!body) return; // 安全检查
+        
+        const hasExplicitTheme = body.classList.contains('dark-theme') || 
+                                (body.classList.contains('auto-theme') && body.classList.contains('dark-mode')) ||
+                                body.classList.contains('light-theme');
+        
+        // 只有在没有明确主题设置的情况下才应用系统偏好
+        if (!hasExplicitTheme) {
+          if (isDarkMode) {
+            footer.classList.add('footer-auto-dark');
+          } else {
+            footer.classList.remove('footer-auto-dark');
+          }
+        }
+        
+        // 设置自定义数据属性以便于调试
+        footer.dataset.themeSource = hasExplicitTheme ? 'page' : (isDarkMode ? 'system-dark' : 'system-light');
+      } catch (error) {
+        console.error('Error applying theme to footer:', error);
+      }
+    }
+    
+    // 定期检查，以防主题切换或DOM更改
+    setInterval(applyThemeBasedOnSystemPreference, 5000);
+  })();
+</script>
