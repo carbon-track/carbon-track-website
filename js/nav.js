@@ -319,7 +319,7 @@ function updateLoginStatus() {
         $('[data-target="#registerModal"]').hide();
     } else {
         $('.logoutControl').hide();
-        $('#userStatus').text('Please login or register:');
+        $('#userStatus').text('Please sign in or register:');
         $('#loginButton').show();
         $('[data-target="#loginModal"]').show();
         $('[data-target="#registerModal"]').show();
