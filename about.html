@@ -808,11 +808,11 @@
         if (response && response.success) {
           $('#userCount').text(response.count);
         } else {
-          $('#userCount').text('Loading failed');
+          $('#userCount').text('Loading...');
         }
       },
       error: function (xhr, status, error) {
-        $('#userCount').text('Loading failed');
+        $('#userCount').text('Loading...');
         console.error('Failed to update community count: ', status, error);
       },
     });
@@ -831,7 +831,7 @@
         }
       },
       error: function (xhr, status, error) {
-        $('#totalPoints').text('Loading failed');
+        $('#totalPoints').text('Loading...');
         console.error('Failed to update total points: ', status, error);
       },
     });
