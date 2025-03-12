@@ -2043,7 +2043,7 @@ function initLoginModal() {
                     </div>
                     <div style="display: flex; justify-content: space-between; width: 100%;">
                         <a href="iforgot.html">Forgot password?</a>
-                        <a href="#" data-toggle="modal" data-target="#registerModal">Create Account</a>
+                        <a href="#" data-toggle="modal" data-target="#registerModal">Create new account</a>
                     </div>
                 </div>
             </div>
