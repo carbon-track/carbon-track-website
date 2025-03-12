@@ -1205,7 +1205,7 @@ function loadNavbar() {
                     <span class="navbar-text mx-2 text-light" id="userStatus">Please login or register:</span>
                     <div class="nav-item auth-buttons">
                         <!-- Use iOS-style button classes -->
-                        <button class="btn btn-ios-primary btn-sm mx-1" data-toggle="modal" data-target="#loginModal">Sign In</button>
+                        <button class="btn btn-ios-primary btn-sm mx-1" data-toggle="modal" data-target="#loginModal">Sign in</button>
                         <button class="btn btn-ios-secondary btn-sm mx-1" data-toggle="modal" data-target="#registerModal">Register</button>
                         <button class="btn btn-outline-danger btn-sm mx-1" id="logoutButton" style="display:none;">Logout</button>
                     </div>
@@ -2019,7 +2019,7 @@ function initLoginModal() {
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="loginModalLabel">Sign In</h5>
+                    <h5 class="modal-title" id="loginModalLabel">Sign in</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -2034,7 +2034,7 @@ function initLoginModal() {
                             <label for="password">Password</label>
                             <input type="password" class="form-control" id="password" placeholder="Enter your password">
                         </div>
-                        <button type="submit" class="btn btn-success btn-block">Sign In</button>
+                        <button type="submit" class="btn btn-success btn-block">Sign in</button>
                     </form>
                 </div>
                 <div class="modal-footer" style="flex-direction: column;">
