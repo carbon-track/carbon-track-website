@@ -442,7 +442,7 @@ function updateButtonForRemainingTime() {
         // 使用setTimeout来延迟下一次调用，无需清除定时器
         setTimeout(updateButtonForRemainingTime, 1000);
     } else {
-        $('#sendVerificationCode').text('发送验证码');
+        $('#sendVerificationCode').text('发送验证码 Send verification code');
         $('#sendVerificationCode').prop('disabled', false);
     }
 }
