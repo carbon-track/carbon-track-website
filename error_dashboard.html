@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>O&M Dashboard - Error Logs</title>
+    <!-- 引入 Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- 引入 Font Awesome 图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    <!-- 自定义样式 -->
+    <style>
+        body {
+            background-color: #f4f6f9;
+        }
+        .navbar {
+            background-color: #3c8dbc;
+        }
+        .navbar-brand, .navbar-nav .nav-link {
+            color: #fff;
+        }
+        .navbar-brand:hover, .navbar-nav .nav-link:hover {
+            color: #e0e0e0;
+        }
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            background-color: #fff;
+        }
+        .card-header {
+            background-color: #fff;
+            border-bottom: none;
+        }
+        .card-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: #333;
+        }
+        .icon-large {
+            font-size: 2rem;
+            color: #3c8dbc;
+        }
+        .stat-card {
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        .stat-card .card-body {
+            padding: 20px;
+        }
+        .stat-card .fa-3x {
+            font-size: 3rem;
+        }
+        .stat-card .card-title {
+            margin-top: 15px;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        .stat-card .card-text {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+        }
+        .btn-primary {
+            background-color: #3c8dbc;
+            border-color: #367fa9;
+        }
+        .btn-primary:hover {
+            background-color: #367fa9;
+            border-color: #204d74;
+        }
+        .no-data {
+            text-align: center;
+            font-size: 18px;
+            color: #666;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        /* 图表容器 */
+        .chart-container {
+            position: relative;
+            height: 40vh;
+            width: 100%;
+        }
+        /* 错误日志动画 */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .form-inline input, .form-inline select, .form-inline button, .form-check {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+        }
+        /* 错误日志折叠样式 */
+        .error-log-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .error-log-card-body {
+            padding: 15px;
+            border: 1px solid #dee2e6;
+            border-top: none;
+        }
+        .error-log-details {
+            margin-top: 10px;
+        }
+        .error-log-details p {
+            margin: 5px 0;
+        }
+        .error-log-details pre {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+    <!-- 引入 Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- 引入 Chart.js 插件（用于显示图表中的图标） -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <!-- 引入时间适配器（用于处理时间刻度） -->
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@1.0.0"></script>
+</head>
+<body>
+
+<!-- 导航栏 -->
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <a class="navbar-brand" href="#"><i class="fas fa-tools"></i> O&M Dashboard </a>
+</nav>
+
+<div class="container mt-5">
+    <!-- 四宫格统计信息 -->
+    <div class="row mb-4">
+        <div class="col-md-3 col-sm-6">
+            <div class="card text-center stat-card" onclick="filterByErrorType('Error')">
+                <div class="card-body">
+                    <i class="fas fa-exclamation-circle fa-3x text-danger mb-2"></i>
+                    <h5 class="card-title">总错误数</h5>
+                    <p class="card-text" id="totalErrors">0</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="card text-center stat-card" onclick="filterByErrorType('Exception')">
+                <div class="card-body">
+                    <i class="fas fa-bug fa-3x text-warning mb-2"></i>
+                    <h5 class="card-title">总异常数</h5>
+                    <p class="card-text" id="totalExceptions">0</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="card text-center stat-card" onclick="filterByErrorType('Fatal Error')">
+                <div class="card-body">
+                    <i class="fas fa-skull-crossbones fa-3x text-dark mb-2"></i>
+                    <h5 class="card-title">致命错误</h5>
+                    <p class="card-text" id="fatalErrors">0</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="card text-center stat-card" onclick="filterByErrorType('HTTP Errors')">
+                <div class="card-body">
+                    <i class="fas fa-server fa-3x text-primary mb-2"></i>
+                    <h5 class="card-title">HTTP 错误</h5>
+                    <p class="card-text" id="httpErrors">0</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 四宫格图表 -->
+    <div class="row">
+        <div class="col-md-6">
+            <!-- 错误类型统计 -->
+            <div class="card">
+                <div class="card-header d-flex align-items-center">
+                    <h2><i class="fas fa-exclamation-triangle icon-large mr-2"></i> 错误类型统计</h2>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="errorTypeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <!-- 每日错误统计 -->
+            <div class="card">
+                <div class="card-header d-flex align-items-center">
+                    <h2><i class="fas fa-chart-line icon-large mr-2"></i> 每日错误统计（最近7天）</h2>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="dailyErrorChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <!-- 按小时错误统计 -->
+            <div class="card">
+                <div class="card-header d-flex align-items-center">
+                    <h2><i class="fas fa-clock icon-large mr-2"></i> 按小时错误统计</h2>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="hourlyErrorChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <!-- 按星期错误统计 -->
+            <div class="card">
+                <div class="card-header d-flex align-items-center">
+                    <h2><i class="fas fa-calendar-alt icon-large mr-2"></i> 按星期错误统计</h2>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="weeklyErrorChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 搜索表单 -->
+    <div class="card">
+        <div class="card-header d-flex align-items-center">
+            <h2><i class="fas fa-search icon-large mr-2"></i> 搜索错误日志</h2>
+        </div>
+        <div class="card-body">
+            <form class="form-inline justify-content-center" onsubmit="event.preventDefault(); loadErrorLogs();">
+                <input type="text" id="keyword" class="form-control mr-2" placeholder="搜索关键词">
+                <input type="date" id="start_date" class="form-control mr-2">
+                <input type="date" id="end_date" class="form-control mr-2">
+                <select id="error_type" class="form-control mr-2">
+                    <option value="">所有类型</option>
+                    <option value="Error">错误</option>
+                    <option value="Exception">异常</option>
+                    <option value="Fatal Error">致命错误</option>
+                    <option value="HTTP 400 Error">HTTP 400 错误</option>
+                    <option value="HTTP 401 Error">HTTP 401 错误</option>
+                    <option value="HTTP 403 Error">HTTP 403 错误</option>
+                    <option value="HTTP 404 Error">HTTP 404 错误</option>
+                    <option value="HTTP 405 Error">HTTP 405 错误</option>
+                    <option value="HTTP 422 Error">HTTP 422 错误</option>
+                    <option value="HTTP 500 Error">HTTP 500 错误</option>
+                </select>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> 搜索</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 按小时错误统计时间范围选择 -->
+    <div class="card">
+        <div class="card-header d-flex align-items-center">
+            <h2><i class="fas fa-clock icon-large mr-2"></i> 按小时错误统计时间范围</h2>
+        </div>
+        <div class="card-body">
+            <form class="form-inline justify-content-center">
+                <input type="date" id="hourly_start_date" class="form-control mr-2" placeholder="开始日期">
+                <input type="date" id="hourly_end_date" class="form-control mr-2" placeholder="结束日期">
+                <!-- 添加复选框 -->
+                <div class="form-check mr-2">
+                    <input class="form-check-input" type="checkbox" id="hide_zero_errors">
+                    <label class="form-check-label" for="hide_zero_errors">
+                        隐藏错误数为0的时间段
+                    </label>
+                </div>
+                <button type="button" class="btn btn-primary" onclick="loadHourlyErrorStats()"><i class="fas fa-sync-alt"></i> 更新图表</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 错误日志列表 -->
+    <div id="errorLogsContainer" class="mt-4">
+        <!-- 错误日志将通过 JavaScript 动态插入 -->
+    </div>
+</div>
+
+<!-- 引入必要的脚本 -->
+<!-- jQuery 和 Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<!-- Popper.js -->
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<!-- Bootstrap JS -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<!-- 自定义脚本 -->
+<script>
+    // 从 Cookie 中获取 Token
+    function getTokenFromCookie() {
+        return localStorage.getItem('token');
+    }
+
+    let token = getTokenFromCookie();
+    alert(token);
+    // 验证令牌
+    function authenticate() {
+        const formData = new URLSearchParams();
+        formData.append('token', token);
+
+        fetch('verify_admin.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: formData.toString()
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (!data.success) {
+                alert('认证失败: ' + token);
+                window.location.href = '/'; // 重定向到主页或登录页
+            } else {
+                // 加载统计数据和错误日志
+                loadErrorStats();
+                loadErrorLogs();
+            }
+        })
+        .catch(error => {
+            console.error('认证错误:', error);
+        });
+    }
+
+    // 加载错误统计数据
+    function loadErrorStats() {
+        fetch('get_error_stats.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ token })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('加载统计数据:', data); // 调试日志
+            if (data.success) {
+                renderErrorTypeChart(data.errorTypeStats);
+                renderDailyErrorChart(data.dailyErrorStats);
+                renderWeeklyErrorChart(data.weeklyErrorStats);
+                updateStatCards(data.errorTypeStats);
+                // 初始加载“按小时错误统计”图表，默认时间范围为最近一天
+                const today = new Date();
+                const yesterday = new Date();
+                yesterday.setDate(today.getDate() - 1);
+                document.getElementById('hourly_start_date').value = yesterday.toISOString().split('T')[0];
+                document.getElementById('hourly_end_date').value = today.toISOString().split('T')[0];
+                loadHourlyErrorStats();
+            } else {
+                alert('加载错误统计数据失败: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('加载统计数据错误:', error);
+        });
+    }
+
+    // 更新四宫格统计信息
+    function updateStatCards(stats) {
+        let totalErrors = 0;
+        let totalExceptions = 0;
+        let fatalErrors = 0;
+        let httpErrors = 0;
+
+        stats.forEach(item => {
+            const count = parseInt(item.count);
+            switch (item.error_type) {
+                case 'Error':
+                    totalErrors += count;
+                    break;
+                case 'Exception':
+                    totalExceptions += count;
+                    break;
+                case 'Fatal Error':
+                    fatalErrors += count;
+                    break;
+                case 'HTTP 400 Error':
+                case 'HTTP 401 Error':
+                case 'HTTP 403 Error':
+                case 'HTTP 404 Error':
+                case 'HTTP 405 Error':
+                case 'HTTP 422 Error':
+                case 'HTTP 500 Error':
+                    httpErrors += count;
+                    break;
+            }
+        });
+
+        document.getElementById('totalErrors').textContent = totalErrors;
+        document.getElementById('totalExceptions').textContent = totalExceptions;
+        document.getElementById('fatalErrors').textContent = fatalErrors;
+        document.getElementById('httpErrors').textContent = httpErrors;
+    }
+
+    // 渲染错误类型统计图表
+    function renderErrorTypeChart(stats) {
+        const ctx = document.getElementById('errorTypeChart').getContext('2d');
+        const labels = stats.map(item => item.error_type);
+        const counts = stats.map(item => parseInt(item.count));
+
+        const backgroundColors = [
+            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#FF6384', '#36A2EB'
+        ];
+
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: counts,
+                    backgroundColor: backgroundColors
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    },
+                    datalabels: {
+                        formatter: (value, ctx) => {
+                            return ctx.chart.data.labels[ctx.dataIndex];
+                        },
+                        color: '#fff',
+                    }
+                }
+            },
+            plugins: [ChartDataLabels]
+        });
+    }
+
+    // 渲染每日错误统计图表
+    function renderDailyErrorChart(stats) {
+        const ctx = document.getElementById('dailyErrorChart').getContext('2d');
+        const labels = stats.map(item => item.date);
+        const counts = stats.map(item => parseInt(item.count));
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: '错误数',
+                    data: counts,
+                    backgroundColor: '#36A2EB',
+                    borderColor: '#367fa9',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        },
+                        title: {
+                            display: true,
+                            text: '错误数'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: '日期'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+    }
+
+    // 加载指定时间范围内的按小时错误统计数据
+    function loadHourlyErrorStats() {
+        const startDate = document.getElementById('hourly_start_date').value;
+        const endDate = document.getElementById('hourly_end_date').value;
+
+        // 检查日期输入
+        if (!startDate || !endDate) {
+            alert('请同时选择开始日期和结束日期进行按小时统计。');
+            return;
+        }
+
+        fetch('get_error_stats.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                token,
+                hourly_start_date: startDate,
+                hourly_end_date: endDate
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('加载按小时错误统计数据:', data); // 调试日志
+            if (data.success) {
+                renderHourlyErrorChart(data.hourlyErrorStats, startDate, endDate);
+            } else {
+                console.error('加载按小时错误统计数据失败:', data.error);
+                alert('加载按小时错误统计数据失败: ' + (data.error || '未知错误'));
+            }
+        })
+        .catch(error => {
+            console.error('加载按小时错误统计数据错误:', error);
+            alert('加载按小时错误统计数据时发生错误。');
+        });
+    }
+
+    // 渲染按小时错误统计图表
+    function renderHourlyErrorChart(stats, startDate, endDate) {
+        const ctx = document.getElementById('hourlyErrorChart').getContext('2d');
+
+        // 生成指定日期范围内的所有小时
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999); // 将结束日期设为当天的最后一刻
+
+        const labels = [];
+        const counts = [];
+
+        // 创建一个 Map，用于快速查找统计数据
+        const statsMap = new Map();
+        stats.forEach(item => {
+            statsMap.set(item.hour_label, parseInt(item.count));
+        });
+
+        // 获取复选框状态
+        const hideZeroErrors = document.getElementById('hide_zero_errors').checked;
+
+        // 遍历日期范围，生成每个小时的标签和数据
+        for (let d = new Date(start); d <= end; d.setHours(d.getHours() + 1)) {
+            const label = moment(d).format('YYYY-MM-DD HH');
+            const count = statsMap.get(label) || 0;
+
+            // 根据复选框状态决定是否添加到数组
+            if (hideZeroErrors && count === 0) {
+                continue; // 跳过错误数量为 0 的时间段
+            }
+
+            labels.push(label);
+            counts.push(count);
+        }
+
+        // 销毁旧的图表（如果存在）
+        if (window.hourlyChart) {
+            window.hourlyChart.destroy();
+        }
+
+        // 创建新的图表
+        window.hourlyChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: '错误数',
+                    data: counts,
+                    fill: false,
+                    borderColor: '#FF6384',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            parser: 'YYYY-MM-DD HH',
+                            unit: 'hour',
+                            displayFormats: {
+                                hour: 'MMM D, HH:mm'
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: '时间'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: '错误数'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+    }
+
+    // 渲染按星期错误统计图表
+function renderWeeklyErrorChart(stats) {
+    console.log('渲染按星期错误统计图表的数据:', stats); // 调试日志
+    if (!stats || stats.length === 0) {
+        console.error('weeklyErrorStats 数据未定义或为空。');
+        return;
+    }
+
+    const ctx = document.getElementById('weeklyErrorChart').getContext('2d');
+    const labels = ['星期一','星期二', '星期三', '星期四', '星期五', '星期六', '星期日'];
+    const counts = Array(7).fill(0);
+
+    stats.forEach(item => {
+        const weekday = parseInt(item.weekday);
+        const count = parseInt(item.count);
+
+        if (weekday >= 0 && weekday < 7) {
+            counts[weekday] = count;
+        } else {
+            console.warn(`无效的 weekday 值: ${item.weekday}`);
+        }
+    });
+
+    console.log('Weekly Counts:', counts); // 确认 counts 数组
+
+    new Chart(ctx, {
+        type: 'polarArea',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: counts,
+                backgroundColor: [
+                    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#FF6384'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'right',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            // 使用 context.raw 直接获取数据值
+                            const value = context.raw;
+                            return `${context.label}: ${value}`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+
+    // 加载错误日志列表
+    function loadErrorLogs(specialType) {
+        const keyword = document.getElementById('keyword').value;
+        const startDate = document.getElementById('start_date').value;
+        const endDate = document.getElementById('end_date').value;
+        let errorType = document.getElementById('error_type').value;
+
+        // 如果是特殊类型 HTTP Errors
+        if (specialType === 'HTTP Errors') {
+            errorType = 'HTTP Errors';
+        }
+
+        console.log('加载错误日志参数:', { keyword, startDate, endDate, errorType }); // 调试日志
+
+        fetch('get_error_logs.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                token,
+                keyword,
+                start_date: startDate,
+                end_date: endDate,
+                error_type: errorType
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('加载错误日志响应:', data); // 调试日志
+            if (data.success) {
+                renderErrorLogs(data.data);
+            } else {
+                alert('加载错误日志失败: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('加载错误日志错误:', error);
+        });
+    }
+
+    // 渲染错误日志列表，保持展开折叠样式并增强视觉分隔
+    function renderErrorLogs(logs) {
+        const container = document.getElementById('errorLogsContainer');
+        if (logs.length === 0) {
+            container.innerHTML = '<p class="no-data fade-in">未找到匹配的错误日志。</p>';
+            return;
+        }
+
+        let html = `<div class="accordion fade-in" id="errorLogsAccordion">`;
+
+        logs.forEach((log, index) => {
+            const logId = log.id;
+            const collapseId = 'collapse' + index;
+            const headingId = 'heading' + index;
+
+            // 根据错误类型选择合适的图标
+            let iconClass = '';
+            switch (log.error_type) {
+                case 'Error':
+                    iconClass = 'fas fa-exclamation-circle text-danger';
+                    break;
+                case 'Exception':
+                    iconClass = 'fas fa-bug text-warning';
+                    break;
+                case 'Fatal Error':
+                    iconClass = 'fas fa-skull-crossbones text-dark';
+                    break;
+                case 'HTTP 400 Error':
+                case 'HTTP 401 Error':
+                case 'HTTP 403 Error':
+                case 'HTTP 404 Error':
+                case 'HTTP 405 Error':
+                case 'HTTP 422 Error':
+                case 'HTTP 500 Error':
+                    iconClass = getHttpErrorIcon(log.error_type);
+                    break;
+                default:
+                    iconClass = 'fas fa-exclamation-triangle text-danger';
+            }
+
+            html += `
+            <div class="card">
+                <div class="card-header error-log-header" id="${headingId}">
+                    <h2 class="mb-0">
+                        <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#${collapseId}" aria-expanded="false" aria-controls="${collapseId}">
+                            <i class="${iconClass}"></i> [${escapeHtml(log.error_time)}] ${escapeHtml(log.error_type)}: ${escapeHtml(log.error_message)}
+                        </button>
+                    </h2>
+                </div>
+
+                <div id="${collapseId}" class="collapse" aria-labelledby="${headingId}" data-parent="#errorLogsAccordion">
+                    <div class="card-body error-log-card-body">
+                        <div class="error-log-details">
+                            <p><strong>错误类型:</strong> ${escapeHtml(log.error_type)}</p>
+                            <p><strong>错误消息:</strong> ${nl2br(escapeHtml(log.error_message))}</p>
+                            <p><strong>文件:</strong> ${escapeHtml(log.error_file)}</p>
+                            <p><strong>行号:</strong> ${escapeHtml(log.error_line)}</p>
+                            <p><strong>脚本名称:</strong> ${escapeHtml(log.script_name)}</p>
+                            <h5>客户端数据</h5>
+                            <p><strong>GET:</strong></p>
+                            <pre>${formatJson(log.client_get)}</pre>
+                            <p><strong>POST:</strong></p>
+                            <pre>${formatJson(log.client_post)}</pre>
+                            <p><strong>FILES:</strong></p>
+                            <pre>${formatJson(log.client_files)}</pre>
+                            <p><strong>COOKIE:</strong></p>
+                            <pre>${formatJson(log.client_cookie)}</pre>
+                            <p><strong>SESSION:</strong></p>
+                            <pre>${formatJson(log.client_session)}</pre>
+                            <p><strong>SERVER:</strong></p>
+                            <pre>${formatJson(log.client_server)}</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            `;
+        });
+
+        html += `</div>`;
+
+        container.innerHTML = html;
+    }
+
+    // 获取HTTP错误类型对应的图标
+    function getHttpErrorIcon(errorType) {
+        switch (errorType) {
+            case 'HTTP 400 Error':
+                return 'fas fa-ban text-info';
+            case 'HTTP 401 Error':
+                return 'fas fa-user-lock text-warning';
+            case 'HTTP 403 Error':
+                return 'fas fa-shield-alt text-secondary';
+            case 'HTTP 404 Error':
+                return 'fas fa-search-minus text-muted';
+            case 'HTTP 405 Error':
+                return 'fas fa-times-circle text-danger';
+            case 'HTTP 422 Error':
+                return 'fas fa-user-lock text-warning';
+            case 'HTTP 500 Error':
+                return 'fas fa-server text-primary';
+            default:
+                return 'fas fa-exclamation-triangle text-danger';
+        }
+    }
+
+    // 转义 HTML
+    function escapeHtml(text) {
+        if (text === null || text === undefined) return '';
+        return String(text)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    // 格式化 JSON 数据
+    function formatJson(jsonStr) {
+        if (!jsonStr) return '';
+        try {
+            const obj = JSON.parse(jsonStr);
+            return escapeHtml(JSON.stringify(obj, null, 2));
+        } catch (e) {
+            return escapeHtml(jsonStr);
+        }
+    }
+
+    // 处理换行符
+    function nl2br(str) {
+        if (!str) return '';
+        return str.replace(/\n/g, '<br>');
+    }
+
+    // 根据错误类型过滤错误日志
+    function filterByErrorType(type) {
+        if (type === 'HTTP Errors') {
+            // 如果是 HTTP Errors，需要包含多个类型
+            loadErrorLogs('HTTP Errors');
+        } else {
+            loadErrorLogs();
+        }
+    }
+
+    // 页面加载时进行鉴权
+    authenticate();
+</script>
+
+
+</body>
+</html>
