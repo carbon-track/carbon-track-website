@@ -7,7 +7,7 @@ $db_pass = 'your_password';
 try {
     $pdo = new PDO($dsn, $db_user, $db_pass, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
 } catch (PDOException $e) {
-    die(json_encode(['success' => false, 'message' => '数据库连接失败']));
+    die(json_encode(['success' => false, 'message' => '数据库连接失败Fail to connect to database']));
 }
 
 // 获取用户提交的数据
