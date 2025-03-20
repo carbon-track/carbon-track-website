@@ -1,13 +1,13 @@
 <?php
-// 连接数据库
-$dsn = 'mysql:host=localhost;dbname=carbontrack_schema_with_data;charset=utf8mb4';
-$db_user = 'your_username';
-$db_pass = 'your_password';
+// 数据库连接信息
+$dsn = 'mysql:host=localhost;dbname=carbontrack;charset=utf8mb4';
+$db_user = 'carbontrack';
+$db_pass = 'ctbcarbontrack123!';
 
 try {
     $pdo = new PDO($dsn, $db_user, $db_pass, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
 } catch (PDOException $e) {
-    die(json_encode(['success' => false, 'message' => '数据库连接失败Fail to connect to database']));
+    die(json_encode(['success' => false, 'message' => '数据库连接失败']));
 }
 
 // 获取用户提交的数据
@@ -27,8 +27,8 @@ if (!$user) {
 
 $user_id = $user['id'];
 
-// 获取活动的碳减排因子
-$stmt = $pdo->prepare("SELECT reduction_factor, bonus_points FROM carbon_factors WHERE activity = :activity");
+// 从数据库获取碳减排行为的计算因子
+$stmt = $pdo->prepare("SELECT reduction_factor, unit, bonus_points FROM carbon_factors WHERE activity = :activity");
 $stmt->execute(['activity' => $activity]);
 $factor = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -38,6 +38,7 @@ if (!$factor) {
 
 $reduction_factor = $factor['reduction_factor'];
 $bonus_points = $factor['bonus_points'];
+$unit = $factor['unit'];
 
 // 计算碳减排量和积分
 $carbon_reduction = $quantity * $reduction_factor;
