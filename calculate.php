@@ -1,6 +1,6 @@
 <?php
 // 连接数据库
-$dsn = 'mysql:host=localhost;dbname=carbontrack;charset=utf8mb4';
+$dsn = 'mysql:host=localhost;dbname=carbontrack_schema_with_data;charset=utf8mb4';
 $db_user = 'your_username';
 $db_pass = 'your_password';
 
