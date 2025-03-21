@@ -1021,10 +1021,48 @@
       
       // 活动选项映射
       var options = {
-        'transport': ['公交出行1km / Bus transport 1km', '地铁出行1km / Subway travel 1km', '步行1km / Walk 1km', '骑行1km / Cycle 1km', '拼车1km / Carpool 1km'],
-        'energy': ['上网课1h / Online class 1h', '提交电子作业1次 / Write assignment electronically 1 time'],
-        'food': ['减少肉类消费1kg / Reduce meat consumption 1kg', '光盘行动1次 / Finish everything on your plate 1 time'],
-        'waste': ['旧衣回收1kg / Recycle 1kg old clothes', '二手交易1次 / Second-hand transaction 1 time', '衣物租赁1次 / Clothing rental service 1 time', '居家回收利用']
+        'transport':  [
+              '购物时自带袋子 / Bring your own bag when shopping',
+              '早睡觉一小时 / Sleep an hour earlier',
+              '刷牙时关掉水龙头 / Turn off the tap while brushing teeth',
+              '出门自带水杯 / Bring your own water bottle',
+              '垃圾分类 / Sort waste properly',
+              '减少打印纸 / Reduce unnecessary printing paper',
+              '减少使用一次性餐盒 / Reduce disposable meal boxes',
+              '简易包装礼物 / Use minimal gift wrapping',
+              '夜跑 / Night running',
+              '自然风干湿发 / Air-dry wet hair',
+              '点外卖选择“无需餐具” / Choose No-Cutlery when ordering delivery',
+              '下班时关电脑和灯 / Turn off computer and lights when off-duty',
+              '晚上睡觉全程关灯 / Keep lights off at night',
+              '快速洗澡 / Take a quick shower',
+              '阳光晾晒衣服 / Sun-dry clothes',
+              '夏天空调调至26°C以上 / Set AC to above 78°F during Summer',
+              '攒够一桶衣服再洗 / Save and wash a full load of clothes',
+              '化妆品用完购买替代装 / Buy refillable cosmetics or toiletries',
+              '购买本地应季水果 / Buy local seasonal fruits',
+              '自己做饭 / Cook at home',
+              '吃一顿轻食 / Have a light meal',
+              '吃完水果蔬菜 / Finish all fruits and vegetables',
+              '光盘行动 / Finish all food on the plate',
+              '喝燕麦奶或植物基食品 / Drink oat milk or plant-based food',
+              '公交地铁通勤 / Use public transport',
+              '骑行探索城市 / Explore the city by bike',
+              '种一棵树 / Plant a tree',
+              '购买二手书 / Buy a second-hand book',
+              '乘坐快轨去机场 / Take high-speed rail to the airport',
+              '拼车 / Carpool',
+              '自行车出行 / Travel by bike',
+              '旅行时自备洗漱用品 / Bring your own toiletries when traveling',
+              '旧物改造 / Repurpose old items',
+              '购买一级能效家电 / Buy an energy-efficient appliance',
+              '购买白色或浅色衣物 / Buy white or light-colored clothes',
+              '花一天享受户外 / Spend a full day outdoors',
+              '自己种菜并吃 / Grow and eat your own vegetables',
+              '减少使用手机时间 / Reduce screen time'],
+        'energy': [],
+        'food': [],
+        'waste': []
       };
       
       // 中英文类别映射
@@ -1066,39 +1104,91 @@
 
       // 减排系数（kg CO2 per unit）
       var reductionFactors = {
-        '旧衣回收1kg / Recycle 1kg old clothes': 3.6,
-        '二手交易1次 / Second-hand transaction 1 time': 10, // 基础分值 + 4
-        '衣物租赁1次 / Clothing rental service 1 time': 10, // 基础分值 + 4
-        '减少肉类消费1kg / Reduce meat consumption 1kg': 15.54,
-        '光盘行动1次 / Finish everything on your plate 1 time': 0.0329041095890411,
-        '居家回收利用': 10, // 基础分值 + 4
-        '公交出行1km / Bus transport 1km': 0.094,
-        '地铁出行1km / Subway travel 1km': 0.089,
-        '步行1km / Walk 1km': 0.135,
-        '骑行1km / Cycle 1km': 0.05,
-        '拼车1km / Carpool 1km': 0.0675,
-        '上网课1h / Online class 1h': 0.15,
-        '提交电子作业1次 / Write assignment electronically 1 time': 0.05
+        '购物时自带袋子 / Bring your own bag when shopping': 0.0190,
+        '早睡觉一小时 / Sleep an hour earlier': 0.0950,
+        '刷牙时关掉水龙头 / Turn off the tap while brushing teeth': 0.0090,
+        '出门自带水杯 / Bring your own water bottle': 0.0400,
+        '垃圾分类 / Sort waste properly': 0.0004,
+        '减少打印纸 / Reduce unnecessary printing paper': 0.0040,
+        '减少使用一次性餐盒 / Reduce disposable meal boxes': 0.1900,
+        '简易包装礼物 / Use minimal gift wrapping': 0.1400,
+        '夜跑 / Night running': 0.0950,
+        '自然风干湿发 / Air-dry wet hair': 0.1520,
+        '点外卖选择“无需餐具” / Choose No-Cutlery when ordering delivery': 0.0540,
+        '下班时关电脑和灯 / Turn off computer and lights when off-duty': 0.1660,
+        '晚上睡觉全程关灯 / Keep lights off at night': 0.1100,
+        '快速洗澡 / Take a quick shower': 0.1200,
+        '阳光晾晒衣服 / Sun-dry clothes': 0.3230,
+        '夏天空调调至26°C以上 / Set AC to above 78°F during Summer': 0.2190,
+        '攒够一桶衣服再洗 / Save and wash a full load of clothes': 0.4730,
+        '化妆品用完购买替代装 / Buy refillable cosmetics or toiletries': 0.0850,
+        '购买本地应季水果 / Buy local seasonal fruits': 2.9800,
+        '自己做饭 / Cook at home': 0.1900,
+        '吃一顿轻食 / Have a light meal': 0.3600,
+        '吃完水果蔬菜 / Finish all fruits and vegetables': 0.0163,
+        '光盘行动 / Finish all food on the plate': 0.0163,
+        '喝燕麦奶或植物基食品 / Drink oat milk or plant-based food': 0.6430,
+        '公交地铁通勤 / Use public transport': 0.1005,
+        '骑行探索城市 / Explore the city by bike': 0.1490,
+        '种一棵树 / Plant a tree': 10.0000,
+        '购买二手书 / Buy a second-hand book': 2.8800,
+        '乘坐快轨去机场 / Take high-speed rail to the airport': 3.8700,
+        '拼车 / Carpool': 0.0450,
+        '自行车出行 / Travel by bike': 0.1490,
+        '旅行时自备洗漱用品 / Bring your own toiletries when traveling': 0.0470,
+        '旧物改造 / Repurpose old items': 0.7700,
+        '购买一级能效家电 / Buy an energy-efficient appliance': 2.1500,
+        '购买白色或浅色衣物 / Buy white or light-colored clothes': 3.4300,
+        '花一天享受户外 / Spend a full day outdoors': 0.7570,
+        '自己种菜并吃 / Grow and eat your own vegetables': 0.0250,
+        '减少使用手机时间 / Reduce screen time': 0.0003
       };
 
       // 单位标签
       var unitLabels = {
-        '旧衣回收1kg / Recycle 1kg old clothes': 'kg',
-        '二手交易1次 / Second-hand transaction 1 time': '次/times',
-        '衣物租赁1次 / Clothing rental service 1 time': '次/times',
-        '减少肉类消费1kg / Reduce meat consumption 1kg': 'kg',
-        '光盘行动1次 / Finish everything on your plate 1 time': '次/times',
-        '居家回收利用': '次/times',
-        '公交出行1km / Bus transport 1km': 'km',
-        '地铁出行1km / Subway travel 1km': 'km',
-        '步行1km / Walk 1km': 'km',
-        '骑行1km / Cycle 1km': 'km',
-        '拼车1km / Carpool 1km': 'km',
-        '上网课1h / Online class 1h': 'h',
-        '提交电子作业1次 / Write assignment electronically 1 time': '次/times'
+        // 格式：'完整中文名 / 完整英文名': '单位' 
+        '购物时自带袋子 / Bring your own bag when shopping': '个/count',
+        '早睡觉一小时 / Sleep an hour earlier': '小时/hours',
+        '刷牙时关掉水龙头 / Turn off the tap while brushing teeth': '次/times',
+        '出门自带水杯 / Bring your own water bottle': '次/times',
+        '垃圾分类 / Sort waste properly': '次/times',
+        '减少打印纸 / Reduce unnecessary printing paper': '张/count',
+        '减少使用一次性餐盒 / Reduce disposable meal boxes': '个/count',
+        '简易包装礼物 / Use minimal gift wrapping': '次/times',
+        '夜跑 / Night running': '小时/hours',
+        '自然风干湿发 / Air-dry wet hair': '次/times',
+        '点外卖选择“无需餐具” / Choose No-Cutlery when ordering delivery': '次/times',
+        '下班时关电脑和灯 / Turn off computer and lights when off-duty': '次/times',
+        '晚上睡觉全程关灯 / Keep lights off at night': '次/times',
+        '快速洗澡 / Take a quick shower': '次/times',
+        '阳光晾晒衣服 / Sun-dry clothes': '次/times',
+        '夏天空调调至26°C以上 / Set AC to above 78°F during Summer': '小时/hours',
+        '攒够一桶衣服再洗 / Save and wash a full load of clothes': '次/times',
+        '化妆品用完购买替代装 / Buy refillable cosmetics or toiletries': '瓶/count',
+        '购买本地应季水果 / Buy local seasonal fruits': 'kg',
+        '自己做饭 / Cook at home': '次/times',
+        '吃一顿轻食 / Have a light meal': '次/times',
+        '吃完水果蔬菜 / Finish all fruits and vegetables': '次/times',
+        '光盘行动 / Finish all food on the plate': '次/times',
+        '喝燕麦奶或植物基食品 / Drink oat milk or plant-based food': '次/times',
+        '公交地铁通勤 / Use public transport': 'km',
+        '骑行探索城市 / Explore the city by bike': 'km',
+        '种一棵树 / Plant a tree': '次/times',
+        '购买二手书 / Buy a second-hand book': '本/count',
+        '乘坐快轨去机场 / Take high-speed rail to the airport': '次/times',
+        '拼车 / Carpool': 'km',
+        '自行车出行 / Travel by bike': 'km',
+        '旅行时自备洗漱用品 / Bring your own toiletries when traveling': '次/times',
+        '旧物改造 / Repurpose old items': '次/times',
+        '购买一级能效家电 / Buy an energy-efficient appliance': '次/times',
+        '购买白色或浅色衣物 / Buy white or light-colored clothes': '件/count',
+        '花一天享受户外 / Spend a full day outdoors': '天/days',
+        '自己种菜并吃 / Grow and eat your own vegetables': 'kg',
+        '减少使用手机时间 / Reduce screen time': '小时/hours'
       };
 
-      // 自定义计算逻辑（针对带有额外加分的活动）
+      <!-- 
+      // 自定义计算逻辑（针对带有额外加分的活动）这个版本暂时没有加分活动
       var carbonSavings = 0;
       if (activity === '二手交易1次 / Second-hand transaction 1 time' || 
           activity === '衣物租赁1次 / Clothing rental service 1 time' || 
@@ -1107,6 +1197,7 @@
       } else {
         carbonSavings = dataInput * reductionFactors[activity];
       }
+      -->
 
       // 显示减排量和单位
       $('#unitLabel').text(unitLabels[activity] || 'units');
