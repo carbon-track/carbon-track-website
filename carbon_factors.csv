@@ -1,0 +1,14 @@
+activity,unit,reduction_factor,bonus_points
+旧衣回收1kg / Recycle 1kg old clothes,kg,3.6,0
+二手交易1次 / Second-hand transaction 1 time,times,10.0,4
+衣物租赁1次 / Clothing rental service 1 time,times,10.0,4
+减少肉类消费1kg / Reduce meat consumption 1kg,kg,15.54,0
+光盘行动1次 / Finish everything on your plate 1 time,times,0.0329,0
+居家回收利用,times,10.0,4
+公交出行1km / Bus transport 1km,km,0.094,0
+地铁出行1km / Subway travel 1km,km,0.089,0
+步行1km / Walk 1km,km,0.135,0
+骑行1km / Cycle 1km,km,0.05,0
+拼车1km / Carpool 1km,km,0.0675,0
+上网课1h / Online class 1h,h,0.15,0
+提交电子作业1次 / Write assignment electronically 1 time,times,0.05,0
