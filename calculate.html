@@ -1021,56 +1021,59 @@
       
       // 活动选项映射
       var options = {
-        'transport':  [
+        'Sustainable Mobility': [  
+              '公交地铁通勤 / Use public transport',
+              '骑行探索城市 / Explore the city by bike',
+              '拼车 / Carpool',
+              '自行车出行 / Travel by bike',
+              '乘坐快轨去机场 / Take high-speed rail to the airport'
+            ],
+        'Circular Economy': [
               '购物时自带袋子 / Bring your own bag when shopping',
+              '出门自带水杯 / Bring your own water bottle',
+              '减少使用一次性餐盒 / Reduce disposable meal boxes',
+              '垃圾分类 / Sort waste properly',
+              '旅行时自备洗漱用品 / Bring your own toiletries when traveling',
+              '旧物改造 / Repurpose old items',
+              '简易包装礼物 / Use minimal gift wrapping',
+              '减少打印纸 / Reduce unnecessary printing paper',
+              '化妆品用完购买替代装 / Buy refillable cosmetics or toiletries',
+              '购买二手书 / Buy a second-hand book',
+              '购买白色或浅色衣物 / Buy white or light-colored clothes',
+              '购买一级能效家电 / Buy an energy-efficient appliance',
+              '种一棵树 / Plant a tree'  
+            ],
+        'Low-Carbon Diet': [
+              '光盘行动 / Finish all food on the plate',
+              '吃完水果蔬菜 / Finish all fruits and vegetables',
+              '吃一顿轻食 / Have a light meal',
+              '喝燕麦奶或植物基食品 / Drink oat milk or plant-based food',
+              '购买本地应季水果 / Buy local seasonal fruits',
+              '自己种菜并吃 / Grow and eat your own vegetables',
+              '自己做饭 / Cook at home'
+            ],
+        'Green Lifestyle': [
               '早睡觉一小时 / Sleep an hour earlier',
               '刷牙时关掉水龙头 / Turn off the tap while brushing teeth',
-              '出门自带水杯 / Bring your own water bottle',
-              '垃圾分类 / Sort waste properly',
-              '减少打印纸 / Reduce unnecessary printing paper',
-              '减少使用一次性餐盒 / Reduce disposable meal boxes',
-              '简易包装礼物 / Use minimal gift wrapping',
-              '夜跑 / Night running',
-              '自然风干湿发 / Air-dry wet hair',
-              '点外卖选择“无需餐具” / Choose No-Cutlery when ordering delivery',
               '下班时关电脑和灯 / Turn off computer and lights when off-duty',
               '晚上睡觉全程关灯 / Keep lights off at night',
               '快速洗澡 / Take a quick shower',
-              '阳光晾晒衣服 / Sun-dry clothes',
               '夏天空调调至26°C以上 / Set AC to above 78°F during Summer',
-              '攒够一桶衣服再洗 / Save and wash a full load of clothes',
-              '化妆品用完购买替代装 / Buy refillable cosmetics or toiletries',
-              '购买本地应季水果 / Buy local seasonal fruits',
-              '自己做饭 / Cook at home',
-              '吃一顿轻食 / Have a light meal',
-              '吃完水果蔬菜 / Finish all fruits and vegetables',
-              '光盘行动 / Finish all food on the plate',
-              '喝燕麦奶或植物基食品 / Drink oat milk or plant-based food',
-              '公交地铁通勤 / Use public transport',
-              '骑行探索城市 / Explore the city by bike',
-              '种一棵树 / Plant a tree',
-              '购买二手书 / Buy a second-hand book',
-              '乘坐快轨去机场 / Take high-speed rail to the airport',
-              '拼车 / Carpool',
-              '自行车出行 / Travel by bike',
-              '旅行时自备洗漱用品 / Bring your own toiletries when traveling',
-              '旧物改造 / Repurpose old items',
-              '购买一级能效家电 / Buy an energy-efficient appliance',
-              '购买白色或浅色衣物 / Buy white or light-colored clothes',
+              '自然风干湿发 / Air-dry wet hair',
+              '阳光晾晒衣服 / Sun-dry clothes',
+              '减少使用手机时间 / Reduce screen time',
+              '夜跑 / Night running',
               '花一天享受户外 / Spend a full day outdoors',
-              '自己种菜并吃 / Grow and eat your own vegetables',
-              '减少使用手机时间 / Reduce screen time'],
-        'energy': [],
-        'food': [],
-        'waste': []
+              '攒够一桶衣服再洗 / Save and wash a full load of clothes'  
+            ]
       };
       
       // 中英文类别映射
       var categoryMapping = {
-        '衣': 'waste',
-        '食': 'food',
-        '行': 'transport',
-        '习': 'energy'
+        '绿色生活': 'Green Lifestyle',
+        '低碳饮食': 'Low-Carbon Diet',
+        '绿色出行': 'Sustainable Mobility',
+        '循环经济': 'Circular Economy'
       };
       
       // 确定使用哪个类别
@@ -1257,10 +1260,10 @@
           <div class="form-group">
               <label for="category">Category</label>
               <select class="form-control" id="category" name="category">
-                <option value="衣">衣 Clothing</option>
-                <option value="食">食 Eating</option>
-                <option value="行">行 Traveling</option>
-                <option value="习">习 Studying</option>
+                <option value="绿色生活">绿色生活 Green Lifestyle</option>
+                <option value="低碳饮食">低碳饮食 Low-Carbon Diet</option>
+                <option value="绿色出行">绿色出行 Sustainable Mobility</option>
+                <option value="循环经济">循环经济 Circular Economy</option>
               </select>
     </div>
           <div class="form-group">
