@@ -1,0 +1,34 @@
+2025-03-21 14:17:56 - 用户ID: 8, 伙伴ID: 10000
+2025-03-21 14:17:56 - 响应: {"success":true,"read_messages":[],"count":0}
+2025-03-21 14:18:01 - 用户ID: 8, 伙伴ID: 10000
+2025-03-21 14:18:01 - 响应: {"success":true,"read_messages":[],"count":0}
+2025-03-21 14:18:03 - 用户ID: 7, 伙伴ID: 10000
+2025-03-21 14:18:03 - 响应: {"success":true,"read_messages":[],"count":0}
+2025-03-21 14:18:06 - 用户ID: 8, 伙伴ID: 10000
+2025-03-21 14:18:06 - 响应: {"success":true,"read_messages":[],"count":0}
+2025-03-21 14:18:11 - 用户ID: 8, 伙伴ID: 10000
+2025-03-21 14:18:11 - 响应: {"success":true,"read_messages":[],"count":0}
+2025-03-21 14:18:16 - 用户ID: 8, 伙伴ID: 10000
+2025-03-21 14:18:16 - 响应: {"success":true,"read_messages":[],"count":0}
+2025-03-21 14:18:21 - 用户ID: 8, 伙伴ID: 10000
+2025-03-21 14:18:21 - 响应: {"success":true,"read_messages":[],"count":0}
+2025-03-21 14:18:26 - 用户ID: 8, 伙伴ID: 10000
+2025-03-21 14:18:26 - 响应: {"success":true,"read_messages":[],"count":0}
+2025-03-21 14:18:31 - 用户ID: 8, 伙伴ID: 10000
+2025-03-21 14:18:31 - 响应: {"success":true,"read_messages":[],"count":0}
+2025-03-21 14:18:36 - 用户ID: 8, 伙伴ID: 10000
+2025-03-21 14:18:36 - 响应: {"success":true,"read_messages":[],"count":0}
+2025-03-21 14:18:41 - 用户ID: 8, 伙伴ID: 10000
+2025-03-21 14:18:41 - 响应: {"success":true,"read_messages":[],"count":0}
+2025-03-21 14:18:46 - 用户ID: 8, 伙伴ID: 10000
+2025-03-21 14:18:46 - 响应: {"success":true,"read_messages":[],"count":0}
+2025-03-21 14:18:51 - 用户ID: 8, 伙伴ID: 10000
+2025-03-21 14:18:51 - 响应: {"success":true,"read_messages":[],"count":0}
+2025-03-21 14:19:54 - 用户ID: 7, 伙伴ID: 10000
+2025-03-21 14:19:54 - 响应: {"success":true,"read_messages":[],"count":0}
+2025-03-21 14:19:59 - 用户ID: 7, 伙伴ID: 10000
+2025-03-21 14:19:59 - 响应: {"success":true,"read_messages":[],"count":0}
+2025-03-21 14:20:04 - 用户ID: 7, 伙伴ID: 10000
+2025-03-21 14:20:04 - 响应: {"success":true,"read_messages":[],"count":0}
+2025-03-21 14:21:26 - 用户ID: 7, 伙伴ID: 10000
+2025-03-21 14:21:26 - 响应: {"success":true,"read_messages":[],"count":0}
