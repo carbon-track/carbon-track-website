@@ -4,6 +4,12 @@
     "title": "PHP API Endpoints",
     "version": "1.0.0"
   },
+  "servers": [
+    {
+      "url": "https://api.hfiuc.org/",
+      "description": "Production server"
+    }
+  ],
   "paths": {
     "/get_user_points.php": {
       "post": {
