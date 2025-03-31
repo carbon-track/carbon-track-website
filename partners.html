@@ -36,6 +36,7 @@
       --country-fill-dark: #5D8D7D;
       --marker-fill-light: #ff3b30;
       --marker-fill-dark: #ff453a;
+      --animation-timing-apple: cubic-bezier(0.25, 0.1, 0.25, 1);
     }
     
     body {
@@ -45,6 +46,52 @@
       font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
       color: var(--text-color-light);
       transition: background-color 0.3s ease, color 0.3s ease;
+      position: relative;
+      min-height: 100vh;
+    }
+
+    /* Frosted glass background */
+    .frosted-glass {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: -2;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      background: rgba(255, 255, 255, 0.05);
+    }
+    
+    /* Add ambient glow effects */
+    .glow-effect {
+      position: fixed;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      filter: blur(50px);
+      z-index: -1;
+      opacity: 0.5;
+      animation: pulse 8s infinite alternate var(--animation-timing-apple);
+    }
+    
+    .glow-green {
+      top: 10%;
+      right: 10%;
+      background: radial-gradient(circle, rgba(52, 199, 89, 0.2), transparent 70%);
+    }
+    
+    .glow-blue {
+      bottom: 10%;
+      left: 5%;
+      background: radial-gradient(circle, rgba(0, 122, 255, 0.15), transparent 70%);
+      animation-delay: 2s;
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1) translate(0, 0); opacity: 0.5; }
+      50% { transform: scale(1.05) translate(20px, -10px); opacity: 0.7; }
+      100% { transform: scale(1) translate(0, 0); opacity: 0.5; }
     }
 
     /* Dark mode styles */
@@ -61,7 +108,14 @@
       margin: 30px auto;
       padding: 30px;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.4s var(--animation-timing-apple);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+    
+    .block:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
     }
 
     body.dark-theme .block,
@@ -77,6 +131,27 @@
       text-align: center;
       border-radius: 0 0 24px 24px;
       margin-bottom: 40px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    /* Add shimmer effect */
+    .hero-header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
+      transform: rotate(30deg);
+      animation: shimmer 10s infinite linear;
+      pointer-events: none;
+    }
+    
+    @keyframes shimmer {
+      0% { transform: translateX(-50%) rotate(0deg); }
+      100% { transform: translateX(0%) rotate(360deg); }
     }
     
     .hero-header h1 {
@@ -84,13 +159,27 @@
       color: white;
       margin-bottom: 16px;
       font-size: 48px;
+      opacity: 0;
+      animation: fadeInUp 0.8s var(--animation-timing-apple) forwards;
     }
     
     .hero-header p {
       font-size: 1.2rem;
-      opacity: 0.9;
+      opacity: 0;
       max-width: 800px;
       margin: 0 auto;
+      animation: fadeInUp 0.8s var(--animation-timing-apple) 0.2s forwards;
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     #header {
@@ -105,6 +194,8 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
+      opacity: 0;
+      animation: fadeInUp 0.8s var(--animation-timing-apple) 0.4s forwards;
     }
     
     #header h2 {
@@ -112,6 +203,8 @@
       font-size: 24px;
       font-weight: 600;
       color: var(--text-color-light);
+      opacity: 0;
+      animation: fadeInUp 0.8s var(--animation-timing-apple) 0.6s forwards;
     }
     
     body.dark-theme #header h2,
@@ -125,6 +218,8 @@
       line-height: 1.6;
       font-size: 18px;
       color: var(--text-color-light);
+      opacity: 0;
+      animation: fadeInUp 0.8s var(--animation-timing-apple) 0.8s forwards;
     }
     
     body.dark-theme #header p,
@@ -139,6 +234,8 @@
       font-size: 24px;
       font-weight: 600;
       color: var(--text-color-light);
+      opacity: 0;
+      animation: fadeInUp 0.8s var(--animation-timing-apple) 1s forwards;
     }
     
     body.dark-theme #header h3,
@@ -153,7 +250,9 @@
       overflow: hidden;
       background: var(--map-bg-light);
       border-radius: 24px;
-      transition: background-color 0.3s ease;
+      transition: background-color 0.3s ease, transform 0.4s var(--animation-timing-apple);
+      opacity: 0;
+      animation: fadeInUp 0.8s var(--animation-timing-apple) 1.2s forwards;
     }
     
     body.dark-theme #map-container,
@@ -267,6 +366,8 @@
     #footer {
       text-align: center;
       padding: 20px;
+      opacity: 0;
+      animation: fadeInUp 0.8s var(--animation-timing-apple) 1.4s forwards;
     }
     
     #footer h3 {
@@ -484,7 +585,14 @@
     });
   </script>
 </head>
-<body>
+<body class="auto-theme">
+  <!-- Add frosted glass background -->
+  <div class="frosted-glass"></div>
+
+  <!-- Add ambient glow effects -->
+  <div class="glow-effect glow-green"></div>
+  <div class="glow-effect glow-blue"></div>
+
   <!-- Navbar container, will be loaded by JavaScript -->
   <div id="navbar-container"></div>
 
@@ -524,7 +632,7 @@
         If you're passionate about sustainability and want to be part of a global network of changemakers,
         we welcome you to join us! Together, we can create a more sustainable future for our planet.
       </p>
-      <a href="#" class="join-button">Join Us Today</a>
+      <a href="about.html" class="join-button">Join Us Today</a>
     </div>
   </div>
 
