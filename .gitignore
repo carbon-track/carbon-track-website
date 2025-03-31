@@ -1,6 +1,8 @@
 # MacOS
 .DS_Store
 
+.user.ini
+.htaccess
 # User uploaded files
 uploads/
 
@@ -8,11 +10,11 @@ uploads/
 db.php
 login.php
 global_variables.php
-.user.ini
-.htaccess
 update.bat
 @target.md
 @todolist.md
 draft.md
 todolist.md
 gitpull.php
+chkreadstatus_log.txt
+getmsg_log.txt
