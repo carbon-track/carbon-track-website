@@ -270,7 +270,8 @@
       fill: var(--country-fill-light);
       stroke: rgba(255, 255, 255, 0.2);
       stroke-width: 0.5;
-      transition: fill 0.3s ease;
+      transition: fill 0.3s ease, stroke 0.3s ease;
+      cursor: pointer;
     }
     
     body.dark-theme .country,
@@ -278,22 +279,55 @@
       fill: var(--country-fill-dark);
     }
 
+    body.dark-theme .country:hover,
+    body.auto-theme.dark-mode .country:hover {
+      fill: var(--country-fill-dark);
+      filter: brightness(1.1);
+    }
+
+    .marker-container {
+      transition: transform 0.3s ease;
+      cursor: pointer;
+    }
+
+    /* 移除容器的悬停缩放效果以防止抽搐 */
+    /* .marker-container:hover {
+      transform: scale(1.3);
+    } */
+
     .marker {
       fill: var(--marker-fill-light);
+      stroke: white;
+      stroke-width: 1.5;
       cursor: pointer;
       transition: fill 0.3s ease, transform 0.2s ease;
       transform-origin: center center;
+    }
+
+    .marker-pulse {
+      fill: var(--marker-fill-light);
+      fill-opacity: 0.3;
+      animation: pulse-marker 2s infinite;
+    }
+
+    @keyframes pulse-marker {
+      0% { r: 5; fill-opacity: 0.8; }
+      70% { r: 15; fill-opacity: 0; }
+      100% { r: 5; fill-opacity: 0; }
     }
     
     body.dark-theme .marker,
     body.auto-theme.dark-mode .marker {
       fill: var(--marker-fill-dark);
     }
+
+    body.dark-theme .marker-pulse,
+    body.auto-theme.dark-mode .marker-pulse {
+      fill: var(--marker-fill-dark);
+    }
     
     .marker:hover {
       fill: var(--ios-blue);
-      /* Remove the transform to prevent flickering */
-      /* transform: scale(1.2); */
     }
 
     #popup {
@@ -488,6 +522,56 @@
     body.auto-theme.dark-mode #popup::-webkit-scrollbar-thumb {
       background-color: rgba(99, 99, 102, 0.7); /* Darker gray for dark mode */
     }
+
+    .map-controls {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 10;
+    }
+
+    .map-control-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      border: none;
+      color: var(--map-bg-light);
+      font-size: 18px;
+      transition: all 0.2s ease;
+    }
+
+    .map-control-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      background: white;
+    }
+
+    body.dark-theme .map-control-btn,
+    body.auto-theme.dark-mode .map-control-btn {
+      background: rgba(60, 60, 67, 0.8);
+      color: white;
+    }
+
+    .map-control-btn:active {
+      transform: translateY(1px);
+    }
+
+    .map-region-label {
+      font-size: 12px;
+      font-weight: 600;
+      fill: rgba(255, 255, 255, 0.7);
+      text-anchor: middle;
+      pointer-events: none;
+    }
   </style>
   <script>
     // To be executed after the page loads
@@ -624,6 +708,17 @@
     <div id="map-container" class="block">
       <svg id="map"></svg>
       <div id="popup"></div>
+      <div class="map-controls">
+        <button class="map-control-btn" id="zoomIn" aria-label="Zoom In">
+          <i class="fas fa-plus"></i>
+        </button>
+        <button class="map-control-btn" id="zoomOut" aria-label="Zoom Out">
+          <i class="fas fa-minus"></i>
+        </button>
+        <button class="map-control-btn" id="resetMap" aria-label="Reset Map">
+          <i class="fas fa-undo"></i>
+        </button>
+      </div>
     </div>
 
     <div id="footer" class="block">
@@ -645,69 +740,173 @@
     const width = container.clientWidth;
     const height = container.clientHeight;
     const svg = d3.select("#map");
+    
+    // Set up the zoom behavior
+    const zoom = d3.zoom()
+      .scaleExtent([1, 8])
+      .on("zoom", zoomed);
+      
+    // Initialize map group with zoom support
+    svg.call(zoom);
     const mapGroup = svg.append("g");
 
-    const projection = d3.geoEquirectangular();
+    // 创建分层的图层以确保正确的渲染顺序
+    const countryLayer = mapGroup.append("g").attr("class", "country-layer");
+    const markerLayer = mapGroup.append("g").attr("class", "marker-layer");
+    const labelLayer = mapGroup.append("g").attr("class", "label-layer");
+
+    // Define continent centers for quick navigation
+    const continentCenters = {
+      "northAmerica": { coords: [-100, 40], scale: 2.5 },
+      "southAmerica": { coords: [-60, -15], scale: 2.5 },
+      "europe": { coords: [15, 50], scale: 4 },
+      "africa": { coords: [20, 0], scale: 2.5 },
+      "asia": { coords: [100, 30], scale: 2 },
+      "oceania": { coords: [135, -25], scale: 3 }
+    };
+
+    const projection = d3.geoEquirectangular()
+      .center([0, 20]) // Shift to see more of northern hemisphere
+      .rotate([-10, 0]); // Slight rotation for better view
     const path = d3.geoPath(projection);
-    const horizontalFactor = 0.65;
-    const effectiveWidth = width * horizontalFactor;
+    
+    // Set the map to fill the container
+    const effectiveWidth = width;
+    
+    // Make map responsive to container size
+    window.addEventListener('resize', resizeMap);
+    
+    function resizeMap() {
+      // Update dimensions
+      const newWidth = container.clientWidth;
+      const newHeight = container.clientHeight;
+      
+      // Adjust projection
+      projection.fitSize([newWidth, newHeight], worldFC);
+      
+      // Update paths
+      countryLayer.selectAll("path.country")
+        .attr("d", path);
+      
+      // Update markers
+      updateMarkers();
+    }
+    
+    // Zoom function
+    function zoomed(event) {
+      const { transform } = event;
+      mapGroup.attr("transform", transform);
+      
+      // Adjust marker size based on zoom level
+      const markerBaseSize = 120;
+      const newSize = markerBaseSize / transform.k;
+      markerLayer.selectAll(".marker")
+        .attr("d", d3.symbol().type(d3.symbolCircle).size(newSize));
+      
+      // Adjust stroke width based on zoom
+      countryLayer.selectAll(".country")
+        .style("stroke-width", 0.5 / transform.k);
+    }
+    
+    function updateMarkers() {
+      markerLayer.selectAll(".marker-container")
+        .attr("transform", d => {
+          const [mx, my] = projection(d.coords);
+          return `translate(${mx}, ${my})`;
+        });
+        
+      // 更新区域标签位置
+      labelLayer.selectAll("text.map-region-label")
+        .attr("x", d => projection(d.center)[0])
+        .attr("y", d => projection(d.center)[1] - 40);
+    }
+    
+    // Zoom control buttons
+    document.getElementById("zoomIn").addEventListener("click", function() {
+      svg.transition().duration(500).call(zoom.scaleBy, 1.5);
+    });
+    
+    document.getElementById("zoomOut").addEventListener("click", function() {
+      svg.transition().duration(500).call(zoom.scaleBy, 0.75);
+    });
+    
+    document.getElementById("resetMap").addEventListener("click", function() {
+      svg.transition().duration(750).call(
+        zoom.transform,
+        d3.zoomIdentity
+      );
+    });
 
     let isPopupSticky = false; // Track if popup should stay open
     let hidePopupTimeout; // Timeout to hide popup with delay
+    let activeMarker = null; // 跟踪当前活动的标记
     
     // Mouse is over popup flag
     let isMouseOverPopup = false;
+    
+    // Global variable to store our data for later use
+    let worldFC;
 
     const schools = [
     {
         name: "Hamden Hall Country Day School",
         coords: [-72.93, 41.40],
-        info: "Adress: 1108 Whitney Ave, Hamden, Ct, 06516. It is the founding place of the Carbon Footprint Initiative."
+        info: "Adress: 1108 Whitney Ave, Hamden, Ct, 06516. It is the founding place of the Carbon Footprint Initiative.",
+        region: "North America"
       },
       {
         name: "Kingswood Oxford School",
         coords: [-72.75, 41.78],
-        info: "Adress: 170 Kingswood Rd, West Hartford, CT 06119. Its material club is one of our major collaborators."
+        info: "Adress: 170 Kingswood Rd, West Hartford, CT 06119. Its material club is one of our major collaborators.",
+        region: "North America"
       },
       {
         name: "Nanjing Foreign Language School",
         coords: [118.78, 32.05],
-        info: "Adress: 30 Beijing E Rd, Xuanwu, Nanjing, Jiangsu. One of the founding places of the Carbon Footprint Initiative."
+        info: "Adress: 30 Beijing E Rd, Xuanwu, Nanjing, Jiangsu. One of the founding places of the Carbon Footprint Initiative.",
+        region: "Asia"
       },
       {
         name: "Shanghai Starriver Bilingual School",
         coords: [121.2, 31.2],
-        info: "Adress: 上海市闵行区金都路2588号. A bilingual School in Shanghai, China, with a profound focus on sustainability, one of the participants of our Initiative."
+        info: "Adress: 上海市闵行区金都路2588号. A bilingual School in Shanghai, China, with a profound focus on sustainability, one of the participants of our Initiative.",
+        region: "Asia"
       },
       {
         name: "Baylor School",
         coords: [-85.3, 35.08],
-        info: "Adress: 171 Baylor School Rd, Chattanooga, TN, 37405. It has a strong focus on sustainability and environmental education, one of the participants of our Initiative."
+        info: "Adress: 171 Baylor School Rd, Chattanooga, TN, 37405. It has a strong focus on sustainability and environmental education, one of the participants of our Initiative.",
+        region: "North America"
       },
       {
         name: "Hiba Academy shanghai",
         coords: [121.2, 31.4],
-        info: "Adress: 上海市浦东新区林耀路235号. A bilingual School in Shanghai, China, with a profound focus on sustainability, one of the participants of our Initiative"
+        info: "Adress: 上海市浦东新区林耀路235号. A bilingual School in Shanghai, China, with a profound focus on sustainability, one of the participants of our Initiative",
+        region: "Asia"
       },
       {
         name: "Shanghai Qingpu Pinghe Bilingual School",
         coords: [121.4, 31.1],
-        info: "Adress: 上海市青浦区朱家角路6号. A bilingual School in Shanghai, China, with a profound focus on sustainability, one of the participants of our Initiative"
+        info: "Adress: 上海市青浦区朱家角路6号. A bilingual School in Shanghai, China, with a profound focus on sustainability, one of the participants of our Initiative",
+        region: "Asia"
       },
       {
         name: "The Bryn Mawr School",
         coords: [-76.63, 39.37],
-        info: "Adress: 109 W Melrose Ave, Baltimore, MD 21210. It has a great focus on sustainability and environmental education, one of the participants of our Initiative"
+        info: "Adress: 109 W Melrose Ave, Baltimore, MD 21210. It has a great focus on sustainability and environmental education, one of the participants of our Initiative",
+        region: "North America"
       },
       {
         name: "上海市世界外国语中学",
         coords: [121.4, 31.2],
-        info: "Adress: 中国上海市虹漕南路602号. An international School in Shanghai, China, with a profound focus on sustainability, one of the first participants of our Initiative"
+        info: "Adress: 中国上海市虹漕南路602号. An international School in Shanghai, China, with a profound focus on sustainability, one of the first participants of our Initiative",
+        region: "Asia"
       },
       {
         name: "广东碧桂园学校",
         coords: [113.16, 22.56],
-        info: "Adress: Shunde District, Foshan, China, 511419. An international School in Guangdong, China, with a profound focus on sustainability, one of the participants of our Initiative"
+        info: "Adress: Shunde District, Foshan, China, 511419. An international School in Guangdong, China, with a profound focus on sustainability, one of the participants of our Initiative",
+        region: "Asia"
       }
     ];
 
@@ -756,6 +955,7 @@
            .style("top", top + "px")
            .style("visibility", "visible");
     }
+    
     function hidePopup() {
       popup.style("display", "none")
            .style("visibility", "hidden");
@@ -777,15 +977,22 @@
       }
     });
 
-    const markerSymbol = d3.symbol().type(d3.symbolCircle).size(120);
-
+    // Enhanced marker mouseenter with active state
     function markerMouseEnter(event, d) {
-      event.stopPropagation();
+      event.stopPropagation(); // 防止事件冒泡
+      
+      // 如果有一个活动的标记，并且是不同的标记，则不执行任何操作
+      if (isPopupSticky && activeMarker && activeMarker !== this) {
+        return;
+      }
+      
+      // Highlight this marker
+      d3.select(this.parentNode).classed("active", true);
       
       // Calculate cluster info
       const [baseX, baseY] = projection(d.coords);
       const cluster = [];
-      mapGroup.selectAll(".marker").each(function(d2) {
+      markerLayer.selectAll(".marker-container").each(function(d2) {
         // Skip self comparison
         if (d === d2) return;
         const [bx, by] = projection(d2.coords);
@@ -793,6 +1000,8 @@
         // Increase distance threshold for cluster detection
         if (Math.sqrt(dx * dx + dy * dy) < 40) { 
           cluster.push(d2);
+          // Highlight clustered markers also
+          d3.select(this).classed("active", true);
         }
       });
       
@@ -802,14 +1011,14 @@
       const displayItems = [d].concat(cluster);
       
       if (displayItems.length > 1) {
-        htmlContent = "<h3>Schools in this area:</h3><ul>";
+        htmlContent = `<h3>Schools in ${d.region}:</h3><ul>`;
         displayItems.forEach(school => {
            htmlContent += `<li><strong>${school.name}</strong><br>${school.info}</li>`;
         });
         htmlContent += "</ul>";
       } else {
         // Only the single hovered marker
-        htmlContent = `<h3>${d.name}</h3><p>${d.info}</p>`;
+        htmlContent = `<h3>${d.name}</h3><p><strong>Region:</strong> ${d.region}</p><p>${d.info}</p>`;
       }
       
       // Show popup directly using event coordinates relative to container
@@ -817,9 +1026,151 @@
     }
     
     function markerMouseLeave(event, d) {
-      event.stopPropagation();
+      event.stopPropagation(); // 防止事件冒泡
+      
+      // 如果标记已固定，则不响应鼠标离开事件
+      if (isPopupSticky && activeMarker) {
+        return;
+      }
+      
+      // Remove highlight if not clicked
+      if (!isPopupSticky) {
+        markerLayer.selectAll(".marker-container").classed("active", false);
+      }
+      
       // Hide popup only if it's not sticky (i.e., not clicked),
       // and use a timeout to allow moving to the popup
+      if (!isPopupSticky) {
+        // Clear any existing timeout
+        if (hidePopupTimeout) {
+          clearTimeout(hidePopupTimeout);
+        }
+        
+        // Set a short delay to check if mouse moved to popup
+        hidePopupTimeout = setTimeout(() => {
+          if (!isMouseOverPopup) {
+      hidePopup(); 
+          }
+        }, 300); // 300ms delay
+      }
+    }
+
+    // Updated click handling with improved interaction
+    function markerClick(event, d) {
+      event.stopPropagation(); // 防止事件冒泡
+      
+      // 如果点击的是当前活动的标记，则切换状态
+      if (activeMarker === this) {
+        isPopupSticky = !isPopupSticky;
+        if (!isPopupSticky) {
+          // 如果取消固定，隐藏弹出窗口并重置活动标记
+          hidePopup();
+          markerLayer.selectAll(".marker-container").classed("active", false);
+          activeMarker = null;
+          return;
+        }
+      } else {
+        // 如果点击的是新标记，设置为固定状态
+        isPopupSticky = true;
+        // 重置之前的活动标记
+        markerLayer.selectAll(".marker-container").classed("active", false);
+      }
+      
+      // 设置当前标记为活动标记
+      activeMarker = this;
+      
+      // Add active class to this marker
+      d3.select(this.parentNode).classed("active", true);
+      
+      // If clicked, show popup with enhanced content
+      const enhancedContent = `
+        <h3>${d.name}</h3>
+        <p><strong>Region:</strong> ${d.region}</p>
+        <p>${d.info}</p>
+        <p style="text-align: center; margin-top: 15px;">
+          <a href="#" id="zoom-to-school" style="color: var(--ios-blue);">
+            <i class="fas fa-search-plus"></i> Zoom to location
+          </a>
+        </p>
+      `;
+      
+      showPopup(event, enhancedContent);
+      
+      // Add zoom to location functionality
+      setTimeout(() => {
+        const zoomBtn = document.getElementById("zoom-to-school");
+        if (zoomBtn) {
+          zoomBtn.addEventListener("click", function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Calculate the pixel coordinates of the school
+            const [x, y] = projection(d.coords);
+            
+            // Create a transform that centers on the school and zooms in
+            const scale = 5;
+            const translate = [width / 2 - x * scale, height / 2 - y * scale];
+            
+            // Apply the transform with smooth transition
+            svg.transition()
+              .duration(750)
+              .call(
+                zoom.transform,
+                d3.zoomIdentity
+                  .translate(translate[0], translate[1])
+                  .scale(scale)
+              );
+          });
+        }
+      }, 100);
+    }
+
+    // Country hover effect
+    function countryMouseOver(event, d) {
+      // 如果弹出窗口已固定，不执行悬停效果
+      if (isPopupSticky) return;
+      
+      d3.select(this)
+        .classed("hover", true); // 不再使用raise()方法避免覆盖标记
+        
+      // Get country name
+      const countryName = d.properties.name;
+      
+      // Find schools in this country
+      const schoolsInCountry = schools.filter(school => {
+        // This is a simple approximation - in a real app you would use more precise geospatial checks
+        const [lon, lat] = school.coords;
+        const point = projection([lon, lat]);
+        const isInside = d3.geoContains(d, [lon, lat]);
+        return isInside;
+      });
+      
+      if (schoolsInCountry.length > 0) {
+        let content = `<h3>${countryName}</h3>`;
+        content += `<p>Contributors: <strong>${schoolsInCountry.length}</strong> schools</p>`;
+        content += "<ul>";
+        schoolsInCountry.forEach(school => {
+          content += `<li><strong>${school.name}</strong></li>`;
+        });
+        content += "</ul>";
+        
+        showPopup(event, content);
+      }
+    }
+    
+    function countryMouseOut(event, d) {
+      d3.select(this).classed("hover", false);
+      
+      // Hide popup immediately if it's not sticky
+      if (!isPopupSticky) {
+        hidePopup();
+      }
+      
+      // 移除延时隐藏逻辑，让弹窗的 mouseleave 事件处理隐藏 (Keep this comment or remove)
+      /*
+      // 如果弹出窗口已固定，不执行鼠标离开效果
+      if (isPopupSticky) return;
+      
       if (!isPopupSticky) {
         // Clear any existing timeout
         if (hidePopupTimeout) {
@@ -833,51 +1184,151 @@
           }
         }, 300); // 300ms delay
       }
+      */
     }
 
-    // Click handling can remain similar
-    function markerClick(event, d) {
-      event.stopPropagation();
-      markerMouseEnter(event, d); // Reuse mouseenter logic for click
-      isPopupSticky = true; // Mark popup as sticky after click
+    function countryClick(event, d) {
+      // 如果弹出窗口已固定，先清除它
+      if (isPopupSticky) {
+        hidePopup();
+        isPopupSticky = false;
+        activeMarker = null;
+        markerLayer.selectAll(".marker-container").classed("active", false);
+      }
       
-      // Optional: close popup on clicking outside the map
-      // d3.select(document).on("click.popup", function(e) {
-      //   if (!container.contains(e.target)) {
-      //     activeMarker = null;
-      //     hidePopup();
-      //     d3.select(document).on("click.popup", null); // Remove listener
-      //   }
-      // });
+      // Get bounds of the country
+      const bounds = path.bounds(d);
+      const dx = bounds[1][0] - bounds[0][0];
+      const dy = bounds[1][1] - bounds[0][1];
+      const x = (bounds[0][0] + bounds[1][0]) / 2;
+      const y = (bounds[0][1] + bounds[1][1]) / 2;
+      
+      // Calculate appropriate scale
+      const scale = Math.max(1, Math.min(8, 0.9 / Math.max(dx / width, dy / height)));
+      
+      // Transition to the country
+      svg.transition().duration(750).call(
+        zoom.transform,
+        d3.zoomIdentity
+          .translate(width / 2, height / 2)
+          .scale(scale)
+          .translate(-x, -y)
+      );
     }
 
+    // Load and render the world map
     d3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson")
       .then(world => {
         const worldData = world.features.filter(d => d.properties.name !== "Antarctica");
-        const worldFC = { type: "FeatureCollection", features: worldData };
+        worldFC = { type: "FeatureCollection", features: worldData };
+        
+        // Fit map to the container
         projection.fitSize([effectiveWidth, height], worldFC);
-        projection.scale(projection.scale() * 1.3);
-        const offsetX = (width - effectiveWidth) / 2;
-        mapGroup.attr("transform", `translate(${offsetX}, 0)`);
-        mapGroup.selectAll("path.country")
+        
+        // Render countries with improved styling and interactions
+        countryLayer.selectAll("path.country")
           .data(worldData)
           .enter()
           .append("path")
           .attr("class", "country")
-          .attr("d", path);
-        mapGroup.selectAll("path.marker")
+          .attr("d", path)
+          .attr("data-name", d => d.properties.name)
+          .on("mouseover", countryMouseOver)
+          .on("mouseout", countryMouseOut)
+          .on("click", countryClick);
+        
+        // Add gradient defs for marker effects
+        const defs = svg.append("defs");
+        
+        // Create radial gradient for markers
+        const gradient = defs.append("radialGradient")
+          .attr("id", "marker-gradient")
+          .attr("cx", "50%")
+          .attr("cy", "50%")
+          .attr("r", "50%");
+        
+        gradient.append("stop")
+          .attr("offset", "0%")
+          .attr("stop-color", "var(--marker-fill-light)")
+          .attr("stop-opacity", 1);
+          
+        gradient.append("stop")
+          .attr("offset", "100%")
+          .attr("stop-color", "var(--marker-fill-light)")
+          .attr("stop-opacity", 0.7);
+        
+        // Create enhanced marker groups with pulsing effect
+        const markerContainers = markerLayer.selectAll("g.marker-container")
           .data(schools)
           .enter()
-          .append("path")
-          .attr("class", "marker")
+          .append("g")
+          .attr("class", "marker-container")
           .attr("transform", d => {
             const [mx, my] = projection(d.coords);
             return `translate(${mx}, ${my})`;
-          })
-          .attr("d", markerSymbol)
-          .on("mouseenter", markerMouseEnter) // Changed event
-          .on("mouseleave", markerMouseLeave) // Add mouseleave listener back
-          .on("click", markerClick); // Keep click handling
+          });
+        
+        // Add pulsing circle behind markers for visual effect
+        markerContainers.append("circle")
+          .attr("class", "marker-pulse")
+          .attr("r", 5)
+          .attr("fill", "var(--marker-fill-light)");
+        
+        // Add the main marker with improved styling
+        markerContainers.append("path")
+          .attr("class", "marker")
+          .attr("d", d3.symbol().type(d3.symbolCircle).size(120))
+          .attr("fill", "url(#marker-gradient)")
+          .on("mouseenter", markerMouseEnter)
+          .on("mouseleave", markerMouseLeave)
+          .on("click", markerClick);
+        
+        // Add region labels
+        const regions = {};
+        schools.forEach(school => {
+          if (!regions[school.region]) {
+            regions[school.region] = {
+              name: school.region,
+              schools: [],
+              center: [0, 0]
+            };
+          }
+          regions[school.region].schools.push(school);
+        });
+        
+        // Calculate region centers from schools
+        Object.values(regions).forEach(region => {
+          const sumCoords = region.schools.reduce((sum, school) => {
+            return [sum[0] + school.coords[0], sum[1] + school.coords[1]];
+          }, [0, 0]);
+          
+          region.center = [
+            sumCoords[0] / region.schools.length,
+            sumCoords[1] / region.schools.length
+          ];
+        });
+        
+        // Add labels for regions
+        labelLayer.selectAll("text.map-region-label")
+          .data(Object.values(regions))
+          .enter()
+          .append("text")
+          .attr("class", "map-region-label")
+          .attr("x", d => projection(d.center)[0])
+          .attr("y", d => projection(d.center)[1] - 40) // Position above marker clusters
+          .text(d => `${d.name} (${d.schools.length})`);
+      });
+      
+    // Close popup when clicking outside of markers
+    svg.on("click", function(event) {
+      // 如果事件已经被处理了，则不执行
+      if (event.defaultPrevented) return;
+      
+      // 重置状态
+      hidePopup();
+      isPopupSticky = false;
+      activeMarker = null;
+      markerLayer.selectAll(".marker-container").classed("active", false);
       });
   </script>
 </body>
