@@ -572,6 +572,49 @@
       text-anchor: middle;
       pointer-events: none;
     }
+
+    /* Back button style */
+    .back-button {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1001; /* Ensure it's above other elements like theme toggle */
+      background-color: var(--card-bg-light);
+      color: var(--text-color-light);
+      padding: 8px 16px;
+      border-radius: 20px; /* Rounded corners like iOS */
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+      border: 1px solid var(--border-color-light);
+    }
+
+    .back-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      text-decoration: none;
+      color: var(--text-color-light); /* Ensure text color remains on hover */
+    }
+
+    body.dark-theme .back-button,
+    body.auto-theme.dark-mode .back-button {
+      background-color: var(--card-bg-dark);
+      color: var(--text-color-dark);
+      border-color: var(--border-color-dark);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    body.dark-theme .back-button:hover,
+    body.auto-theme.dark-mode .back-button:hover {
+      color: var(--text-color-dark); /* Ensure text color remains on hover */
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+
+    .back-button i {
+      margin-right: 6px; /* Space between icon and text */
+    }
   </style>
   <script>
     // To be executed after the page loads
@@ -670,6 +713,11 @@
   </script>
 </head>
 <body class="auto-theme">
+  <!-- Add back button -->
+  <a href="about.html" class="back-button">
+    <i class="fas fa-chevron-left"></i> Back
+  </a>
+
   <!-- Add frosted glass background -->
   <div class="frosted-glass"></div>
 
