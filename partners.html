@@ -35,7 +35,9 @@
       --country-fill-light: #A1D1BF;
       --country-fill-dark: #5D8D7D;
       --marker-fill-light: #ff3b30;
-      --marker-fill-dark: #ff453a;
+      --marker-fill-dark: #ff6b60;
+      --marker-stroke-light: white;
+      --marker-stroke-dark: white;
       --animation-timing-apple: cubic-bezier(0.25, 0.1, 0.25, 1);
     }
     
@@ -289,15 +291,26 @@
       transition: transform 0.3s ease;
       cursor: pointer;
     }
-
-    /* 移除容器的悬停缩放效果以防止抽搐 */
-    /* .marker-container:hover {
-      transform: scale(1.3);
-    } */
+    
+    /* Active state for marker containers */
+    .marker-container.active .marker {
+      fill: var(--ios-blue);
+      stroke-width: 2px;
+      transform: scale(1.1);
+    }
+    
+    /* Enhance active markers in dark mode */
+    body.dark-theme .marker-container.active .marker,
+    body.auto-theme.dark-mode .marker-container.active .marker {
+      fill: #5ac8fa; /* Bright blue in dark mode */
+      stroke: white;
+      stroke-width: 2.5px;
+      filter: drop-shadow(0px 0px 3px rgba(90, 200, 250, 0.5));
+    }
 
     .marker {
       fill: var(--marker-fill-light);
-      stroke: white;
+      stroke: var(--marker-stroke-light);
       stroke-width: 1.5;
       cursor: pointer;
       transition: fill 0.3s ease, transform 0.2s ease;
@@ -319,6 +332,8 @@
     body.dark-theme .marker,
     body.auto-theme.dark-mode .marker {
       fill: var(--marker-fill-dark);
+      stroke: var(--marker-stroke-dark);
+      stroke-width: 2px; /* Thicker stroke in dark mode for better visibility */
     }
 
     body.dark-theme .marker-pulse,
@@ -328,6 +343,14 @@
     
     .marker:hover {
       fill: var(--ios-blue);
+    }
+
+    /* Add enhanced hover effect for dark mode */
+    body.dark-theme .marker:hover,
+    body.auto-theme.dark-mode .marker:hover {
+      fill: #5ac8fa; /* Brighter blue for dark mode hover */
+      filter: brightness(1.2);
+      transform: scale(1.05);
     }
 
     #popup {
@@ -347,6 +370,26 @@
       will-change: transform;
       overflow: auto;
       max-height: 60vh;
+    }
+    
+    /* Add responsive styles for popup on mobile */
+    @media (max-width: 768px) {
+      #popup {
+        max-width: 85vw; /* Wider popup on mobile */
+        max-height: 50vh; /* Shorter max height on mobile to prevent overflow */
+        padding: 12px; /* Smaller padding */
+        font-size: 0.9em; /* Slightly smaller text */
+      }
+      
+      #popup h3 {
+        font-size: 16px;
+        margin-bottom: 8px;
+      }
+      
+      #popup p, #popup li {
+        margin-bottom: 6px;
+        font-size: 13px;
+      }
     }
     
     body.dark-theme #popup,
@@ -557,8 +600,16 @@
 
     body.dark-theme .map-control-btn,
     body.auto-theme.dark-mode .map-control-btn {
-      background: rgba(60, 60, 67, 0.8);
+      background: rgba(60, 60, 67, 0.9); /* More opaque for better visibility */
       color: white;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25); /* Stronger shadow for better visibility */
+    }
+
+    body.dark-theme .map-control-btn:hover,
+    body.auto-theme.dark-mode .map-control-btn:hover {
+      background: rgba(80, 80, 87, 0.95); /* Lighter on hover */
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     }
 
     .map-control-btn:active {
@@ -571,6 +622,13 @@
       fill: rgba(255, 255, 255, 0.7);
       text-anchor: middle;
       pointer-events: none;
+      text-shadow: 0px 1px 3px rgba(0, 0, 0, 0.5);
+    }
+    
+    body.dark-theme .map-region-label,
+    body.auto-theme.dark-mode .map-region-label {
+      fill: rgba(255, 255, 255, 0.9);
+      text-shadow: 0px 1px 4px rgba(0, 0, 0, 0.8);
     }
 
     /* Back button style */
@@ -975,29 +1033,50 @@
       const popupWidth = popup.node().offsetWidth;
       const popupHeight = popup.node().offsetHeight;
       const mapRect = container.getBoundingClientRect();
+      
+      // Check if we're on a mobile device (less than 768px width)
+      const isMobile = window.innerWidth <= 768;
 
       // Calculate position to avoid edge overflow
       let left = x + 15;
       let top = y - 15;
       
-      // Special positioning for east Asia region (China markers)
-      // Check if marker is in the right side of the map
-      if (x > mapRect.width * 0.75) {
-        // Force display to the left for right-side markers
-        left = x - popupWidth - 15;
-      } else if (left + popupWidth > mapRect.width) {
-        // For other markers, adjust if would overflow right edge
-        left = x - popupWidth - 15; 
-      }
-      
-      // Adjust if would overflow bottom edge
-      if (top + popupHeight > mapRect.height) {
+      // Special mobile positioning - center wider popups horizontally
+      if (isMobile) {
+        // Center horizontally if enough space
+        left = Math.max(10, Math.min(mapRect.width - popupWidth - 10, x - (popupWidth / 2)));
+        
+        // For vertical positioning on mobile, prefer showing below the tap point
+        // This avoids the finger/thumb covering the popup when tapping
+        if (y + popupHeight + 30 <= mapRect.height) {
+          top = y + 30; // Position below finger/tap point
+        } else if (y - popupHeight - 30 >= 0) {
+          top = y - popupHeight - 30; // Position above if there's room
+        } else {
+          // If neither above nor below fits well, center in the visible area
+          top = Math.max(10, Math.min(mapRect.height - popupHeight - 10, (mapRect.height - popupHeight) / 2));
+        }
+      } else {
+        // Desktop positioning logic
+        // Special positioning for east Asia region (China markers)
+        // Check if marker is in the right side of the map
+        if (x > mapRect.width * 0.75) {
+          // Force display to the left for right-side markers
+          left = x - popupWidth - 15;
+        } else if (left + popupWidth > mapRect.width) {
+          // For other markers, adjust if would overflow right edge
+          left = x - popupWidth - 15; 
+        }
+        
+        // Adjust if would overflow bottom edge
+        if (top + popupHeight > mapRect.height) {
           top = Math.max(5, mapRect.height - popupHeight - 10); // Keep within map with small margin
-      }
-      
-      // Adjust if would overflow top edge
-      if (top < 5) {
+        }
+        
+        // Adjust if would overflow top edge
+        if (top < 5) {
           top = 5; // Maintain small margin from top
+        }
       }
 
       // Apply final position and make visible
@@ -1132,17 +1211,37 @@
       // Add active class to this marker
       d3.select(this.parentNode).classed("active", true);
       
+      // Check if we're on mobile
+      const isMobile = window.innerWidth <= 768;
+      
       // If clicked, show popup with enhanced content
-      const enhancedContent = `
-        <h3>${d.name}</h3>
-        <p><strong>Region:</strong> ${d.region}</p>
-        <p>${d.info}</p>
-        <p style="text-align: center; margin-top: 15px;">
-          <a href="#" id="zoom-to-school" style="color: var(--ios-blue);">
-            <i class="fas fa-search-plus"></i> Zoom to location
-          </a>
-        </p>
-      `;
+      let enhancedContent;
+      
+      if (isMobile) {
+        // Simpler content for mobile
+        enhancedContent = `
+          <h3>${d.name}</h3>
+          <p><strong>Region:</strong> ${d.region}</p>
+          <p>${d.info}</p>
+          <p style="text-align: center; margin-top: 10px;">
+            <a href="#" id="zoom-to-school" style="color: var(--ios-blue); font-size: 14px; display: inline-block; padding: 6px 0;">
+              <i class="fas fa-search-plus"></i> Zoom to location
+            </a>
+          </p>
+        `;
+      } else {
+        // Regular content for desktop
+        enhancedContent = `
+          <h3>${d.name}</h3>
+          <p><strong>Region:</strong> ${d.region}</p>
+          <p>${d.info}</p>
+          <p style="text-align: center; margin-top: 15px;">
+            <a href="#" id="zoom-to-school" style="color: var(--ios-blue);">
+              <i class="fas fa-search-plus"></i> Zoom to location
+            </a>
+          </p>
+        `;
+      }
       
       showPopup(event, enhancedContent);
       
@@ -1158,7 +1257,7 @@
             const [x, y] = projection(d.coords);
             
             // Create a transform that centers on the school and zooms in
-            const scale = 5;
+            const scale = isMobile ? 4 : 5; // Slightly less zoom on mobile
             const translate = [width / 2 - x * scale, height / 2 - y * scale];
             
             // Apply the transform with smooth transition
@@ -1170,6 +1269,16 @@
                   .translate(translate[0], translate[1])
                   .scale(scale)
               );
+            
+            // On mobile, hide the popup after zooming to give more map visibility
+            if (isMobile) {
+              setTimeout(() => {
+                hidePopup();
+                isPopupSticky = false;
+                activeMarker = null;
+                markerLayer.selectAll(".marker-container").classed("active", false);
+              }, 800);
+            }
           });
         }
       }, 100);
@@ -1196,13 +1305,31 @@
       });
       
       if (schoolsInCountry.length > 0) {
-        let content = `<h3>${countryName}</h3>`;
-        content += `<p>Contributors: <strong>${schoolsInCountry.length}</strong> schools</p>`;
-        content += "<ul>";
-        schoolsInCountry.forEach(school => {
-          content += `<li><strong>${school.name}</strong></li>`;
-        });
-        content += "</ul>";
+        let content;
+        // Check if on mobile for simpler display
+        const isMobile = window.innerWidth <= 768;
+        
+        if (isMobile && schoolsInCountry.length > 2) {
+          // Simplified content for mobile with many schools
+          content = `<h3>${countryName}</h3>`;
+          content += `<p>Contributors: <strong>${schoolsInCountry.length}</strong> schools</p>`;
+          // Just list the names without additional details to save space
+          content += "<ul style='margin-bottom: 5px;'>";
+          schoolsInCountry.forEach(school => {
+            content += `<li><strong>${school.name}</strong></li>`;
+          });
+          content += "</ul>";
+          content += "<p style='font-size: 12px; margin-top: 5px;'>Tap a school marker for details</p>";
+        } else {
+          // Standard content for desktop or mobile with few schools
+          content = `<h3>${countryName}</h3>`;
+          content += `<p>Contributors: <strong>${schoolsInCountry.length}</strong> schools</p>`;
+          content += "<ul>";
+          schoolsInCountry.forEach(school => {
+            content += `<li><strong>${school.name}</strong></li>`;
+          });
+          content += "</ul>";
+        }
         
         showPopup(event, content);
       }
@@ -1211,13 +1338,11 @@
     function countryMouseOut(event, d) {
       d3.select(this).classed("hover", false);
       
-      // Hide popup immediately if it's not sticky
-      if (!isPopupSticky) {
-        hidePopup();
-      }
+      // 不再立即隐藏popup
+      // if (!isPopupSticky) {
+      //   hidePopup();
+      // }
       
-      // 移除延时隐藏逻辑，让弹窗的 mouseleave 事件处理隐藏 (Keep this comment or remove)
-      /*
       // 如果弹出窗口已固定，不执行鼠标离开效果
       if (isPopupSticky) return;
       
@@ -1234,7 +1359,6 @@
           }
         }, 300); // 300ms delay
       }
-      */
     }
 
     function countryClick(event, d) {
