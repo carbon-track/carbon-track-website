@@ -576,39 +576,41 @@
     /* Back button style */
     .back-button {
       position: fixed;
-      top: 20px;
+      top: 80px; /* Move below the navbar */
       left: 20px;
       z-index: 1001; /* Ensure it's above other elements like theme toggle */
-      background-color: var(--card-bg-light);
-      color: var(--text-color-light);
+      background-color: rgba(50, 50, 50, 0.8); /* Darker, semi-transparent background */
+      color: white;
       padding: 8px 16px;
       border-radius: 20px; /* Rounded corners like iOS */
       text-decoration: none;
       font-size: 14px;
       font-weight: 500;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
       transition: all 0.3s ease;
-      border: 1px solid var(--border-color-light);
+      border: 1px solid rgba(80, 80, 80, 0.5);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
     }
 
     .back-button:hover {
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
       text-decoration: none;
-      color: var(--text-color-light); /* Ensure text color remains on hover */
+      color: white; /* Ensure text color remains on hover */
     }
 
     body.dark-theme .back-button,
     body.auto-theme.dark-mode .back-button {
-      background-color: var(--card-bg-dark);
-      color: var(--text-color-dark);
-      border-color: var(--border-color-dark);
+      background-color: rgba(40, 40, 40, 0.8);
+      color: white;
+      border-color: rgba(70, 70, 70, 0.5);
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     }
 
     body.dark-theme .back-button:hover,
     body.auto-theme.dark-mode .back-button:hover {
-      color: var(--text-color-dark); /* Ensure text color remains on hover */
+      color: white; /* Ensure text color remains on hover */
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
     }
 
