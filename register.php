@@ -1,7 +1,5 @@
 <?php
-require_once 'global_variables.php';
-require_once 'global_error_handler.php';
-require 'db.php';
+require_once 'global_variables.php'; // Includes global_error_handler.php and db.php
 
 session_start();
 
@@ -16,7 +14,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'], $_POST['regu
             handleApiError(400, 'Invalid Email address.');
         }
 
-        if ($verificationCode != $_SESSION['verification_code'] || empty($verificationCode)) {
+        // Check verification code: ensure submitted code is not empty, session code exists, and they match
+        if (empty($verificationCode) || !isset($_SESSION['verification_code']) || $verificationCode != $_SESSION['verification_code']) {
             handleApiError(400, 'Incorrect Verification Code.');
         }
 
