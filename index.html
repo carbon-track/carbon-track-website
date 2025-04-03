@@ -3050,6 +3050,41 @@
         }
       }
     });
+    
+    // 确保注册模态框验证码发送按钮事件绑定
+    setTimeout(function() {
+      console.log('确保验证码按钮事件绑定');
+      
+      // 检查发送验证码按钮是否存在
+      if ($('#sendVerificationCode').length) {
+        console.log('发送验证码按钮已找到，绑定点击事件');
+        
+        // 先解除所有现有的点击事件，防止重复绑定
+        $('#sendVerificationCode').off('click');
+        
+        // 绑定新的点击事件
+        $('#sendVerificationCode').on('click', function(e) {
+          e.preventDefault();
+          console.log('触发发送验证码函数');
+          sendVerificationCode();
+        });
+      } else {
+        console.log('未找到发送验证码按钮，将在模态框打开后再尝试绑定');
+        
+        // 如果按钮不存在，可能是模态框尚未初始化，监听模态框显示事件
+        $(document).on('shown.bs.modal', '#registerModal', function() {
+          console.log('注册模态框已显示，尝试绑定验证码按钮事件');
+          
+          if ($('#sendVerificationCode').length) {
+            $('#sendVerificationCode').off('click').on('click', function(e) {
+              e.preventDefault();
+              console.log('触发发送验证码函数');
+              sendVerificationCode();
+            });
+          }
+        });
+      }
+    }, 1000); // 延迟1秒执行，确保DOM已完全加载
   });
   
   // Enhanced carousel initialization with synchronized animations

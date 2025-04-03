@@ -376,6 +376,7 @@ function registerUser() {
 
 // 发送验证码
 function sendVerificationCode() {
+    console.log('点击发送验证码按钮');
     var allFilled = true;
     $('.required-input').each(function() {
         if ($(this).val() === '') {
@@ -392,41 +393,72 @@ function sendVerificationCode() {
         showAlert('请填写所有必填信息后再发送验证码。', 'warning');
         return; // 终止函数执行
     }
-    // 记录发送时间到localStorage
-    const now = Date.now();
-    localStorage.setItem('lastSentTime', now.toString());
-
-    // 获取用户输入的邮箱并发送验证码...
+    
+    // 获取用户输入的邮箱
     var email = $('#email').val();
-    var cftoken=localStorage.getItem('cf_token');
-    if (email) {
-        $.ajax({
-            type: 'POST',
-            url: 'sendVerificationCode.php',
-            data: {cf_token:cftoken, email: email },
-            dataType: 'json',
-            success: function(response) {
-                if (response.success) {
-                    $('#emailHelp').show();
-                    // 禁用发送按钮，60秒后再启用
-                    const now = Date.now();
-                    localStorage.setItem('lastSentTime', now.toString());
-                    $('#sendVerificationCode').prop('disabled', true);
-                    updateButtonForRemainingTime();
-                    
-                } else {
-                    $('#emailHelp').hide();
-                    showAlert('验证码发送失败: ' + response.error, 'error');
-                }
-            },
-            error: function() {
-                $('#emailHelp').hide();
-                showAlert('请求发送验证码失败，请稍后再试。', 'error');
-            }
-        });
-    } else {
-        showAlert('请输入邮箱地址。', 'warning');
+    console.log('准备发送验证码到邮箱:', email);
+    
+    // 检查邮箱是否有效
+    if (!email || !email.includes('@')) {
+        showAlert('请输入有效的邮箱地址。', 'warning');
+        return;
     }
+    
+    // 获取cf_token (如果存在)
+    var cftoken = '';
+    try {
+        cftoken = localStorage.getItem('cf_token') || '';
+        console.log('cf_token:', cftoken ? '已获取' : '未找到');
+    } catch (e) {
+        console.error('获取cf_token时出错:', e);
+    }
+    
+    // 准备发送请求
+    console.log('准备发送XHR请求到 sendVerificationCode.php');
+    
+    // 显示加载状态
+    $('#sendVerificationCode').prop('disabled', true);
+    $('#sendVerificationCode').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> 发送中...');
+    
+    // 发送AJAX请求
+    $.ajax({
+        type: 'POST',
+        url: 'sendVerificationCode.php',
+        data: {
+            cf_token: cftoken, 
+            email: email 
+        },
+        dataType: 'json',
+        success: function(response) {
+            console.log('验证码请求响应:', response);
+            if (response.success) {
+                $('#emailHelp').show();
+                showAlert('验证码已发送到您的邮箱，请查收。', 'success');
+                
+                // 记录发送时间到localStorage
+                const now = Date.now();
+                localStorage.setItem('lastSentTime', now.toString());
+                
+                // 更新按钮状态
+                updateButtonForRemainingTime();
+            } else {
+                $('#emailHelp').hide();
+                $('#sendVerificationCode').prop('disabled', false);
+                $('#sendVerificationCode').text('发送验证码 Send verification code');
+                showAlert('验证码发送失败: ' + (response.error || response.message || '未知错误'), 'error');
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('发送验证码请求失败:', error);
+            console.error('状态码:', xhr.status);
+            console.error('响应文本:', xhr.responseText);
+            
+            $('#emailHelp').hide();
+            $('#sendVerificationCode').prop('disabled', false);
+            $('#sendVerificationCode').text('发送验证码 Send verification code');
+            showAlert('请求发送验证码失败，请稍后再试。', 'error');
+        }
+    });
 }
 
 function updateButtonForRemainingTime() {
