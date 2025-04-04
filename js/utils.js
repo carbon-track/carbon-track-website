@@ -14,57 +14,45 @@ function showAlert(message, type = 'info', callback = null) {
     // Remove any existing alert modal to prevent duplicates
     const existingAlert = document.getElementById('iosAlertModal');
     if (existingAlert) {
-        const existingModalInstance = bootstrap.Modal.getInstance(existingAlert);
-        if (existingModalInstance) {
-            existingModalInstance.hide();
-        }
-        // Add slight delay for hide animation before removing
-        setTimeout(() => existingAlert.remove(), 300);
+        // Immediately remove existing modal to prevent conflicts
+        existingAlert.remove(); 
+        // Also remove backdrop if it exists
+        const backdrop = document.querySelector('.modal-backdrop');
+        if (backdrop) backdrop.remove();
     }
 
-    // Determine title, icon based on type
-    let title, iconClass;
+    // Determine title based on type
+    let title;
     switch (type) {
-        case 'success':
-            title = 'Success';
-            iconClass = 'fas fa-check-circle icon-success';
-            break;
-        case 'warning':
-            title = 'Warning';
-            iconClass = 'fas fa-exclamation-triangle icon-warning';
-            break;
-        case 'error':
-            title = 'Error';
-            iconClass = 'fas fa-times-circle icon-error';
-            break;
-        default: // info
-            title = 'Information';
-            iconClass = 'fas fa-info-circle icon-info';
+        case 'success': title = 'Success'; break;
+        case 'warning': title = 'Warning'; break;
+        case 'error': title = 'Error'; break;
+        default: title = 'Information'; break;
     }
 
     // Detect theme
     const bodyClasses = document.body.className;
     let themeClass = 'ios-alert-light'; // Default to light
-    if (bodyClasses.includes('dark-theme') || (bodyClasses.includes('auto-theme') && bodyClasses.includes('dark-mode'))) {
+    // Check for manual dark theme OR auto theme + system dark mode preference
+    if (bodyClasses.includes('dark-theme') || 
+        (bodyClasses.includes('auto-theme') && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
         themeClass = 'ios-alert-dark';
     }
 
     // Create modal HTML
     const modalId = 'iosAlertModal';
     const modalHTML = `
-    <div class="modal fade ios-alert-modal ${themeClass}" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true">
+    <div class="modal fade ios-alert-modal ${themeClass}" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="${modalId}Label">${title}</h5>
                 </div>
                 <div class="modal-body">
-                    <!-- Optional Icon -->
-                    <!-- <i class="alert-icon ${iconClass}"></i> --> 
-                    ${message}
+                    ${message} 
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-ios" data-bs-dismiss="modal">OK</button>
+                    <button type="button" class="btn btn-ios" data-bs-dismiss="modal">OK</button> 
                 </div>
             </div>
         </div>
@@ -74,26 +62,41 @@ function showAlert(message, type = 'info', callback = null) {
     // Insert modal into DOM
     document.body.insertAdjacentHTML('beforeend', modalHTML);
 
-    // Get modal element and instance
     const modalElement = document.getElementById(modalId);
-    const modal = new bootstrap.Modal(modalElement, { backdrop: 'static', keyboard: false }); // Prevent closing by clicking outside or Esc
+    const modal = new bootstrap.Modal(modalElement);
 
-    // Set up event listener for when the modal is hidden
-    modalElement.addEventListener('hidden.bs.modal', function handler() {
-        modalElement.removeEventListener('hidden.bs.modal', handler); // Clean up listener
-        if (callback && typeof callback === 'function') {
-            callback();
+    // Use the 'hidden.bs.modal' event for cleanup and callback
+    modalElement.addEventListener('hidden.bs.modal', function handler(event) {
+        // Ensure we're not responding to events from nested modals if any
+        if (event.target !== modalElement) {
+            return;
         }
-        modalElement.remove(); // Remove modal from DOM after hidden
-         // Ensure backdrop is removed if stuck
-         const backdrop = document.querySelector('.modal-backdrop');
-         if (backdrop) {
-             backdrop.remove();
-         }
-         // Restore body scrollability if needed
-         document.body.style.overflow = ''; 
-         document.body.style.paddingRight = ''; 
-    });
+        
+        modalElement.removeEventListener('hidden.bs.modal', handler); // Clean up this listener
+        
+        // Execute callback if provided
+        if (callback && typeof callback === 'function') {
+            try {
+                 callback();
+            } catch (e) {
+                 console.error("Error in showAlert callback:", e);
+            }
+        }
+        
+        // Remove the modal from DOM
+        modalElement.remove();
+        
+        // Double-check for backdrop removal (Bootstrap 5 should handle this, but just in case)
+        const stillExistingBackdrop = document.querySelector('.modal-backdrop');
+        if (stillExistingBackdrop) {
+            stillExistingBackdrop.remove();
+        }
+        // Restore body scrollability if Bootstrap hasn't
+        if (document.body.style.overflow === 'hidden') {
+             document.body.style.overflow = ''; 
+             document.body.style.paddingRight = ''; 
+        }
+    }, { once: true }); // Use { once: true } for automatic listener removal
 
     // Show the modal
     modal.show();

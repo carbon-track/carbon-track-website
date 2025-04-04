@@ -831,12 +831,17 @@
           if (response.success) {
           displayProducts(response.products)
           } else {
-          $('#productsList').html('<div class="alert alert-danger">Error: ' + response.message + '</div>')
+          // Use response.message directly
+          showAlert(response.message || 'Failed to load products.', 'error'); 
+          $('#productsList').html(''); // Clear the list on error
           }
         },
-      error: function () {
+      error: function (jqXHR, textStatus, errorThrown) {
           $('#loading').hide() // 隐藏加载动画
-        $('#productsList').html('<div class="alert alert-danger">Failed to fetch products. Please try again later.</div>')
+          console.error("AJAX Error fetching products:", textStatus, errorThrown);
+          // Use a generic error message for AJAX failures
+          showAlert('Failed to connect to server to fetch products. Please try again later.', 'error');
+        $('#productsList').html(''); // Clear the list on error
       }
       })
     }
@@ -1018,16 +1023,20 @@
       dataType: 'json',
       success: function (response) {
         if (response.success) {
-          showAlert('兑换成功！' + response.message, 'success');
+          // Use response.message for success too, if available, or a default
+          showAlert(response.message || 'Exchange successful!', 'success');
           // 更新用户积分和产品列表
           fetchUserPoints(); 
           fetchProducts();
         } else {
-          showAlert('兑换失败：' + response.message, 'error');
+          // Use response.message directly for failure
+          showAlert(response.message || 'Exchange failed. Please try again.', 'error');
         }
       },
-      error: function () {
-        showAlert('兑换请求失败，请稍后再试。', 'error');
+      error: function (jqXHR, textStatus, errorThrown) {
+          console.error("AJAX Error exchanging product:", textStatus, errorThrown);
+         // Use a generic error message for AJAX failures
+         showAlert('Failed to connect to server for exchange. Please try again later.', 'error');
       }
     }); // Ensure correct closing
   }
