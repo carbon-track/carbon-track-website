@@ -814,13 +814,6 @@
 
       // 从PHP接口获取商品数据
       fetchProducts();
-
-      // 兑换商品
-      $('#productsList').on('click', '.exchange-btn', function () {
-        var productId = $(this).data('id')
-      var token = localStorage.getItem('token')
-        exchangeProduct(productId, token)
-      })
     })
 
     function fetchProducts() {
@@ -912,32 +905,6 @@
     })
     productsRow += '</div>'
     $('#productsList').html(productsRow);
-  }
-
-    function exchangeProduct(productId, token) {
-      $.ajax({
-        type: 'POST',
-        url: 'exchange_product.php',
-        contentType: 'application/json',
-        data: JSON.stringify({
-          productId: productId,
-          token: token
-        }),
-        dataType: 'json',
-        success: function (response) {
-          if (response.success) {
-          showAlert('兑换成功！' + response.message, 'success');
-          // 更新用户积分和产品列表
-          fetchUserPoints();
-          fetchProducts();
-          } else {
-          showAlert('兑换失败：' + response.message, 'error');
-        }
-      },
-      error: function () {
-        showAlert('兑换请求失败，请稍后再试。', 'error');
-      }
-    });
   }
 
   // --- Turnstile related functions ---
