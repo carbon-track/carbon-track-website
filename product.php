@@ -91,8 +91,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
         try {
             $pdo = new PDO($dsn, $user, $pass, $options);
 
-            // Fetch all products (no pagination/search for POST)
-            $stmt = $pdo->query("SELECT id, name, description, price, image_url, stock FROM products ORDER BY id DESC");
+            // Fetch all products (using correct column names)
+            $stmt = $pdo->query("SELECT product_id as id, name, description, points_required as price, image_path as image_url, stock FROM products ORDER BY product_id DESC");
             $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             echo json_encode([
