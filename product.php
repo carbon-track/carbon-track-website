@@ -70,7 +70,47 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
         handleApiError(500, 'Internal server error: ' . $e->getMessage());
     }
 } else {
-    // Optionally handle POST or other methods if needed for other actions in the future
-    handleApiError(405, 'Invalid request method. Use GET for listing products.');
+    // --- Handle POST requests for product listing with token validation ---
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        // Get the token from POST data
+        $token = $_POST['token'] ?? null;
+
+        if (!$token) {
+            handleApiError(400, 'Token is required.');
+            exit;
+        }
+
+        // Validate the token
+        $userData = validateToken($token);
+        if (!$userData) {
+            handleApiError(401, 'Invalid or expired token.');
+            exit;
+        }
+
+        // If token is valid, fetch all products
+        try {
+            $pdo = new PDO($dsn, $user, $pass, $options);
+
+            // Fetch all products (no pagination/search for POST)
+            $stmt = $pdo->query("SELECT id, name, description, price, image_url, stock FROM products ORDER BY id DESC");
+            $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            echo json_encode([
+                'success' => true,
+                'products' => $products
+            ]);
+
+        } catch (PDOException $e) {
+            logException($e);
+            handleApiError(500, 'Database error: ' . $e->getMessage());
+        } catch (Exception $e) {
+            logException($e);
+            handleApiError(500, 'Internal server error: ' . $e->getMessage());
+        }
+
+    } else {
+        // Reject other methods
+        handleApiError(405, 'Invalid request method. Use GET for listing products or POST with a valid token to list products.');
+    }
 }
 ?>
