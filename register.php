@@ -3,8 +3,14 @@ require_once 'global_variables.php'; // Includes global_error_handler.php and db
 
 session_start();
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'], $_POST['regusername'], $_POST['regpassword'], $_POST['verificationCode'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'], $_POST['regusername'], $_POST['regpassword'], $_POST['verificationCode'], $_POST['cf-turnstile-response'])) {
     try {
+        // Verify Turnstile token first
+        $turnstileToken = $_POST['cf-turnstile-response'];
+        if (!verifyTurnstileToken($turnstileToken)) {
+            handleApiError(403, 'Anti-bot verification failed. Please try again.');
+        }
+
         $email = sanitizeInput($_POST['email']);
         $username = sanitizeInput($_POST['regusername']);
         $password = $_POST['regpassword']; // Password will be hashed, no need to sanitize

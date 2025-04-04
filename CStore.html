@@ -810,10 +810,10 @@
       })
       }
       // 获取用户积分
-      fetchUserPoints()
+      fetchUserPoints();
 
       // 从PHP接口获取商品数据
-      fetchProducts()
+      fetchProducts();
 
       // 兑换商品
       $('#productsList').on('click', '.exchange-btn', function () {
@@ -911,24 +911,25 @@
       `
     })
     productsRow += '</div>'
-    $('#productsList').html(productsRow)
+    $('#productsList').html(productsRow);
   }
 
     function exchangeProduct(productId, token) {
       $.ajax({
         type: 'POST',
         url: 'exchange_product.php',
-      data: {
-        product_id: productId,
-        token: token
-      },
+        contentType: 'application/json',
+        data: JSON.stringify({
+          productId: productId,
+          token: token
+        }),
         dataType: 'json',
         success: function (response) {
           if (response.success) {
           showAlert('兑换成功！' + response.message, 'success');
           // 更新用户积分和产品列表
-          fetchUserPoints()
-          fetchProducts()
+          fetchUserPoints();
+          fetchProducts();
           } else {
           showAlert('兑换失败：' + response.message, 'error');
         }
@@ -936,8 +937,164 @@
       error: function () {
         showAlert('兑换请求失败，请稍后再试。', 'error');
       }
-    })
+    });
   }
+
+  // --- Turnstile related functions ---
+  // Global variable to store the product ID being confirmed
+  var currentProductIdToExchange = null;
+
+  // Callback function after Turnstile script is loaded
+  function onloadTurnstileCallback() {
+      console.log('Turnstile script loaded.');
+      // We will render the widget explicitly when the modal is shown
+  }
+
+  // Dynamically load Turnstile script
+  function loadTurnstileScript() {
+      if (!window.turnstile && !document.querySelector('script[src*="challenges.cloudflare.com/turnstile"]')) {
+          const script = document.createElement('script');
+          script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback';
+          script.async = true;
+          script.defer = true;
+          document.head.appendChild(script);
+      }
+  }
+  // ---------------------------------
+  
+  $(document).ready(function () {
+      loadTurnstileScript(); // Load script on page ready
+      fetchUserPoints()
+      // Modify the click handler for exchange buttons
+      $('body').on('click', '.exchange-btn', function () {
+          currentProductIdToExchange = $(this).data('id');
+          var productName = $(this).closest('.product-card').find('.product-title').text();
+          var productPrice = $(this).closest('.product-card').find('.price-tag').text();
+
+          $('#confirmProductName').text(productName);
+          $('#confirmProductPrice').text(productPrice);
+          
+          // Show the confirmation modal
+          $('#exchangeConfirmModal').modal('show');
+          
+          // Explicitly render the Turnstile widget inside the modal *after* it's shown
+          // Ensure the container is empty before rendering
+          var turnstileContainer = document.getElementById('turnstile-exchange-widget');
+          if (turnstileContainer) {
+              turnstileContainer.innerHTML = ''; // Clear previous widget if any
+              if (window.turnstile) {
+                  window.turnstile.render('#turnstile-exchange-widget', {
+                      sitekey: '0x4AAAAAABD07zmMDmgwgTsL',
+                      callback: function(token) {
+                          console.log('Exchange Turnstile verified with token:', token);
+                          // Optional: Enable confirm button here
+                          $('#confirmExchangeBtn').prop('disabled', false);
+                      },
+                      'expired-callback': function() {
+                          console.log('Exchange Turnstile expired');
+                           $('#confirmExchangeBtn').prop('disabled', true); // Disable on expiry
+                           // Optionally reset the widget
+                           window.turnstile.reset('#turnstile-exchange-widget');
+                      },
+                      'error-callback': function(){
+                           console.error('Exchange Turnstile error');
+                           $('#confirmExchangeBtn').prop('disabled', true); // Disable on error
+                      }
+                  });
+                   $('#confirmExchangeBtn').prop('disabled', true); // Disable button initially
+              } else {
+                  console.error("Turnstile object not loaded yet.");
+                  // Handle error - maybe show a message
+              }
+          } else {
+              console.error("Turnstile container not found in modal.");
+          }
+      });
+      
+      // Add click handler for the final confirmation button in the modal
+      $('#confirmExchangeBtn').on('click', function() {
+          var token = localStorage.getItem('token');
+          var turnstileResponse = $('#turnstile-exchange-widget [name="cf-turnstile-response"]').val();
+          
+          if (!currentProductIdToExchange) {
+              showAlert('Error: Product ID not found.', 'error');
+              return;
+          }
+          
+          if (!turnstileResponse) {
+              showAlert('请完成人机验证 Please complete the verification.', 'warning');
+              return;
+          }
+          
+          // Call the exchange function with the Turnstile response
+          exchangeProduct(currentProductIdToExchange, token, turnstileResponse);
+          
+          // Hide the modal
+          $('#exchangeConfirmModal').modal('hide');
+      });
+
+      fetchProducts() // Fetch products on page load
+    $('#productsList').html(productsRow)
+  })
+
+    // Modify exchangeProduct to accept and send the turnstile token
+    function exchangeProduct(productId, token, turnstileResponse) {
+      $.ajax({
+        type: 'POST',
+        url: 'exchange_product.php',
+        contentType: 'application/json',
+        data: JSON.stringify({ 
+          productId: productId, 
+          token: token,
+          'cf-turnstile-response': turnstileResponse // Add turnstile token
+        }),
+        dataType: 'json',
+        success: function (response) {
+          if (response.success) {
+            showAlert('兑换成功！' + response.message, 'success');
+            // 更新用户积分和产品列表
+            fetchUserPoints(); 
+            fetchProducts();
+          } else {
+            showAlert('兑换失败：' + response.message, 'error');
+          }
+        },
+        error: function () {
+          showAlert('兑换请求失败，请稍后再试。', 'error');
+        }
+      }); // Ensure correct closing
+    }
+
+  // Add the confirmation modal HTML to the body
+   $(function() { // Ensure this runs after the DOM is ready
+     const modalHTML = `
+    <div class="modal fade" id="exchangeConfirmModal" tabindex="-1" role="dialog" aria-labelledby="exchangeConfirmModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content ios-modal-content">
+          <div class="modal-header ios-modal-header">
+            <h5 class="modal-title" id="exchangeConfirmModalLabel">Confirm Exchange</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body ios-modal-body">
+            <p>Are you sure you want to exchange <strong id="confirmProductPrice"></strong> credits for <strong id="confirmProductName"></strong>?</p>
+            <!-- Turnstile Widget Container -->
+            <div id="turnstile-exchange-widget" style="margin-top: 15px; margin-bottom: 15px;">
+               <!-- Turnstile will render here -->
+            </div>
+            <small class="text-muted">Please complete the verification below.</small>
+          </div>
+          <div class="modal-footer ios-modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary" id="confirmExchangeBtn" disabled>Confirm Exchange</button> 
+          </div>
+        </div>
+      </div>
+    </div>`;
+     $('body').append(modalHTML);
+   }); // Ensure correct closing for $(function(){...})
+
   </script>
 </body>
 </html>

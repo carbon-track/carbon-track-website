@@ -337,6 +337,15 @@ function registerUser() {
     var email = $('#email').val();
     var regpassword = $('#regpassword').val();
     var verificationCode = $('#verificationCode').val();
+    var turnstileResponse = $('#registerModal [name="cf-turnstile-response"]').val(); // Get Turnstile response
+
+    // 检查Turnstile验证是否完成
+    if (!turnstileResponse) {
+        showAlert('请完成人机验证 Please complete the verification.', 'warning');
+        var $submitButton = $('#registerModal form').find('button[type="submit"]');
+        $submitButton.prop('disabled', false).html('Create Account'); // Re-enable button
+        return; 
+    }
 
     // 发送AJAX请求到服务器进行注册
     $.ajax({
@@ -346,7 +355,8 @@ function registerUser() {
             email: email,
             regusername: regusername,
             regpassword: regpassword,
-            verificationCode: verificationCode
+            verificationCode: verificationCode,
+            'cf-turnstile-response': turnstileResponse // Add Turnstile response to data
         },
         dataType: 'json',
         success: function(response) {
@@ -2133,6 +2143,12 @@ function initRegisterModal() {
                                 <small id="emailHelp" class="form-text text-muted" style="display: none; margin-top: 8px;">The code has been sent to your email.</small>
                             </div>
                         </div>
+                        
+                        <!-- Add Cloudflare Turnstile Widget -->
+                        <div class="form-group">
+                             <div class="cf-turnstile" data-sitekey="0x4AAAAAABD07zmMDmgwgTsL" data-callback="turnstileCallbackRegister"></div>
+                        </div>
+                        
                         <button type="submit" class="btn btn-success btn-block">Create Account</button>
                         <div id="registerError" style="display:none;" class="alert alert-danger mt-3"></div>
                     </form>
@@ -2438,8 +2454,9 @@ function checkUnreadMessagesAndUpdate() {
         url: 'chkmsg.php',
         type: 'POST',
         data: {
-            token: token,
-            uid: userId
+            token: token
+            // Remove uid as backend derives it from token
+            // uid: userId 
         },
         dataType: 'json',
         success: function(response) {
@@ -2531,4 +2548,33 @@ function refreshMessagesAndConversations() {
         showAlert('刷新消息出错：' + error.message, 'error');
     });
 }
+
+// Add Turnstile callback function (can be empty if only using explicit rendering)
+function turnstileCallbackRegister(token) {
+    console.log("Turnstile Register Callback Triggered with token:", token);
+    // You can potentially enable the submit button here if it was initially disabled
+}
+
+// Dynamically load Turnstile script if not already loaded
+function loadTurnstileScript() {
+    if (!window.turnstile) {
+        const script = document.createElement('script');
+        script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback';
+        script.async = true;
+        script.defer = true;
+        document.head.appendChild(script);
+    }
+}
+
+// Callback function after Turnstile script is loaded
+function onloadTurnstileCallback() {
+    console.log('Turnstile script loaded.');
+    // Optionally render widgets explicitly if needed
+    // window.turnstile.render('#turnstile-widget-register', { sitekey: 'YOUR_SITE_KEY', callback: function(token) { ... } });
+}
+
+// Call loadTurnstileScript when appropriate, e.g., when the modal is shown or document ready
+$(document).ready(function() {
+    loadTurnstileScript();
+});
 

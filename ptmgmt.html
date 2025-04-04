@@ -236,18 +236,58 @@
 
 <div class="container">
   <h3>碳减排记录审查</h3><br>
+
+  <!-- Search Bar -->
+  <div class="row mb-3">
+    <div class="col-md-6">
+      <div class="input-group">
+        <input type="text" id="searchInput" class="form-control" placeholder="Search by User ID or Email...">
+        <div class="input-group-append">
+          <button class="btn btn-primary" type="button" id="searchButton">Search</button>
+          <button class="btn btn-secondary" type="button" id="clearSearchButton">Clear</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div id="records" class="row">
     <!-- 交易记录将在这里动态生成 -->
   </div>
+  <!-- Pagination Controls -->
+  <div id="pagination-controls" class="mt-4 text-center"></div>
 </div>
 
 <script>
   $(document).ready(function () {
     verifyAdmin()
+    // Search button click
+    $('#searchButton').on('click', function() {
+      currentSearchTerm = $('#searchInput').val();
+      fetchTransactionsForAdmin(1, currentSearchTerm); // Reset to page 1 on new search
+    });
+
+    // Clear search button click
+    $('#clearSearchButton').on('click', function() {
+      $('#searchInput').val('');
+      currentSearchTerm = null;
+      fetchTransactionsForAdmin(1, currentSearchTerm); // Reset to page 1 and clear search
+    });
+
+    // Optional: Trigger search on Enter key press in search input
+    $('#searchInput').on('keypress', function(e) {
+      if (e.which == 13) { // Enter key pressed
+        $('#searchButton').click(); // Trigger search button click
+      }
+    });
   })
+
   var token = localStorage.getItem('token')
-  if (token) {
-  } else {
+  var currentPage = 1;
+  var recordsPerPage = 10; // Should match backend default if not specified
+  var totalRecords = 0;
+  var currentSearchTerm = null; // Variable to hold the current search term
+
+  if (!token) {
     showAlert('请先登录。', 'warning', function() {
       window.location.href = 'index.html'
     })
@@ -261,10 +301,10 @@
       url: 'verify_admin.php', // 替换为您的PHP脚本路径
       dataType: 'json',
       success: function (response) {
-        if (response.success) {
-          fetchTransactionsForAdmin()
+        if (response.success && response.isAdmin) {
+          fetchTransactionsForAdmin(currentPage, currentSearchTerm)
         } else {
-          showAlert('非法访问，您不是管理员。', 'error', function() {
+          showAlert('非法访问，您没有管理员权限。', 'error', function() {
             window.location.href = 'index.html'
           })
         }
@@ -277,39 +317,97 @@
     })
   }
 
-  function fetchTransactionsForAdmin() {
+  function fetchTransactionsForAdmin(page, searchTerm) {
+    currentPage = page; // Update current page
+    currentSearchTerm = searchTerm; // Update current search term
     var token = localStorage.getItem('token')
+    
+    var requestData = { 
+      token: token,
+      page: currentPage,
+      limit: recordsPerPage
+    }; 
+
+    // Add searchTerm to request data if it's not null or empty
+    if (currentSearchTerm && currentSearchTerm.trim() !== '') {
+      requestData.searchTerm = currentSearchTerm;
+    } else {
+       // Ensure search term is null if empty for clarity and potentially backend logic
+      currentSearchTerm = null; 
+    }
+
     $.ajax({
       type: 'POST',
-      data: { token: token },
-      url: 'gapthis.php', // 替换为您的PHP脚本路径
+      data: requestData,
+      url: 'gapthis.php', 
       dataType: 'json',
       success: function (response) {
         if (response.success) {
           const recordsContainer = $('#records')
-          recordsContainer.empty() // 清空现有记录
-          // 过滤出act字段为'non'的记录
-          const filteredRecords = response.data.filter(record => record.auth === 'non')
-          if (filteredRecords.length === 0) {
-            // 如果没有符合条件的记录，显示提示信息
-            recordsContainer.append('<p>暂无要审批的数据。</p>')
+          recordsContainer.empty() // Clear existing records
+          
+          totalRecords = response.total; 
+          currentPage = response.page; 
+          recordsPerPage = response.limit;
+          // Update search input visually if cleared or term comes back from server
+          $('#searchInput').val(response.searchTerm || ''); 
+
+          const records = response.data;
+          
+          if (records.length === 0) {
+             let message = totalRecords === 0 ? '暂无要审批的数据。' : '没有找到匹配的记录。';
+             if (currentSearchTerm) {
+                 message = `没有找到与 "${currentSearchTerm}" 匹配的待审批记录。`;
+             }
+             recordsContainer.append(`<p>${message}</p>`);
           } else {
-            // 处理过滤后的积分变动记录
-            filteredRecords.forEach(record => {
+            records.forEach(record => {
               const card = createCard(record)
               recordsContainer.append(card)
             })
           }
+          renderPaginationControls(); // Render pagination controls regardless of results
         } else {
-          // 处理错误消息
           showAlert('错误: ' + response.message, 'error')
+          $('#pagination-controls').empty(); 
         }
       },
       error: function () {
         showAlert('请求失败，请重试。', 'error')
+        $('#pagination-controls').empty(); 
       },
     })
   }
+
+ function renderPaginationControls() {
+    const paginationContainer = $('#pagination-controls');
+    paginationContainer.empty();
+    
+    if (totalRecords === 0) return; // No controls if no records
+
+    const totalPages = Math.ceil(totalRecords / recordsPerPage);
+
+    if (totalPages <= 1) return; // No controls if only one page
+
+    let paginationHTML = '<nav aria-label="Page navigation"><ul class="pagination justify-content-center">';
+
+    // Previous button
+    paginationHTML += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                         <a class="page-link" href="#" onclick="fetchTransactionsForAdmin(${currentPage - 1}, currentSearchTerm)">Previous</a>
+                       </li>`;
+
+    // Page numbers (simplified version: just show current page / total pages)
+    // You could expand this to show more page numbers if needed
+    paginationHTML += `<li class="page-item disabled"><span class="page-link">Page ${currentPage} of ${totalPages}</span></li>`; 
+
+    // Next button
+    paginationHTML += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                         <a class="page-link" href="#" onclick="fetchTransactionsForAdmin(${currentPage + 1}, currentSearchTerm)">Next</a>
+                       </li>`;
+
+    paginationHTML += '</ul></nav>';
+    paginationContainer.html(paginationHTML);
+ }
 
 
   function createCard(record) {
@@ -352,14 +450,14 @@
   function approveTransaction(id, type, uid) {
     $.ajax({
       type: 'POST',
-      url: 'approve_transaction.php', // 替换为您的PHP脚本路径
+      url: 'approve_transaction.php', 
       data: { token: localStorage.getItem('token'), transactionId: id, uid: uid, status: 'approved', type: type },
       dataType: 'json',
       success: function (response) {
         if (response.success) {
           showAlert('交易已通过。', 'success')
-          // 刷新或更新页面上的记录
-          fetchTransactionsForAdmin();
+          // Refresh the current page & search state after approval
+          fetchTransactionsForAdmin(currentPage, currentSearchTerm);
         } else {
           showAlert('审批失败: ' + response.message, 'error')
         }
@@ -373,14 +471,14 @@
   function rejectTransaction(id, type) {
     $.ajax({
       type: 'POST',
-      url: 'reject_transaction.php', // 替换为您的PHP脚本路径
+      url: 'reject_transaction.php', 
       data: { token: localStorage.getItem('token'), transactionId: id, status: 'rejected', type: type },
       dataType: 'json',
       success: function (response) {
         if (response.success) {
           showAlert('交易已打回。', 'success')
-          // 刷新或更新页面上的记录
-          fetchTransactionsForAdmin();
+          // Refresh the current page & search state after rejection
+          fetchTransactionsForAdmin(currentPage, currentSearchTerm);
         } else {
           showAlert('打回失败: ' + response.message, 'error')
         }

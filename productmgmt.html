@@ -271,28 +271,63 @@
 
 <div class="container mt-4">
   <h2 class="section-title">Current Products</h2>
-  <div id="productList" class="row">
-    <!-- 商品信息将通过JavaScript动态插入 -->
-    <div class="col-12 text-center py-5">
-      <div class="spinner-border text-primary" role="status">
-        <span class="sr-only">Loading...</span>
+
+  <!-- Search Bar -->
+  <div class="row mb-3">
+    <div class="col-md-6">
+      <div class="input-group">
+        <input type="text" id="productSearchInput" class="form-control" placeholder="Search by Product Name...">
+        <div class="input-group-append">
+          <button class="btn btn-primary" type="button" id="productSearchButton">Search</button>
+          <button class="btn btn-secondary" type="button" id="clearProductSearchButton">Clear</button>
+        </div>
       </div>
-      <p class="mt-3">Loading products...</p>
     </div>
   </div>
+
+  <div id="productList" class="row">
+    <!-- Product list or loading indicator -->
+  </div>
+  <!-- Pagination Controls -->
+  <div id="pagination-controls" class="mt-4 text-center"></div>
 </div>
 
 <script>
+  var currentPage = 1;
+  var productsPerPage = 12; 
+  var totalProducts = 0;
+  var currentSearchTerm = null; // For product search
+
   $(document).ready(function () {
-    var token = localStorage.getItem('token'); // Use localStorage instead of sessionStorage
+    var token = localStorage.getItem('token'); 
     if (!token) {
       showAlert('请先登录！', 'warning', function() {
-        window.location.href = 'index.html'; // Redirect to login page if token is not present
+        window.location.href = 'index.html'; 
       });
       return;
     }
     
-    verifyAdmin();
+    verifyAdmin(); 
+
+    // Product Search button click
+    $('#productSearchButton').on('click', function() {
+      currentSearchTerm = $('#productSearchInput').val();
+      fetchProducts(1, currentSearchTerm); // Reset to page 1 on new search
+    });
+
+    // Clear Product Search button click
+    $('#clearProductSearchButton').on('click', function() {
+      $('#productSearchInput').val('');
+      currentSearchTerm = null;
+      fetchProducts(1, currentSearchTerm); // Reset to page 1 and clear search
+    });
+
+    // Optional: Trigger product search on Enter key press
+    $('#productSearchInput').on('keypress', function(e) {
+      if (e.which == 13) { // Enter key pressed
+        $('#productSearchButton').click(); 
+      }
+    });
   });
 
   function verifyAdmin() {
@@ -303,56 +338,9 @@
       url: 'verify_admin.php',
       dataType: 'json',
       success: function (response) {
-        if (response.success) {
-          fetchProducts();
-          
-          $('#addProductForm').submit(function (e) {
-            e.preventDefault();
-            
-            // Show loading state
-            var submitBtn = $(this).find('button[type="submit"]');
-            var originalText = submitBtn.html();
-            submitBtn.html('<i class="fas fa-spinner fa-spin mr-2"></i> Adding...');
-            submitBtn.prop('disabled', true);
-            
-            var name = $('#addName').val();
-            var description = $('#addDescription').val();
-            var price = $('#addPrice').val();
-            var stock = $('#addStock').val();
-            var token = localStorage.getItem('token');
-            
-            $.ajax({
-              type: 'POST',
-              url: 'add_product.php',
-              data: {
-                name: name,
-                description: description,
-                points_required: price,
-                stock: stock,
-                token: token,
-              },
-              success: function (response) {
-                // Reset button state
-                submitBtn.html(originalText);
-                submitBtn.prop('disabled', false);
-                
-                if (response.success) {
-                  showAlert('商品添加成功！', 'success', function() {
-                    $('#addProductForm')[0].reset();
-                    fetchProducts();
-                  });
-                } else {
-                  showAlert('添加商品失败：' + response.message, 'error');
-                }
-              },
-              error: function (xhr) {
-                // Reset button state
-                submitBtn.html(originalText);
-                submitBtn.prop('disabled', false);
-                showAlert('请求失败，请重试：' + xhr.responseText, 'error');
-              },
-            });
-          });
+        if (response.success && response.isAdmin) {
+          fetchProducts(currentPage, currentSearchTerm); // Initial fetch
+          setupForms(); 
         } else {
           showAlert('访问被拒绝。您不是管理员。', 'error', function() {
             window.location.href = 'index.html';
@@ -365,6 +353,55 @@
         });
       },
     });
+  }
+
+  // Separate function to setup form handlers, called after admin verification
+  function setupForms() {
+      $('#addProductForm').submit(function (e) {
+        e.preventDefault();
+        
+        var submitBtn = $(this).find('button[type="submit"]');
+        var originalText = submitBtn.html();
+        submitBtn.html('<i class="fas fa-spinner fa-spin mr-2"></i> Adding...');
+        submitBtn.prop('disabled', true);
+        
+        var name = $('#addName').val();
+        var description = $('#addDescription').val();
+        var price = $('#addPrice').val();
+        var stock = $('#addStock').val();
+        var token = localStorage.getItem('token');
+        
+        $.ajax({
+          type: 'POST',
+          url: 'add_product.php',
+          data: {
+            name: name,
+            description: description,
+            points_required: price,
+            stock: stock,
+            token: token, // Token is required for adding
+          },
+          success: function (response) {
+            submitBtn.html(originalText);
+            submitBtn.prop('disabled', false);
+            
+            if (response.success) {
+              showAlert('商品添加成功！', 'success', function() {
+                $('#addProductForm')[0].reset();
+                fetchProducts(1, currentSearchTerm); // Go to first page to see newly added product
+              });
+            } else {
+              showAlert('添加商品失败：' + response.message, 'error');
+            }
+          },
+          error: function (xhr) {
+            submitBtn.html(originalText);
+            submitBtn.prop('disabled', false);
+            showAlert('请求失败，请重试：' + xhr.responseText, 'error');
+          },
+        });
+      });
+      // Note: updateProduct and deleteProduct are called via onclick, no need to setup submit here
   }
 
   function updateProduct() {
@@ -390,20 +427,18 @@
         token: token,
       },
       success: function (response) {
-        // Reset button state
         submitBtn.html(originalText);
         submitBtn.prop('disabled', false);
         
         if (response.success) {
           showAlert('商品更新成功！', 'success', function() {
-            fetchProducts();
+            fetchProducts(currentPage, currentSearchTerm); // Refresh current page
           });
         } else {
           showAlert('更新商品失败：' + response.message, 'error');
         }
       },
       error: function (xhr) {
-        // Reset button state
         submitBtn.html(originalText);
         submitBtn.prop('disabled', false);
         showAlert('请求失败，请重试。', 'error');
@@ -432,21 +467,20 @@
         token: token,
       },
       success: function (response) {
-        // Reset button state
         submitBtn.html(originalText);
         submitBtn.prop('disabled', false);
         
         if (response.success) {
           showAlert('商品删除成功！', 'success', function() {
             $('#updateDeleteProductForm')[0].reset();
-            fetchProducts();
+            fetchProducts(currentPage, currentSearchTerm); // Refresh current page, might need to go to previous if last item deleted
+            // TODO: Add logic to go to previous page if current page becomes empty after delete
           });
         } else {
           showAlert('删除商品失败：' + response.message, 'error');
         }
       },
       error: function (xhr) {
-        // Reset button state
         submitBtn.html(originalText);
         submitBtn.prop('disabled', false);
         showAlert('请求失败，请重试。', 'error');
@@ -454,25 +488,90 @@
     });
   }
 
-  function fetchProducts() {
+  function fetchProducts(page, searchTerm) {
+    currentPage = page;
+    currentSearchTerm = searchTerm;
+    var productList = $('#productList');
+    var paginationControls = $('#pagination-controls');
+    productList.html('<div class="col-12 text-center py-5"><div class="spinner-border text-primary" role="status"><span class="sr-only">Loading...</span></div><p class="mt-3">Loading products...</p></div>');
+    paginationControls.empty();
+
+    var requestData = { 
+        page: currentPage, 
+        limit: productsPerPage 
+    };
+    if (currentSearchTerm && currentSearchTerm.trim() !== '') {
+        requestData.searchTerm = currentSearchTerm;
+    } else {
+        currentSearchTerm = null; // Ensure consistency
+    }
+
     $.ajax({
       type: 'GET',
       url: 'product.php',
+      data: requestData, // Pass pagination & search params
       dataType: 'json',
       success: function (response) {
+        productList.empty();
         if (response.success) {
+          totalProducts = response.total;
+          currentPage = response.page;
+          productsPerPage = response.limit;
+          $('#productSearchInput').val(response.searchTerm || ''); // Update search box
+          
           renderProducts(response.products);
+          
+          // Display message if no products found
+          if (response.products.length === 0) {
+              let message = totalProducts === 0 ? 'No products available. Add your first product!' : 'No matching products found.';
+              if (currentSearchTerm) {
+                  message = `No products found matching "${currentSearchTerm}".`;
+              }
+              productList.html(`<div class="col-12 text-center py-5"><p>${message}</p></div>`);
+          }
+          
+          renderPaginationControls();
         } else {
           console.error('Failed to get products: ' + response.message);
-          $('#productList').html('<div class="col-12"><div class="alert alert-danger">Failed to load products: ' + response.message + '</div></div>');
+          productList.html('<div class="col-12"><div class="alert alert-danger">Failed to load products: ' + response.message + '</div></div>');
         }
       },
       error: function () {
+        productList.empty();
         console.error('Product data request failed.');
-        $('#productList').html('<div class="col-12"><div class="alert alert-danger">Failed to load products. Please try again later.</div></div>');
+        productList.html('<div class="col-12"><div class="alert alert-danger">Failed to load products. Please try again later.</div></div>');
       },
     });
   }
+
+ function renderPaginationControls() {
+    const paginationContainer = $('#pagination-controls');
+    paginationContainer.empty();
+    
+    if (totalProducts === 0) return; 
+
+    const totalPages = Math.ceil(totalProducts / productsPerPage);
+
+    if (totalPages <= 1) return; 
+
+    let paginationHTML = '<nav aria-label="Product page navigation"><ul class="pagination justify-content-center">';
+
+    // Previous button (includes search term)
+    paginationHTML += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                         <a class="page-link" href="#" onclick="fetchProducts(${currentPage - 1}, currentSearchTerm)">Previous</a>
+                       </li>`;
+
+    // Page numbers (simplified)
+    paginationHTML += `<li class="page-item disabled"><span class="page-link">Page ${currentPage} of ${totalPages}</span></li>`; 
+
+    // Next button (includes search term)
+    paginationHTML += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                         <a class="page-link" href="#" onclick="fetchProducts(${currentPage + 1}, currentSearchTerm)">Next</a>
+                       </li>`;
+
+    paginationHTML += '</ul></nav>';
+    paginationContainer.html(paginationHTML);
+ }
 
   function renderProducts(products) {
     var productList = $('#productList');

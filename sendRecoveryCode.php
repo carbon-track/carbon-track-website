@@ -5,10 +5,18 @@ require 'db.php';
 
 session_start();
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'])) {
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'], $_POST['cf_token'])) {
     try {
         $email = sanitizeInput($_POST['email']);
+        $token = sanitizeInput($_POST['cf_token']); // Get the token
 
+        // Verify the Cloudflare Turnstile token using the global function
+        if (!verifyTurnstileToken($token)) {
+            handleApiError(403, 'Anti-bot verification failed. Please try again.');
+        }
+
+        // Proceed only if Turnstile verification succeeded
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             handleApiError(422, 'Invalid email address.');
         }

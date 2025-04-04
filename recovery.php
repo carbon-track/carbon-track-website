@@ -9,35 +9,13 @@ if (!isset($_POST['cf_token'])) {
     echo json_encode(["message" => "Please Finish the Anti-bot Verification."]);
     exit();
 }
+
+// Verify Turnstile token using the global function
 $cftoken = $_POST['cf_token'];
-$url = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
-$cfdata = http_build_query([
-    'secret' => '0x4AAAAAAA0wckoWtl8jqQKsOJNXi3Ouo0M',
-    'response' => $cftoken
-]);
-$ch = curl_init($url);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_POST, true);
-curl_setopt($ch, CURLOPT_POSTFIELDS, $cfdata);
-curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-
-$result = curl_exec($ch);
-if (curl_errno($ch)) {
-    http_response_code(500);
-    echo json_encode(["message" => "Internal Server Error."]);
-    curl_close($ch);
-    exit();
+if (!verifyTurnstileToken($cftoken)) {
+    handleApiError(403, 'Anti-bot verification failed. Please try again.');
 }
 
-curl_close($ch);
-
-$response = json_decode($result, true);
-if (is_null($response) || !$response['success']) {
-    http_response_code(403);
-    echo json_encode(["message" => "Please Finish the Anti-bot Verification."]);
-    exit();
-}
 // 清理和验证输入
 $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
 $verificationCode = filter_input(INPUT_POST, 'verificationCode', FILTER_SANITIZE_NUMBER_INT);

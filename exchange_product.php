@@ -10,10 +10,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $json = file_get_contents('php://input');
         $data = json_decode($json, true);
 
-        if (!isset($data['productId']) || !isset($data['token'])) {
-            handleApiError(400, 'Missing required fields');
+        // Check for required fields including Turnstile response
+        if (!isset($data['productId']) || !isset($data['token']) || !isset($data['cf-turnstile-response'])) { 
+            handleApiError(400, 'Missing required fields or verification token');
         }
 
+        // Verify Turnstile token first
+        $turnstileToken = $data['cf-turnstile-response'];
+        if (!verifyTurnstileToken($turnstileToken)) {
+             handleApiError(403, 'Anti-bot verification failed. Please try again.');
+        }
+
+        // Proceed with the rest of the logic if verification passes
         $productId = sanitizeInput($data['productId']);
         $token = sanitizeInput($data['token']);
         $email = opensslDecrypt($token);

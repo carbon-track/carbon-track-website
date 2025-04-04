@@ -708,9 +708,20 @@
         
         var formData = new FormData(this)
         formData.append('activity', $('#activity').val())
-        formData.append('oridata', $('#dataInput').val())
+        formData.append('oridata', parseFloat($('#dataInput').val()) || 0)
         formData.append('token', localStorage.getItem('token'))
+        formData.append('notes', $('#notes').val())
+        formData.append('date', $('#date').val())
+        // Add Turnstile response
+        formData.append('cf-turnstile-response', $('#carbonForm [name="cf-turnstile-response"]').val());
         // 移除id参数，让服务器端通过token获取用户ID
+        
+        // Check if Turnstile response exists
+        if (!formData.get('cf-turnstile-response')) {
+          showAlert('请完成人机验证 Please complete the verification.', 'warning');
+          $('#submitButton').prop('disabled', false).html('Submit Carbon Reduction'); // Re-enable button
+          return; 
+        }
         
         // 显示加载状态
         $('#submitButton').prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> 提交中...');
@@ -854,31 +865,50 @@
         });
         
         // 更新文件信息和预览
+        let currentBlobUrl = null; // Variable to store the current blob URL
+
         function updateFileInfo(file) {
+          // Revoke the previous blob URL if it exists
+          if (currentBlobUrl) {
+            URL.revokeObjectURL(currentBlobUrl);
+            currentBlobUrl = null;
+          }
+
+          // Frontend check for file size (5MB limit)
+          if (file.size > 5 * 1024 * 1024) { // 5 MB in bytes
+            showAlert('File is too large. Maximum size is 5MB.', 'warning');
+            fileInput.val(''); // Clear the input
+            return;
+          }
+          
           // 只接受图片文件
           if (!file.type.match('image.*')) {
             showAlert('Please select an image file', 'warning');
+            fileInput.val(''); // Clear the input
             return;
           }
           
           // 显示文件名
           fileNameDisplay.text(file.name).show();
           
-          // 预览图片
-          var reader = new FileReader();
-          reader.onload = function(e) {
-            previewImage.attr('src', e.target.result);
-            previewContainer.show();
+          // --- Use URL.createObjectURL for preview ---
+          currentBlobUrl = URL.createObjectURL(file);
+          previewImage.attr('src', currentBlobUrl);
+          previewContainer.show();
+          // ---------------------------------------------
             
-            // 隐藏初始上传图标和文本
-            $('.file-upload-icon, .file-message').hide();
-            $('.file-drop-info').text('To change the image, click or drop a new file');
-          }
-          reader.readAsDataURL(file);
+          // 隐藏初始上传图标和文本
+          $('.file-upload-icon, .file-message').hide();
+          $('.file-drop-info').text('To change the image, click or drop a new file');
         }
         
         // 移除图片按钮
         $('.remove-image-btn').on('click', function() {
+          // Revoke the blob URL when removing the image
+          if (currentBlobUrl) {
+            URL.revokeObjectURL(currentBlobUrl);
+            currentBlobUrl = null;
+          }
           fileInput.val('');
           previewContainer.hide();
           fileNameDisplay.hide();
@@ -1032,7 +1062,7 @@
               '购物时自带袋子 / Bring your own bag when shopping',
               '出门自带水杯 / Bring your own water bottle',
               '减少使用一次性餐盒 / Reduce disposable meal boxes',
-              '点外卖选择“无需餐具” / Choose No-Cutlery when ordering delivery',
+              '点外卖选择"无需餐具" / Choose No-Cutlery when ordering delivery',
               '垃圾分类 / Sort waste properly',
               '旅行时自备洗漱用品 / Bring your own toiletries when traveling',
               '旧物改造 / Repurpose old items',
@@ -1118,7 +1148,7 @@
         '简易包装礼物 / Use minimal gift wrapping': 0.1400,
         '夜跑 / Night running': 0.0950,
         '自然风干湿发 / Air-dry wet hair': 0.1520,
-        '点外卖选择“无需餐具” / Choose No-Cutlery when ordering delivery': 0.0540,
+        '点外卖选择"无需餐具" / Choose No-Cutlery when ordering delivery': 0.0540,
         '下班时关电脑和灯 / Turn off computer and lights when off-duty': 0.1660,
         '晚上睡觉全程关灯 / Keep lights off at night': 0.1100,
         '快速洗澡 / Take a quick shower': 0.1200,
@@ -1161,7 +1191,7 @@
         '简易包装礼物 / Use minimal gift wrapping': '次/times',
         '夜跑 / Night running': '小时/hours',
         '自然风干湿发 / Air-dry wet hair': '次/times',
-        '点外卖选择“无需餐具” / Choose No-Cutlery when ordering delivery': '次/times',
+        '点外卖选择"无需餐具" / Choose No-Cutlery when ordering delivery': '次/times',
         '下班时关电脑和灯 / Turn off computer and lights when off-duty': '次/times',
         '晚上睡觉全程关灯 / Keep lights off at night': '次/times',
         '快速洗澡 / Take a quick shower': '次/times',
@@ -1191,21 +1221,9 @@
         '减少使用手机时间 / Reduce screen time': '小时/hours'
       };
 
-      <!-- 
-      // 自定义计算逻辑（针对带有额外加分的活动）这个版本暂时没有加分活动
-      var carbonSavings = 0;
-      if (activity === '二手交易1次 / Second-hand transaction 1 time' || 
-          activity === '衣物租赁1次 / Clothing rental service 1 time' || 
-          activity === '居家回收利用') {
-        carbonSavings = dataInput * reductionFactors[activity] + 4;
-      } else {
-        carbonSavings = dataInput * reductionFactors[activity];
-      }
-      -->
-
       // 显示减排量和单位
       $('#unitLabel').text(unitLabels[activity] || 'units');
-      $('#reductionAmount').text(carbonSavings.toFixed(4));
+      $('#reductionAmount').text((dataInput * reductionFactors[activity]).toFixed(4));
     }
 
     // 获取用户积分的函数
@@ -1232,6 +1250,34 @@
         }
       });
     }
+
+    // Add Turnstile callback function
+    function turnstileCallbackCalculate(token) {
+        console.log("Turnstile Calculate Callback Triggered with token:", token);
+    }
+
+    // Dynamically load Turnstile script
+    function loadTurnstileScript() {
+        if (!window.turnstile) {
+            const script = document.createElement('script');
+            script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback';
+            script.async = true;
+            script.defer = true;
+            document.head.appendChild(script);
+        }
+    }
+
+    // Callback function after Turnstile script is loaded
+    function onloadTurnstileCallback() {
+        console.log('Turnstile script loaded.');
+        // Optionally render widgets explicitly if needed
+        // window.turnstile.render('#turnstile-widget-calculate', { sitekey: 'YOUR_SITE_KEY', callback: function(token) { ... } });
+    }
+
+    // Load the script when the document is ready
+    $(document).ready(function() {
+        loadTurnstileScript();
+    });
   </script>
 </head>
 <body>
@@ -1308,6 +1354,12 @@
               <label for="notes">Notes (Optional)</label>
               <textarea class="form-control" id="notes" name="notes" rows="3" placeholder="Add any additional notes here"></textarea>
 </div>
+            
+            <!-- Add Cloudflare Turnstile Widget -->
+            <div class="form-group">
+                 <div class="cf-turnstile" data-sitekey="0x4AAAAAABD07zmMDmgwgTsL" data-callback="turnstileCallbackCalculate"></div>
+            </div>
+            
             <button type="button" class="btn btn-outline-info mb-3" data-toggle="modal" data-target="#tutorialModal">
               <i class="fas fa-question-circle"></i> Submission Guide
         </button>

@@ -8,6 +8,16 @@ date_default_timezone_set('Asia/Shanghai');
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     try {
+        // Verify Turnstile token first
+        if (!isset($_POST['cf-turnstile-response'])) {
+            handleApiError(400, 'Missing anti-bot verification token.');
+        }
+        $turnstileToken = $_POST['cf-turnstile-response'];
+        if (!verifyTurnstileToken($turnstileToken)) {
+            handleApiError(403, 'Anti-bot verification failed. Please try again.');
+        }
+
+        // Proceed with the rest of the logic if verification passes
         $token = sanitizeInput($_POST['token']);
         $email = opensslDecrypt($token);
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -94,7 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             case '自然风干湿发 / Air-dry wet hair':
                 $carbonSavings = $dataInput * 0.1520;
                 break;
-            case '点外卖选择“无需餐具” / Choose No-Cutlery when ordering delivery':
+            case '点外卖选择"无需餐具" / Choose No-Cutlery when ordering delivery':
                 $carbonSavings = $dataInput * 0.0540;
                 break;
             case '下班时关电脑和灯 / Turn off computer and lights when off-duty':

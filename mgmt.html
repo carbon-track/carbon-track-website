@@ -189,7 +189,7 @@
       data: { token: token },
       dataType: 'json',
       success: function(response) {
-        if (!response.success) {
+        if (!response.success || !response.isAdmin) { 
           showAlert('您没有管理员权限，无法访问此页面', 'error', function() {
             window.location.href = 'index.html';
           });
