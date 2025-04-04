@@ -9,78 +9,93 @@
  * @param {Function|null} callback - 模态框关闭后的回调函数
  */
 function showAlert(message, type = 'info', callback = null) {
-    // 防止重复创建
-    const existingAlert = document.querySelector('.custom-alert-modal');
+    ensureAlertStyles(); // Make sure styles are loaded
+
+    // Remove any existing alert modal to prevent duplicates
+    const existingAlert = document.getElementById('iosAlertModal');
     if (existingAlert) {
-        existingAlert.remove();
+        const existingModalInstance = bootstrap.Modal.getInstance(existingAlert);
+        if (existingModalInstance) {
+            existingModalInstance.hide();
+        }
+        // Add slight delay for hide animation before removing
+        setTimeout(() => existingAlert.remove(), 300);
     }
-    
-    // 根据类型确定标题和颜色
-    let title, headerClass, iconClass;
+
+    // Determine title, icon based on type
+    let title, iconClass;
     switch (type) {
         case 'success':
-            title = '成功';
-            headerClass = 'bg-success text-white';
-            iconClass = 'fas fa-check-circle';
+            title = 'Success';
+            iconClass = 'fas fa-check-circle icon-success';
             break;
         case 'warning':
-            title = '警告';
-            headerClass = 'bg-warning text-dark';
-            iconClass = 'fas fa-exclamation-triangle';
+            title = 'Warning';
+            iconClass = 'fas fa-exclamation-triangle icon-warning';
             break;
         case 'error':
-            title = '错误';
-            headerClass = 'bg-danger text-white';
-            iconClass = 'fas fa-times-circle';
+            title = 'Error';
+            iconClass = 'fas fa-times-circle icon-error';
             break;
         default: // info
-            title = '提示';
-            headerClass = 'bg-info text-white';
-            iconClass = 'fas fa-info-circle';
+            title = 'Information';
+            iconClass = 'fas fa-info-circle icon-info';
     }
-    
-    // 创建模态框HTML
+
+    // Detect theme
+    const bodyClasses = document.body.className;
+    let themeClass = 'ios-alert-light'; // Default to light
+    if (bodyClasses.includes('dark-theme') || (bodyClasses.includes('auto-theme') && bodyClasses.includes('dark-mode'))) {
+        themeClass = 'ios-alert-dark';
+    }
+
+    // Create modal HTML
+    const modalId = 'iosAlertModal';
     const modalHTML = `
-    <div class="modal fade custom-alert-modal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
+    <div class="modal fade ios-alert-modal ${themeClass}" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header ${headerClass} py-2">
-                    <h5 class="modal-title">
-                        <i class="${iconClass} me-2"></i>${title}
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="modal-header">
+                    <h5 class="modal-title" id="${modalId}Label">${title}</h5>
                 </div>
-                <div class="modal-body py-4">
-                    <p class="mb-0">${message}</p>
+                <div class="modal-body">
+                    <!-- Optional Icon -->
+                    <!-- <i class="alert-icon ${iconClass}"></i> --> 
+                    ${message}
                 </div>
-                <div class="modal-footer py-2">
-                    <button type="button" class="btn btn-primary px-4" data-bs-dismiss="modal">确定</button>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-ios" data-bs-dismiss="modal">OK</button>
                 </div>
             </div>
         </div>
     </div>
     `;
-    
-    // 插入模态框到DOM
+
+    // Insert modal into DOM
     document.body.insertAdjacentHTML('beforeend', modalHTML);
-    
-    // 获取模态框实例
-    const modalElement = document.querySelector('.custom-alert-modal');
-    const modal = new bootstrap.Modal(modalElement);
-    
-    // 在模态框隐藏后执行回调并移除模态框
-    if (callback) {
-        modalElement.addEventListener('hidden.bs.modal', function () {
+
+    // Get modal element and instance
+    const modalElement = document.getElementById(modalId);
+    const modal = new bootstrap.Modal(modalElement, { backdrop: 'static', keyboard: false }); // Prevent closing by clicking outside or Esc
+
+    // Set up event listener for when the modal is hidden
+    modalElement.addEventListener('hidden.bs.modal', function handler() {
+        modalElement.removeEventListener('hidden.bs.modal', handler); // Clean up listener
+        if (callback && typeof callback === 'function') {
             callback();
-            modalElement.remove();
-        });
-    } else {
-        modalElement.addEventListener('hidden.bs.modal', function () {
-            modalElement.remove();
-        });
-    }
-    
-    // 显示模态框
+        }
+        modalElement.remove(); // Remove modal from DOM after hidden
+         // Ensure backdrop is removed if stuck
+         const backdrop = document.querySelector('.modal-backdrop');
+         if (backdrop) {
+             backdrop.remove();
+         }
+         // Restore body scrollability if needed
+         document.body.style.overflow = ''; 
+         document.body.style.paddingRight = ''; 
+    });
+
+    // Show the modal
     modal.show();
 }
 
@@ -198,4 +213,111 @@ function getToken() {
  */
 function isLoggedIn() {
     return !!getToken();
+}
+
+/**
+ * Ensures the necessary CSS styles for the iOS-style alert modal are present in the document head.
+ */
+function ensureAlertStyles() {
+    if (document.getElementById('ios-alert-styles')) return; // Styles already exist
+
+    const css = `
+        .ios-alert-modal .modal-dialog {
+            max-width: 300px; /* Smaller width for iOS style */
+            margin: 1.75rem auto;
+        }
+        .ios-alert-modal .modal-content {
+            border-radius: 14px; /* iOS rounded corners */
+            border: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .ios-alert-modal .modal-header {
+            border-bottom: none;
+            padding: 16px 16px 0;
+            justify-content: center; /* Center title */
+        }
+        .ios-alert-modal .modal-title {
+            font-size: 17px;
+            font-weight: 600; /* Semibold */
+            margin-bottom: 4px; /* Space below title */
+        }
+        .ios-alert-modal .modal-body {
+            padding: 0 16px 16px; /* Reduced padding */
+            font-size: 13px; /* Smaller font size */
+            line-height: 1.4;
+        }
+        .ios-alert-modal .modal-footer {
+            border-top: 1px solid #dbdbdf; /* iOS separator */
+            padding: 0;
+            justify-content: center; /* Center button */
+        }
+        .ios-alert-modal .modal-footer button {
+            flex-grow: 1; /* Button takes full width */
+            border: none;
+            background-color: transparent;
+            color: #007aff; /* iOS blue */
+            font-size: 17px;
+            font-weight: 600; /* Semibold */
+            padding: 11px 0;
+            border-radius: 0 0 14px 14px; /* Round bottom corners */
+            transition: background-color 0.2s ease;
+        }
+        .ios-alert-modal .modal-footer button:hover {
+            background-color: rgba(0, 122, 255, 0.05); /* Subtle hover */
+        }
+        .ios-alert-modal .modal-footer button:focus {
+            outline: none;
+            box-shadow: none;
+        }
+        .ios-alert-modal .alert-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+            display: block; /* Make icon block level */
+        }
+        .ios-alert-modal .alert-icon.icon-success { color: #34c759; } /* iOS green */
+        .ios-alert-modal .alert-icon.icon-warning { color: #ff9500; } /* iOS orange */
+        .ios-alert-modal .alert-icon.icon-error { color: #ff3b30; } /* iOS red */
+        .ios-alert-modal .alert-icon.icon-info { color: #007aff; } /* iOS blue */
+
+        /* Light Mode Styles */
+        .ios-alert-light .modal-content {
+            background-color: rgba(248, 248, 248, 0.95); /* Slightly transparent white */
+            color: #000;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .ios-alert-light .modal-footer {
+            border-color: #dbdbdf;
+        }
+        .ios-alert-light .modal-footer button {
+            color: #007aff;
+        }
+        .ios-alert-light .modal-footer button:hover {
+            background-color: rgba(0, 122, 255, 0.05);
+        }
+
+        /* Dark Mode Styles */
+        .ios-alert-dark .modal-content {
+            background-color: rgba(44, 44, 46, 0.95); /* Slightly transparent dark gray */
+            color: #fff;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .ios-alert-dark .modal-footer {
+            border-color: #545458;
+        }
+        .ios-alert-dark .modal-footer button {
+            color: #0a84ff; /* Slightly brighter blue for dark mode */
+        }
+        .ios-alert-dark .modal-footer button:hover {
+            background-color: rgba(10, 132, 255, 0.15);
+        }
+    `;
+
+    const styleElement = document.createElement('style');
+    styleElement.id = 'ios-alert-styles';
+    styleElement.textContent = css;
+    document.head.appendChild(styleElement);
 } 
