@@ -1033,37 +1033,37 @@
           $('#exchangeConfirmModal').modal('hide');
       });
 
-      fetchProducts() // Fetch products on page load
-    $('#productsList').html(productsRow)
-  })
+      // Fetch products on page load (displayProducts handles insertion)
+      fetchProducts(); 
+  });
 
-    // Modify exchangeProduct to accept and send the turnstile token
-    function exchangeProduct(productId, token, turnstileResponse) {
-      $.ajax({
-        type: 'POST',
-        url: 'exchange_product.php',
-        contentType: 'application/json',
-        data: JSON.stringify({ 
-          productId: productId, 
-          token: token,
-          'cf-turnstile-response': turnstileResponse // Add turnstile token
-        }),
-        dataType: 'json',
-        success: function (response) {
-          if (response.success) {
-            showAlert('兑换成功！' + response.message, 'success');
-            // 更新用户积分和产品列表
-            fetchUserPoints(); 
-            fetchProducts();
-          } else {
-            showAlert('兑换失败：' + response.message, 'error');
-          }
-        },
-        error: function () {
-          showAlert('兑换请求失败，请稍后再试。', 'error');
+  // Modify exchangeProduct to accept and send the turnstile token
+  function exchangeProduct(productId, token, turnstileResponse) {
+    $.ajax({
+      type: 'POST',
+      url: 'exchange_product.php',
+      contentType: 'application/json',
+      data: JSON.stringify({ 
+        productId: productId, 
+        token: token,
+        'cf-turnstile-response': turnstileResponse // Add turnstile token
+      }),
+      dataType: 'json',
+      success: function (response) {
+        if (response.success) {
+          showAlert('兑换成功！' + response.message, 'success');
+          // 更新用户积分和产品列表
+          fetchUserPoints(); 
+          fetchProducts();
+        } else {
+          showAlert('兑换失败：' + response.message, 'error');
         }
-      }); // Ensure correct closing
-    }
+      },
+      error: function () {
+        showAlert('兑换请求失败，请稍后再试。', 'error');
+      }
+    }); // Ensure correct closing
+  }
 
   // Add the confirmation modal HTML to the body
    $(function() { // Ensure this runs after the DOM is ready
@@ -1191,20 +1191,10 @@
 
       // Reset Turnstile when modal is hidden
       $('body').on('hidden.bs.modal', '#exchangeConfirmModal', function () {
-          if (window.turnstile) {
-              var widgetElement = document.querySelector('#turnstile-exchange-widget .cf-turnstile');
-              if(widgetElement){
-                  // Attempt to remove the widget using its ID if available
-                  var widgetId = widgetElement.getAttribute('data-widgetid'); // Check if an ID is set
-                  if (widgetId) {
-                      window.turnstile.remove(widgetId); 
-                  } else {
-                       // Fallback: try removing by selector (might not always work perfectly)
-                       window.turnstile.remove('#turnstile-exchange-widget');
-                  }
-                  // Ensure container is empty
-                   document.getElementById('turnstile-exchange-widget').innerHTML = '';
-              }
+          // Simply clear the container, as we re-render explicitly on shown
+          var turnstileContainer = document.getElementById('turnstile-exchange-widget');
+          if (turnstileContainer) {
+             turnstileContainer.innerHTML = '';
           }
       });
 
