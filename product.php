@@ -80,9 +80,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
             exit;
         }
 
-        // Validate the token
-        $userData = validateToken($token);
-        if (!$userData) {
+        // Validate the token using opensslDecrypt
+        $decryptedData = opensslDecrypt($token);
+        if ($decryptedData === false) { // Check if decryption failed
             handleApiError(401, 'Invalid or expired token.');
             exit;
         }
