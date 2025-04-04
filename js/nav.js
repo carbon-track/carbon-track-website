@@ -1,6 +1,29 @@
+// Global variable to store the fetched site key
+var turnstileSiteKey = null;
+
+// Function to fetch the Turnstile site key from the backend
+async function fetchTurnstileSiteKey() {
+    try {
+        const response = await fetch('get_config.php');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const config = await response.json();
+        if (config && config.turnstile_sitekey) {
+            turnstileSiteKey = config.turnstile_sitekey;
+            console.log('Turnstile Site Key fetched successfully.');
+        } else {
+            console.error('Failed to retrieve Turnstile site key from config.');
+        }
+    } catch (error) {
+        console.error('Error fetching Turnstile site key:', error);
+    }
+}
+
 $(document).ready(function() {
     // Load navbar
     loadNavbar();
+    fetchTurnstileSiteKey(); // Fetch the key when the document is ready
     
     var translateElement = $('<div>', { id: 'google_translate_element' });
     $('.nav-item #userStatus').parent().before(translateElement);
@@ -2031,6 +2054,62 @@ function initRegisterModal() {
     document.body.insertAdjacentHTML('beforeend', modalHTML);
     
     console.log('注册模态框已创建并初始化完成');
+
+    // Initialize Turnstile widget when modal is shown
+    $('#registerModal').on('shown.bs.modal', function () {
+        // Ensure the site key is fetched before rendering
+        if (!turnstileSiteKey) {
+            console.error("Turnstile site key not available for registration modal.");
+            // Optionally show an error to the user or disable the form
+            showAlert('Verification setup error. Please try again later.', 'error');
+            return; // Prevent rendering if key is missing
+        }
+
+        var turnstileContainer = document.getElementById('turnstile-register-widget');
+        if (turnstileContainer && window.turnstile) {
+            // Check if a widget already exists and remove it before rendering a new one
+            if (turnstileContainer.innerHTML.trim() !== '') {
+                 window.turnstile.remove(turnstileContainer.querySelector('.cf-turnstile'));
+                 turnstileContainer.innerHTML = ''; // Clear container fully
+            }
+
+            try {
+                window.turnstile.render('#turnstile-register-widget', {
+                    sitekey: turnstileSiteKey, // Use the fetched site key
+                    callback: turnstileCallbackRegister,
+                     'expired-callback': function() {
+                          console.log('Register Turnstile expired');
+                           // Optionally disable submit button or show message
+                      },
+                      'error-callback': function(){
+                           console.error('Register Turnstile error');
+                           // Optionally disable submit button or show message
+                      }
+                });
+            } catch (error) {
+                 console.error("Error rendering Turnstile widget:", error);
+                 showAlert('Failed to load verification widget.', 'error');
+            }
+        } else if (!window.turnstile) {
+             console.error("Turnstile object not loaded yet when trying to render in register modal.");
+              // Attempt to load script again or show error
+              loadTurnstileScript(); // Try loading again
+        } else {
+            console.error("Turnstile container not found in register modal.");
+        }
+    });
+
+    // Reset Turnstile when modal is hidden
+     $('#registerModal').on('hidden.bs.modal', function () {
+         if (window.turnstile) {
+             var widgetElement = document.querySelector('#turnstile-register-widget .cf-turnstile');
+             if(widgetElement){
+                 window.turnstile.remove(widgetElement);
+             }
+         }
+         // Also clear the form fields if needed
+         // $(this).find('form')[0].reset();
+     });
 }
 
 // 安全净化HTML内容，防止XSS攻击 (Simplified version)
@@ -2344,30 +2423,34 @@ function refreshMessagesAndConversations() {
 
 // Add Turnstile callback function (can be empty if only using explicit rendering)
 function turnstileCallbackRegister(token) {
-    console.log("Turnstile Register Callback Triggered with token:", token);
-    // You can potentially enable the submit button here if it was initially disabled
+    console.log('Register Turnstile verified with token:', token);
+    // You can enable the submit button here if it was disabled
 }
 
 // Dynamically load Turnstile script if not already loaded
 function loadTurnstileScript() {
-    if (!window.turnstile) {
+    if (!window.turnstile && !document.querySelector('script[src*="challenges.cloudflare.com/turnstile"]')) {
         const script = document.createElement('script');
-        script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback';
+        // Use a generic callback name or handle loading state differently
+        script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?onload=turnstileScriptLoadedCallback'; 
         script.async = true;
         script.defer = true;
         document.head.appendChild(script);
     }
 }
 
-// Callback function after Turnstile script is loaded
-function onloadTurnstileCallback() {
-    console.log('Turnstile script loaded.');
-    // Optionally render widgets explicitly if needed
-    // window.turnstile.render('#turnstile-widget-register', { sitekey: 'YOUR_SITE_KEY', callback: function(token) { ... } });
+// Callback function when Turnstile script is loaded
+function turnstileScriptLoadedCallback() {
+    console.log('Turnstile API script loaded globally.');
+    // Now Turnstile should be available. 
+    // You might need to trigger rendering if modals were opened before script load.
 }
 
-// Call loadTurnstileScript when appropriate, e.g., when the modal is shown or document ready
+// Make sure to call loadTurnstileScript early, e.g., in document ready
 $(document).ready(function() {
+    // ... other ready functions ...
     loadTurnstileScript();
+     fetchTurnstileSiteKey(); // Fetch the key when the document is ready
+    // ... rest of the document ready function ...
 });
 

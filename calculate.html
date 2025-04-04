@@ -1251,33 +1251,84 @@
       });
     }
 
-    // Add Turnstile callback function
-    function turnstileCallbackCalculate(token) {
-        console.log("Turnstile Calculate Callback Triggered with token:", token);
+    // Global variable for the site key
+    var turnstileSiteKey = null;
+
+    // Function to fetch the Turnstile site key
+    async function fetchTurnstileSiteKey() {
+        try {
+            const response = await fetch('get_config.php');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const config = await response.json();
+            if (config && config.turnstile_sitekey) {
+                turnstileSiteKey = config.turnstile_sitekey;
+                console.log('Calculate page: Turnstile Site Key fetched.');
+                // Now that the key is fetched, render the widget
+                renderTurnstileWidget();
+            } else {
+                console.error('Calculate page: Failed to retrieve Turnstile site key.');
+                 showAlert('无法加载验证组件配置。', 'error');
+            }
+        } catch (error) {
+            console.error('Calculate page: Error fetching Turnstile site key:', error);
+             showAlert('加载验证组件时出错。', 'error');
+        }
     }
 
-    // Dynamically load Turnstile script
+    // Function to render the Turnstile widget
+    function renderTurnstileWidget() {
+        if (!turnstileSiteKey) {
+            console.error("Cannot render Turnstile widget: site key not available.");
+            return;
+        }
+        if (window.turnstile) {
+             var container = document.getElementById('turnstile-calculate-widget');
+             if (container.innerHTML.trim() === '') { // Render only if empty
+                 window.turnstile.render('#turnstile-calculate-widget', {
+                    sitekey: turnstileSiteKey, // Use fetched key
+                    callback: turnstileCallbackCalculate,
+                     'expired-callback': function() {
+                         console.log('Calculate Turnstile expired');
+                         // Optionally disable submit button or show message
+                     },
+                     'error-callback': function(){
+                          console.error('Calculate Turnstile error');
+                          // Optionally disable submit button or show message
+                     }
+                });
+             }
+        } else {
+            console.error("Turnstile object not loaded yet for calculate page.");
+            // Script loading should be handled by loadTurnstileScript
+        }
+    }
+
+    // Callback function for Calculate page Turnstile
+    function turnstileCallbackCalculate(token) {
+        console.log('Calculate Turnstile verified with token:', token);
+        // Optional: Enable submit button
+        $('#submitButton').prop('disabled', false);
+    }
+
+    // Function to dynamically load Turnstile script
     function loadTurnstileScript() {
-        if (!window.turnstile) {
+        if (!window.turnstile && !document.querySelector('script[src*="challenges.cloudflare.com/turnstile"]')) {
             const script = document.createElement('script');
-            script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback';
+            script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?onload=turnstileScriptLoadedCallbackCalculate';
             script.async = true;
             script.defer = true;
             document.head.appendChild(script);
         }
     }
 
-    // Callback function after Turnstile script is loaded
-    function onloadTurnstileCallback() {
-        console.log('Turnstile script loaded.');
-        // Optionally render widgets explicitly if needed
-        // window.turnstile.render('#turnstile-widget-calculate', { sitekey: 'YOUR_SITE_KEY', callback: function(token) { ... } });
+    // Callback function when Turnstile script is loaded for this page
+    function turnstileScriptLoadedCallbackCalculate() {
+        console.log('Turnstile API script loaded for calculate.html.');
+        // Attempt to render the widget now that the script is loaded and key should be fetched
+        fetchTurnstileSiteKey(); // Fetch key which will then call render
     }
-
-    // Load the script when the document is ready
-    $(document).ready(function() {
-        loadTurnstileScript();
-    });
   </script>
 </head>
 <body>
