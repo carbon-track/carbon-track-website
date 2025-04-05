@@ -812,7 +812,7 @@
     
     // --- Initial Checks & Setup ---
     var token = localStorage.getItem('token');
-    var uid = localStorage.getItem('id');
+    var uid = localStorage.getItem('userId');
     
     if (!token || !uid) {
       $('#userPoints').text('未登录');
@@ -1009,7 +1009,7 @@
     }
 
     function fetchUserPoints() {
-    var uid = localStorage.getItem('id')
+    var uid = localStorage.getItem('userId')
     var token = localStorage.getItem('token')
       $.ajax({
         type: 'POST',
