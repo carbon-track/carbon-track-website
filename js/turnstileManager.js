@@ -7,59 +7,67 @@
 
 const turnstileManager = (() => {
     let siteKey = null;
-    let scriptLoading = false;
-    let scriptLoaded = false;
+    let isScriptLoadingOrLoaded = false; // Combined flag to prevent multiple load attempts
     let scriptLoadPromise = null;
     let siteKeyPromise = null;
     const widgetMap = new Map(); // Stores info about rendered widgets { id: { containerId: string, options: object } }
+    const POLLING_INTERVAL = 100; // ms
+    const POLLING_TIMEOUT = 10000; // ms (10 seconds)
 
-    // Callback function attached to the script URL (?onload=...)
-    function handleScriptLoaded() {
-        console.log('[TurnstileManager] Script loaded successfully.');
-        scriptLoaded = true;
-        scriptLoading = false;
-        // Resolve the promise for listeners waiting for the script
-        if (scriptLoadPromise && typeof scriptLoadPromise.resolve === 'function') {
-            scriptLoadPromise.resolve();
-        }
-    }
-
-    // Function to load the Turnstile API script exactly once
+    // Function to load the Turnstile API script exactly once using polling
     function loadScript() {
-        if (scriptLoaded) {
-            console.log('[TurnstileManager] Script already loaded.');
-            return Promise.resolve();
-        }
-        if (scriptLoading && scriptLoadPromise) {
-            console.log('[TurnstileManager] Script is currently loading.');
-            return scriptLoadPromise.promise;
+        if (isScriptLoadingOrLoaded && scriptLoadPromise) {
+            console.log('[TurnstileManager] Script load already initiated or completed.');
+            return scriptLoadPromise; // Return existing promise
         }
 
-        console.log('[TurnstileManager] Initiating script load.');
-        scriptLoading = true;
+        console.log('[TurnstileManager] Initiating script load sequence.');
+        isScriptLoadingOrLoaded = true; // Set flag immediately
         
-        // Create a promise that handleScriptLoaded will resolve
-        let resolveFn;
-        const promise = new Promise(resolve => {
-            resolveFn = resolve;
+        // Create a new promise for this load attempt
+        scriptLoadPromise = new Promise((resolve, reject) => {
+            // Check if Turnstile object already exists (e.g., loaded by another means?)
+            if (typeof window.turnstile === 'object' && window.turnstile) {
+                console.log('[TurnstileManager] window.turnstile already exists.');
+                resolve();
+                return;
+            }
+
+            const script = document.createElement('script');
+            // Load script WITHOUT the onload callback parameter
+            script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js'; 
+            script.async = true;
+            script.defer = true;
+            script.onerror = () => {
+                console.error('[TurnstileManager] Failed to load Turnstile script via <script> tag.');
+                isScriptLoadingOrLoaded = false; // Reset flag on error
+                reject(new Error('Failed to load Turnstile script'));
+            };
+            
+            // Append the script
+            document.head.appendChild(script);
+            console.log('[TurnstileManager] Turnstile script appended to head.');
+
+            // Start polling to check when window.turnstile becomes available
+            let elapsedTime = 0;
+            const pollInterval = setInterval(() => {
+                if (typeof window.turnstile === 'object' && window.turnstile) {
+                    clearInterval(pollInterval);
+                    console.log('[TurnstileManager] Polling successful: window.turnstile found.');
+                    resolve();
+                } else {
+                    elapsedTime += POLLING_INTERVAL;
+                    if (elapsedTime >= POLLING_TIMEOUT) {
+                        clearInterval(pollInterval);
+                        console.error('[TurnstileManager] Polling timed out: window.turnstile did not appear within', POLLING_TIMEOUT, 'ms.');
+                        isScriptLoadingOrLoaded = false; // Reset flag on timeout
+                        reject(new Error('Turnstile script loaded but API object did not initialize.'));
+                    }
+                }
+            }, POLLING_INTERVAL);
         });
-        scriptLoadPromise = { promise, resolve: resolveFn };
 
-        const script = document.createElement('script');
-        // IMPORTANT: Point the onload callback to our manager's function
-        script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?onload=turnstileManager.scriptReadyCallback';
-        script.async = true;
-        script.defer = true;
-        script.onerror = () => {
-            console.error('[TurnstileManager] Failed to load Turnstile script.');
-            scriptLoading = false;
-            // Reject the promise if the script fails to load
-            // scriptLoadPromise.reject(new Error('Failed to load Turnstile script')); 
-            // Or maybe resolve, but indicate failure? For now, just log.
-        };
-        document.head.appendChild(script);
-
-        return scriptLoadPromise.promise;
+        return scriptLoadPromise;
     }
 
     // Function to fetch the site key exactly once
@@ -117,41 +125,34 @@ const turnstileManager = (() => {
         console.log(`[TurnstileManager] Request to render widget in: ${containerSelector}`);
         
         try {
-            // Ensure script is loaded and site key is fetched concurrently
+            // Ensure script is loaded (via polling) and site key is fetched concurrently
             const [_, currentSiteKey] = await Promise.all([
-                loadScript(),
+                loadScript(), // This now uses polling
                 fetchSiteKey()
             ]);
 
+            // Check results after promises resolve
             if (!currentSiteKey) {
-                 console.error('[TurnstileManager] Cannot render widget: Site key is missing.');
+                 console.error('[TurnstileManager] Cannot render widget: Site key is missing after fetch attempt.');
                  return null;
             }
-            
-            if (!window.turnstile) {
-                console.error('[TurnstileManager] Cannot render widget: window.turnstile object not found.');
-                return null;
+            if (typeof window.turnstile === 'undefined') {
+                 console.error('[TurnstileManager] Cannot render widget: window.turnstile is still undefined after script load attempt.');
+                 return null;
             }
 
-            // Wait for a short delay to allow container DOM to stabilize
+            // Add delay AFTER script/key are ready
             await new Promise(resolve => setTimeout(resolve, renderDelay)); 
 
             const containerElement = document.querySelector(containerSelector);
             if (!containerElement) {
-                console.error(`[TurnstileManager] Container element ${containerSelector} not found in DOM.`);
+                console.error(`[TurnstileManager] Container element ${containerSelector} not found in DOM after delay.`);
                 return null;
             }
-
-            // Clear previous content/widget if any
             containerElement.innerHTML = ''; 
 
             console.log(`[TurnstileManager] Rendering widget in ${containerSelector} with sitekey ${currentSiteKey}`);
-
-            const renderOptions = {
-                ...options,
-                sitekey: currentSiteKey,
-            };
-
+            const renderOptions = { ...options, sitekey: currentSiteKey };
             const widgetId = window.turnstile.render(containerSelector, renderOptions);
             
             if (widgetId) {
@@ -164,7 +165,11 @@ const turnstileManager = (() => {
             }
 
         } catch (error) {
-            console.error(`[TurnstileManager] Error rendering widget in ${containerSelector}:`, error);
+            console.error(`[TurnstileManager] Error during renderWidget sequence for ${containerSelector}:`, error);
+            // Ensure the flag allows reloading if the whole sequence failed
+            // This depends on where the error occurred. If script load failed, flag is already false.
+            // If key fetch failed but resolved with fallback, it continues.
+            // If render failed, script is loaded, so flag should remain true.
             return null;
         }
     }
@@ -244,18 +249,17 @@ const turnstileManager = (() => {
         }
     }
 
-    // Expose the necessary functions and the script loaded callback
+    // Expose the necessary functions 
+    // No need to expose the callback anymore
     return {
-        loadScript, // Should generally not be needed externally
-        fetchSiteKey, // Can be called early if needed
+        // loadScript, // Internal use mostly
+        fetchSiteKey, 
         renderWidget,
         removeWidget,
         resetWidget,
-        getResponse,
-        // IMPORTANT: This function needs to be globally accessible for the onload callback
-        scriptReadyCallback: handleScriptLoaded 
+        getResponse 
     };
 })();
 
-// IMPORTANT: Make the callback globally accessible
+// Assign to window immediately (IIFE executes)
 window.turnstileManager = turnstileManager; 
