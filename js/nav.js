@@ -23,7 +23,7 @@ async function fetchTurnstileSiteKey() {
 $(document).ready(function() {
     // Load navbar
     loadNavbar();
-    fetchTurnstileSiteKey(); // Fetch the key when the document is ready
+    // turnstileManager.fetchSiteKey(); // Pre-fetch site key if needed, manager handles singleton
     
     var translateElement = $('<div>', { id: 'google_translate_element' });
     $('.nav-item #userStatus').parent().before(translateElement);
@@ -355,54 +355,65 @@ function updateLoginStatus() {
 
 // 注册用户
 function registerUser() {
-    // 获取表单数据
-    var regusername = $('#regusername').val();
-    var email = $('#email').val();
-    var regpassword = $('#regpassword').val();
+    console.log('Attempting user registration');
+    var username = $('#registerUsername').val();
+    var password = $('#registerPassword').val();
+    var email = $('#registerEmail').val();
     var verificationCode = $('#verificationCode').val();
-    var turnstileResponse = $('#registerModal [name="cf-turnstile-response"]').val(); // Get Turnstile response
-
-    // 检查Turnstile验证是否完成
+    
+    // Get Turnstile token using the manager
+    var turnstileResponse = null;
+    // ** Ensure registerModalWidgetId is declared/accessible in this scope ** 
+    // (We'll declare it globally later if needed, or pass it in)
+    if (typeof registerModalWidgetId !== 'undefined' && registerModalWidgetId) { 
+        turnstileResponse = turnstileManager.getResponse(registerModalWidgetId);
+        console.log('[Register] Got Turnstile response via manager:', !!turnstileResponse);
+    } else {
+        console.warn('[Register] Cannot get Turnstile response: registerModalWidgetId is not defined or null.');
+    }
+    
+    // Basic validation
+    if (!username || !password || !email || !verificationCode) {
+        showAlert('Please fill in all fields.', 'warning');
+        return;
+    }
+    
     if (!turnstileResponse) {
-        showAlert('请完成人机验证 Please complete the verification.', 'warning');
-        var $submitButton = $('#registerModal form').find('button[type="submit"]');
-        $submitButton.prop('disabled', false).html('Create Account'); // Re-enable button
-        return; 
+        showAlert('Please complete the verification.', 'warning');
+        return;
     }
 
-    // 发送AJAX请求到服务器进行注册
+    console.log('Proceeding with registration AJAX call');
     $.ajax({
         type: 'POST',
-        url: 'register.php', // 您的注册处理脚本
+        url: 'register.php',
         data: {
+            username: username,
+            password: password,
             email: email,
-            regusername: regusername,
-            regpassword: regpassword,
-            verificationCode: verificationCode,
-            'cf-turnstile-response': turnstileResponse // Add Turnstile response to data
+            code: verificationCode,
+            'cf-turnstile-response': turnstileResponse // Send the token
         },
         dataType: 'json',
         success: function(response) {
             if (response.success) {
-                // 关闭注册模态框，显示成功消息，然后打开登录模态框
-                $('#registerModal').modal('hide');
-                showAlert('注册成功！Register success!', 'success', function() {
-                    // 在用户关闭提示后显示登录模态框
-                    $('#loginModal').modal('show');
-                });
-                
-                // 清空表单
-                $('#regusername, #regpassword, #email, #verificationCode').val('');
-                $('#registerError').hide();
+                showAlert('Registration successful! Please log in.', 'success');
+                $('#registerModal').modal('hide'); 
+                $('#loginModal').modal('show'); // Show login modal after successful registration
             } else {
-                // 显示注册失败消息
-                $('#registerError').text(response.message).show();
+                showAlert(response.message || 'Registration failed.', 'error');
+                // Optionally reset the Turnstile widget on failure?
+                if (typeof registerModalWidgetId !== 'undefined' && registerModalWidgetId) {
+                   turnstileManager.resetWidget(registerModalWidgetId);
+                }
             }
         },
         error: function() {
-            // 显示错误信息
-            showAlert('注册请求失败，请稍后再试。Register request failed, please try later.', 'error');
-            $('#registerError').text('注册请求失败，请稍后再试。Register request failed, please try later.').show();
+            showAlert('An error occurred during registration. Please try again.', 'error');
+             // Optionally reset the Turnstile widget on error?
+            if (typeof registerModalWidgetId !== 'undefined' && registerModalWidgetId) {
+               turnstileManager.resetWidget(registerModalWidgetId);
+            }
         }
     });
 }
@@ -1985,131 +1996,120 @@ function initLoginModal() {
     console.log('登录模态框已创建并初始化完成');
 }
 
+// Make sure this is declared at a scope accessible by initRegisterModal and registerUser
+var registerModalWidgetId = null; 
+
 // 初始化注册模态框
 function initRegisterModal() {
-    console.log('初始化注册模态框');
-    
-    // 检查模态框是否已存在
-    if (document.getElementById('registerModal')) {
-        console.log('注册模态框已存在，无需重新创建');
-        return;
-    }
-    
-    // 创建模态框HTML
-    const modalHTML = `
-    <div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="registerModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="registerModalLabel">Create Account</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form>
-                        <div class="form-group">
-                            <label for="regusername">Username</label>
-                            <input type="text" class="form-control required-input" id="regusername" placeholder="Choose a username">
-                        </div>
-                        <div class="form-group">
-                            <label for="regpassword">Password</label>
-                            <input type="password" class="form-control required-input" id="regpassword" placeholder="Create a password">
-                        </div>
-                        <div class="form-group">
-                            <label for="email">Email Address</label>
-                            <input type="email" class="form-control required-input" id="email" name="email" placeholder="Enter your email address" required>
-                            
-                            <div style="margin-top: 16px;">
-                                <button type="button" class="btn btn-outline-primary" id="sendVerificationCode">Send Verification Code</button>
-                            </div>
-
-                            <div style="margin-top: 16px;">
-                                <label for="verificationCode">Verification Code</label>
-                                <input type="text" class="form-control" id="verificationCode" placeholder="Enter the code sent to your email" required>
-                                <small id="emailHelp" class="form-text text-muted" style="display: none; margin-top: 8px;">The code has been sent to your email.</small>
-                            </div>
-                        </div>
-                        
-                        <!-- Add Cloudflare Turnstile Widget -->
-                        <div class="form-group">
-                             <div class="cf-turnstile" data-sitekey="0x4AAAAAABD07zmMDmgwgTsL" data-callback="turnstileCallbackRegister"></div>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-success btn-block">Create Account</button>
-                        <div id="registerError" style="display:none;" class="alert alert-danger mt-3"></div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <div class="alert alert-warning" role="alert" id="refreshAlert" style="display: none; width: 100%; border-radius: 12px;">
-                        If you're having trouble, please reload the page or press <a href="#" onclick="location.reload();">here</a>.
+    console.log("Initializing Register Modal and its event listeners.");
+    // Check if modal already exists
+    if (!document.getElementById('registerModal')) {
+        const modalHTML = `
+        <div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="registerModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content ios-modal-content">
+                    <div class="modal-header ios-modal-header">
+                        <h5 class="modal-title" id="registerModalLabel">Register</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
-                    <a href="#" data-toggle="modal" data-target="#loginModal">Already have an account? Sign in</a>
+                    <div class="modal-body ios-modal-body">
+                        <form id="registerForm" onsubmit="return false;"> <!-- Prevent default form submission -->
+                            <div class="form-group">
+                                <label for="registerUsername">Username</label>
+                                <input type="text" class="form-control ios-input" id="registerUsername" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="registerPassword">Password</label>
+                                <input type="password" class="form-control ios-input" id="registerPassword" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="registerEmail">Email</label>
+                                <input type="email" class="form-control ios-input" id="registerEmail" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="verificationCode">Verification Code</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control ios-input" id="verificationCode" required>
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-secondary ios-button" type="button" id="sendCodeBtn">Send Code</button>
+                                    </div>
+                                </div>
+                                <small id="codeHelp" class="form-text text-muted">Enter the code sent to your email.</small>
+                            </div>
+                            <!-- *** Turnstile Widget Placeholder *** -->
+                            <div id="turnstile-register-widget" style="margin-top: 15px; margin-bottom: 15px;">
+                                <!-- Turnstile will render here -->
+                            </div>
+                            
+                            <div id="registerError" class="alert alert-danger" style="display: none;"></div>
+                            
+                            <button type="button" class="btn btn-primary btn-block ios-button" id="registerButton" disabled>Register</button> 
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>`;
-    
-    // 将模态框添加到body
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
-    
-    console.log('注册模态框已创建并初始化完成');
+        </div>`;
+        $('body').append(modalHTML);
+        console.log("Register Modal HTML appended.");
 
-    // Initialize Turnstile widget when modal is shown
-    $('#registerModal').on('shown.bs.modal', function () {
-        // Ensure the site key is fetched before rendering
-        if (!turnstileSiteKey) {
-            console.error("Turnstile site key not available for registration modal.");
-            // Optionally show an error to the user or disable the form
-            showAlert('Verification setup error. Please try again later.', 'error');
-            return; // Prevent rendering if key is missing
-        }
+        // Attach event listeners for buttons *inside* the modal
+        // Use .off().on() to prevent duplicate bindings if init is called multiple times
+        $('body').off('click', '#sendCodeBtn').on('click', '#sendCodeBtn', sendVerificationCode);
+        $('body').off('click', '#registerButton').on('click', '#registerButton', registerUser);
 
-        var turnstileContainer = document.getElementById('turnstile-register-widget');
-        if (turnstileContainer && window.turnstile) {
-            // Check if a widget already exists and remove it before rendering a new one
-            if (turnstileContainer.innerHTML.trim() !== '') {
-                 window.turnstile.remove(turnstileContainer.querySelector('.cf-turnstile'));
-                 turnstileContainer.innerHTML = ''; // Clear container fully
-            }
-
-            try {
-                window.turnstile.render('#turnstile-register-widget', {
-                    sitekey: turnstileSiteKey, // Use the fetched site key
-                    callback: turnstileCallbackRegister,
-                     'expired-callback': function() {
-                          console.log('Register Turnstile expired');
-                           // Optionally disable submit button or show message
-                      },
-                      'error-callback': function(){
-                           console.error('Register Turnstile error');
-                           // Optionally disable submit button or show message
-                      }
-                });
-            } catch (error) {
-                 console.error("Error rendering Turnstile widget:", error);
-                 showAlert('Failed to load verification widget.', 'error');
-            }
-        } else if (!window.turnstile) {
-             console.error("Turnstile object not loaded yet when trying to render in register modal.");
-              // Attempt to load script again or show error
-              loadTurnstileScript(); // Try loading again
-        } else {
-            console.error("Turnstile container not found in register modal.");
-        }
-    });
-
-    // Reset Turnstile when modal is hidden
-     $('#registerModal').on('hidden.bs.modal', function () {
-         if (window.turnstile) {
-             var widgetElement = document.querySelector('#turnstile-register-widget .cf-turnstile');
-             if(widgetElement){
-                 window.turnstile.remove(widgetElement);
+        // Add Turnstile render/remove logic to modal events
+        $('#registerModal').off('shown.bs.modal').on('shown.bs.modal', async function () {
+             console.log('[Register Modal] Shown event triggered.');
+             $('#registerButton').prop('disabled', true); // Disable button initially
+             // Define callbacks for the registration widget
+             const registerWidgetOptions = {
+                callback: function(token) {
+                    console.log('[Turnstile] Register Success callback. Token:', token);
+                    $('#registerButton').prop('disabled', false); // Enable register button
+                },
+                'expired-callback': function() {
+                    console.log('[Turnstile] Register Expired callback.');
+                    $('#registerButton').prop('disabled', true);
+                    // Maybe show a message?
+                },
+                'error-callback': function(errorCode) {
+                    console.error('[Turnstile] Register Error callback. Code:', errorCode);
+                    $('#registerButton').prop('disabled', true);
+                    showAlert(`Verification error (${errorCode}). Please refresh and try again.`, 'error');
+                }
+             };
+             // Render using the manager
+             console.log('[Register Modal] Requesting Turnstile render...');
+             registerModalWidgetId = await turnstileManager.renderWidget('#turnstile-register-widget', registerWidgetOptions, 200); 
+             if (registerModalWidgetId) {
+                console.log('[Register Modal] Turnstile widget render requested. ID:', registerModalWidgetId);
+             } else {
+                console.error('[Register Modal] Failed to render Turnstile widget via manager.');
+                 showAlert('Failed to load verification component. Please close and retry.', 'error');
              }
-         }
-         // Also clear the form fields if needed
-         // $(this).find('form')[0].reset();
-     });
+        });
+
+        $('#registerModal').off('hidden.bs.modal').on('hidden.bs.modal', function () {
+            console.log('[Register Modal] Hidden event triggered. Cleaning up widget ID:', registerModalWidgetId);
+            if (registerModalWidgetId) {
+                turnstileManager.removeWidget(registerModalWidgetId);
+                registerModalWidgetId = null; // Reset ID
+            }
+             // Also reset the register button state and clear errors/fields
+             $('#registerButton').prop('disabled', true); 
+             $('#registerError').hide().text('');
+             // Optional: Clear form fields? 
+             // $('#registerForm')[0].reset(); 
+        });
+
+    } else {
+         console.log("Register Modal already exists.");
+         // Ensure listeners are attached even if modal exists (might be needed if listeners were somehow detached)
+         // Consider a more robust check or different initialization pattern if this becomes an issue.
+         // For now, assume listeners persist if the modal exists.
+    }
 }
 
 // 安全净化HTML内容，防止XSS攻击 (Simplified version)
