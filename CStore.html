@@ -965,8 +965,6 @@
                       'expired-callback': function() {
                           console.log('Exchange Turnstile expired');
                            $('#confirmExchangeBtn').prop('disabled', true); // Disable on expiry
-                           // Optionally reset the widget
-                           window.turnstile.reset('#turnstile-exchange-widget');
                       },
                       'error-callback': function(){
                            console.error('Exchange Turnstile error');
@@ -1022,23 +1020,23 @@
   function exchangeProduct(productId, token, turnstileResponse) {
       var confirmButton = $('#confirmExchangeBtn');
       $.ajax({
-          type: 'POST',
-          url: 'exchange_product.php',
+        type: 'POST',
+        url: 'exchange_product.php',
           contentType: 'application/json',
           data: JSON.stringify({ 
               productId: productId, 
               token: token,
               'cf-turnstile-response': turnstileResponse 
           }),
-          dataType: 'json',
-          success: function (response) {
-              if (response.success) {
+        dataType: 'json',
+        success: function (response) {
+          if (response.success) {
                   showAlert(response.message || 'Exchange successful!', 'success', function() {
                        $('#exchangeConfirmModal').modal('hide'); // Hide modal after success alert is closed
                   });
                   fetchUserPoints(); 
                   fetchProducts();
-              } else {
+          } else {
                   showAlert(response.message || 'Exchange failed. Please try again.', 'error');
                   // Don't hide modal on failure, allow user to retry or cancel
               }
@@ -1164,7 +1162,6 @@
                   'expired-callback': function() {
                       console.log('Exchange Turnstile expired');
                       $('#confirmExchangeBtn').prop('disabled', true); 
-                      window.turnstile.reset('#turnstile-exchange-widget');
                   },
                   'error-callback': function(){
                       console.error('Exchange Turnstile error');
