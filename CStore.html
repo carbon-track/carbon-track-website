@@ -965,6 +965,8 @@
                       'expired-callback': function() {
                           console.log('Exchange Turnstile expired');
                            $('#confirmExchangeBtn').prop('disabled', true); // Disable on expiry
+                           // Optionally reset the widget
+                           window.turnstile.reset('#turnstile-exchange-widget');
                       },
                       'error-callback': function(){
                            console.error('Exchange Turnstile error');
@@ -1149,38 +1151,31 @@
               return; 
           }
           
-          // --- Use jQuery context find --- 
-          var turnstileContainer = $(this).find('#turnstile-exchange-widget').get(0); // Find within THIS modal instance
-          
+          var turnstileContainer = document.getElementById('turnstile-exchange-widget');
           if (turnstileContainer && window.turnstile) {
               // Clear previous widget before rendering new one
               turnstileContainer.innerHTML = ''; 
-              window.turnstile.render(turnstileContainer, { // Pass the DOM element directly
+              window.turnstile.render('#turnstile-exchange-widget', {
                   sitekey: turnstileSiteKey, // Use the fetched site key
                   callback: function(token) {
                       console.log('Exchange Turnstile verified with token:', token);
-                      $('#confirmExchangeBtn').prop('disabled', false); // Enable confirm on success
+                      $('#confirmExchangeBtn').prop('disabled', false);
                   },
                   'expired-callback': function() {
                       console.log('Exchange Turnstile expired');
                       $('#confirmExchangeBtn').prop('disabled', true); 
+                      window.turnstile.reset('#turnstile-exchange-widget');
                   },
                   'error-callback': function(){
-                       console.error('Exchange Turnstile error');
-                       $('#confirmExchangeBtn').prop('disabled', true); 
-                       if (window.turnstile) {
-                           try { window.turnstile.reset(turnstileContainer); } catch (e) { console.error("Error resetting turnstile in error-callback:", e); }
-                       }
+                      console.error('Exchange Turnstile error');
+                      $('#confirmExchangeBtn').prop('disabled', true); 
                   }
               });
               $('#confirmExchangeBtn').prop('disabled', true); // Disable button initially
-          } else if (!turnstileContainer){
-               // Specific error if container is not found
-               console.error("Turnstile container (#turnstile-exchange-widget) not found within the modal.");
-                showAlert('无法加载验证小部件容器。', 'error');
-          } else { // Implies window.turnstile is not ready
-               console.error("Turnstile object not loaded yet when modal shown.");
-                showAlert('验证服务尚未准备就绪。', 'error');
+          } else {
+               console.error("Turnstile not ready or container not found for exchange modal.");
+                // Handle error - maybe show a message
+                showAlert('无法加载验证小部件。', 'error');
           }
       });
 
