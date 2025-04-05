@@ -737,6 +737,66 @@
 <div id="footer-placeholder"></div>
 
   <script>
+  // Global variables for Turnstile
+  var currentProductIdToExchange = null;
+  var turnstileWidgetId = null;
+  var turnstileSiteKey = null;
+  
+  // Debug function to check modal availability
+  function checkModalAvailability() {
+    const modal = document.getElementById('exchangeConfirmModal');
+    const container = document.getElementById('turnstile-exchange-widget');
+    console.log('Modal exists:', !!modal);
+    console.log('Turnstile container exists:', !!container);
+    if (container) {
+      console.log('Container parent:', container.parentElement.tagName);
+    }
+  }
+
+  // Unified function to load Turnstile script just once
+  function loadTurnstileScript() {
+    if (!window.turnstile && !document.querySelector('script[src*="challenges.cloudflare.com/turnstile"]')) {
+      const script = document.createElement('script');
+      script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback';
+      script.async = true;
+      script.defer = true;
+      document.head.appendChild(script);
+      console.log('Turnstile script loading initiated');
+    } else {
+      console.log('Turnstile script already exists or is loading');
+    }
+  }
+
+  // Callback function after Turnstile script is loaded
+  function onloadTurnstileCallback() {
+    console.log('Turnstile script loaded successfully');
+    // Fetch the site key if it's not already fetched
+    if (!turnstileSiteKey) {
+      fetchTurnstileSiteKey();
+    }
+  }
+
+  // Function to fetch the Turnstile site key
+  async function fetchTurnstileSiteKey() {
+    try {
+      const response = await fetch('get_config.php');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const config = await response.json();
+      if (config && config.turnstile_sitekey) {
+        turnstileSiteKey = config.turnstile_sitekey;
+        console.log('Turnstile Site Key fetched successfully');
+      } else {
+        console.error('Failed to retrieve Turnstile site key from config');
+        showAlert('Unable to load verification configuration.', 'error');
+      }
+    } catch (error) {
+      console.error('Error fetching Turnstile site key:', error);
+      showAlert('Error loading verification component.', 'error');
+    }
+  }
+
   // Theme toggling functionality
   document.addEventListener('DOMContentLoaded', function() {
     // 创建加载动画气泡效果
@@ -912,199 +972,217 @@
     $('#productsList').html(productsRow);
   }
 
-  // --- Turnstile related functions ---
-  // Global variable to store the product ID being confirmed
-  var currentProductIdToExchange = null;
-  var turnstileWidgetId = null; // Track the current widget ID
-
-  // Unified function to load Turnstile script just once
-  function loadTurnstileScript() {
-      if (!window.turnstile && !document.querySelector('script[src*="challenges.cloudflare.com/turnstile"]')) {
-          const script = document.createElement('script');
-          script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback';
-          script.async = true;
-          script.defer = true;
-          document.head.appendChild(script);
-          console.log('Turnstile script loading initiated');
-      } else {
-          console.log('Turnstile script already exists or is loading');
-      }
-  }
-
-  // Callback function after Turnstile script is loaded
-  function onloadTurnstileCallback() {
-      console.log('Turnstile script loaded successfully');
-      // Do not render the widget here - it will be rendered when the modal is shown
-      
-      // Fetch the site key if it's not already fetched
-      if (!turnstileSiteKey) {
-          fetchTurnstileSiteKey();
-      }
-  }
-
-  // Function to fetch the Turnstile site key
-  async function fetchTurnstileSiteKey() {
-      try {
-          const response = await fetch('get_config.php');
-          if (!response.ok) {
-              throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          const config = await response.json();
-          if (config && config.turnstile_sitekey) {
-              turnstileSiteKey = config.turnstile_sitekey;
-              console.log('Turnstile Site Key fetched successfully');
-          } else {
-              console.error('Failed to retrieve Turnstile site key from config');
-              showAlert('Unable to load verification configuration.', 'error');
-          }
-      } catch (error) {
-          console.error('Error fetching Turnstile site key:', error);
-          showAlert('Error loading verification component.', 'error');
-      }
-  }
-  
-  // Function to safely render the Turnstile widget with delay
+  // Function to render the Turnstile widget safely
   function renderTurnstileWidget() {
-      // Clear any existing widgets first
-      if (turnstileWidgetId && window.turnstile) {
-          try {
-              window.turnstile.remove(turnstileWidgetId);
-          } catch (e) {
-              console.warn('Error removing previous widget:', e);
+    console.log('Attempting to render Turnstile widget');
+    checkModalAvailability(); // Debug check
+
+    // First ensure the container exists
+    var container = document.getElementById('turnstile-exchange-widget');
+    if (!container) {
+      console.error('Turnstile container not found in DOM');
+      return;
+    }
+
+    // Clear any existing widgets first
+    if (turnstileWidgetId && window.turnstile) {
+      try {
+        window.turnstile.remove(turnstileWidgetId);
+      } catch (e) {
+        console.warn('Error removing previous widget:', e);
+      }
+      turnstileWidgetId = null;
+    }
+    
+    // Always clear the container
+    container.innerHTML = '';
+    
+    // Only render if we have the site key and turnstile object
+    if (!turnstileSiteKey) {
+      console.error('Cannot render widget: missing sitekey');
+      turnstileSiteKey = '0x4AAAAAABD07zmMDmgwgTsL'; // Use hardcoded key as fallback
+      console.log('Using fallback sitekey');
+    }
+    
+    if (!window.turnstile) {
+      console.error('Cannot render widget: turnstile object not available');
+      return;
+    }
+    
+    // Add a small delay to ensure the modal is fully rendered
+    setTimeout(() => {
+      try {
+        console.log('Rendering Turnstile widget in container:', container);
+        // The explicit ID option helps with cleanup
+        turnstileWidgetId = window.turnstile.render('#turnstile-exchange-widget', {
+          sitekey: turnstileSiteKey,
+          callback: function(token) {
+            console.log('Turnstile verification successful with token');
+            $('#confirmExchangeBtn').prop('disabled', false);
+          },
+          'expired-callback': function() {
+            console.log('Turnstile token expired');
+            $('#confirmExchangeBtn').prop('disabled', true);
+          },
+          'error-callback': function(error) {
+            console.error('Turnstile error:', error);
+            $('#confirmExchangeBtn').prop('disabled', true);
           }
-          turnstileWidgetId = null;
+        });
+        console.log('Turnstile widget rendered with ID:', turnstileWidgetId);
+        $('#confirmExchangeBtn').prop('disabled', true);
+      } catch (error) {
+        console.error('Error rendering Turnstile widget:', error);
+        showAlert('Failed to initialize verification. Please try again.', 'error');
       }
-      
-      var container = document.getElementById('turnstile-exchange-widget');
-      if (!container) {
-          console.error('Turnstile container not found');
-          return;
-      }
-      
-      // Always clear the container
-      container.innerHTML = '';
-      
-      // Only render if we have the site key and turnstile object
-      if (!turnstileSiteKey || !window.turnstile) {
-          console.error('Cannot render widget: missing sitekey or turnstile object');
-          return;
-      }
-      
-      // Add a small delay to ensure the modal is fully rendered
-      setTimeout(() => {
-          try {
-              // The explicit ID option helps with cleanup
-              turnstileWidgetId = window.turnstile.render('#turnstile-exchange-widget', {
-                  sitekey: turnstileSiteKey,
-                  callback: function(token) {
-                      console.log('Turnstile verification successful');
-                      $('#confirmExchangeBtn').prop('disabled', false);
-                  },
-                  'expired-callback': function() {
-                      console.log('Turnstile token expired');
-                      $('#confirmExchangeBtn').prop('disabled', true);
-                  },
-                  'error-callback': function(error) {
-                      console.error('Turnstile error:', error);
-                      $('#confirmExchangeBtn').prop('disabled', true);
-                  }
-              });
-              console.log('Turnstile widget rendered with ID:', turnstileWidgetId);
-              $('#confirmExchangeBtn').prop('disabled', true);
-          } catch (error) {
-              console.error('Error rendering Turnstile widget:', error);
-              showAlert('Failed to initialize verification. Please refresh and try again.', 'error');
-          }
-      }, 150); // Small delay for modal animation to complete
+    }, 200); // Longer delay for more reliability
   }
   
   $(document).ready(function () {
-      // Load script early
-      loadTurnstileScript();
+    console.log('Document ready, initializing Turnstile components');
+    // Load script early
+    loadTurnstileScript();
+    
+    // Fetch user points
+    fetchUserPoints();
+    
+    // Make sure the modal is properly initialized
+    if (!document.getElementById('exchangeConfirmModal')) {
+      console.log('Modal not found on ready, creating it');
+      const modalHTML = `
+      <div class="modal fade" id="exchangeConfirmModal" tabindex="-1" role="dialog" aria-labelledby="exchangeConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content ios-modal-content">
+            <div class="modal-header ios-modal-header">
+              <h5 class="modal-title" id="exchangeConfirmModalLabel">Confirm Exchange</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body ios-modal-body">
+              <p>Are you sure you want to exchange <strong id="confirmProductPrice"></strong> credits for <strong id="confirmProductName"></strong>?</p>
+              <!-- Turnstile Widget Container -->
+              <div id="turnstile-exchange-widget" style="margin-top: 15px; margin-bottom: 15px;">
+                <!-- Turnstile will render here -->
+              </div>
+              <small class="text-muted">Please complete the verification below.</small>
+            </div>
+            <div class="modal-footer ios-modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+              <button type="button" class="btn btn-primary" id="confirmExchangeBtn" disabled>Confirm Exchange</button> 
+            </div>
+          </div>
+        </div>
+      </div>`;
+      $('body').append(modalHTML);
+    }
+    
+    // Direct binding to exchange buttons
+    $(document).on('click', '.exchange-btn', function(e) {
+      e.preventDefault();
+      console.log('Exchange button clicked');
       
-      // Fetch user points
-      fetchUserPoints();
+      // Store product info
+      currentProductIdToExchange = $(this).data('id');
+      var productName = $(this).closest('.product-card').find('.product-title').text();
+      var productPrice = $(this).closest('.product-card').find('.price-tag').text();
       
-      // Click handler for exchange buttons - show the modal
-      $('body').on('click', '.exchange-btn', function () {
-          // Store product info
-          currentProductIdToExchange = $(this).data('id');
-          var productName = $(this).closest('.product-card').find('.product-title').text();
-          var productPrice = $(this).closest('.product-card').find('.price-tag').text();
-          
-          // Update modal contents
-          $('#confirmProductName').text(productName);
-          $('#confirmProductPrice').text(productPrice);
-          
-          // Show the modal - widget will be rendered after modal is shown
-          $('#exchangeConfirmModal').modal('show');
-      });
+      console.log('Product ID:', currentProductIdToExchange, 'Name:', productName, 'Price:', productPrice);
       
-      // When modal is fully shown, render the Turnstile widget
-      $('body').on('shown.bs.modal', '#exchangeConfirmModal', function () {
-          renderTurnstileWidget();
-      });
+      // Update modal contents
+      $('#confirmProductName').text(productName);
+      $('#confirmProductPrice').text(productPrice);
       
-      // Click handler for the confirmation button
-      $('#confirmExchangeBtn').on('click', function() {
-          var token = localStorage.getItem('token');
-          // Get token directly from rendered widget
-          var turnstileResponse = null;
-          
-          try {
-              if (turnstileWidgetId) {
-                  turnstileResponse = window.turnstile.getResponse(turnstileWidgetId);
-              }
-              
-              if (!turnstileResponse) {
-                  // Fallback method to get token
-                  var turnstileInput = document.querySelector('#turnstile-exchange-widget [name="cf-turnstile-response"]');
-                  if (turnstileInput) {
-                      turnstileResponse = turnstileInput.value;
-                  }
-              }
-          } catch (e) {
-              console.error('Error getting Turnstile response:', e);
+      // Check if modal exists before showing
+      if (!document.getElementById('exchangeConfirmModal')) {
+        console.error('Modal not found before showing!');
+        showAlert('Error initializing exchange dialog', 'error');
+        return;
+      }
+      
+      // Show the modal
+      try {
+        $('#exchangeConfirmModal').modal('show');
+        console.log('Modal shown successfully');
+      } catch (e) {
+        console.error('Error showing modal:', e);
+      }
+    });
+    
+    // When modal is fully shown, render the Turnstile widget
+    $(document).on('shown.bs.modal', '#exchangeConfirmModal', function () {
+      console.log('Modal shown event triggered, rendering Turnstile widget');
+      renderTurnstileWidget();
+    });
+    
+    // Click handler for the confirmation button
+    $(document).on('click', '#confirmExchangeBtn', function() {
+      console.log('Confirm exchange button clicked');
+      var token = localStorage.getItem('token');
+      
+      // Get token directly from rendered widget
+      var turnstileResponse = null;
+      
+      try {
+        if (turnstileWidgetId) {
+          turnstileResponse = window.turnstile.getResponse(turnstileWidgetId);
+          console.log('Got Turnstile response from widget ID');
+        }
+        
+        if (!turnstileResponse) {
+          // Fallback method to get token
+          var turnstileInput = document.querySelector('#turnstile-exchange-widget [name="cf-turnstile-response"]');
+          if (turnstileInput) {
+            turnstileResponse = turnstileInput.value;
+            console.log('Got Turnstile response from input element');
           }
-          
-          if (!currentProductIdToExchange) {
-              showAlert('Error: Product ID not found.', 'error');
-              return;
-          }
-          
-          if (!turnstileResponse) {
-              showAlert('Please complete the verification.', 'warning');
-              return;
-          }
-          
-          // Call the exchange function with the Turnstile response
-          exchangeProduct(currentProductIdToExchange, token, turnstileResponse);
-          
-          // Hide the modal
-          $('#exchangeConfirmModal').modal('hide');
-      });
+        }
+      } catch (e) {
+        console.error('Error getting Turnstile response:', e);
+      }
       
-      // Clean up Turnstile when modal is hidden
-      $('body').on('hidden.bs.modal', '#exchangeConfirmModal', function () {
-          // Clear the container
-          const container = document.getElementById('turnstile-exchange-widget');
-          if (container) {
-              container.innerHTML = '';
-          }
-          
-          // Remove the widget using its ID
-          if (turnstileWidgetId && window.turnstile) {
-              try {
-                  window.turnstile.remove(turnstileWidgetId);
-              } catch (e) {
-                  console.warn('Error removing Turnstile widget:', e);
-              }
-              turnstileWidgetId = null;
-          }
-      });
+      if (!currentProductIdToExchange) {
+        showAlert('Error: Product ID not found.', 'error');
+        return;
+      }
       
-      // Fetch products
-      fetchProducts();
+      if (!turnstileResponse) {
+        showAlert('Please complete the verification.', 'warning');
+        return;
+      }
+      
+      console.log('Proceeding with exchange, product ID:', currentProductIdToExchange);
+      
+      // Call the exchange function with the Turnstile response
+      exchangeProduct(currentProductIdToExchange, token, turnstileResponse);
+      
+      // Hide the modal
+      $('#exchangeConfirmModal').modal('hide');
+    });
+    
+    // Clean up Turnstile when modal is hidden
+    $(document).on('hidden.bs.modal', '#exchangeConfirmModal', function () {
+      console.log('Modal hidden, cleaning up Turnstile widget');
+      
+      // Clear the container
+      const container = document.getElementById('turnstile-exchange-widget');
+      if (container) {
+        container.innerHTML = '';
+      }
+      
+      // Remove the widget using its ID
+      if (turnstileWidgetId && window.turnstile) {
+        try {
+          window.turnstile.remove(turnstileWidgetId);
+        } catch (e) {
+          console.warn('Error removing Turnstile widget:', e);
+        }
+        turnstileWidgetId = null;
+      }
+    });
+    
+    // Fetch products
+    fetchProducts();
   });
 
   // Modify exchangeProduct to accept and send the turnstile token
@@ -1138,36 +1216,6 @@
       }
     }); // Ensure correct closing
   }
-
-  // Add the confirmation modal HTML to the body
-   $(function() { // Ensure this runs after the DOM is ready
-     const modalHTML = `
-    <div class="modal fade" id="exchangeConfirmModal" tabindex="-1" role="dialog" aria-labelledby="exchangeConfirmModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content ios-modal-content">
-          <div class="modal-header ios-modal-header">
-            <h5 class="modal-title" id="exchangeConfirmModalLabel">Confirm Exchange</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body ios-modal-body">
-            <p>Are you sure you want to exchange <strong id="confirmProductPrice"></strong> credits for <strong id="confirmProductName"></strong>?</p>
-            <!-- Turnstile Widget Container -->
-            <div id="turnstile-exchange-widget" style="margin-top: 15px; margin-bottom: 15px;">
-               <!-- Turnstile will render here -->
-            </div>
-            <small class="text-muted">Please complete the verification below.</small>
-          </div>
-          <div class="modal-footer ios-modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-            <button type="button" class="btn btn-primary" id="confirmExchangeBtn" disabled>Confirm Exchange</button> 
-          </div>
-        </div>
-      </div>
-    </div>`;
-     $('body').append(modalHTML);
-   }); // Ensure correct closing for $(function(){...})
 
   </script>
 </body>
