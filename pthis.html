@@ -570,7 +570,7 @@
 <div class="container">
   <div class="user-info ios-depth-effect fade-in-up delay-2">
     <div class="user-info-label">Current User:</div>
-    <div class="user-info-value" id="email">Loading...</div>
+    <div class="user-info-value" id="username">Loading...</div>
   </div>
   
   <h2 class="section-title fade-in-up delay-2">Carbon Reduction Submissions</h2>
@@ -637,7 +637,7 @@
   var token = localStorage.getItem('token');
   if (token) {
   } else {
-    $('#email').text('Not logged in');
+    $('#username').text('Not logged in');
     showAlert('请先登录', 'warning', function() {
       window.location.href = 'index.html';
     });
@@ -652,7 +652,7 @@
       return; // 如果没有token，停止执行
     }
     
-    $('#email').text(localStorage.getItem('email'));
+    $('#username').text(localStorage.getItem('username'));
     $('#loading').show(); // 显示加载动画
     
     $.ajax({
