@@ -11,15 +11,33 @@
 function showAlert(message, type = 'info', callback = null) {
     ensureAlertStyles(); // Make sure styles are loaded
 
+    // --- Start Aggressive Cleanup ---
+    console.log("[showAlert] Cleaning up previous modals/backdrops...");
     // Remove any existing alert modal to prevent duplicates
     const existingAlert = document.getElementById('iosAlertModal');
     if (existingAlert) {
-        // Immediately remove existing modal to prevent conflicts
-        existingAlert.remove(); 
-        // Also remove backdrop if it exists
-        const backdrop = document.querySelector('.modal-backdrop');
-        if (backdrop) backdrop.remove();
+        console.log("[showAlert] Removing existing modal:", existingAlert.id);
+        // Try to hide it first if it has a BS instance
+        const existingInstance = bootstrap.Modal.getInstance(existingAlert);
+        if (existingInstance) {
+            try {
+                existingInstance.hide(); // Attempt graceful hide
+            } catch (e) { /* Ignore errors if already hidden/removed */ }
+        }
+        existingAlert.remove();
     }
+    // Also remove *any* backdrop immediately
+    document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
+        console.log("[showAlert] Removing existing backdrop.");
+        backdrop.remove();
+    });
+    // Reset body styles if necessary
+    if (document.body.style.overflow === 'hidden') {
+         console.log("[showAlert] Restoring body overflow.");
+         document.body.style.overflow = ''; 
+         document.body.style.paddingRight = ''; 
+    }
+    // --- End Aggressive Cleanup ---
 
     // Determine title based on type
     let title;
@@ -52,7 +70,7 @@ function showAlert(message, type = 'info', callback = null) {
                     ${message} 
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-ios" data-bs-dismiss="modal">OK</button> 
+                    <button type="button" class="btn btn-ios alert-ok-button" data-bs-dismiss="modal">OK</button> 
                 </div>
             </div>
         </div>
@@ -64,9 +82,39 @@ function showAlert(message, type = 'info', callback = null) {
 
     const modalElement = document.getElementById(modalId);
     const modal = new bootstrap.Modal(modalElement);
+    const okButton = modalElement.querySelector('.alert-ok-button'); // Select the button
+
+    // --- Start Debug Logging & Explicit Handler ---
+    console.log(`[showAlert] Initializing modal #${modalId} for message:`, message);
+
+    modalElement.addEventListener('show.bs.modal', () => {
+        console.log(`[showAlert] Event: show.bs.modal #${modalId}`);
+    });
+    modalElement.addEventListener('shown.bs.modal', () => {
+        console.log(`[showAlert] Event: shown.bs.modal #${modalId}`);
+    });
+    modalElement.addEventListener('hide.bs.modal', () => {
+        console.log(`[showAlert] Event: hide.bs.modal #${modalId}`);
+    });
+
+    // Add explicit click listener to OK button
+    if (okButton) {
+        okButton.addEventListener('click', function handleOkClick() {
+            console.log(`[showAlert] OK button clicked for modal #${modalId}. Manually calling hide().`);
+            okButton.removeEventListener('click', handleOkClick); // Remove listener after first click
+            try {
+                 modal.hide();
+            } catch (e) {
+                console.error("[showAlert] Error calling modal.hide() on OK click:", e);
+            }
+        }, { once: true }); // Use once: true to ensure it only fires once
+    } else {
+        console.error(`[showAlert] Could not find OK button for modal #${modalId}`);
+    }
 
     // Use the 'hidden.bs.modal' event for cleanup and callback
     modalElement.addEventListener('hidden.bs.modal', function handler(event) {
+        console.log(`[showAlert] Event: hidden.bs.modal #${modalId}`);
         // Ensure we're not responding to events from nested modals if any
         if (event.target !== modalElement) {
             return;
@@ -84,6 +132,7 @@ function showAlert(message, type = 'info', callback = null) {
         }
         
         // Remove the modal from DOM
+        console.log(`[showAlert] Removing modal element #${modalId} from DOM.`);
         modalElement.remove();
         
         // Double-check for backdrop removal (Bootstrap 5 should handle this, but just in case)
@@ -93,12 +142,14 @@ function showAlert(message, type = 'info', callback = null) {
         }
         // Restore body scrollability if Bootstrap hasn't
         if (document.body.style.overflow === 'hidden') {
+             console.log("[showAlert] Restoring body overflow.");
              document.body.style.overflow = ''; 
              document.body.style.paddingRight = ''; 
         }
     }, { once: true }); // Use { once: true } for automatic listener removal
 
     // Show the modal
+    console.log(`[showAlert] Calling modal.show() for #${modalId}`);
     modal.show();
 }
 
