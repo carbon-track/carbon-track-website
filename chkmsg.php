@@ -19,7 +19,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->execute([$userId]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // --- Add logic to update lastlgn --- 
         try {
             $currentTime = date('Y-m-d H:i:s');
             $updateSql = "UPDATE users SET lastlgn = :lastLoginTime WHERE id = :userId";
@@ -28,10 +27,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $updateStmt->bindParam(':userId', $userId, PDO::PARAM_INT);
             $updateStmt->execute();
         } catch (PDOException $updateE) {
-            // Log the error but don't stop the script, as updating lastlgn is secondary
-            logException($updateE, "Failed to update lastlgn in chkmsg.php"); 
+            logException($updateE); 
         }
-        // --- End logic to update lastlgn ---
 
         echo json_encode(['success' => true, 'unreadCount' => $result['unread_count']]);
     } catch (PDOException $e) {
