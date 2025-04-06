@@ -34,7 +34,6 @@ try {
         handleApiError(403, 'Access denied.');
     }
 
-    // $pdo = dbconnect(); // Remove this line
     global $pdo; // Ensure $pdo from db.php is accessible
     if (!isset($pdo)) {
         require_once 'db.php';
@@ -60,9 +59,9 @@ try {
 
 } catch (PDOException $e) {
     logException($e);
-    handleApiError(500, 'Database error while deleting user.');
+    handleApiError(500, 'Internal Server Error.');
 } catch (Exception $e) {
     logException($e);
-    handleApiError(500, 'An unexpected error occurred.');
+    handleApiError(500, 'Internal Server Error.');
 }
 ?> 

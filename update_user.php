@@ -36,8 +36,7 @@ try {
     if (!isAdmin($email)) {
         handleApiError(403, 'Access denied.');
     }
-
-    // $pdo = dbconnect(); // Remove this line
+    
     global $pdo; // Ensure $pdo from db.php is accessible
     if (!isset($pdo)) {
         require_once 'db.php';
@@ -46,7 +45,6 @@ try {
         }
     }
 
-    $pdo = dbconnect();
     $sql = "UPDATE users SET points = :points, school = :school WHERE id = :userId";
     $stmt = $pdo->prepare($sql);
 

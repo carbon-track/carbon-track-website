@@ -12,6 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             handleApiError(403, 'Token不合法');
+            exit;
         }
 
         $type = sanitizeInput($_POST['type'] ?? 'all');
