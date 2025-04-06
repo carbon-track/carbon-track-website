@@ -25,10 +25,48 @@
       padding: 80px 0 60px;
       text-align: center;
       border-radius: 0 0 24px 24px;
-      margin-bottom: 10px; /* Adjusted margin */
+      margin-bottom: 30px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     }
-    .admin-header h1 { font-weight: 700; margin-bottom: 16px; }
-    .admin-header p { opacity: 0.9; max-width: 600px; margin: 0 auto; font-size: 1.1rem; }
+
+    /* Add shimmer effect */
+    .admin-header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
+      transform: rotate(30deg);
+      animation: shimmer 10s infinite linear;
+      pointer-events: none;
+    }
+    
+    @keyframes shimmer {
+      0% { transform: translateX(-50%) rotate(0deg); }
+      100% { transform: translateX(0%) rotate(360deg); }
+    }
+    
+    .admin-header h1 { 
+      font-weight: 700; 
+      margin-bottom: 16px; 
+      letter-spacing: -0.5px;
+      position: relative;
+      z-index: 2;
+    }
+    
+    .admin-header p { 
+      opacity: 0.9; 
+      max-width: 600px; 
+      margin: 0 auto; 
+      font-size: 1.1rem; 
+      position: relative;
+      z-index: 2;
+    }
+    
     .admin-nav {
       background-color: var(--ios-secondary-system-background);
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
@@ -38,88 +76,446 @@
       padding: 8px 0;
       border-bottom: 1px solid rgba(0, 0, 0, 0.05);
       margin-bottom: 30px; /* Spacing below nav */
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
+    
     .admin-nav-list { display: flex; list-style: none; margin: 0; padding: 0; justify-content: center; flex-wrap: wrap; }
     .admin-nav-item { margin: 0 8px; position: relative; }
     .admin-nav-link { display: flex; flex-direction: column; align-items: center; padding: 10px 16px; color: var(--ios-gray); text-decoration: none; transition: all 0.2s ease; border-radius: 12px; font-weight: 500; }
     .admin-nav-link i { font-size: 20px; margin-bottom: 4px; }
     .admin-nav-link:hover { color: var(--ios-blue); background-color: rgba(0, 122, 255, 0.1); text-decoration: none; }
     .admin-nav-item.active .admin-nav-link { color: var(--ios-blue); background-color: rgba(0, 122, 255, 0.1); }
-    .admin-nav-item.active::after { content: ''; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); width: 6px; height: 6px; border-radius: 50%; background-color: var(--ios-blue); }
+    
+    /* Add pulse animation to active indicator */
+    .admin-nav-item.active::after { 
+      content: ''; 
+      position: absolute; 
+      bottom: -8px; 
+      left: 50%; 
+      transform: translateX(-50%); 
+      width: 6px; 
+      height: 6px; 
+      border-radius: 50%; 
+      background-color: var(--ios-blue);
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(0, 122, 255, 0.4); }
+      70% { box-shadow: 0 0 0 6px rgba(0, 122, 255, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(0, 122, 255, 0); }
+    }
+    
     @media (prefers-color-scheme: dark) {
-      body.auto-theme .admin-nav { background-color: var(--ios-secondary-background-dark, #1C1C1E); border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+      body.auto-theme .admin-nav { background-color: rgba(44, 44, 46, 0.8); border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
       body.auto-theme .admin-nav-link:hover, body.auto-theme .admin-nav-item.active .admin-nav-link { background-color: rgba(10, 132, 255, 0.2); }
     }
-    body.dark-theme .admin-nav { background-color: var(--ios-secondary-background-dark, #1C1C1E); border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+    body.dark-theme .admin-nav { background-color: rgba(44, 44, 46, 0.8); border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
     body.dark-theme .admin-nav-link:hover, body.dark-theme .admin-nav-item.active .admin-nav-link { background-color: rgba(10, 132, 255, 0.2); }
     @media (max-width: 768px) { .admin-nav-link span { font-size: 12px; } .admin-nav-link { padding: 8px 12px; } }
 
-    /* User Management Specific Styles */
+    /* User Management Specific Styles - Enhanced */
     .table-container {
       background-color: var(--ios-secondary-system-background);
-      padding: 20px;
-      border-radius: 18px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      padding: 25px;
+      border-radius: 20px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+      transition: all 0.3s ease;
+      overflow: hidden;
+      position: relative;
+      margin-bottom: 40px;
     }
+    
+    .table-container::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, var(--ios-blue), var(--ios-purple));
+      border-radius: 20px 20px 0 0;
+    }
+    
+    .table-container:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    }
+    
+    .table {
+      margin-bottom: 0;
+    }
+    
     .table th {
         border-top: none;
         font-weight: 600;
         color: var(--ios-secondary-label);
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+        padding: 16px 12px;
     }
+    
     .table td {
         vertical-align: middle;
         border-top: 1px solid var(--ios-separator);
+        padding: 14px 12px;
+        transition: background-color 0.2s ease;
     }
+    
+    .table tbody tr {
+        transition: all 0.2s ease;
+    }
+    
+    .table tbody tr:hover {
+        background-color: rgba(0, 122, 255, 0.05);
+    }
+    
     .table tbody tr:first-child td {
         border-top: none;
     }
+    
     .action-btn {
-        font-size: 0.9rem;
-        padding: 5px 10px;
+        font-size: 0.85rem;
+        padding: 6px 12px;
         margin-right: 5px;
+        border-radius: 10px;
+        transition: all 0.2s ease;
     }
+    
+    .edit-btn {
+        color: var(--ios-blue);
+        border-color: var(--ios-blue);
+    }
+    
+    .edit-btn:hover {
+        background-color: var(--ios-blue);
+        color: white;
+    }
+    
+    .delete-btn {
+        color: var(--ios-red);
+        border-color: var(--ios-red);
+    }
+    
+    .delete-btn:hover {
+        background-color: var(--ios-red);
+        color: white;
+    }
+    
     .search-bar {
-        margin-bottom: 20px;
+        margin-bottom: 25px;
         position: relative;
     }
+    
     .search-bar input {
-        padding-left: 40px;
-        border-radius: 12px;
+        padding: 14px 45px;
+        border-radius: 16px;
+        background-color: rgba(0, 0, 0, 0.04);
+        border: none;
+        font-size: 1rem;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
     }
+    
+    .search-bar input:focus {
+        background-color: white;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+        border: none;
+        outline: none;
+    }
+    
     .search-bar .fa-search {
         position: absolute;
-        left: 15px;
+        left: 18px;
         top: 50%;
         transform: translateY(-50%);
         color: var(--ios-gray);
+        font-size: 16px;
+    }
+    
+    /* User stats cards */
+    .stats-container {
+        display: flex;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+    }
+    
+    .stat-card {
+        flex: 1;
+        min-width: 200px;
+        background: white;
+        border-radius: 16px;
+        padding: 20px;
+        margin-right: 15px;
+        margin-bottom: 15px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stat-card:last-child {
+        margin-right: 0;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    }
+    
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 5px;
+    }
+    
+    .stat-card.users::before {
+        background: linear-gradient(90deg, var(--ios-blue), var(--ios-indigo));
+    }
+    
+    .stat-card.points::before {
+        background: linear-gradient(90deg, var(--ios-green), var(--ios-mint));
+    }
+    
+    .stat-card.schools::before {
+        background: linear-gradient(90deg, var(--ios-orange), var(--ios-yellow));
+    }
+    
+    .stat-icon {
+        font-size: 22px;
+        margin-bottom: 12px;
+        display: inline-block;
+        width: 50px;
+        height: 50px;
+        line-height: 50px;
+        text-align: center;
+        border-radius: 15px;
+    }
+    
+    .stat-card.users .stat-icon {
+        color: var(--ios-blue);
+        background-color: rgba(0, 122, 255, 0.1);
+    }
+    
+    .stat-card.points .stat-icon {
+        color: var(--ios-green);
+        background-color: rgba(52, 199, 89, 0.1);
+    }
+    
+    .stat-card.schools .stat-icon {
+        color: var(--ios-orange);
+        background-color: rgba(255, 149, 0, 0.1);
+    }
+    
+    .stat-value {
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 0;
+    }
+    
+    .stat-label {
+        color: var(--ios-secondary-label);
+        font-size: 0.9rem;
+        margin-top: 5px;
+    }
+
+    /* Improved loading spinner */
+    #loadingUsers {
+        padding: 40px;
+    }
+    
+    .loading-spinner {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .loading-spinner .spinner-border {
+        color: var(--ios-blue);
+        width: 2.5rem;
+        height: 2.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .loading-text {
+        color: var(--ios-secondary-label);
+        font-weight: 500;
     }
 
     /* Dark mode table adjustments */
      body.dark-theme .table-container, body.auto-theme.dark-mode .table-container {
-        background-color: var(--ios-secondary-background-dark, #1C1C1E);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        background-color: rgba(44, 44, 46, 0.8);
+        box-shadow: 0 8px 30px rgba(0,0,0,0.18);
      }
+     
+     body.dark-theme .stat-card, body.auto-theme.dark-mode .stat-card {
+        background-color: rgba(44, 44, 46, 0.8);
+     }
+     
      body.dark-theme .table th, body.auto-theme.dark-mode .table th {
         color: var(--ios-secondary-label-dark, #8E8E93);
      }
+     
      body.dark-theme .table td, body.auto-theme.dark-mode .table td {
         border-top: 1px solid var(--ios-separator-dark, #38383A);
         color: var(--ios-label-dark, #F2F2F7);
      }
+     
+     body.dark-theme .table tbody tr:hover, body.auto-theme.dark-mode .table tbody tr:hover {
+        background-color: rgba(10, 132, 255, 0.1);
+     }
+     
      body.dark-theme .search-bar input, body.auto-theme.dark-mode .search-bar input {
-         background-color: var(--ios-tertiary-system-fill-dark, #2C2C2E);
+         background-color: rgba(255, 255, 255, 0.1);
          border-color: var(--ios-separator-dark, #38383A);
          color: var(--ios-label-dark, #F2F2F7);
      }
+     
+     body.dark-theme .search-bar input:focus, body.auto-theme.dark-mode .search-bar input:focus {
+         background-color: rgba(255, 255, 255, 0.15);
+     }
+     
      body.dark-theme .search-bar .fa-search, body.auto-theme.dark-mode .search-bar .fa-search {
          color: var(--ios-secondary-label-dark, #8E8E93);
      }
-
+     
+     /* Improved modal styling */
+     .ios-modal-content {
+         border-radius: 20px;
+         border: none;
+         box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+         overflow: hidden;
+     }
+     
+     .ios-modal-header {
+         padding: 20px 25px;
+         border-bottom: 1px solid var(--ios-separator);
+         position: relative;
+     }
+     
+     .ios-modal-header .modal-title {
+         font-weight: 600;
+     }
+     
+     .ios-modal-header .close {
+         opacity: 0.6;
+         transition: opacity 0.2s ease;
+     }
+     
+     .ios-modal-header .close:hover {
+         opacity: 1;
+     }
+     
+     .ios-modal-body {
+         padding: 25px;
+     }
+     
+     .ios-modal-footer {
+         padding: 15px 25px 25px;
+         border-top: none;
+     }
+     
+     .ios-input {
+         border-radius: 12px;
+         padding: 12px 15px;
+         border: 1px solid var(--ios-separator);
+         transition: all 0.3s ease;
+     }
+     
+     .ios-input:focus {
+         border-color: var(--ios-blue);
+         box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
+     }
+     
+     body.dark-theme .ios-modal-content, body.auto-theme.dark-mode .ios-modal-content {
+         background-color: rgba(44, 44, 46, 0.95);
+     }
+     
+     body.dark-theme .ios-modal-header, body.auto-theme.dark-mode .ios-modal-header {
+         border-bottom-color: var(--ios-separator-dark, #38383A);
+     }
+     
+     body.dark-theme .ios-input, body.auto-theme.dark-mode .ios-input {
+         background-color: rgba(255, 255, 255, 0.1);
+         border-color: var(--ios-separator-dark, #38383A);
+         color: var(--ios-label-dark, #F2F2F7);
+     }
+     
+     body.dark-theme .ios-input:focus, body.auto-theme.dark-mode .ios-input:focus {
+         border-color: var(--ios-blue);
+         background-color: rgba(255, 255, 255, 0.15);
+     }
+     
+     /* Animation for fade-in effects */
+     @keyframes fadeInUp {
+         from {
+             opacity: 0;
+             transform: translateY(20px);
+         }
+         to {
+             opacity: 1;
+             transform: translateY(0);
+         }
+     }
+     
+     .fade-in {
+         animation: fadeInUp 0.5s ease-out forwards;
+     }
+     
+     .delay-1 { animation-delay: 0.1s; }
+     .delay-2 { animation-delay: 0.2s; }
+     .delay-3 { animation-delay: 0.3s; }
+     .delay-4 { animation-delay: 0.4s; }
   </style>
 </head>
 <body class="auto-theme">
 <!-- Main Navbar -->
 <div id="navbar-container"></div>
+
+<!-- Admin Navigation Bar -->
+<div class="admin-nav" style="display: none;">
+  <div class="container">
+    <ul class="admin-nav-list">
+      <li class="admin-nav-item">
+        <a href="mgmt.html" class="admin-nav-link">
+          <i class="fas fa-tachometer-alt"></i>
+          <span>Admin Dashboard</span>
+        </a>
+      </li>
+      <li class="admin-nav-item">
+        <a href="ptmgmt.html" class="admin-nav-link">
+          <i class="fas fa-clipboard-check"></i>
+          <span>Carbon Review</span>
+        </a>
+      </li>
+      <li class="admin-nav-item">
+        <a href="productmgmt.html" class="admin-nav-link">
+          <i class="fas fa-store"></i>
+          <span>Product Management</span>
+        </a>
+      </li>
+      <li class="admin-nav-item active"> <!-- Set active for this page -->
+        <a href="usermgmt.html" class="admin-nav-link" id="userMgmtNav">
+          <i class="fas fa-users"></i>
+          <span>User Management</span>
+        </a>
+      </li>
+      <li class="admin-nav-item">
+        <a href="index.html" class="admin-nav-link">
+          <i class="fas fa-home"></i>
+          <span>Return to Site</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
 
 <header class="admin-header">
   <div class="container">
@@ -130,11 +526,36 @@
 
 <!-- User Management Content -->
 <div class="container">
-  <div class="table-container">
+  <!-- User Stats -->
+  <div class="stats-container fade-in">
+    <div class="stat-card users delay-1">
+      <div class="stat-icon">
+        <i class="fas fa-user"></i>
+      </div>
+      <p class="stat-value" id="totalUsers">-</p>
+      <p class="stat-label">Total Users</p>
+    </div>
+    <div class="stat-card points delay-2">
+      <div class="stat-icon">
+        <i class="fas fa-award"></i>
+      </div>
+      <p class="stat-value" id="totalPoints">-</p>
+      <p class="stat-label">Total Carbon Credits</p>
+    </div>
+    <div class="stat-card schools delay-3">
+      <div class="stat-icon">
+        <i class="fas fa-university"></i>
+      </div>
+      <p class="stat-value" id="totalSchools">-</p>
+      <p class="stat-label">Schools</p>
+    </div>
+  </div>
+
+  <div class="table-container fade-in delay-4">
     <!-- Search Bar -->
     <div class="search-bar">
         <i class="fas fa-search"></i>
-        <input type="text" id="userSearchInput" class="form-control ios-input" placeholder="Search by username or email...">
+        <input type="text" id="userSearchInput" class="form-control" placeholder="Search by username or email...">
     </div>
 
     <!-- User Table -->
@@ -155,16 +576,17 @@
                 <!-- User data will be loaded here by JavaScript -->
                 <tr>
                     <td colspan="7" class="text-center" id="loadingUsers">
-                        <div class="spinner-border spinner-border-sm" role="status">
-                            <span class="sr-only">Loading...</span>
+                        <div class="loading-spinner">
+                            <div class="spinner-border" role="status">
+                                <span class="sr-only">Loading...</span>
+                            </div>
+                            <span class="loading-text">Loading users...</span>
                         </div>
-                        Loading users...
                     </td>
                 </tr>
             </tbody>
         </table>
     </div>
-    <!-- Optional: Add Pagination Controls here if needed -->
   </div>
 </div>
 
@@ -257,10 +679,11 @@
     $('#userTableBody').on('click', '.delete-btn', function() {
         const userId = $(this).data('id');
         const username = $(this).closest('tr').find('td:eq(1)').text();
-        // Simple confirm for now, use showAlert for better UI later
-        if (confirm(`Are you sure you want to delete user "${username}" (ID: ${userId})? This cannot be undone.`)) {
+        
+        // Use the showAlert function for a more iOS-like confirmation
+        showAlert(`Are you sure you want to delete user "${username}" (ID: ${userId})? This action cannot be undone.`, 'warning', function() {
             deleteUser(token, userId);
-        }
+        });
     });
 
     // Set Active Nav Item
@@ -297,8 +720,13 @@
               if (response.success) {
                   if (response.users && response.users.length > 0) {
                       displayUsers(response.users);
+                      updateStatistics(response.users);
                   } else {
                       $('#userTableBody').append('<tr><td colspan="7" class="text-center">No users found.</td></tr>');
+                      // Reset statistics for empty results
+                      $('#totalUsers').text('0');
+                      $('#totalPoints').text('0');
+                      $('#totalSchools').text('0');
                   }
               } else {
                   showAlert(response.message || 'Failed to load users.', 'error');
@@ -317,12 +745,15 @@
       const tableBody = $('#userTableBody');
       tableBody.empty(); // Clear loading/previous content
 
-      users.forEach(user => {
+      users.forEach((user, index) => {
           // Format last login - assuming it's a string like 'YYYY-MM-DD HH:MM:SS' or null
           let lastLoginFormatted = user.lastlgn ? formatDateTime(user.lastlgn) : 'Never';
 
+          // Add animation delay class based on row index
+          const delayClass = index < 10 ? `delay-${index % 5}` : '';
+          
           const row = `
-              <tr>
+              <tr class="fade-in ${delayClass}">
                   <td>${user.id}</td>
                   <td>${escapeHtml(user.username)}</td>
                   <td>${escapeHtml(user.email)}</td>
@@ -339,10 +770,34 @@
       });
   }
 
+  function updateStatistics(users) {
+      // Total users
+      $('#totalUsers').text(users.length);
+      
+      // Total points
+      const totalPoints = users.reduce((sum, user) => {
+          return sum + (parseFloat(user.points) || 0);
+      }, 0);
+      $('#totalPoints').text(totalPoints.toFixed(2));
+      
+      // Total unique schools
+      const uniqueSchools = new Set();
+      users.forEach(user => {
+          if (user.school && user.school.trim() !== '') {
+              uniqueSchools.add(user.school.trim());
+          }
+      });
+      $('#totalSchools').text(uniqueSchools.size);
+  }
+
   function updateUser(token, userId, points, school) {
       console.log(`Updating user ${userId}: Points=${points}, School=${school}`);
-      // Add AJAX call to update_user.php
-       $.ajax({
+      
+      // Show updating indicator on button
+      const saveBtn = $('#saveUserChangesBtn').html('<i class="fas fa-spinner fa-spin"></i> Saving...');
+      saveBtn.prop('disabled', true);
+      
+      $.ajax({
           url: 'update_user.php', type: 'POST',
           data: { token: token, userId: userId, points: points, school: school },
           dataType: 'json',
@@ -354,16 +809,20 @@
               } else {
                   showAlert(response.message || 'Failed to update user.', 'error');
               }
+              // Reset button state
+              saveBtn.html('Save Changes').prop('disabled', false);
           },
           error: function() {
               showAlert('Failed to connect to server to update user.', 'error');
+              // Reset button state
+              saveBtn.html('Save Changes').prop('disabled', false);
           }
       });
   }
 
   function deleteUser(token, userId) {
       console.log(`Deleting user ${userId}`);
-      // Add AJAX call to delete_user.php
+      
       $.ajax({
           url: 'delete_user.php', type: 'POST',
           data: { token: token, userId: userId },
@@ -393,7 +852,7 @@
           .replace(/'/g, '&#039;');
   }
 
-  // Function to set the active nav item based on current page (ensure this is present)
+  // Function to set the active nav item based on current page
   function setActiveNavItem() {
     var currentPath = window.location.pathname;
     var filename = currentPath.substring(currentPath.lastIndexOf('/') + 1);
