@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         if ($stmt->execute()) {
             if ($stmt->rowCount() > 0) {
-                echo json_encode(['success' => true, 'message' => 'Product deleted successfully.']);
+            echo json_encode(['success' => true, 'message' => 'Product deleted successfully.']);
             } else {
                 handleApiError(404, 'Product not found or already deleted.');
             }

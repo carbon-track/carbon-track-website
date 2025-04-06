@@ -11,11 +11,11 @@ $csvFile = 'carbon_factors.csv';
 // Wrap logic in try block
 try {
     // Check file existence
-    if (!file_exists($csvFile)) {
+if (!file_exists($csvFile)) {
         // Use handleApiError for client-side (or configuration) errors
         handleApiError(404, 'CSV 文件不存在'); 
-    }
-    
+}
+
     // Attempt to open the file
     $file = @fopen($csvFile, 'r'); // Use @ to suppress default warning on failure
     if ($file === false) {
@@ -23,8 +23,8 @@ try {
         throw new Exception("无法打开 CSV 文件: {$csvFile}");
     }
 
-    $updated = 0;
-    $inserted = 0;
+$updated = 0;
+$inserted = 0;
     $lineNum = 0;
 
     // Ensure $pdo is available
@@ -36,13 +36,13 @@ try {
     // Start transaction
     $pdo->beginTransaction();
 
-    while (($data = fgetcsv($file)) !== FALSE) {
+while (($data = fgetcsv($file)) !== FALSE) {
         $lineNum++;
         // Basic validation for row data count
-        if (count($data) < 4) {
+    if (count($data) < 4) {
             error_log("[update_factors.php] Skipping invalid row #{$lineNum}: Not enough columns.");
             continue; // Skip invalid row
-        }
+    }
 
         // Trim and sanitize data
         $activity = trim($data[0]);
@@ -65,38 +65,38 @@ try {
             // Update existing data
             $stmtUpdate = $pdo->prepare("UPDATE carbon_factors SET unit = :unit, reduction_factor = :reduction_factor, bonus_points = :bonus_points WHERE id = :id");
             $stmtUpdate->execute([
-                'unit' => $unit,
-                'reduction_factor' => $reduction_factor,
-                'bonus_points' => $bonus_points,
+            'unit' => $unit,
+            'reduction_factor' => $reduction_factor,
+            'bonus_points' => $bonus_points,
                 'id' => $existingId // Use ID for update
-            ]);
-            $updated++;
-        } else {
+        ]);
+        $updated++;
+    } else {
             // Insert new data
             $stmtInsert = $pdo->prepare("INSERT INTO carbon_factors (activity, unit, reduction_factor, bonus_points) VALUES (:activity, :unit, :reduction_factor, :bonus_points)");
             $stmtInsert->execute([
-                'activity' => $activity,
-                'unit' => $unit,
-                'reduction_factor' => $reduction_factor,
-                'bonus_points' => $bonus_points
-            ]);
-            $inserted++;
-        }
+            'activity' => $activity,
+            'unit' => $unit,
+            'reduction_factor' => $reduction_factor,
+            'bonus_points' => $bonus_points
+        ]);
+        $inserted++;
     }
+}
 
     // Commit transaction
     $pdo->commit();
 
     // Close the file handle
-    fclose($file);
+fclose($file);
 
     // Return success JSON response
-    echo json_encode([
-        'success' => true,
-        'updated' => $updated,
-        'inserted' => $inserted,
+echo json_encode([
+    'success' => true,
+    'updated' => $updated,
+    'inserted' => $inserted,
         'message' => "数据更新完成 ({$updated} updated, {$inserted} inserted)"
-    ]);
+]);
 
 } catch (PDOException $e) {
     // Rollback transaction on PDO error

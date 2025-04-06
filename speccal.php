@@ -27,8 +27,8 @@ try {
          handleApiError(400, 'Auth token is required.');
     }
     $token = sanitizeInput($_POST['token']);
-    $email = opensslDecrypt($token);
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+$email = opensslDecrypt($token);
+if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         handleApiError(401, 'Token解密失败，不是有效的邮件地址。');
     }
     
@@ -36,7 +36,7 @@ try {
     global $pdo;
     if (!$pdo) {
          handleApiError(500, 'Database connection is not available.');
-    }
+}
     $uid = getUid($pdo, $email);
      if (!$uid) {
          handleApiError(404, 'User not found for the given token.');
@@ -45,26 +45,26 @@ try {
     // Validate activity type and data
     $activity = sanitizeInput($_POST['activity'] ?? '');
     $dataInput = isset($_POST['oridata']) ? floatval($_POST['oridata']) : 0.0;
-    $notes = isset($_POST['notes']) ? sanitizeInput($_POST['notes']) : NULL;
-    $activityDate = isset($_POST['date']) ? sanitizeInput($_POST['date']) : date('Y-m-d');
+$notes = isset($_POST['notes']) ? sanitizeInput($_POST['notes']) : NULL;
+$activityDate = isset($_POST['date']) ? sanitizeInput($_POST['date']) : date('Y-m-d');
 
     // Validate date format and ensure it's not in the future
-    if (!empty($activityDate)) {
-        $dateObj = DateTime::createFromFormat('Y-m-d', $activityDate);
-        if (!$dateObj || $dateObj->format('Y-m-d') !== $activityDate) {
-            handleApiError(400, '日期格式无效');
-        }
-        $today = new DateTime();
+if (!empty($activityDate)) {
+    $dateObj = DateTime::createFromFormat('Y-m-d', $activityDate);
+    if (!$dateObj || $dateObj->format('Y-m-d') !== $activityDate) {
+        handleApiError(400, '日期格式无效');
+    }
+    $today = new DateTime();
         // Allow today, reject future
         if ($dateObj->format('Y-m-d') > $today->format('Y-m-d')) { 
-            handleApiError(400, '不能提交未来日期的记录');
-        }
+        handleApiError(400, '不能提交未来日期的记录');
     }
-    
+}
+
     // File Upload Handling
     $uploadPath = ''; // Initialize upload path
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-        $image = $_FILES['image'];
+    $image = $_FILES['image'];
         $uploadDirectory = "uploads/"; // Ensure this directory exists and is writable
         
         // Basic security checks
@@ -84,11 +84,11 @@ try {
         if (!in_array($fileExtension, ['jpg', 'jpeg', 'png', 'gif', 'webp', 'heic', 'heif'])) {
             $fileExtension = 'jpg'; // Default to jpg if extension is weird/missing
         }
-        $dateTime = date('YmdHis');
+            $dateTime = date('YmdHis');
         // Use UID instead of email for filename if possible
         $safeFilenamePart = preg_replace('/[^a-zA-Z0-9_-]/', '_', $email); // Basic sanitization for filename part
         $newFileName = $safeFilenamePart . '_' . $dateTime . '_' . uniqid() . '.' . $fileExtension;
-        $uploadPath = $uploadDirectory . $newFileName;
+            $uploadPath = $uploadDirectory . $newFileName;
 
         if (!move_uploaded_file($image['tmp_name'], $uploadPath)) {
              // Throw exception if move fails
@@ -107,18 +107,18 @@ try {
     }
 
     // Calculate carbon savings based on activity type
-    $carbonSavings = 0;
-    switch ($activity) {
-        case '节约用电1度':
+$carbonSavings = 0;
+switch ($activity) {
+    case '节约用电1度':
             $carbonSavings = $dataInput; // Assuming dataInput is kWh?
-            break;
-        case '节约用水1L':
+        break;
+    case '节约用水1L':
             $carbonSavings = $dataInput; // Assuming dataInput is Liters?
-            break;
-        case '垃圾分类1次':
+        break;
+    case '垃圾分类1次':
             $carbonSavings = 145; // Fixed value?
             break;
-        default:
+    default:
             handleApiError(400, '未知的活动类型。');
     }
     
@@ -127,7 +127,7 @@ try {
 
     // Start transaction
     $pdo->beginTransaction();
-
+    
     // Update user points
     $updateSql = "UPDATE users SET points = points + :points WHERE id = :uid"; // Update by UID
     $updateStmt = $pdo->prepare($updateSql);
@@ -155,7 +155,7 @@ try {
 
     // Commit transaction
     $pdo->commit();
-
+    
     // Success response
     echo json_encode(['success' => true, 'message' => '碳减排积分记录已加入审核队列。', 'points' => $carbonSavings]);
 
@@ -169,7 +169,7 @@ try {
 } catch (Exception $e) {
     // Rollback transaction on general error if applicable
     if (isset($pdo) && $pdo->inTransaction()) {
-        $pdo->rollBack();
+    $pdo->rollBack();
     }
     logException($e); // Log and exit via global handler
 }

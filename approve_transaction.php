@@ -32,13 +32,13 @@ function updateTransactionHistory($pdo, $transaction_id, $type, $uid) {
         }
 
         // Get points and UID (might be redundant if passed in correctly)
-        $ptstmt = $pdo->prepare("SELECT points, uid FROM points_transactions WHERE id = :id");
-        $ptstmt->bindParam(':id', $transaction_id, PDO::PARAM_INT);
-        $ptstmt->execute();
+            $ptstmt = $pdo->prepare("SELECT points, uid FROM points_transactions WHERE id = :id");
+            $ptstmt->bindParam(':id', $transaction_id, PDO::PARAM_INT);
+            $ptstmt->execute();
         $transactionData = $ptstmt->fetch(PDO::FETCH_ASSOC);
 
         if (!$transactionData) {
-             $pdo->rollBack();
+                $pdo->rollBack();
              throw new Exception('Could not retrieve transaction data after update. ID: ' . $transaction_id);
         }
         
@@ -53,13 +53,13 @@ function updateTransactionHistory($pdo, $transaction_id, $type, $uid) {
              error_log("[Approve Transaction] Approved 'ord' type transaction ID: {$transaction_id} for UID: {$actualUid}");
         } else if ($type === 'spec') {
             // For 'spec', add the points to the user account
-             $uptstmt = $pdo->prepare("UPDATE users SET points = points + :points WHERE id = :uid");
+            $uptstmt = $pdo->prepare("UPDATE users SET points = points + :points WHERE id = :uid");
              $uptstmt->bindParam(':points', $points, PDO::PARAM_STR); // Points can be float
              $uptstmt->bindParam(':uid', $actualUid, PDO::PARAM_INT);
-             $uptstmt->execute();
+            $uptstmt->execute();
              error_log("[Approve Transaction] Approved 'spec' type transaction ID: {$transaction_id}, added {$points} points to UID: {$actualUid}");
-        } else {
-             $pdo->rollBack();
+            } else {
+                $pdo->rollBack();
              throw new Exception('Invalid transaction type specified: ' . $type);
         }
         
@@ -69,7 +69,7 @@ function updateTransactionHistory($pdo, $transaction_id, $type, $uid) {
         } else {
              // This case should ideally not happen if transactionData was fetched
              error_log("[Approve Transaction] Warning: UID was empty for transaction ID: {$transaction_id} when trying to send message.");
-        }
+            }
         
         $pdo->commit();
         // Return success from the main block, not here
@@ -77,7 +77,7 @@ function updateTransactionHistory($pdo, $transaction_id, $type, $uid) {
     } catch (Exception $e) { // Catch PDOException or general Exception
         // Ensure rollback if transaction started
         if (isset($pdo) && $pdo->inTransaction()) {
-            $pdo->rollBack();
+        $pdo->rollBack();
         }
         // Re-throw the exception to be caught by the main try-catch which calls logException
         throw $e; 

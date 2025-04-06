@@ -81,38 +81,54 @@ $(document).ready(function() {
     
         // 模态框显示时加载消息
 $('#messagesModal').on('show.bs.modal', function(e) {
-        console.log('消息模态框正在打开');
+        console.log('[show.bs.modal] Message modal opening...'); // Log start
         
-        // 添加加载动画
-    var modalBody = $(this).find('.modal-body');
-        modalBody.prepend('<div id="loading"><div class="spinner-border text-primary" role="status"><span class="sr-only">加载中...</span></div></div>');
+        // 添加加载动画 (for conversation list)
+        var modalBody = $(this).find('.modal-body #conversationList'); // Target conversation list specifically
+        // Clear previous content and add spinner
+        modalBody.html('<div id="convListLoading" class="text-center py-5"><div class="spinner-border text-primary" role="status"><span class="sr-only">Loading conversations...</span></div></div>');
+        
+        // Ensure initial state of right panel is correct immediately
+        $('#messageContainer').hide(); 
+        $('#noConversationSelected').show();
+        console.log('[show.bs.modal] Initial state set: messageContainer hidden, noConversationSelected shown.');
         
         // 清除新消息标志
         localStorage.removeItem('hasNewMessages');
         
-        // 获取消息
-    fetchMessages().then(function(data) {
-        $('#loading').remove(); // 移除加载动画
+        // 获取消息 (conversations)
+        fetchMessages().then(function(data) {
+            console.log('[show.bs.modal] fetchMessages resolved.');
+            $('#convListLoading').remove(); // 移除对话列表加载动画
             
-        if (data.success) {
-                // 默认显示"选择一个会话"提示
-                $('#messageContainer').hide();
-                $('#noConversationSelected').show();
-                
+            if (data.success) {
+                console.log('[show.bs.modal] fetchMessages success. Building list and setting panel state.');
                 // 构建会话列表
-            buildConversationsList(data);
-        } else {
-            console.error('获取消息失败');
-                showAlert('加载消息失败：' + (data.message || '未知错误'), 'error');
-        }
+                buildConversationsList(data);
+                // Explicitly set right panel state AGAIN after build (belt and suspenders)
+                $('#messageContainer').hide(); 
+                $('#noConversationSelected').show();
+                console.log('[show.bs.modal] Post-build state set: messageContainer hidden, noConversationSelected shown.');
+            } else {
+                console.error('[show.bs.modal] fetchMessages failed:', data.message);
+                showAlert('Failed to load conversations: ' + (data.message || 'Unknown error'), 'error');
+                $('#conversationList').html('<p class="text-danger">Failed to load conversations.</p>');
+                // Ensure correct state even on failure
+                $('#messageContainer').hide(); 
+                $('#noConversationSelected').show().text('Error loading conversations.');
+            }
             
-            // 开始定期检查未读消息
-            startUnreadChecksAndUpdates();
-    }).catch(function(error) {
-        $('#loading').remove(); // 确保即使发生错误也要移除加载动画
-            console.error('加载消息出错:', error.message);
-            showAlert('加载消息出错：' + error.message, 'error');
-    });
+            // 这部分可能不需要在模态框显示时重复启动，因为它已经在登录后启动了
+            // startUnreadChecksAndUpdates(); 
+        }).catch(function(error) {
+             console.error('[show.bs.modal] fetchMessages AJAX error:', error);
+             $('#convListLoading').remove(); // Ensure spinner removed on catch
+             showAlert('Error loading conversations: ' + error.message, 'error');
+             $('#conversationList').html('<p class="text-danger">Error connecting to server.</p>');
+             // Ensure correct state even on AJAX error
+             $('#messageContainer').hide(); 
+             $('#noConversationSelected').show().text('Error connecting to server.');
+        });
 });  } else {
     logout(); // 如果过期或未登录，执行注销操作
     

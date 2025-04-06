@@ -23,39 +23,39 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 // Wrap logic in try block
 try {
-    // Get request data
-    $input = json_decode(file_get_contents('php://input'), true);
+// Get request data
+$input = json_decode(file_get_contents('php://input'), true);
     if (json_last_error() !== JSON_ERROR_NONE) {
         handleApiError(400, 'Invalid JSON input.');
     }
-    $token = $input['token'] ?? '';
+$token = $input['token'] ?? '';
     // $key = base64_decode($base64Key); // From global_variables
 
     // Authentication and Authorization
-    if (empty($token)) {
+if (empty($token)) {
         handleApiError(400, 'Token is required.');
-    }
+}
 
     $email = opensslDecrypt($token); // Use key from global_variables
 
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL) || !isAdmin($email)) {
+if (!filter_var($email, FILTER_VALIDATE_EMAIL) || !isAdmin($email)) {
         handleApiError(403, 'Unauthorized.');
     }
     
     global $pdo;
     if (!$pdo) {
          handleApiError(500, 'Database connection is not available.');
-    }
+}
 
-    // Get time range parameters (for hourly stats)
-    $hourlyStartDate = $input['hourly_start_date'] ?? null;
-    $hourlyEndDate = $input['hourly_end_date'] ?? null;
+// Get time range parameters (for hourly stats)
+$hourlyStartDate = $input['hourly_start_date'] ?? null;
+$hourlyEndDate = $input['hourly_end_date'] ?? null;
 
     // Initialize stats arrays
     $errorTypeStats = [];
     $dailyErrorStats = [];
     $weeklyErrorStats = [];
-    $hourlyErrorStats = [];
+$hourlyErrorStats = [];
 
     // Error type statistics
     $sqlType = "SELECT error_type, COUNT(*) as count FROM error_logs GROUP BY error_type";

@@ -6,7 +6,7 @@ header('Content-Type: application/json; charset=UTF-8');
 
 // Start session if not already started
 if (session_status() == PHP_SESSION_NONE) {
-    session_start();
+session_start();
 }
 
 // Check request method
@@ -27,7 +27,7 @@ try {
 
     // Sanitize and validate email
     $email = sanitizeInput($_POST['email'] ?? '');
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         handleApiError(400, '无效的邮箱地址。');
     }
     
@@ -39,12 +39,12 @@ try {
     $stmtCheck->execute();
     if ($stmtCheck->fetchColumn()) { 
         handleApiError(400, 'Email address is already registered.');
-    }
+}
     */
 
     // Generate and store verification code
     $verificationCode = rand(100000, 999999); 
-    $_SESSION['verification_code'] = $verificationCode;
+$_SESSION['verification_code'] = $verificationCode;
 
     // Send email using global function (handles its own exceptions)
     sendRegistrationEmail($email, $verificationCode); 
