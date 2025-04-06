@@ -83,15 +83,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         echo json_encode($response);
     } catch (PDOException $e) {
         logException($e);
-        file_put_contents('chkreadstatus_log.txt', date('Y-m-d H:i:s') . ' - 数据库错误: ' . $e->getMessage() . "\n", FILE_APPEND);
-        handleApiError(500, '数据库错误: ' . $e->getMessage());
+        // file_put_contents('chkreadstatus_log.txt', date('Y-m-d H:i:s') . ' - 数据库错误: ' . $e->getMessage() . "\n", FILE_APPEND);
+        // handleApiError(500, '数据库错误: ' . $e->getMessage());
     } catch (Exception $e) {
         logException($e);
-        file_put_contents('chkreadstatus_log.txt', date('Y-m-d H:i:s') . ' - 服务器错误: ' . $e->getMessage() . "\n", FILE_APPEND);
-        handleApiError(500, '内部服务器错误: ' . $e->getMessage());
+        // file_put_contents('chkreadstatus_log.txt', date('Y-m-d H:i:s') . ' - 服务器错误: ' . $e->getMessage() . "\n", FILE_APPEND);
+        // handleApiError(500, '内部服务器错误: ' . $e->getMessage());
     }
 } else {
-    file_put_contents('chkreadstatus_log.txt', date('Y-m-d H:i:s') . ' - 不支持的请求方法: ' . $_SERVER['REQUEST_METHOD'] . "\n", FILE_APPEND);
+    // file_put_contents('chkreadstatus_log.txt', date('Y-m-d H:i:s') . ' - 不支持的请求方法: ' . $_SERVER['REQUEST_METHOD'] . "\n", FILE_APPEND);
     handleApiError(405, '不支持的请求方法。');
 }
 ?> 

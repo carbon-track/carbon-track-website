@@ -161,15 +161,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         echo json_encode(['success' => true, 'message' => 'Database configuration saved and database initialized successfully.']);
 
     } catch (PDOException $e) {
-        echo json_encode(['success' => false, 'error' => 'Database connection or initialization error: ' . $e->getMessage()]);
-        exit;
+        // Provide a user-friendly message, but log the detail for debugging if possible
+        error_log("Install Error (DB): " . $e->getMessage()); // Log detailed error
+        echo json_encode(['success' => false, 'error' => 'Database connection or initialization failed. Check credentials and permissions.']);
     } catch (Exception $e) {
-        echo json_encode(['success' => false, 'error' => 'Error writing to db.php: ' . $e->getMessage()]);
-        exit;
+         // Provide a user-friendly message
+        error_log("Install Error (File Write): " . $e->getMessage()); // Log detailed error
+        echo json_encode(['success' => false, 'error' => 'Failed to write database configuration file (db.php).']);
     }
 } else {
     http_response_code(405);
-    echo json_encode(['success' => false, 'error' => 'Method not allowed']);
-    exit;
+    echo json_encode(['success' => false, 'error' => 'Method not allowed. Please use POST.']);
 }
 ?>

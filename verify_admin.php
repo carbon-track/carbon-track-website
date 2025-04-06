@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $email = opensslDecrypt($token);
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-             handleApiError(403, 'Token不合法');
+             handleApiError(401, 'Token不合法或已过期');
         }
 
         if (isAdmin($email)) {
@@ -23,14 +23,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         } else {
             echo json_encode(['success' => true, 'isAdmin' => false]);
         }
-    } catch (PDOException $e) {
-        logException($e);
-        handleApiError(500, 'Database error');
     } catch (Exception $e) {
         logException($e);
-        handleApiError(500, 'Internal server error');
     }
 } else {
-    handleApiError(400, 'Invalid request method');
+    handleApiError(405, 'Invalid request method.');
 }
 ?>

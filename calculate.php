@@ -225,12 +225,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $pdo->rollBack();
         }
         logException($e);
-        handleApiError(500, 'Database error');
     } catch (Exception $e) {
         logException($e);
-        handleApiError(500, 'Internal server error');
     }
 } else {
-    handleApiError(400, 'Invalid request method');
+    handleApiError(405, 'Invalid request method');
 }
 ?>

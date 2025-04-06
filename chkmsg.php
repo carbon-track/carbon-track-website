@@ -22,10 +22,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         echo json_encode(['success' => true, 'unreadCount' => $result['unread_count']]);
     } catch (PDOException $e) {
         logException($e);
-        handleApiError(500, 'Database error');
     } catch (Exception $e) {
         logException($e);
-        handleApiError(500, 'Internal server error');
     }
 } else {
     handleApiError(405, '不支持的请求方法。');

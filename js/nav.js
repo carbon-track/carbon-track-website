@@ -360,7 +360,7 @@ function registerUser() {
     var password = $('#registerPassword').val();
     var email = $('#registerEmail').val();
     var verificationCode = $('#verificationCode').val();
-    
+
     // Get Turnstile token using the manager
     var turnstileResponse = null;
     // ** Ensure registerModalWidgetId is declared/accessible in this scope ** 
@@ -398,7 +398,7 @@ function registerUser() {
         success: function(response) {
             if (response.success) {
                 showAlert('Registration successful! Please log in.', 'success');
-                $('#registerModal').modal('hide'); 
+                $('#registerModal').modal('hide');
                 $('#loginModal').modal('show'); // Show login modal after successful registration
             } else {
                 showAlert(response.message || 'Registration failed.', 'error');
@@ -886,7 +886,7 @@ function ensureMessageStyles() {
                 background-color: #dcf8c6;
                 border-bottom-right-radius: 5px;
             }
-             .message-bubble.received {
+            .message-bubble.received {
                 background-color: #f1f0f0;
                 border-bottom-left-radius: 5px;
             }
@@ -2004,27 +2004,27 @@ function initRegisterModal() {
     console.log("Initializing Register Modal and its event listeners.");
     // Check if modal already exists
     if (!document.getElementById('registerModal')) {
-        const modalHTML = `
-        <div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="registerModalLabel" aria-hidden="true">
+    const modalHTML = `
+    <div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="registerModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content ios-modal-content">
                     <div class="modal-header ios-modal-header">
                         <h5 class="modal-title" id="registerModalLabel">Register</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
                     <div class="modal-body ios-modal-body">
                         <form id="registerForm" onsubmit="return false;"> <!-- Prevent default form submission -->
-                            <div class="form-group">
+                        <div class="form-group">
                                 <label for="registerUsername">Username</label>
                                 <input type="text" class="form-control ios-input" id="registerUsername" required>
-                            </div>
-                            <div class="form-group">
+                        </div>
+                        <div class="form-group">
                                 <label for="registerPassword">Password</label>
                                 <input type="password" class="form-control ios-input" id="registerPassword" required>
-                            </div>
-                            <div class="form-group">
+                        </div>
+                        <div class="form-group">
                                 <label for="registerEmail">Email</label>
                                 <input type="email" class="form-control ios-input" id="registerEmail" required>
                             </div>
@@ -2034,23 +2034,23 @@ function initRegisterModal() {
                                     <input type="text" class="form-control ios-input" id="verificationCode" required>
                                     <div class="input-group-append">
                                         <button class="btn btn-outline-secondary ios-button" type="button" id="sendCodeBtn">Send Code</button>
-                                    </div>
-                                </div>
-                                <small id="codeHelp" class="form-text text-muted">Enter the code sent to your email.</small>
                             </div>
+                        </div>
+                                <small id="codeHelp" class="form-text text-muted">Enter the code sent to your email.</small>
+                </div>
                             <!-- *** Turnstile Widget Placeholder *** -->
                             <div id="turnstile-register-widget" style="margin-top: 15px; margin-bottom: 15px;">
                                 <!-- Turnstile will render here -->
-                            </div>
+                    </div>
                             
                             <div id="registerError" class="alert alert-danger" style="display: none;"></div>
                             
                             <button type="button" class="btn btn-primary btn-block ios-button" id="registerButton" disabled>Register</button> 
                         </form>
-                    </div>
                 </div>
             </div>
-        </div>`;
+        </div>
+    </div>`;
         $('body').append(modalHTML);
         console.log("Register Modal HTML appended.");
 

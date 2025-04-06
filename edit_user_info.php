@@ -41,25 +41,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
 
         if (empty($updateFields)) {
-            echo json_encode(['success' => false, 'message' => '没有提供更新信息']);
-            exit;
+            handleApiError(400, '没有提供更新信息');
         }
 
         $sql = "UPDATE users SET " . join(', ', $updateFields) . " WHERE email = :email";
         $params[':email'] = $email;
 
         $stmt = $pdo->prepare($sql);
-        $stmt->execute($params);
+        
+        if ($stmt->execute($params)) {
+            if ($stmt->rowCount() > 0) {
+                echo json_encode(['success' => true, 'message' => '用户信息已更新。']);
+            } else {
+                echo json_encode(['success' => true, 'message' => '未进行任何更改（可能数据未变动）。']);
+            }
+        } else {
+            throw new Exception('未能更新用户信息。');
+        }
 
-        echo json_encode(['success' => true]);
     } catch (PDOException $e) {
         logException($e);
-        handleApiError(500, 'Database error');
     } catch (Exception $e) {
         logException($e);
-        handleApiError(500, 'Internal server error');
     }
 } else {
-    handleApiError(400, 'Invalid request method');
+    handleApiError(405, 'Invalid request method');
 }
 ?>

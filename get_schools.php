@@ -22,12 +22,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['token'])) {
         echo json_encode($schools);
     } catch (PDOException $e) {
         logException($e);
-        handleApiError(500, 'Database error');
     } catch (Exception $e) {
         logException($e);
-        handleApiError(500, 'Internal server error');
     }
 } else {
-    handleApiError(400, 'Invalid request');
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        handleApiError(405, 'Invalid request method.');
+    } else {
+        handleApiError(400, 'Token is required.');
+    }
 }
 ?>

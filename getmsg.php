@@ -89,20 +89,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if ($pdo->inTransaction()) {
             $pdo->rollBack();
         }
+        // logException handles logging, response, and exiting
         logException($e);
-        file_put_contents('getmsg_log.txt', date('Y-m-d H:i:s') . ' - 数据库错误: ' . $e->getMessage() . "\n", FILE_APPEND);
-        handleApiError(500, '数据库错误: ' . $e->getMessage());
+        // file_put_contents('getmsg_log.txt', date('Y-m-d H:i:s') . ' - 数据库错误: ' . $e->getMessage() . "\n", FILE_APPEND);
+        // handleApiError(500, '数据库错误: ' . $e->getMessage()); // Redundant
     } catch (Exception $e) {
         // 回滚事务如果有错误
         if ($pdo->inTransaction()) {
             $pdo->rollBack();
         }
+        // logException handles logging, response, and exiting
         logException($e);
-        file_put_contents('getmsg_log.txt', date('Y-m-d H:i:s') . ' - 服务器错误: ' . $e->getMessage() . "\n", FILE_APPEND);
-        handleApiError(500, '内部服务器错误: ' . $e->getMessage());
+        // file_put_contents('getmsg_log.txt', date('Y-m-d H:i:s') . ' - 服务器错误: ' . $e->getMessage() . "\n", FILE_APPEND);
+        // handleApiError(500, '内部服务器错误: ' . $e->getMessage()); // Redundant
     }
 } else {
-    file_put_contents('getmsg_log.txt', date('Y-m-d H:i:s') . ' - 不支持的请求方法: ' . $_SERVER['REQUEST_METHOD'] . "\n", FILE_APPEND);
+    // file_put_contents('getmsg_log.txt', date('Y-m-d H:i:s') . ' - 不支持的请求方法: ' . $_SERVER['REQUEST_METHOD'] . "\n", FILE_APPEND);
     handleApiError(405, '不支持的请求方法。');
 }
 ?>

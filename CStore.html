@@ -668,6 +668,76 @@
         transform: translateY(-80px) scale(0.5);
       }
     }
+
+    /* Dark Mode Styles for Exchange Confirmation Modal */
+    body.dark-mode #exchangeConfirmModal .modal-content {
+        background-color: #2d3748; /* Dark background */
+        color: #edf2f7; /* Light text */
+        border: 1px solid #4a5568; /* Slightly lighter border */
+        border-radius: 15px; /* Keep the rounded corners */
+    }
+
+    body.dark-mode #exchangeConfirmModal .modal-header {
+        background-color: #1a202c; /* Even darker header */
+        border-bottom: 1px solid #4a5568;
+        border-top-left-radius: 15px;
+        border-top-right-radius: 15px;
+    }
+
+    body.dark-mode #exchangeConfirmModal .modal-title {
+        color: #e2e8f0; /* Light title text */
+    }
+
+    body.dark-mode #exchangeConfirmModal .modal-header .close {
+        color: #e2e8f0; /* Light close button */
+        opacity: 0.7;
+        text-shadow: none;
+    }
+     body.dark-mode #exchangeConfirmModal .modal-header .close:hover {
+        opacity: 1;
+    }
+
+    body.dark-mode #exchangeConfirmModal .modal-body {
+        /* Background is inherited from modal-content */
+        color: #edf2f7; /* Ensure body text is light */
+    }
+
+     body.dark-mode #exchangeConfirmModal .modal-body strong {
+        color: #a0aec0; /* Slightly different color for emphasized text */
+    }
+
+    body.dark-mode #exchangeConfirmModal .modal-footer {
+        background-color: #2d3748; /* Match modal content background */
+        border-top: 1px solid #4a5568;
+        border-bottom-left-radius: 15px;
+        border-bottom-right-radius: 15px;
+    }
+
+    /* Style buttons for dark mode if default bootstrap is too light/dark */
+    body.dark-mode #exchangeConfirmModal .modal-footer .btn-secondary {
+        background-color: #4a5568;
+        border-color: #4a5568;
+        color: #e2e8f0;
+    }
+     body.dark-mode #exchangeConfirmModal .modal-footer .btn-secondary:hover {
+        background-color: #2d3748;
+        border-color: #2d3748;
+    }
+
+    body.dark-mode #exchangeConfirmModal .modal-footer .btn-primary {
+        background-color: #3182ce; /* Example blue */
+        border-color: #3182ce;
+        color: #ffffff;
+    }
+     body.dark-mode #exchangeConfirmModal .modal-footer .btn-primary:hover {
+        background-color: #2b6cb0;
+        border-color: #2b6cb0;
+    }
+     body.dark-mode #exchangeConfirmModal .modal-footer .btn-primary:disabled {
+        background-color: #4a5568; 
+        border-color: #4a5568;
+        opacity: 0.65;
+    }
   </style>
 </head>
 <body class="auto-theme">
@@ -738,7 +808,7 @@
 
   <!-- Load Turnstile Manager FIRST -->
   <script src="js/turnstileManager.js"></script> 
-  
+
   <script>
   // Global variable specific to this page's logic
   var currentProductIdToExchange = null;

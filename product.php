@@ -64,10 +64,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 
     } catch (PDOException $e) {
         logException($e);
-        handleApiError(500, 'Database error: ' . $e->getMessage());
     } catch (Exception $e) {
         logException($e);
-        handleApiError(500, 'Internal server error: ' . $e->getMessage());
     }
 } else {
     // --- Handle POST requests for product listing with token validation ---
@@ -77,14 +75,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 
         if (!$token) {
             handleApiError(400, 'Token is required.');
-            exit;
         }
 
         // Validate the token using opensslDecrypt
         $decryptedData = opensslDecrypt($token);
         if ($decryptedData === false) { // Check if decryption failed
             handleApiError(401, 'Invalid or expired token.');
-            exit;
         }
 
         // If token is valid, fetch all products
@@ -102,10 +98,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 
         } catch (PDOException $e) {
             logException($e);
-            handleApiError(500, 'Database error: ' . $e->getMessage());
         } catch (Exception $e) {
             logException($e);
-            handleApiError(500, 'Internal server error: ' . $e->getMessage());
         }
 
     } else {

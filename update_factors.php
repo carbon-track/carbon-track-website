@@ -1,65 +1,118 @@
 <?php
-// 引入数据库连接
-require_once 'db.php';
+// Include global handlers and variables
+require_once 'global_variables.php'; // Includes db.php indirectly
+require_once 'global_error_handler.php';
 
-// 设定上传的 CSV 文件路径
+header('Content-Type: application/json; charset=UTF-8');
+
+// Define CSV file path
 $csvFile = 'carbon_factors.csv';
 
-// 检查文件是否存在
-if (!file_exists($csvFile)) {
-    die(json_encode(['success' => false, 'message' => 'CSV 文件不存在']));
-}
-
-// 读取 CSV 文件
-$file = fopen($csvFile, 'r');
-$updated = 0;
-$inserted = 0;
-
-while (($data = fgetcsv($file)) !== FALSE) {
-    if (count($data) < 4) {
-        continue; // 忽略无效行
+// Wrap logic in try block
+try {
+    // Check file existence
+    if (!file_exists($csvFile)) {
+        // Use handleApiError for client-side (or configuration) errors
+        handleApiError(404, 'CSV 文件不存在'); 
+    }
+    
+    // Attempt to open the file
+    $file = @fopen($csvFile, 'r'); // Use @ to suppress default warning on failure
+    if ($file === false) {
+        // Throw an exception if fopen fails, to be caught below
+        throw new Exception("无法打开 CSV 文件: {$csvFile}");
     }
 
-    $activity = trim($data[0]);  // 行为名称
-    $unit = trim($data[1]);      // 计算单位
-    $reduction_factor = floatval($data[2]); // 碳减排因子
-    $bonus_points = intval($data[3]); // 额外积分
+    $updated = 0;
+    $inserted = 0;
+    $lineNum = 0;
 
-    // 检查行为是否已存在
-    $stmt = $pdo->prepare("SELECT id FROM carbon_factors WHERE activity = :activity");
-    $stmt->execute(['activity' => $activity]);
-    $existing = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if ($existing) {
-        // 更新已存在的数据
-        $stmt = $pdo->prepare("UPDATE carbon_factors SET unit = :unit, reduction_factor = :reduction_factor, bonus_points = :bonus_points WHERE activity = :activity");
-        $stmt->execute([
-            'unit' => $unit,
-            'reduction_factor' => $reduction_factor,
-            'bonus_points' => $bonus_points,
-            'activity' => $activity
-        ]);
-        $updated++;
-    } else {
-        // 插入新数据
-        $stmt = $pdo->prepare("INSERT INTO carbon_factors (activity, unit, reduction_factor, bonus_points) VALUES (:activity, :unit, :reduction_factor, :bonus_points)");
-        $stmt->execute([
-            'activity' => $activity,
-            'unit' => $unit,
-            'reduction_factor' => $reduction_factor,
-            'bonus_points' => $bonus_points
-        ]);
-        $inserted++;
+    // Ensure $pdo is available
+    global $pdo;
+    if (!$pdo) {
+         handleApiError(500, 'Database connection is not available.');
     }
+    
+    // Start transaction
+    $pdo->beginTransaction();
+
+    while (($data = fgetcsv($file)) !== FALSE) {
+        $lineNum++;
+        // Basic validation for row data count
+        if (count($data) < 4) {
+            error_log("[update_factors.php] Skipping invalid row #{$lineNum}: Not enough columns.");
+            continue; // Skip invalid row
+        }
+
+        // Trim and sanitize data
+        $activity = trim($data[0]);
+        $unit = trim($data[1]);
+        $reduction_factor = isset($data[2]) ? floatval($data[2]) : 0.0;
+        $bonus_points = isset($data[3]) ? intval($data[3]) : 0;
+
+        // Basic validation for activity name
+        if (empty($activity)) {
+             error_log("[update_factors.php] Skipping invalid row #{$lineNum}: Activity name is empty.");
+             continue;
+        }
+
+        // Check if activity exists
+        $stmtCheck = $pdo->prepare("SELECT id FROM carbon_factors WHERE activity = :activity");
+        $stmtCheck->execute(['activity' => $activity]);
+        $existingId = $stmtCheck->fetchColumn(); // Use fetchColumn
+
+        if ($existingId !== false) {
+            // Update existing data
+            $stmtUpdate = $pdo->prepare("UPDATE carbon_factors SET unit = :unit, reduction_factor = :reduction_factor, bonus_points = :bonus_points WHERE id = :id");
+            $stmtUpdate->execute([
+                'unit' => $unit,
+                'reduction_factor' => $reduction_factor,
+                'bonus_points' => $bonus_points,
+                'id' => $existingId // Use ID for update
+            ]);
+            $updated++;
+        } else {
+            // Insert new data
+            $stmtInsert = $pdo->prepare("INSERT INTO carbon_factors (activity, unit, reduction_factor, bonus_points) VALUES (:activity, :unit, :reduction_factor, :bonus_points)");
+            $stmtInsert->execute([
+                'activity' => $activity,
+                'unit' => $unit,
+                'reduction_factor' => $reduction_factor,
+                'bonus_points' => $bonus_points
+            ]);
+            $inserted++;
+        }
+    }
+
+    // Commit transaction
+    $pdo->commit();
+
+    // Close the file handle
+    fclose($file);
+
+    // Return success JSON response
+    echo json_encode([
+        'success' => true,
+        'updated' => $updated,
+        'inserted' => $inserted,
+        'message' => "数据更新完成 ({$updated} updated, {$inserted} inserted)"
+    ]);
+
+} catch (PDOException $e) {
+    // Rollback transaction on PDO error
+    if (isset($pdo) && $pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
+    if (isset($file) && $file !== false) { fclose($file); } // Ensure file is closed on error
+    logException($e); // Log and exit via global handler
+
+} catch (Exception $e) {
+    // Rollback transaction on general error if applicable
+    if (isset($pdo) && $pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
+     if (isset($file) && $file !== false) { fclose($file); } // Ensure file is closed on error
+    logException($e); // Log and exit via global handler
 }
 
-fclose($file);
-
-// 返回 JSON 响应
-echo json_encode([
-    'success' => true,
-    'updated' => $updated,
-    'inserted' => $inserted,
-    'message' => '数据更新完成'
-]);
 ?>

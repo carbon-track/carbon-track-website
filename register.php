@@ -67,10 +67,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'], $_POST['regu
         }
     } catch (PDOException $e) {
         logException($e);
-        handleApiError(500, 'Database error.');
     } catch (Exception $e) {
         logException($e);
-        handleApiError(500, 'Internal server error.');
     }
 } else {
     handleApiError(405, '114514');

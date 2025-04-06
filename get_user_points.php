@@ -38,13 +38,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     } catch (PDOException $e) {
         logException($e);
-        handleApiError(500, 'Database error.');
     } catch (Exception $e) {
         logException($e);
-        handleApiError(500, 'Internal server error.');
     }
 } else {
-    handleApiError(405, 'Invalid request.');
+    handleApiError(405, 'Invalid request method.');
 }
 
 ?>

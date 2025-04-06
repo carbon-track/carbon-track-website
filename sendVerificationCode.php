@@ -1,33 +1,60 @@
 <?php
 require_once 'global_variables.php';
-header('Content-Type: application/json');
+require_once 'global_error_handler.php';
 
-// 开启新会话或继续会话
-session_start();
+header('Content-Type: application/json; charset=UTF-8');
 
-// 清理和验证邮箱地址
-$email = sanitizeInput($_POST['email']);
-if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    echo json_encode(['success' => false, 'message' => '无效的邮箱地址。']);
-    exit;
+// Start session if not already started
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
 }
 
-$verificationCode = rand(100000, 999999); // 生成6位数的验证码
+// Check request method
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    handleApiError(405, 'Invalid request method.');
+}
 
-// 将验证码保存在会话中，以便验证
-$_SESSION['verification_code'] = $verificationCode;
-
+// Wrap in try block
 try {
-    $mail = initializeMailer();
-    $mail->addAddress($email); // 添加收件人
-    // 邮件内容设置
-    $mail->isHTML(true);
-    $mail->Subject = '[CarbonTrack]Registration Verification Code 您的注册验证码';
-    $mail->Body    = 'Thank you for your support. Your registration verification code is: ' . $verificationCode;
+    // Check Turnstile token
+    if (!isset($_POST['cf_token'])) { // Assuming token is sent as 'cf_token'
+        handleApiError(400, 'Missing anti-bot verification token.');
+    }
+    $cftoken = $_POST['cf_token'];
+    if (!verifyTurnstileToken($cftoken)) {
+        handleApiError(403, 'Anti-bot verification failed.');
+    }
 
-    $mail->send();
-    echo json_encode(['success' => true]);
+    // Sanitize and validate email
+    $email = sanitizeInput($_POST['email'] ?? '');
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        handleApiError(400, '无效的邮箱地址。');
+    }
+    
+    // Optionally check if email is already registered? Depending on use case.
+    /*
+    global $pdo;
+    $stmtCheck = $pdo->prepare("SELECT id FROM users WHERE email = :email");
+    $stmtCheck->bindParam(':email', $email);
+    $stmtCheck->execute();
+    if ($stmtCheck->fetchColumn()) { 
+        handleApiError(400, 'Email address is already registered.');
+    }
+    */
+
+    // Generate and store verification code
+    $verificationCode = rand(100000, 999999); 
+    $_SESSION['verification_code'] = $verificationCode;
+
+    // Send email using global function (handles its own exceptions)
+    sendRegistrationEmail($email, $verificationCode); 
+    
+    // If sendRegistrationEmail didn't exit, it succeeded
+    echo json_encode(['success' => true, 'message' => 'Verification code sent.']);
+
 } catch (Exception $e) {
-    echo json_encode(['success' => false, 'error' => $mail->ErrorInfo]);
+    // Catch any other unexpected exceptions (PDOExceptions should be caught by global handler if db.php fails)
+    logException($e); // Log and provide generic 500 response
 }
+
 ?>

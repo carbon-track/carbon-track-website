@@ -51,15 +51,29 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         // 执行更新操作
         $stmt = $pdo->prepare($sql);
-        $stmt->execute($params);
+        
+        if ($stmt->execute($params)) {
+             // Check if any row was actually updated
+            if ($stmt->rowCount() > 0) {
+                 echo json_encode(['success' => true, 'message' => 'Product updated successfully.']);
+            } else {
+                 // Product ID might not exist, or data was the same
+                 handleApiError(404, 'Product not found or data unchanged.'); 
+            }
+        } else {
+            // If execute fails, it should throw a PDOException
+             throw new Exception('Failed to execute update statement for product ID: ' . $product_id);
+        }
 
-        echo json_encode(['success' => $stmt->rowCount() > 0]);
     } catch (PDOException $e) {
+        // logException handles logging, response, and exiting
         logException($e);
-        handleApiError(500, 'Database error');
     } catch (Exception $e) {
+        // logException handles logging, response, and exiting
         logException($e);
-        handleApiError(500, 'Internal server error');
     }
+} else {
+     // Added missing 405 handler
+     handleApiError(405, 'Method not allowed.');
 }
 ?>

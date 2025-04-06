@@ -77,10 +77,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     }  catch (PDOException $e) {
         logException($e);
-        handleApiError(500, 'Database error: ' . $e->getMessage()); // Include specific error in log/dev env
     } catch (Exception $e) {
         logException($e);
-        handleApiError(500, 'Internal server error: ' . $e->getMessage()); // Include specific error in log/dev env
     }
 } else {
     handleApiError(405, '不支持的请求方法。');

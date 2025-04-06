@@ -1,10 +1,14 @@
 <?php
 require_once 'global_variables.php';
 require_once 'global_error_handler.php';
-require 'db.php';
+// require 'db.php'; // Included via global_variables
 
-session_start();
+// Start session if not already started
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 
+header('Content-Type: application/json; charset=UTF-8');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'], $_POST['cf_token'])) {
     try {
@@ -20,13 +24,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'], $_POST['cf_t
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             handleApiError(422, 'Invalid email address.');
         }
+        
+        global $pdo;
+        if (!$pdo) {
+             handleApiError(500, 'Database connection is not available.');
+        }
 
-        $stmt = $pdo->prepare("SELECT * FROM users WHERE email = :email");
+        $stmt = $pdo->prepare("SELECT id FROM users WHERE email = :email");
         $stmt->bindParam(':email', $email);
         $stmt->execute();
-        $result = $stmt->fetchAll();
-
-        if (count($result) == 0) {
+        // Use fetchColumn to just check existence, slightly more efficient
+        if (!$stmt->fetchColumn()) { 
             handleApiError(404, 'Email address not found.');
         }
 
@@ -34,42 +42,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'], $_POST['cf_t
         $verificationCode = rand(100000, 999999);
         $_SESSION['verification_code'] = $verificationCode;
 
-        try {
-            sendRecoveryEmail($email, $verificationCode);
-            echo json_encode(['success' => true, 'message' => 'Verification code sent successfully.']);
-        } catch (Exception $e) {
-            logException($e);
-            handleApiError(500, 'Failed to send recovery email.');
-        }
+        // Directly call the global function (assuming sendRegistrationEmail is suitable)
+        // If not, a dedicated sendRecoveryEmail should be in global_variables.php
+        // The global function should handle its own exceptions via logException
+        sendRegistrationEmail($email, $verificationCode); 
+        
+        // If sendRegistrationEmail did not exit (meaning success), send success response
+        echo json_encode(['success' => true, 'message' => 'Verification code sent successfully.']);
+
+        // Removed inner try-catch block
+
     } catch (PDOException $e) {
+        // logException handles logging, response, and exiting
         logException($e);
-        handleApiError(500, 'Database error.');
+        // handleApiError(500, 'Database error.'); // Redundant
     } catch (Exception $e) {
+        // logException handles logging, response, and exiting
         logException($e);
-        handleApiError(500, 'Internal server error.');
+        // handleApiError(500, 'Internal server error.'); // Redundant
     }
 } else {
     handleApiError(405, '114514');
 }
 
-function sendRecoveryEmail($email, $verificationCode) {
-    try {
-        // 邮件服务器设置
-        $mail = initializeMailer();
+// Removed local sendRecoveryEmail function
 
-        // 收件人设置
-        $mail->addAddress($email); // 添加收件人
-
-        // 设置邮件格式和内容
-        $mail->isHTML(true);
-        $mail->Subject = '[CarbonTrack]密码恢复验证码 Password Recovery Verification Code';
-        $mail->Body    = "你的密码恢复验证码是 Your password recovery verification code is：{$verificationCode}";
-
-        // 发送邮件
-        $mail->send();
-    } catch (Exception $e) {
-        logException($e);
-        throw $e; // Re-throw the exception to be caught by the global error handler
-    }
-}
 ?>

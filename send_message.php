@@ -70,10 +70,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         
     } catch (PDOException $e) {
         logException($e);
-        handleApiError(500, 'Database error: ' . $e->getMessage());
     } catch (Exception $e) {
         logException($e);
-        handleApiError(500, 'Server error: ' . $e->getMessage());
     }
 } else {
     handleApiError(405, 'Method not allowed');

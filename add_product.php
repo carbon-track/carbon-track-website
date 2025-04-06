@@ -11,7 +11,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $email = opensslDecrypt($token);
         if (!isAdmin($email)) {
             handleApiError(401, 'Unauthorized access.');
-            exit;
         }
 
         $name = isset($_POST['name']) ? sanitizeInput($_POST['name']) : '';
@@ -31,14 +30,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if ($stmt->execute()) {
             echo json_encode(['success' => true, 'message' => 'Product added successfully.']);
         } else {
-            handleApiError(500, 'Failed to add product.');
+            throw new Exception('Failed to add product for an unknown reason.');
         }
     } catch (PDOException $e) {
         logException($e);
-        handleApiError(500, 'Database error.');
     } catch (Exception $e) {
         logException($e);
-        handleApiError(500, 'Internal server error.');
     }
 } else {
     handleApiError(405, '114514');

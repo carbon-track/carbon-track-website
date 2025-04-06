@@ -23,10 +23,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         echo json_encode(['success' => true]);
     } catch (PDOException $e) {
         logException($e);
-        handleApiError(500, 'Database error.');
     } catch (Exception $e) {
         logException($e);
-        handleApiError(500, 'Internal server error.');
     }
 } else {
     handleApiError(405, '114514');
