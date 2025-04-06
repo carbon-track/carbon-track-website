@@ -91,6 +91,8 @@ function enumerateArray($array)
  */
 function handleApiError($statusCode, $error)
 {
+    global $hasLogged4xxError; // Declare the global variable
+
     if ($error instanceof Exception) {
         $message = $error->getMessage() . "\n" . $error->getTraceAsString();
         $file = $error->getFile();
@@ -101,6 +103,11 @@ function handleApiError($statusCode, $error)
         $file = '';
         $line = 0;
         $type = 'API Error';
+    }
+
+    // Set the flag if this is a 4xx error to prevent duplicate logging in shutdown function
+    if ($statusCode >= 400 && $statusCode < 500) {
+        $hasLogged4xxError = true;
     }
 
     if ($type === 'API Error' || $type === 'Exception') {
