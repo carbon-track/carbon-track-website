@@ -214,7 +214,7 @@
     }
     
     .search-bar input:focus {
-        background-color: white;
+        background-color: var(--ios-system-background, white);
         box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
         transform: translateY(-2px);
         border: none;
@@ -593,10 +593,151 @@
              margin-bottom: 15px;
          }
      }
+
+    /* ----- Add Dark Mode Styles ----- */
+    body.dark-theme {
+        background-color: var(--ios-system-background-dark);
+        color: var(--ios-label-dark);
+    }
+
+    body.dark-theme .admin-header {
+        /* Gradient might need slight adjustment for dark, or keep as is */
+    }
+
+    body.dark-theme .table-container {
+        background-color: var(--ios-tertiary-system-background-dark); /* Use tertiary for table container */
+        box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+    }
+    body.dark-theme .table-container::after {
+        /* Keep the gradient for the top bar */
+    }
+
+    body.dark-theme .table th {
+        color: var(--ios-secondary-label-dark);
+        border-top: none; /* Keep this */
+    }
+
+    body.dark-theme .table td {
+        border-top: 1px solid var(--ios-separator-dark);
+        color: var(--ios-label-dark);
+    }
+
+    body.dark-theme .table tbody tr:hover {
+        background-color: rgba(10, 132, 255, 0.15); /* Slightly more visible hover */
+    }
+
+    body.dark-theme .search-bar input {
+        background-color: var(--ios-tertiary-system-background-dark);
+        color: var(--ios-label-dark);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    }
+    body.dark-theme .search-bar input::placeholder {
+        color: var(--ios-secondary-label-dark);
+    }
+    body.dark-theme .search-bar input:focus {
+        background-color: var(--ios-secondary-system-background-dark);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+    }
+    body.dark-theme .search-bar .fa-search {
+        color: var(--ios-gray-dark);
+    }
+
+    body.dark-theme .stat-card {
+        background: var(--ios-tertiary-system-background-dark);
+        box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+        color: var(--ios-label-dark);
+    }
+    body.dark-theme .stat-label {
+         color: var(--ios-secondary-label-dark);
+    }
+    body.dark-theme .stat-value {
+         /* Rely on main label color or adjust if needed */
+    }
+
+     /* Edit/Delete buttons in dark mode */
+     body.dark-theme .edit-btn {
+        color: #0A84FF; /* iOS Blue Dark */
+        border-color: #0A84FF;
+        background-color: rgba(10, 132, 255, 0.15);
+    }
+    body.dark-theme .edit-btn:hover {
+        background-color: #0A84FF;
+        color: white;
+        box-shadow: 0 4px 10px rgba(10, 132, 255, 0.3);
+    }
+    body.dark-theme .delete-btn {
+        color: #FF453A; /* iOS Red Dark */
+        border-color: #FF453A;
+        background-color: rgba(255, 69, 58, 0.15);
+    }
+    body.dark-theme .delete-btn:hover {
+        background-color: #FF453A;
+        color: white;
+        box-shadow: 0 4px 10px rgba(255, 69, 58, 0.3);
+    }
+
+    /* Pagination */
+    body.dark-theme .pagination .page-link {
+        background-color: var(--ios-tertiary-system-background-dark);
+        border-color: var(--ios-separator-dark);
+        color: var(--ios-blue-dark);
+    }
+     body.dark-theme .pagination .page-link:hover {
+        background-color: rgba(10, 132, 255, 0.15);
+    }
+    body.dark-theme .pagination .page-item.disabled .page-link {
+        background-color: var(--ios-tertiary-system-background-dark);
+        border-color: var(--ios-separator-dark);
+        color: var(--ios-secondary-label-dark);
+    }
+     body.dark-theme .pagination .page-item.active .page-link {
+        background-color: var(--ios-blue-dark);
+        border-color: var(--ios-blue-dark);
+        color: white;
+    }
+
+     /* Theme Toggle Button */
+    #theme-toggle-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: var(--button-bg-light, #fff);
+      color: var(--button-text-light, #333);
+      border: 1px solid var(--border-color-light, #ccc);
+      border-radius: 50%;
+      width: 45px;
+      height: 45px;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 1050;
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    body.dark-theme #theme-toggle-button {
+      background-color: var(--button-bg-dark, #333);
+      color: var(--button-text-dark, #fff);
+      border: 1px solid var(--border-color-dark, #555);
+      box-shadow: 0 2px 5px rgba(255,255,255,0.15);
+    }
+    #theme-toggle-button:hover {
+        transform: scale(1.05);
+        opacity: 0.9;
+    }
+
   </style>
 </head>
 <body class="auto-theme">
-<!-- Main Navbar -->
+
+<!-- Theme Toggle Button HTML -->
+<button id="theme-toggle-button" aria-label="Toggle theme">
+  <i class="fas fa-sun"></i> <!-- Default icon -->
+</button>
+
+<!-- 导航栏容器，将由JavaScript加载 -->
 <div id="navbar-container"></div>
 
 <header class="admin-header">
@@ -948,6 +1089,51 @@
           return dateStr; // Return as-is if any error occurs
       }
   }
+
+  // Theme toggling logic
+  const themeToggleButton = document.getElementById('theme-toggle-button');
+  const currentTheme = localStorage.getItem('theme') || 'auto'; // Default to 'auto'
+
+  function applyTheme(theme) {
+    const body = document.body;
+    const icon = themeToggleButton.querySelector('i');
+    body.classList.remove('light-theme', 'dark-theme'); // Remove existing theme classes
+
+    if (theme === 'dark' || (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      body.classList.add('dark-theme');
+      icon.className = 'fas fa-moon'; // Moon icon for dark
+    } else {
+      body.classList.add('light-theme'); // Explicitly add light-theme or rely on default
+      icon.className = 'fas fa-sun'; // Sun icon for light
+    }
+    localStorage.setItem('theme', theme);
+
+     // Update icon for auto based on effective theme
+    if (theme === 'auto') {
+        icon.className = 'fas fa-adjust'; // Use adjust icon for auto
+    }
+  }
+
+  function cycleTheme() {
+    const themes = ['light', 'dark', 'auto'];
+    let currentThemeIndex = themes.indexOf(localStorage.getItem('theme') || 'auto');
+    let nextThemeIndex = (currentThemeIndex + 1) % themes.length;
+    applyTheme(themes[nextThemeIndex]);
+  }
+
+  // Apply initial theme on load
+  applyTheme(currentTheme);
+
+  // Listen for system theme changes if in 'auto' mode
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    if (localStorage.getItem('theme') === 'auto') {
+      applyTheme('auto');
+    }
+  });
+
+  // Add event listener to the button
+  themeToggleButton.addEventListener('click', cycleTheme);
+
 </script>
 
 </body>

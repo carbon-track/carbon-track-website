@@ -579,69 +579,95 @@
   </div>
 </div>
 
-<!-- Theme toggle button -->
-<div class="theme-toggle" id="themeToggle">
-  <i class="fas fa-moon"></i>
-</div>
+<!-- Theme toggle button placeholder -->
 
-<!-- 页脚 -->
+<!-- Footer -->
 <div id="footer-placeholder"></div>
 
 <script>
-  // Theme toggling functionality
-  document.addEventListener('DOMContentLoaded', function() {
-    const themeToggle = document.getElementById('themeToggle');
-    const body = document.body;
-    const icon = themeToggle.querySelector('i');
-    
-    // Check if user has a saved preference
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme) {
-      body.className = savedTheme;
-      updateIcon(savedTheme);
-    }
-    
-    themeToggle.addEventListener('click', () => {
-      if (body.classList.contains('auto-theme')) {
-        body.classList.remove('auto-theme');
-        body.classList.add('dark-theme');
-        localStorage.setItem('theme', 'dark-theme');
-      } else if (body.classList.contains('dark-theme')) {
-        body.classList.remove('dark-theme');
-        body.classList.add('light-theme');
-        localStorage.setItem('theme', 'light-theme');
-      } else {
-        body.classList.remove('light-theme');
-        body.classList.add('auto-theme');
-        localStorage.setItem('theme', 'auto-theme');
-      }
-      
-      updateIcon(body.className);
-    });
-    
-    function updateIcon(theme) {
-      if (theme === 'dark-theme') {
-        icon.className = 'fas fa-sun';
-      } else if (theme === 'light-theme') {
-        icon.className = 'fas fa-adjust';
-      } else {
-        icon.className = 'fas fa-moon';
-      }
-    }
-  });
-
   $(document).ready(function () {
+    // Fetch records
     fetchTransactions();
-  });
-  
-  var token = localStorage.getItem('token');
-  if (token) {
-  } else {
-    $('#username').text('Not logged in');
-    showAlert('请先登录', 'warning', function() {
-      window.location.href = 'index.html';
+
+    // ----- START: Theme Toggling Logic -----
+    const savedTheme = localStorage.getItem('theme');
+    const body = document.body;
+
+    function applyTheme(theme) {
+        body.className = theme; // Replace all classes
+        updateThemeIcon(theme);
+        localStorage.setItem('theme', theme);
+    }
+
+    if (savedTheme) {
+        applyTheme(savedTheme);
+    } else {
+        body.classList.add('auto-theme'); // Start with auto
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            body.classList.add('dark-mode');
+        }
+        updateThemeIcon('auto-theme'); // Update icon based on initial auto state
+    }
+    
+    // Listen for system theme changes
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+      if (body.classList.contains('auto-theme')) {
+        if (e.matches) {
+          body.classList.add('dark-mode');
+        } else {
+          body.classList.remove('dark-mode');
+        }
+        updateThemeIcon('auto-theme'); // Update icon for auto theme change
+      }
     });
-  }
+    
+    // Create and add theme toggle button
+    const themeToggle = document.createElement('div');
+    themeToggle.className = 'theme-toggle';
+    themeToggle.id = 'themeToggle';
+    themeToggle.innerHTML = '<i class="fas fa-moon"></i>'; // Default icon
+    document.body.appendChild(themeToggle);
+    updateThemeIcon(body.className || 'auto-theme'); // Set initial icon correctly
+
+    // Add click listener for theme toggle
+    themeToggle.addEventListener('click', function() {
+      let nextTheme;
+      if (body.classList.contains('auto-theme')) {
+          nextTheme = 'dark-theme';
+          body.classList.remove('dark-mode'); // Ensure dark-mode is removed when switching from auto
+      } else if (body.classList.contains('dark-theme')) {
+          nextTheme = 'light-theme';
+      } else { // Must be light-theme
+          nextTheme = 'auto-theme';
+          // Re-apply dark-mode class if system prefers dark when switching back to auto
+          if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+              body.classList.add('dark-mode');
+          }
+      }
+      applyTheme(nextTheme);
+    });
+    
+    // Function to update the theme icon
+    function updateThemeIcon(theme) {
+        const icon = document.querySelector('#themeToggle i');
+        if (!icon) return;
+        
+        if (theme.includes('dark-theme')) {
+          icon.className = 'fas fa-sun'; // Show sun in dark mode
+        } else if (theme.includes('light-theme')) {
+          icon.className = 'fas fa-moon'; // Show moon in light mode
+        } else { // Auto theme
+          // Show the icon corresponding to the CURRENTLY DETECTED system theme
+          if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            icon.className = 'fas fa-sun'; // System is dark, show sun
+          } else {
+            icon.className = 'fas fa-moon'; // System is light, show moon
+          }
+        }
+      }
+      // ----- END: Theme Toggling Logic -----
+
+  }); // End of document ready
 
   function fetchTransactions() {
     var token = localStorage.getItem('token');

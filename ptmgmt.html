@@ -7,54 +7,95 @@
   <!-- 引入Bootstrap和jQuery的CDN链接 -->
   <link rel="stylesheet" href="./css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="./css/ios-design.css">
   <script src="./js/jquery.min.js"></script>
   <script src="./js/bootstrap.min.js"></script>
   <script src="./js/utils.js"></script>
   <script src="./js/nav.js"></script>
   <!-- 省略其他链接和样式 -->
   <style>
-    .card {
-      transition: transform 0.3s ease, box-shadow 0.3s ease; /* 添加过渡动画 */
-      cursor: pointer;
+    /* Basic body styles using CSS Variables */
+    body {
+      background-color: var(--background-color-light);
+      color: var(--text-color-light);
+      font-family: "Microsoft YaHei", sans-serif;
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
+
+    body.dark-theme {
+      background-color: var(--background-color-dark);
+      color: var(--text-color-dark);
+    }
+
+    .card {
+      transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease; /* 添加过渡动画 */
+      cursor: pointer;
+      background-color: var(--card-bg-light); /* Use CSS variable */
+      border: 1px solid var(--border-color-light); /* Add border */
+      border-radius: 12px; /* Consistent border radius */
+    }
+
+    body.dark-theme .card {
+        background-color: var(--card-bg-dark);
+        border: 1px solid var(--border-color-dark);
+    }
+
 
     .card:hover {
       transform: translateY(-5px); /* 鼠标悬停时上移 */
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 鼠标悬停时增加阴影 */
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* 鼠标悬停时增加阴影 */
     }
+    body.dark-theme .card:hover {
+        box-shadow: 0 6px 12px rgba(255, 255, 255, 0.1); /* Adjusted shadow for dark mode */
+    }
+
 
     .card-img-top {
       height: 200px;
       object-fit: cover;
-      border-top-left-radius: calc(0.25rem - 1px);
-      border-top-right-radius: calc(0.25rem - 1px);
+      border-top-left-radius: 11px; /* Adjust for border */
+      border-top-right-radius: 11px; /* Adjust for border */
     }
 
     .card-body {
       padding: 15px;
-      background-color: #ffffff;
-      border-bottom-left-radius: calc(0.25rem - 1px);
-      border-bottom-right-radius: calc(0.25rem - 1px);
+      /* background-color: #ffffff; /* Removed hardcoded background */
+      border-bottom-left-radius: 11px; /* Adjust for border */
+      border-bottom-right-radius: 11px; /* Adjust for border */
     }
 
     .card-title {
       font-size: 18px;
       font-weight: bold;
-      color: #333;
+      color: var(--text-color-light); /* Use CSS variable */
       margin-bottom: 10px;
     }
+     body.dark-theme .card-title {
+        color: var(--text-color-dark);
+     }
 
     .card-text {
       font-size: 14px;
-      color: #666;
+      color: var(--secondary-text-color-light); /* Use CSS variable */
+      height: 60px; /* Keep height limit */
+      overflow: hidden; /* Keep overflow */
+      text-overflow: ellipsis; /* Keep ellipsis */
     }
+    body.dark-theme .card-text {
+        color: var(--secondary-text-color-dark);
+    }
+
 
     .card-text-row {
       padding: 0.5rem;
       margin: 0;
-      background-color: #f9f9f9;
-      border-bottom: 1px solid #eceeef;
+      background-color: var(--table-row-bg-light); /* Use CSS variable */
+      border-bottom: 1px solid var(--border-color-light); /* Use CSS variable */
     }
+     body.dark-theme .card-text-row {
+         background-color: var(--table-row-bg-dark);
+         border-bottom: 1px solid var(--border-color-dark);
+     }
 
     .card-text-row:last-child {
       border-bottom: 0;
@@ -64,7 +105,7 @@
       display: inline-block;
       padding: 0.25em 0.5em;
       border-radius: 5px;
-      color: white;
+      color: white; /* Keep white for contrast on colored backgrounds */
       font-weight: bold;
       text-align: center;
       width: 100%;
@@ -73,149 +114,94 @@
 
     .auth-yes {
       background-color: #28a745;
-      color: black;
+      /* color: black; */ /* Let default contrast work */
     }
 
     .auth-no {
       background-color: #dc3545;
-      color: black;
+       /* color: black; */ /* Let default contrast work */
     }
 
     .auth-non {
       background-color: #ffc107;
-      color: black;
+      color: black; /* Keep black for yellow */
     }
 
-    /* 设置背景颜色和字体 */
-    body {
-      background-color: #f0f0f0;
-      font-family: "Microsoft YaHei", sans-serif;
-    }
 
-    /* 设置导航栏的样式 */
+    /* Use CSS variables for navbar, adjusting as needed */
     .navbar {
-      background-color: #007bff;
+      /* background-color: #007bff; */ /* Replaced by ios-design.css */
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
+    /* body.dark-theme .navbar { */
+      /* Define dark theme navbar background if needed, or let ios-design handle it */
+    /* } */
 
-    .navbar-brand {
-      color: white;
-      font-weight: bold;
+    /* Bootstrap overrides if necessary for dark mode */
+    body.dark-theme .form-control {
+        background-color: var(--input-bg-dark);
+        color: var(--text-color-dark);
+        border-color: var(--border-color-dark);
+    }
+    body.dark-theme .form-control::placeholder {
+        color: var(--secondary-text-color-dark);
+    }
+    body.dark-theme .input-group-text {
+        background-color: var(--input-group-bg-dark);
+        border-color: var(--border-color-dark);
+        color: var(--text-color-dark);
     }
 
-    .navbar-nav .nav-link {
-      color: white;
+    body.dark-theme .btn-primary {
+        background-color: var(--primary-color); /* Use primary color variable */
+        border-color: var(--primary-color);
+        color: white; /* Assuming primary color contrasts well with white */
+    }
+    /* Add hover/active states if needed */
+
+     body.dark-theme .btn-secondary {
+        background-color: var(--secondary-button-bg-dark);
+        border-color: var(--secondary-button-border-dark);
+        color: var(--secondary-button-text-dark);
+    }
+     body.dark-theme .btn-secondary:hover {
+        background-color: var(--secondary-button-hover-bg-dark);
+        border-color: var(--secondary-button-hover-border-dark);
     }
 
-    /* 设置轮播图的样式 */
-    .carousel-item {
-      height: 500px;
-    }
-
-    .carousel-item img {
-      height: 100%;
-      object-fit: cover;
-    }
-
-    /* 设置内容区域的样式 */
-    .container {
-      margin-top: 20px;
-    }
-
-    .card {
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    .card-img-top {
-      height: 200px;
-      object-fit: cover;
-    }
-
-    .card-body {
-      padding: 15px;
-    }
-
-    .card-title {
-      font-size: 18px;
-      font-weight: bold;
-      margin-bottom: 10px;
-    }
-
-    .card-text {
-      font-size: 14px;
-      color: #666;
-      height: 60px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    /* 设置页脚的样式 */
-    .footer {
-      background-color: #f8f9fa;
-      padding: 15px;
-      text-align: center;
-      color: #666;
-      margin-top: 20px;
-    }
-
-    /* 设置登录模态框的样式 */
-    .modal-header {
-      border-bottom: none;
-    }
-
-    .modal-body {
-      padding: 25px;
-    }
-
-    .form-group {
-      margin-bottom: 15px;
-    }
-
-    .form-control {
-      border-radius: 20px;
-    }
-
-    .btn-login {
-      border-radius: 20px;
-      background-color: #007bff;
-      color: white;
-    }
-
-    .btn-login:hover {
-      background-color: #0069d9;
-    }
-
-    .modal-footer {
-      border-top: none;
+    /* Theme Toggle Button Styles */
+    #theme-toggle-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: var(--button-bg-light);
+      color: var(--button-text-light);
+      border: 1px solid var(--border-color-light);
+      border-radius: 50%;
+      width: 45px;
+      height: 45px;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
       justify-content: center;
+      cursor: pointer;
+      z-index: 1050; /* Ensure it's above other elements */
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
 
-    .modal-footer a {
-      color: #007bff;
+    body.dark-theme #theme-toggle-button {
+      background-color: var(--button-bg-dark);
+      color: var(--button-text-dark);
+      border: 1px solid var(--border-color-dark);
+       box-shadow: 0 2px 5px rgba(255,255,255,0.15);
     }
 
-    /* 添加自定义样式以突出显示前三名 */
-    .rank-1 {
-      background-color: #ffd700; /* 金色 */
-    }
+     #theme-toggle-button:hover {
+        opacity: 0.8;
+     }
 
-    .rank-2 {
-      background-color: #c0c0c0; /* 银色 */
-    }
-
-    .rank-3 {
-      background-color: #cd7f32; /* 铜色 */
-    }
-
-    .special-card .card-body {
-      background-color: #eef9ff; /* 浅蓝色背景 */
-      border-color: #b8deff; /* 边框颜色 */
-    }
-
-    .special-card .card-title {
-      color: #007bff; /* 标题颜色 */
-    }
-
+    /* 省略其余样式 */
     @keyframes spin {
       0% {
         transform: rotate(0deg);
@@ -230,6 +216,11 @@
 <div id="loading">
   <div class="loader"></div>
 </div>
+
+<!-- Theme Toggle Button -->
+<button id="theme-toggle-button" aria-label="Toggle theme">
+  <i class="fas fa-sun"></i> <!-- Default icon -->
+</button>
 
 <!-- 导航栏容器，将由JavaScript加载 -->
 <div id="navbar-container"></div>
@@ -258,6 +249,62 @@
 </div>
 
 <script>
+  // Theme toggling logic
+  const themeToggleButton = document.getElementById('theme-toggle-button');
+  const currentTheme = localStorage.getItem('theme') || 'auto'; // Default to 'auto'
+
+  function applyTheme(theme) {
+    const body = document.body;
+    const icon = themeToggleButton.querySelector('i');
+    body.classList.remove('light-theme', 'dark-theme'); // Remove existing theme classes
+
+    if (theme === 'dark' || (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      body.classList.add('dark-theme');
+      icon.className = 'fas fa-moon'; // Moon icon for dark
+      localStorage.setItem('theme', theme);
+        // Update Bootstrap components for dark mode if necessary
+        document.querySelectorAll('.modal-content').forEach(el => el.classList.add('bg-dark', 'text-light')); // Example for modals
+        document.querySelectorAll('.table').forEach(el => el.classList.add('table-dark')); // Example for tables
+
+
+    } else {
+      body.classList.add('light-theme'); // Explicitly add light-theme or rely on default
+      icon.className = 'fas fa-sun'; // Sun icon for light
+      localStorage.setItem('theme', theme);
+       // Revert Bootstrap components if they were changed for dark mode
+       document.querySelectorAll('.modal-content').forEach(el => el.classList.remove('bg-dark', 'text-light'));
+       document.querySelectorAll('.table').forEach(el => el.classList.remove('table-dark'));
+    }
+     // Update icon for auto based on effective theme
+    if (theme === 'auto') {
+        icon.className = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'fas fa-adjust' : 'fas fa-adjust'; // Use adjust icon for auto
+         // Adjust icon based on actual applied theme in auto mode
+        //icon.className = document.body.classList.contains('dark-theme') ? 'fas fa-moon' : 'fas fa-sun'; // Or show moon/sun based on result
+        icon.className = 'fas fa-adjust'; // Keep 'auto' icon simple
+    }
+
+  }
+
+  function cycleTheme() {
+    const themes = ['light', 'dark', 'auto'];
+    let currentThemeIndex = themes.indexOf(localStorage.getItem('theme') || 'auto');
+    let nextThemeIndex = (currentThemeIndex + 1) % themes.length;
+    applyTheme(themes[nextThemeIndex]);
+  }
+
+  // Apply initial theme on load
+  applyTheme(currentTheme);
+
+  // Listen for system theme changes if in 'auto' mode
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    if (localStorage.getItem('theme') === 'auto') {
+      applyTheme('auto');
+    }
+  });
+
+  // Add event listener to the button
+  themeToggleButton.addEventListener('click', cycleTheme);
+
   $(document).ready(function () {
     verifyAdmin()
     // Search button click

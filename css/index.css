@@ -81,7 +81,7 @@
         .jumbotron button {
             background-color: #ffbe16;
             border: none;
-            color: black;
+            color: var(--text-color-light, black);
             font-weight: bold;
             padding: 10px 20px;
         }
@@ -89,8 +89,8 @@
 
         /* 设置主页标题按钮鼠标悬停样式 */
         .jumbotron button:hover {
-            background-color: white;
-            color: black;
+            background-color: var(--card-bg-light, white);
+            color: var(--text-color-light, black);
         }
 
         /* 设置内容区域样式 */
@@ -108,7 +108,7 @@
 
         /* 设置内容段落样式 */
         .container p {
-            color: #000;
+            color: var(--text-color-light, #000);
             font-size: 18px;
             line-height: 1.5;
             margin-bottom: 20px;
@@ -149,15 +149,15 @@
         .card button {
             background-color: #ffbe16;
             border: none;
-            color: black;
+            color: var(--text-color-light, black);
             font-weight: bold;
             padding: 10px 20px;
         }
 
         /* 设置内容卡片按钮鼠标悬停样式 */
         .card button:hover {
-            background-color: white;
-            color: black;
+            background-color: var(--card-bg-light, white);
+            color: var(--text-color-light, black);
         }
 
         /* 设置页脚链接样式 */
@@ -544,4 +544,341 @@
 
 .badge {
     display: none; /* 默认不显示，有未读消息时通过JavaScript显示 */
+}
+
+/* ----- Message Modal Bubble Styles ----- */
+.message-list {
+    max-height: 450px; /* Adjust as needed */
+    overflow-y: auto;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+.message-bubble {
+    max-width: 80%;
+    padding: 10px 15px;
+    border-radius: 18px;
+    margin-bottom: 10px;
+    word-wrap: break-word;
+    line-height: 1.45;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+/* Sender Bubble (Light Mode) */
+.message-bubble.sender {
+    background-color: var(--ios-blue, #007AFF);
+    color: white;
+    border-bottom-right-radius: 4px;
+    align-self: flex-end;
+    margin-left: auto;
+}
+
+/* Receiver Bubble (Light Mode) */
+.message-bubble.receiver {
+    background-color: var(--ios-gray6, #F2F2F7);
+    color: var(--text-color-light, #000);
+    border-bottom-left-radius: 4px;
+    align-self: flex-start;
+    margin-right: auto;
+}
+
+/* Message Content */
+.message-content {
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+/* Message Timestamp */
+.message-time {
+    font-size: 0.75rem;
+    margin-top: 6px;
+    display: block;
+    opacity: 0.7;
+}
+
+.message-bubble.sender .message-time {
+    color: rgba(255, 255, 255, 0.8);
+    text-align: right;
+}
+
+.message-bubble.receiver .message-time {
+    color: var(--muted-text-light, #8E8E93);
+    text-align: left;
+}
+
+/* ----- Dark Mode Message Bubble Styles ----- */
+body.dark-theme .message-bubble.sender,
+body.auto-theme.dark-mode .message-bubble.sender {
+    background-color: var(--ios-blue-dark, #0A84FF); /* Use dark mode blue */
+}
+
+body.dark-theme .message-bubble.receiver,
+body.auto-theme.dark-mode .message-bubble.receiver {
+    background-color: var(--ios-tertiary-system-background-dark, #2C2C2E);
+    color: var(--text-color-dark, #fff);
+}
+
+body.dark-theme .message-bubble.sender .message-time,
+body.auto-theme.dark-mode .message-bubble.sender .message-time {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+body.dark-theme .message-bubble.receiver .message-time,
+body.auto-theme.dark-mode .message-bubble.receiver .message-time {
+    color: var(--muted-text-dark, #8E8E93);
+}
+
+/* Conversation List Item Styles */
+.conversation-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--ios-separator, #E5E5EA);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.conversation-item:hover {
+    background-color: var(--ios-gray6, #F2F2F7);
+}
+
+.conversation-item.active {
+    background-color: rgba(0, 122, 255, 0.1); /* Light blue highlight */
+}
+
+.conversation-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    margin-right: 12px;
+    object-fit: cover; /* Ensure image covers the circle */
+    background-color: var(--ios-gray5); /* Placeholder bg */
+}
+
+.conversation-info {
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+.conversation-name {
+    font-weight: 600;
+    margin-bottom: 2px;
+    color: var(--text-color-light);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.conversation-last-message {
+    font-size: 0.85rem;
+    color: var(--muted-text-light, #8E8E93);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.conversation-time {
+    font-size: 0.75rem;
+    color: var(--muted-text-light, #8E8E93);
+    margin-left: 10px;
+    white-space: nowrap;
+    align-self: flex-start; /* Align time to the top */
+    padding-top: 2px;
+}
+
+.unread-indicator {
+    width: 10px;
+    height: 10px;
+    background-color: var(--ios-blue);
+    border-radius: 50%;
+    margin-left: auto;
+    align-self: center;
+}
+
+/* Dark Mode Conversation List */
+body.dark-theme .conversation-item,
+body.auto-theme.dark-mode .conversation-item {
+    border-bottom-color: var(--ios-separator-dark, #38383A);
+}
+
+body.dark-theme .conversation-item:hover,
+body.auto-theme.dark-mode .conversation-item:hover {
+    background-color: var(--ios-tertiary-system-background-dark, #1C1C1E);
+}
+
+body.dark-theme .conversation-item.active,
+body.auto-theme.dark-mode .conversation-item.active {
+    background-color: rgba(10, 132, 255, 0.15); /* Darker blue highlight */
+}
+
+body.dark-theme .conversation-avatar,
+body.auto-theme.dark-mode .conversation-avatar {
+    background-color: var(--ios-gray-dark); /* Darker placeholder */
+}
+
+body.dark-theme .conversation-name,
+body.auto-theme.dark-mode .conversation-name {
+    color: var(--text-color-dark, #fff);
+}
+
+body.dark-theme .conversation-last-message,
+body.auto-theme.dark-mode .conversation-last-message,
+body.dark-theme .conversation-time,
+body.auto-theme.dark-mode .conversation-time {
+    color: var(--muted-text-dark, #8E8E93);
+}
+
+body.dark-theme .unread-indicator,
+body.auto-theme.dark-mode .unread-indicator {
+    background-color: var(--ios-blue-dark, #0A84FF);
+}
+
+/* Style for the 'No Conversation Selected' placeholder */
+#noConversationSelected {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    color: var(--muted-text-light, #8E8E93);
+    font-size: 1.1rem;
+}
+
+body.dark-theme #noConversationSelected,
+body.auto-theme.dark-mode #noConversationSelected {
+     color: var(--muted-text-dark, #8E8E93);
+}
+
+/* Style for message input area */
+.message-input-area {
+    border-top: 1px solid var(--ios-separator, #E5E5EA);
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
+}
+
+body.dark-theme .message-input-area,
+body.auto-theme.dark-mode .message-input-area {
+    border-top-color: var(--ios-separator-dark, #38383A);
+}
+
+#messageInput {
+    flex-grow: 1;
+    border-radius: 18px;
+    padding: 8px 15px;
+    border: 1px solid var(--ios-gray5, #E5E5EA);
+    background-color: var(--ios-gray6, #F2F2F7);
+    margin-right: 10px;
+    resize: none; /* Prevent manual resize */
+    height: 38px; /* Initial height */
+    line-height: 1.4;
+    max-height: 100px; /* Limit max height */
+}
+
+body.dark-theme #messageInput,
+body.auto-theme.dark-mode #messageInput {
+    border-color: var(--ios-gray-dark);
+    background-color: var(--ios-tertiary-system-background-dark, #2C2C2E);
+    color: var(--text-color-dark);
+}
+
+body.dark-theme #messageInput::placeholder,
+body.auto-theme.dark-mode #messageInput::placeholder {
+    color: var(--muted-text-dark);
+}
+
+#sendMessageBtn {
+    background-color: var(--ios-blue);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    transition: background-color 0.2s ease;
+}
+
+#sendMessageBtn:hover {
+    background-color: #0056b3;
+}
+
+#sendMessageBtn:disabled {
+    background-color: var(--ios-gray5);
+    cursor: not-allowed;
+}
+
+body.dark-theme #sendMessageBtn {
+    background-color: var(--ios-blue-dark);
+}
+
+body.dark-theme #sendMessageBtn:hover {
+    background-color: #0056b3; /* Adjust dark hover if needed */
+}
+
+body.dark-theme #sendMessageBtn:disabled {
+     background-color: var(--ios-gray-dark);
+}
+
+/* ----- Dark Mode Overrides for index.css ----- */
+
+body.dark-theme .jumbotron button,
+body.auto-theme.dark-mode .jumbotron button {
+    color: var(--text-color-dark, white); /* Adjust if needed for contrast on yellow */
+}
+
+body.dark-theme .jumbotron button:hover,
+body.auto-theme.dark-mode .jumbotron button:hover {
+    background-color: var(--card-bg-dark, #2c2c2e);
+    color: var(--text-color-dark, white);
+}
+
+body.dark-theme .container p,
+body.auto-theme.dark-mode .container p {
+    color: var(--text-color-dark, white);
+}
+
+body.dark-theme .card button,
+body.auto-theme.dark-mode .card button {
+     color: var(--text-color-dark, white); /* Adjust if needed for contrast on yellow */
+}
+
+body.dark-theme .card button:hover,
+body.auto-theme.dark-mode .card button:hover {
+    background-color: var(--card-bg-dark, #2c2c2e);
+    color: var(--text-color-dark, white);
+}
+
+/* --- Original Modal and Table styles (if needed) --- */
+/* These might be handled by Bootstrap variables or specific HTML styles, */
+/* but adding explicit dark mode overrides here just in case */
+
+body.dark-theme .modal-content,
+body.auto-theme.dark-mode .modal-content {
+    background-color: var(--card-bg-dark, #2c2c2e);
+    color: var(--text-color-dark, white);
+    border-color: var(--border-color-dark, #38383a);
+}
+
+body.dark-theme .modal-header,
+body.auto-theme.dark-mode .modal-header,
+body.dark-theme .modal-footer,
+body.auto-theme.dark-mode .modal-footer {
+    border-color: var(--border-color-dark, #38383a);
+}
+
+body.dark-theme .close,
+body.auto-theme.dark-mode .close {
+    color: var(--text-color-dark, white);
+    text-shadow: none;
+}
+
+body.dark-theme .table thead th,
+body.auto-theme.dark-mode .table thead th {
+    background-color: var(--card-bg-dark, #2c2c2e);
+    color: var(--text-color-dark, white);
+    border-color: var(--border-color-dark, #38383a);
 }

@@ -675,6 +675,15 @@
     .back-button i {
       margin-right: 6px; /* Space between icon and text */
     }
+
+    .feature-card {
+      transition: transform 0.3s ease;
+    }
+    .feature-card:hover {
+      background: var(--card-bg-light, white);
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
   </style>
   <script>
     // To be executed after the page loads

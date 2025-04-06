@@ -2699,6 +2699,19 @@
     body.auto-theme.dark-mode section .container-fluid {
       background-color: transparent;
     }
+
+    .table {
+      background-color: var(--card-bg-light, white); /* Use variable */
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+    }
+
+    .table thead th {
+      background-color: var(--card-bg-light, white); /* Use variable */
+      color: var(--text-color);
+      font-weight: 600;
+    }
   </style>
   
   <!-- 添加内联脚本来修复emoji -->

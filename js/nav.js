@@ -797,7 +797,7 @@ function displayMessages(messages, sender) {
     }
     
     messageList.innerHTML = '';
-    ensureMessageStyles();
+    //ensureMessageStyles();
     
     if (!messages || messages.length === 0) {
         messageList.innerHTML = '<div class="text-center p-4"><i class="fas fa-comment-slash fa-3x text-muted mb-3"></i><p>暂无消息记录</p></div>';
@@ -883,58 +883,58 @@ function displayMessages(messages, sender) {
 }
 
 // Styles need adjustment for message-meta
-function ensureMessageStyles() {
-    if (!$('head style:contains(".message-bubble")').length) {
-        const messageStyles = `
-        <style>
-            /* ... (other styles remain the same) ... */
-            .message-bubble {
-                max-width: 80%;
-                padding: 10px 15px;
-                border-radius: 18px;
-                position: relative;
-                box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-                word-break: break-word;
-                color: #000; 
-                margin-bottom: 5px; /* Add margin below bubble */
-            }
-            .message-bubble.sent {
-                background-color: #dcf8c6;
-                border-bottom-right-radius: 5px;
-            }
-            .message-bubble.received {
-                background-color: #f1f0f0;
-                border-bottom-left-radius: 5px;
-            }
-            .message-meta {
-                font-size: 0.75rem;
-                color: #888;
-                margin-top: 4px;
-                text-align: right;
-                display: flex; /* Use flex to align items */
-                justify-content: flex-end; /* Align items to the right */
-                align-items: center; /* Center items vertically */
-            }
-            .message-time {
-                 margin-right: 5px; /* Space between time and status */
-            }
-            .message-read-status {
-                /* Status aligned by flexbox */
-            }
-            .message-read-status .fa-check-double { color: #007bff; } /* Blue check for read */
-            .message-read-status .fa-check { color: #6c757d; } /* Gray check for sent */
+// function ensureMessageStyles() {
+//     if (!$('head style:contains(".message-bubble")').length) {
+//         const messageStyles = `
+//         <style>
+//             /* ... (other styles remain the same) ... */
+//             .message-bubble {
+//                 max-width: 80%;
+//                 padding: 10px 15px;
+//                 border-radius: 18px;
+//                 position: relative;
+//                 box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+//                 word-break: break-word;
+//                 color: #000; 
+//                 margin-bottom: 5px; /* Add margin below bubble */
+//             }
+//             .message-bubble.sent {
+//                 background-color: #dcf8c6;
+//                 border-bottom-right-radius: 5px;
+//             }
+//             .message-bubble.received {
+//                 background-color: #f1f0f0;
+//                 border-bottom-left-radius: 5px;
+//             }
+//             .message-meta {
+//                 font-size: 0.75rem;
+//                 color: #888;
+//                 margin-top: 4px;
+//                 text-align: right;
+//                 display: flex; /* Use flex to align items */
+//                 justify-content: flex-end; /* Align items to the right */
+//                 align-items: center; /* Center items vertically */
+//             }
+//             .message-time {
+//                  margin-right: 5px; /* Space between time and status */
+//             }
+//             .message-read-status {
+//                 /* Status aligned by flexbox */
+//             }
+//             .message-read-status .fa-check-double { color: #007bff; } /* Blue check for read */
+//             .message-read-status .fa-check { color: #6c757d; } /* Gray check for sent */
             
-             /* Date separator style */
-            .date-separator span {
-                font-size: 0.8rem;
-                font-weight: 500;
-            }
-            /* ... (rest of the styles) ... */
-        </style>`;
-        $('head').append(messageStyles);
-        console.log('添加了消息样式到页面 (with meta updates)');
-    }
-}
+//              /* Date separator style */
+//             .date-separator span {
+//                 font-size: 0.8rem;
+//                 font-weight: 500;
+//             }
+//             /* ... (rest of the styles) ... */
+//         </style>`;
+//         $('head').append(messageStyles);
+//         console.log('添加了消息样式到页面 (with meta updates)');
+//     }
+// }
 
 // 滚动消息列表到底部
 function scrollToBottom(element) {

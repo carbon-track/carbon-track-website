@@ -193,6 +193,11 @@
 </head>
 <body>
 
+<!-- Theme Toggle Button -->
+<button id="theme-toggle-button" aria-label="Toggle theme" class="ios-theme-toggle-btn">
+  <i class="fas fa-sun"></i> <!-- Default icon -->
+</button>
+
 <!-- 导航栏容器，将由JavaScript加载 -->
 <div id="navbar-container"></div>
 
@@ -297,6 +302,74 @@
   var productsPerPage = 12; 
   var totalProducts = 0;
   var currentSearchTerm = null; // For product search
+
+  // Theme toggling logic (Add this block)
+  const themeToggleButton = document.getElementById('theme-toggle-button');
+  const currentTheme = localStorage.getItem('theme') || 'auto'; // Default to 'auto'
+
+  function applyTheme(theme) {
+    const body = document.body;
+    const icon = themeToggleButton.querySelector('i');
+    body.classList.remove('light-theme', 'dark-theme'); // Remove existing theme classes
+
+    let isDark = false;
+    if (theme === 'dark' || (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      body.classList.add('dark-theme');
+      icon.className = 'fas fa-moon'; // Moon icon for dark
+      isDark = true;
+    } else {
+      body.classList.add('light-theme'); // Explicitly add light-theme or rely on default
+      icon.className = 'fas fa-sun'; // Sun icon for light
+      isDark = false;
+    }
+    localStorage.setItem('theme', theme);
+
+     // Update icon for auto based on effective theme
+    if (theme === 'auto') {
+       icon.className = 'fas fa-adjust'; // Use adjust icon for auto
+    }
+    
+    // --- Add specific component updates for dark/light mode if needed --- 
+    // Example: Update form controls based on theme (might already be handled by CSS variables)
+    document.querySelectorAll('.form-control').forEach(el => {
+        if (isDark) {
+            // Add dark mode specific classes or styles if not handled by CSS vars
+            // e.g., el.classList.add('form-control-dark'); 
+        } else {
+            // Remove dark mode specific classes or styles
+             // e.g., el.classList.remove('form-control-dark');
+        }
+    });
+      // Example: Update modal styles if any modals exist
+    document.querySelectorAll('.modal-content').forEach(el => {
+        if (isDark) {
+            el.classList.add('bg-dark', 'text-light'); // Bootstrap dark mode for modals
+        } else {
+            el.classList.remove('bg-dark', 'text-light');
+        }
+    });
+    
+  }
+
+  function cycleTheme() {
+    const themes = ['light', 'dark', 'auto'];
+    let currentThemeIndex = themes.indexOf(localStorage.getItem('theme') || 'auto');
+    let nextThemeIndex = (currentThemeIndex + 1) % themes.length;
+    applyTheme(themes[nextThemeIndex]);
+  }
+
+  // Apply initial theme on load
+  applyTheme(currentTheme);
+
+  // Listen for system theme changes if in 'auto' mode
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    if (localStorage.getItem('theme') === 'auto') {
+      applyTheme('auto');
+    }
+  });
+
+  // Add event listener to the button
+  themeToggleButton.addEventListener('click', cycleTheme);
 
   $(document).ready(function () {
     var token = localStorage.getItem('token'); 
