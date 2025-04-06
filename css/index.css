@@ -882,3 +882,15 @@ body.auto-theme.dark-mode .table thead th {
     color: var(--text-color-dark, white);
     border-color: var(--border-color-dark, #38383a);
 }
+
+/* Dark Mode Modal Title Color Fix */
+body.dark-theme .modal-title,
+body.auto-theme.dark-mode .modal-title {
+  color: var(--text-color-dark, #FFFFFF); /* Ensure title text is white in dark mode */
+}
+
+/* Also ensure the close button is visible */
+body.dark-theme .modal-header .btn-close,
+body.auto-theme.dark-mode .modal-header .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%); /* Simple way to make it white */
+}
