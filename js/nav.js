@@ -97,19 +97,19 @@ $('#messagesModal').on('show.bs.modal', function(e) {
         localStorage.removeItem('hasNewMessages');
         
         // 获取消息 (conversations)
-        fetchMessages().then(function(data) {
+    fetchMessages().then(function(data) {
             console.log('[show.bs.modal] fetchMessages resolved.');
             $('#convListLoading').remove(); // 移除对话列表加载动画
             
-            if (data.success) {
+        if (data.success) {
                 console.log('[show.bs.modal] fetchMessages success. Building list and setting panel state.');
                 // 构建会话列表
-                buildConversationsList(data);
+            buildConversationsList(data);
                 // Explicitly set right panel state AGAIN after build (belt and suspenders)
                 $('#messageContainer').hide(); 
                 $('#noConversationSelected').show();
                 console.log('[show.bs.modal] Post-build state set: messageContainer hidden, noConversationSelected shown.');
-            } else {
+        } else {
                 console.error('[show.bs.modal] fetchMessages failed:', data.message);
                 showAlert('Failed to load conversations: ' + (data.message || 'Unknown error'), 'error');
                 $('#conversationList').html('<p class="text-danger">Failed to load conversations.</p>');
@@ -120,7 +120,7 @@ $('#messagesModal').on('show.bs.modal', function(e) {
             
             // 这部分可能不需要在模态框显示时重复启动，因为它已经在登录后启动了
             // startUnreadChecksAndUpdates(); 
-        }).catch(function(error) {
+    }).catch(function(error) {
              console.error('[show.bs.modal] fetchMessages AJAX error:', error);
              $('#convListLoading').remove(); // Ensure spinner removed on catch
              showAlert('Error loading conversations: ' + error.message, 'error');
@@ -128,7 +128,7 @@ $('#messagesModal').on('show.bs.modal', function(e) {
              // Ensure correct state even on AJAX error
              $('#messageContainer').hide(); 
              $('#noConversationSelected').show().text('Error connecting to server.');
-        });
+    });
 });  } else {
     logout(); // 如果过期或未登录，执行注销操作
     

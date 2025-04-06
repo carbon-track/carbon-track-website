@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Management - CarbonTrack</title>
+  <link rel="icon" href="/img/team.jpg" type="image/JPG">
+  <!-- Dependencies -->
+  <link rel="stylesheet" href="./css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+  <script src="js/jquery.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/nav.js"></script>
+  <!-- SF Pro font -->
+  <link href="https://fonts.cdnfonts.com/css/sf-pro-display" rel="stylesheet">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="./css/ios-design.css">
+  <link rel="stylesheet" href="./css/index.css">
+  <style>
+    /* Reuse styles from mgmt.html */
+    .admin-header {
+      background: linear-gradient(135deg, var(--ios-blue), var(--ios-purple));
+      color: white;
+      padding: 80px 0 60px;
+      text-align: center;
+      border-radius: 0 0 24px 24px;
+      margin-bottom: 10px; /* Adjusted margin */
+    }
+    .admin-header h1 { font-weight: 700; margin-bottom: 16px; }
+    .admin-header p { opacity: 0.9; max-width: 600px; margin: 0 auto; font-size: 1.1rem; }
+    .admin-nav {
+      background-color: var(--ios-secondary-system-background);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      position: sticky;
+      top: 56px; /* Adjust based on main navbar height */
+      z-index: 100;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      margin-bottom: 30px; /* Spacing below nav */
+    }
+    .admin-nav-list { display: flex; list-style: none; margin: 0; padding: 0; justify-content: center; flex-wrap: wrap; }
+    .admin-nav-item { margin: 0 8px; position: relative; }
+    .admin-nav-link { display: flex; flex-direction: column; align-items: center; padding: 10px 16px; color: var(--ios-gray); text-decoration: none; transition: all 0.2s ease; border-radius: 12px; font-weight: 500; }
+    .admin-nav-link i { font-size: 20px; margin-bottom: 4px; }
+    .admin-nav-link:hover { color: var(--ios-blue); background-color: rgba(0, 122, 255, 0.1); text-decoration: none; }
+    .admin-nav-item.active .admin-nav-link { color: var(--ios-blue); background-color: rgba(0, 122, 255, 0.1); }
+    .admin-nav-item.active::after { content: ''; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); width: 6px; height: 6px; border-radius: 50%; background-color: var(--ios-blue); }
+    @media (prefers-color-scheme: dark) {
+      body.auto-theme .admin-nav { background-color: var(--ios-secondary-background-dark, #1C1C1E); border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+      body.auto-theme .admin-nav-link:hover, body.auto-theme .admin-nav-item.active .admin-nav-link { background-color: rgba(10, 132, 255, 0.2); }
+    }
+    body.dark-theme .admin-nav { background-color: var(--ios-secondary-background-dark, #1C1C1E); border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+    body.dark-theme .admin-nav-link:hover, body.dark-theme .admin-nav-item.active .admin-nav-link { background-color: rgba(10, 132, 255, 0.2); }
+    @media (max-width: 768px) { .admin-nav-link span { font-size: 12px; } .admin-nav-link { padding: 8px 12px; } }
+
+    /* User Management Specific Styles */
+    .table-container {
+      background-color: var(--ios-secondary-system-background);
+      padding: 20px;
+      border-radius: 18px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    .table th {
+        border-top: none;
+        font-weight: 600;
+        color: var(--ios-secondary-label);
+    }
+    .table td {
+        vertical-align: middle;
+        border-top: 1px solid var(--ios-separator);
+    }
+    .table tbody tr:first-child td {
+        border-top: none;
+    }
+    .action-btn {
+        font-size: 0.9rem;
+        padding: 5px 10px;
+        margin-right: 5px;
+    }
+    .search-bar {
+        margin-bottom: 20px;
+        position: relative;
+    }
+    .search-bar input {
+        padding-left: 40px;
+        border-radius: 12px;
+    }
+    .search-bar .fa-search {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--ios-gray);
+    }
+
+    /* Dark mode table adjustments */
+     body.dark-theme .table-container, body.auto-theme.dark-mode .table-container {
+        background-color: var(--ios-secondary-background-dark, #1C1C1E);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+     }
+     body.dark-theme .table th, body.auto-theme.dark-mode .table th {
+        color: var(--ios-secondary-label-dark, #8E8E93);
+     }
+     body.dark-theme .table td, body.auto-theme.dark-mode .table td {
+        border-top: 1px solid var(--ios-separator-dark, #38383A);
+        color: var(--ios-label-dark, #F2F2F7);
+     }
+     body.dark-theme .search-bar input, body.auto-theme.dark-mode .search-bar input {
+         background-color: var(--ios-tertiary-system-fill-dark, #2C2C2E);
+         border-color: var(--ios-separator-dark, #38383A);
+         color: var(--ios-label-dark, #F2F2F7);
+     }
+     body.dark-theme .search-bar .fa-search, body.auto-theme.dark-mode .search-bar .fa-search {
+         color: var(--ios-secondary-label-dark, #8E8E93);
+     }
+
+  </style>
+</head>
+<body class="auto-theme">
+<!-- Main Navbar -->
+<div id="navbar-container"></div>
+
+<!-- Admin Navigation Bar -->
+<div class="admin-nav" style="display: none;">
+  <div class="container">
+    <ul class="admin-nav-list">
+      <li class="admin-nav-item">
+        <a href="mgmt.html" class="admin-nav-link">
+          <i class="fas fa-tachometer-alt"></i>
+          <span>Admin Dashboard</span>
+        </a>
+      </li>
+      <li class="admin-nav-item">
+        <a href="ptmgmt.html" class="admin-nav-link">
+          <i class="fas fa-clipboard-check"></i>
+          <span>Carbon Review</span>
+        </a>
+      </li>
+      <li class="admin-nav-item">
+        <a href="productmgmt.html" class="admin-nav-link">
+          <i class="fas fa-store"></i>
+          <span>Product Management</span>
+        </a>
+      </li>
+      <li class="admin-nav-item active"> <!-- Set active for this page -->
+        <a href="usermgmt.html" class="admin-nav-link" id="userMgmtNav">
+          <i class="fas fa-users"></i>
+          <span>User Management</span>
+        </a>
+      </li>
+      <li class="admin-nav-item">
+        <a href="index.html" class="admin-nav-link">
+          <i class="fas fa-home"></i>
+          <span>Return to Site</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<header class="admin-header">
+  <div class="container">
+    <h1>User Management</h1>
+    <p>View, search, and manage user accounts on the CarbonTrack platform.</p>
+  </div>
+</header>
+
+<!-- User Management Content -->
+<div class="container">
+  <div class="table-container">
+    <!-- Search Bar -->
+    <div class="search-bar">
+        <i class="fas fa-search"></i>
+        <input type="text" id="userSearchInput" class="form-control ios-input" placeholder="Search by username or email...">
+    </div>
+
+    <!-- User Table -->
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Points</th>
+                    <th>School</th>
+                    <th>Last Login</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="userTableBody">
+                <!-- User data will be loaded here by JavaScript -->
+                <tr>
+                    <td colspan="7" class="text-center" id="loadingUsers">
+                        <div class="spinner-border spinner-border-sm" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                        Loading users...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <!-- Optional: Add Pagination Controls here if needed -->
+  </div>
+</div>
+
+<!-- Footer -->
+<div id="footer-placeholder"></div>
+
+<!-- Edit User Modal (Example Structure) -->
+<div class="modal fade" id="editUserModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content ios-modal-content">
+      <div class="modal-header ios-modal-header">
+        <h5 class="modal-title">Edit User</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body ios-modal-body">
+        <form id="editUserForm">
+          <input type="hidden" id="editUserId">
+          <div class="form-group">
+            <label>Username:</label>
+            <p id="editUsername" class="form-control-static"></p> <!-- Display only -->
+          </div>
+          <div class="form-group">
+            <label>Email:</label>
+            <p id="editUserEmail" class="form-control-static"></p> <!-- Display only -->
+          </div>
+          <div class="form-group">
+            <label for="editUserPoints">Points:</label>
+            <input type="number" class="form-control ios-input" id="editUserPoints" step="0.01" required>
+          </div>
+          <div class="form-group">
+            <label for="editUserSchool">School:</label>
+            <input type="text" class="form-control ios-input" id="editUserSchool">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer ios-modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="saveUserChangesBtn">Save Changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  $(document).ready(function() {
+    // Admin check
+    var token = localStorage.getItem('token');
+    if (!token) {
+      showAlert('Please log in first.', 'warning', () => { window.location.href = 'index.html'; });
+      return;
+    }
+    checkAdminAccess(token); // This will load users if successful
+
+    // Search functionality (debounced)
+    let searchTimeout;
+    $('#userSearchInput').on('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            fetchUsers(token, $(this).val());
+        }, 300); // Debounce time
+    });
+
+    // --- Event delegation for dynamically loaded buttons ---
+
+    // Edit button click
+    $('#userTableBody').on('click', '.edit-btn', function() {
+        const userId = $(this).data('id');
+        const userRow = $(this).closest('tr');
+        // Populate modal
+        $('#editUserId').val(userId);
+        $('#editUsername').text(userRow.find('td:eq(1)').text());
+        $('#editUserEmail').text(userRow.find('td:eq(2)').text());
+        $('#editUserPoints').val(userRow.find('td:eq(3)').text());
+        $('#editUserSchool').val(userRow.find('td:eq(4)').text());
+        $('#editUserModal').modal('show');
+    });
+
+    // Save changes button click
+    $('#saveUserChangesBtn').on('click', function() {
+        const userId = $('#editUserId').val();
+        const points = $('#editUserPoints').val();
+        const school = $('#editUserSchool').val();
+        updateUser(token, userId, points, school);
+    });
+
+    // Delete button click
+    $('#userTableBody').on('click', '.delete-btn', function() {
+        const userId = $(this).data('id');
+        const username = $(this).closest('tr').find('td:eq(1)').text();
+        // Simple confirm for now, use showAlert for better UI later
+        if (confirm(`Are you sure you want to delete user "${username}" (ID: ${userId})? This cannot be undone.`)) {
+            deleteUser(token, userId);
+        }
+    });
+
+    // Set Active Nav Item
+    setActiveNavItem();
+  });
+
+  function checkAdminAccess(token) {
+    $.ajax({
+      url: 'verify_admin.php', type: 'POST', data: { token: token }, dataType: 'json',
+      success: function(response) {
+        if (!response.success || !response.isAdmin) {
+          showAlert('Admin access required.', 'error', () => { window.location.href = 'index.html'; });
+        } else {
+          $('.admin-nav').show(); // Show admin nav
+          fetchUsers(token); // Load initial user list
+        }
+      },
+      error: function() {
+        showAlert('Permission check failed. Please try again.', 'error', () => { window.location.href = 'index.html'; });
+      }
+    });
+  }
+
+  function fetchUsers(token, searchTerm = '') {
+      $('#loadingUsers').show();
+      $('#userTableBody').find('tr:not(:first)').remove(); // Clear previous users except loading row
+
+      $.ajax({
+          url: 'get_users.php', type: 'POST',
+          data: { token: token, search: searchTerm },
+          dataType: 'json',
+          success: function(response) {
+              $('#loadingUsers').hide();
+              if (response.success) {
+                  if (response.users && response.users.length > 0) {
+                      displayUsers(response.users);
+                  } else {
+                      $('#userTableBody').append('<tr><td colspan="7" class="text-center">No users found.</td></tr>');
+                  }
+              } else {
+                  showAlert(response.message || 'Failed to load users.', 'error');
+                   $('#userTableBody').append(`<tr><td colspan="7" class="text-center text-danger">Error: ${response.message || 'Could not load users.'}</td></tr>`);
+              }
+          },
+          error: function() {
+              $('#loadingUsers').hide();
+              showAlert('Failed to connect to server to fetch users.', 'error');
+              $('#userTableBody').append('<tr><td colspan="7" class="text-center text-danger">Server connection error.</td></tr>');
+          }
+      });
+  }
+
+  function displayUsers(users) {
+      const tableBody = $('#userTableBody');
+      tableBody.empty(); // Clear loading/previous content
+
+      users.forEach(user => {
+          // Format last login - assuming it's a string like 'YYYY-MM-DD HH:MM:SS' or null
+          let lastLoginFormatted = user.lastlgn ? formatDateTime(user.lastlgn) : 'Never';
+
+          const row = `
+              <tr>
+                  <td>${user.id}</td>
+                  <td>${escapeHtml(user.username)}</td>
+                  <td>${escapeHtml(user.email)}</td>
+                  <td>${user.points ? parseFloat(user.points).toFixed(2) : '0.00'}</td>
+                  <td>${escapeHtml(user.school || '-')}</td>
+                  <td>${lastLoginFormatted}</td>
+                  <td>
+                      <button class="btn btn-sm btn-outline-primary action-btn edit-btn" data-id="${user.id}"><i class="fas fa-edit"></i> Edit</button>
+                      <button class="btn btn-sm btn-outline-danger action-btn delete-btn" data-id="${user.id}"><i class="fas fa-trash"></i> Delete</button>
+                  </td>
+              </tr>
+          `;
+          tableBody.append(row);
+      });
+  }
+
+  function updateUser(token, userId, points, school) {
+      console.log(`Updating user ${userId}: Points=${points}, School=${school}`);
+      // Add AJAX call to update_user.php
+       $.ajax({
+          url: 'update_user.php', type: 'POST',
+          data: { token: token, userId: userId, points: points, school: school },
+          dataType: 'json',
+          success: function(response) {
+              if (response.success) {
+                  showAlert('User updated successfully!', 'success');
+                  $('#editUserModal').modal('hide');
+                  fetchUsers(token, $('#userSearchInput').val()); // Refresh list with current search
+              } else {
+                  showAlert(response.message || 'Failed to update user.', 'error');
+              }
+          },
+          error: function() {
+              showAlert('Failed to connect to server to update user.', 'error');
+          }
+      });
+  }
+
+  function deleteUser(token, userId) {
+      console.log(`Deleting user ${userId}`);
+      // Add AJAX call to delete_user.php
+      $.ajax({
+          url: 'delete_user.php', type: 'POST',
+          data: { token: token, userId: userId },
+          dataType: 'json',
+          success: function(response) {
+              if (response.success) {
+                  showAlert('User deleted successfully!', 'success');
+                  fetchUsers(token, $('#userSearchInput').val()); // Refresh list
+              } else {
+                  showAlert(response.message || 'Failed to delete user.', 'error');
+              }
+          },
+          error: function() {
+              showAlert('Failed to connect to server to delete user.', 'error');
+          }
+      });
+  }
+
+  // Simple HTML escaping function
+  function escapeHtml(text) {
+      if (text === null || text === undefined) return '';
+      return String(text)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+  }
+
+  // Function to set the active nav item based on current page (ensure this is present)
+  function setActiveNavItem() {
+    var currentPath = window.location.pathname;
+    var filename = currentPath.substring(currentPath.lastIndexOf('/') + 1);
+
+    $('.admin-nav-item').removeClass('active');
+
+    if (filename === 'ptmgmt.html') {
+      $('.admin-nav-item:has(a[href="ptmgmt.html"])').addClass('active');
+    } else if (filename === 'productmgmt.html') {
+      $('.admin-nav-item:has(a[href="productmgmt.html"])').addClass('active');
+    } else if (filename === 'usermgmt.html') {
+      $('.admin-nav-item:has(a[href="usermgmt.html"])').addClass('active');
+    } else if (filename === 'mgmt.html' || filename === '') {
+       $('.admin-nav-item:has(a[href="mgmt.html"])').addClass('active');
+    }
+  }
+
+</script>
+
+</body>
+</html> 

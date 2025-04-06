@@ -23,7 +23,7 @@
     .admin-header {
       background: linear-gradient(135deg, var(--ios-blue), var(--ios-purple));
       color: white;
-      padding: 120px 0 60px;
+      padding: 80px 0 60px;
       text-align: center;
       border-radius: 0 0 24px 24px;
       margin-bottom: 40px;
@@ -101,11 +101,156 @@
       color: white;
       text-decoration: none;
     }
+
+    /* Admin Navigation Bar Styles */
+    .admin-nav {
+      background-color: var(--ios-secondary-system-background);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      position: sticky;
+      top: 56px; /* Adjust based on main navbar height */
+      z-index: 100;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      margin-bottom: 10px;
+    }
+
+    .admin-nav-list {
+      display: flex;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .admin-nav-item {
+      margin: 0 8px;
+      position: relative;
+    }
+
+    .admin-nav-link {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px 16px;
+      color: var(--ios-gray);
+      text-decoration: none;
+      transition: all 0.2s ease;
+      border-radius: 12px;
+      font-weight: 500;
+    }
+
+    .admin-nav-link i {
+      font-size: 20px;
+      margin-bottom: 4px;
+    }
+
+    .admin-nav-link:hover {
+      color: var(--ios-blue);
+      background-color: rgba(0, 122, 255, 0.1);
+      text-decoration: none;
+    }
+
+    .admin-nav-item.active .admin-nav-link {
+      color: var(--ios-blue);
+      background-color: rgba(0, 122, 255, 0.1);
+    }
+
+    /* Active indicator dot */
+    .admin-nav-item.active::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: var(--ios-blue);
+    }
+
+    /* Dark mode styles */
+    @media (prefers-color-scheme: dark) {
+      body.auto-theme .admin-nav {
+        background-color: var(--ios-secondary-background-dark, #1C1C1E);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      
+      body.auto-theme .admin-nav-link:hover {
+        background-color: rgba(10, 132, 255, 0.2);
+      }
+      
+      body.auto-theme .admin-nav-item.active .admin-nav-link {
+        background-color: rgba(10, 132, 255, 0.2);
+      }
+    }
+
+    body.dark-theme .admin-nav {
+      background-color: var(--ios-secondary-background-dark, #1C1C1E);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    body.dark-theme .admin-nav-link:hover {
+      background-color: rgba(10, 132, 255, 0.2);
+    }
+    
+    body.dark-theme .admin-nav-item.active .admin-nav-link {
+      background-color: rgba(10, 132, 255, 0.2);
+    }
+
+    /* Responsive styles */
+    @media (max-width: 768px) {
+      .admin-nav-link span {
+        font-size: 12px;
+      }
+      
+      .admin-nav-link {
+        padding: 8px 12px;
+      }
+    }
   </style>
 </head>
 <body>
 <!-- 导航栏容器，将由JavaScript加载 -->
 <div id="navbar-container"></div>
+
+<!-- Admin Navigation Bar -->
+<div class="admin-nav" style="display: none;">
+  <div class="container">
+    <ul class="admin-nav-list">
+      <li class="admin-nav-item active">
+        <a href="mgmt.html" class="admin-nav-link">
+          <i class="fas fa-tachometer-alt"></i>
+          <span>Admin Dashboard</span>
+        </a>
+      </li>
+      <li class="admin-nav-item">
+        <a href="ptmgmt.html" class="admin-nav-link">
+          <i class="fas fa-clipboard-check"></i>
+          <span>Carbon Review</span>
+        </a>
+      </li>
+      <li class="admin-nav-item">
+        <a href="productmgmt.html" class="admin-nav-link">
+          <i class="fas fa-store"></i>
+          <span>Product Management</span>
+        </a>
+      </li>
+      <li class="admin-nav-item">
+        <a href="usermgmt.html" class="admin-nav-link" id="userMgmtNav">
+          <i class="fas fa-users"></i>
+          <span>User Management</span>
+        </a>
+      </li>
+      <li class="admin-nav-item">
+        <a href="index.html" class="admin-nav-link">
+          <i class="fas fa-home"></i>
+          <span>Return to Site</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
 
 <header class="admin-header">
   <div class="container">
@@ -180,6 +325,15 @@
     }
     
     checkAdminAccess(token);
+    
+    // Set active nav item based on current page
+    setActiveNavItem();
+    
+    // Handle User Management nav click (currently a placeholder)
+    $('#userMgmtNav').on('click', function(e) {
+      e.preventDefault();
+      showAlert('User Management feature coming soon!', 'info');
+    });
   });
   
   function checkAdminAccess(token) {
@@ -193,6 +347,9 @@
           showAlert('您没有管理员权限，无法访问此页面', 'error', function() {
             window.location.href = 'index.html';
           });
+        } else {
+          // Admin verified, show admin navigation
+          $('.admin-nav').show();
         }
       },
       error: function() {
@@ -201,6 +358,24 @@
         });
       }
     });
+  }
+  
+  // Function to set the active nav item based on current page
+  function setActiveNavItem() {
+    var currentPath = window.location.pathname;
+    var filename = currentPath.substring(currentPath.lastIndexOf('/') + 1);
+    
+    // Remove active class from all items
+    $('.admin-nav-item').removeClass('active');
+    
+    // Set active class based on current page
+    if (filename === 'ptmgmt.html') {
+      $('.admin-nav-item:has(a[href="ptmgmt.html"])').addClass('active');
+    } else if (filename === 'productmgmt.html') {
+      $('.admin-nav-item:has(a[href="productmgmt.html"])').addClass('active');
+    } else if (filename === 'mgmt.html' || filename === '') {
+      $('.admin-nav-item:has(a[href="mgmt.html"])').addClass('active');
+    }
   }
 </script>
 
