@@ -97,21 +97,6 @@ function showAlert(message, type = 'info', callback = null) {
         console.log(`[showAlert] Event: hide.bs.modal #${modalId}`);
     });
 
-    // Add explicit click listener to OK button
-    if (okButton) {
-        okButton.addEventListener('click', function handleOkClick() {
-            console.log(`[showAlert] OK button clicked for modal #${modalId}. Manually calling hide().`);
-            okButton.removeEventListener('click', handleOkClick); // Remove listener after first click
-            try {
-                 modal.hide();
-            } catch (e) {
-                console.error("[showAlert] Error calling modal.hide() on OK click:", e);
-            }
-        }, { once: true }); // Use once: true to ensure it only fires once
-    } else {
-        console.error(`[showAlert] Could not find OK button for modal #${modalId}`);
-    }
-
     // Use the 'hidden.bs.modal' event for cleanup and callback
     modalElement.addEventListener('hidden.bs.modal', function handler(event) {
         console.log(`[showAlert] Event: hidden.bs.modal #${modalId}`);
