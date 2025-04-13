@@ -1156,12 +1156,12 @@
       productsRow += `
         <div class="col-md-4 mb-4">
           <div class="product-card ios-hover-effect ${animationClass}">
-            <img src="${product.image_url}" alt="${product.name}" class="product-img">
+            <img src="${product.image_path}" alt="${product.name}" class="product-img">
             <div class="product-body">
               <h3 class="product-title">${product.name}</h3>
               <p class="product-description">${product.description}</p>
               <div class="product-price">
-                <span class="price-tag">${product.price} Credits</span>
+                <span class="price-tag">${product.points_required} Credits</span>
                 <button class="exchange-btn" data-id="${product.id}">Exchange</button>
               </div>
               <div class="stock">Stock: ${product.stock}</div>

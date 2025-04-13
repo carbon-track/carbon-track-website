@@ -707,13 +707,10 @@
         }
         
         var formData = new FormData(this)
-        formData.append('activity', $('#activity').val())
         formData.append('oridata', parseFloat($('#dataInput').val()) || 0)
         formData.append('token', localStorage.getItem('token'))
-        formData.append('notes', $('#notes').val())
-        formData.append('date', $('#date').val())
         // Add Turnstile response
-        formData.append('cf-turnstile-response', $('#carbonForm [name="cf-turnstile-response"]').val());
+        // formData.append('cf-turnstile-response', $('#carbonForm [name="cf-turnstile-response"]').val());
         // 移除id参数，让服务器端通过token获取用户ID
         
         // Check if Turnstile response exists

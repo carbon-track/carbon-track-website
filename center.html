@@ -1,27 +1,30 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>User Center - CarbonTrack</title>
   <link rel="icon" href="/img/team.jpg" type="image/JPG">
-  <!-- 将Bootstrap改为CDN引用 -->
+  <!-- 灏咮ootstrap鏀逛负CDN寮曠敤 -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
-  <!-- 引入iOS设计风格CSS -->
+  <!-- 寮曞叆iOS璁捐椋庢牸CSS -->
   <link rel="stylesheet" href="./css/ios-design.css">
   <link rel="stylesheet" href="./css/index.css">
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
+  <!-- 娣诲姞 utils.js 寮曠敤 -->
   <script src="js/utils.js"></script>
   <script src="js/nav.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
   
-  <!-- 页面特定的样式，补充ios-design.css中没有的样式 -->
+  <!-- 椤甸潰鐗瑰畾鐨勬牱寮忥紝琛ュ厖ios-design.css涓病鏈夌殑鏍峰紡 -->
   <style>
-    /* 颜色变量定义 */
+    /* 棰滆壊鍙橀噺瀹氫箟 */
     :root {
-      /* 基础颜色 */
+      /* 鍩虹棰滆壊 */
       --text-color-light: #000;
       --text-color-dark: #fff;
       --bg-color-light: #F2F2F7;
@@ -31,20 +34,20 @@
       --border-color-light: #d1d1d6;
       --border-color-dark: #3a3a3c;
       
-      /* 主题颜色 */
+      /* 涓婚棰滆壊 */
       --ios-blue-light: #007AFF;
       --ios-blue-dark: #0A84FF;
       --ios-purple-light: #5856D6;
       --ios-purple-dark: #5E5CE6;
       
-      /* 辅助颜色 */
+      /* 杈呭姪棰滆壊 */
       --muted-text-light: #8E8E93;
       --muted-text-dark: #98989D;
       --highlight-bg-light: rgba(0, 122, 255, 0.1);
       --highlight-bg-dark: rgba(10, 132, 255, 0.2);
     }
     
-    /* 基础样式 */
+    /* 鍩虹鏍峰紡 */
     body {
       background-color: var(--bg-color-light);
       color: var(--text-color-light);
@@ -52,14 +55,14 @@
       transition: background-color 0.3s ease, color 0.3s ease;
     }
     
-    /* 暗色模式样式 */
+    /* 鏆楄壊妯″紡鏍峰紡 */
     body.dark-theme,
     body.auto-theme.dark-mode {
       background-color: var(--bg-color-dark);
       color: var(--text-color-dark);
     }
     
-    /* 用户信息卡片样式调整 */
+    /* 鐢ㄦ埛淇℃伅鍗＄墖鏍峰紡璋冩暣 */
     .info-card {
       border-radius: 20px;
       border: none;
@@ -90,13 +93,13 @@
       box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
     }
     
-    /* 排名图标样式 */
+    /* 鎺掑悕鍥炬爣鏍峰紡 */
     .rank-icon {
       display: inline-block;
       margin-right: 4px;
     }
     
-    /* 前三名样式 */
+    /* 鍓嶄笁鍚嶆牱寮?*/
     .rank-1 {
       background: linear-gradient(to right, rgba(255, 204, 0, 0.1), transparent 90%);
       font-weight: 700;
@@ -127,7 +130,7 @@
       background: linear-gradient(to right, rgba(52, 199, 89, 0.2), transparent 90%);
     }
     
-    /* 当前用户高亮 */
+    /* 褰撳墠鐢ㄦ埛楂樹寒 */
     .table tbody tr.current-user {
       background-color: var(--highlight-bg-light);
       font-weight: 600;
@@ -138,7 +141,7 @@
       background-color: var(--highlight-bg-dark);
     }
     
-    /* 点数显示样式 */
+    /* 鐐规暟鏄剧ず鏍峰紡 */
     .info-value {
       font-weight: 600;
       color: var(--ios-blue-light);
@@ -158,7 +161,7 @@
       background: var(--highlight-bg-dark);
     }
     
-    /* 信息标题样式 */
+    /* 淇℃伅鏍囬鏍峰紡 */
     .info-title {
       font-weight: 600;
       color: var(--muted-text-light);
@@ -190,7 +193,7 @@
       background: linear-gradient(to right, var(--ios-blue-dark), var(--ios-purple-dark));
     }
     
-    /* 卡片文本 */
+    /* 鍗＄墖鏂囨湰 */
     .card-text {
       color: var(--text-color-light);
       transition: color 0.3s ease;
@@ -202,7 +205,7 @@
       color: var(--text-color-dark);
     }
     
-    /* 按钮激活状态 */
+    /* 鎸夐挳婵€娲荤姸鎬?*/
     .btn-group .btn.active {
       background-color: var(--ios-blue-light) !important;
       color: white !important;
@@ -215,7 +218,7 @@
       box-shadow: 0 4px 12px rgba(10, 132, 255, 0.25);
     }
     
-    /* 按钮组样式美化 */
+    /* 鎸夐挳缁勬牱寮忕編鍖?*/
     .ios-btn-group {
       border-radius: 12px;
       overflow: hidden;
@@ -267,7 +270,7 @@
       background-color: var(--ios-blue-dark);
     }
     
-    /* 历史记录按钮样式 */
+    /* 鍘嗗彶璁板綍鎸夐挳鏍峰紡 */
     .history-btn {
       position: relative;
       right: 0;
@@ -318,7 +321,7 @@
       transform: rotate(45deg) translateX(200%);
     }
     
-    /* 排行榜表格样式 */
+    /* 鎺掕姒滆〃鏍兼牱寮?*/
     .leaderboard-table {
       background-color: var(--card-bg-light);
       backdrop-filter: blur(20px);
@@ -369,7 +372,7 @@
       background-color: var(--highlight-bg-dark);
     }
     
-    /* 页面内容容器 */
+    /* 椤甸潰鍐呭瀹瑰櫒 */
     .content-container {
       padding: 25px;
       border-radius: 20px;
@@ -388,7 +391,7 @@
       box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
     }
     
-    /* 标题样式 */
+    /* 鏍囬鏍峰紡 */
     .ios-section-heading {
       font-weight: 700;
       margin-bottom: 25px;
@@ -420,7 +423,7 @@
       background: linear-gradient(to right, var(--ios-blue-dark), var(--ios-purple-dark));
     }
     
-    /* 添加动画效果 */
+    /* 娣诲姞鍔ㄧ敾鏁堟灉 */
     .fade-in-up {
       animation: fadeInUp 0.6s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
       opacity: 0;
@@ -437,14 +440,14 @@
       }
     }
     
-    /* 添加延迟效果 */
+    /* 娣诲姞寤惰繜鏁堟灉 */
     .delay-1 { animation-delay: 0.1s; }
     .delay-2 { animation-delay: 0.2s; }
     .delay-3 { animation-delay: 0.3s; }
     .delay-4 { animation-delay: 0.4s; }
     .delay-5 { animation-delay: 0.5s; }
     
-    /* 霓虹效果 */
+    /* 闇撹櫣鏁堟灉 */
     .glow-effect {
       position: fixed;
       width: 300px;
@@ -484,7 +487,7 @@
       100% { transform: scale(1) translate(0, 0); opacity: 0.5; }
     }
     
-    /* 模态框样式 */
+    /* 妯℃€佹鏍峰紡 */
     .modal-content {
       background-color: var(--card-bg-light);
       border-radius: 16px;
@@ -537,7 +540,7 @@
       opacity: 1;
     }
     
-    /* 表单控件 */
+    /* 琛ㄥ崟鎺т欢 */
     .form-control {
       background-color: var(--bg-color-light);
       border-color: var(--border-color-light);
@@ -565,7 +568,7 @@
       border-color: var(--ios-blue-dark);
     }
     
-    /* 表单标签 */
+    /* 琛ㄥ崟鏍囩 */
     .form-group label {
       color: var(--text-color-light);
       font-weight: 500;
@@ -578,7 +581,7 @@
       color: var(--text-color-dark);
     }
     
-    /* 主题切换按钮 */
+    /* 涓婚鍒囨崲鎸夐挳 */
     .theme-toggle {
       position: fixed;
       right: 20px;
@@ -613,7 +616,7 @@
       color: var(--text-color-dark);
     }
     
-    /* 毛玻璃效果 */
+    /* 姣涚幓鐠冩晥鏋?*/
     .frosted-glass {
       position: fixed;
       top: 0;
@@ -632,13 +635,13 @@
       background: rgba(0, 0, 0, 0.05);
     }
     
-    /* 设置文本高对比度 - 让黑夜模式更清晰可见 */
+    /* 璁剧疆鏂囨湰楂樺姣斿害 - 璁╅粦澶滄ā寮忔洿娓呮櫚鍙鈝鈝 */
     body.dark-theme,
     body.auto-theme.dark-mode {
-      --text-color-dark: #ffffff; /* 确保白色足够明亮 */
+      --text-color-dark: #ffffff; /* 纭繚鐧借壊瓒冲鏄庝寒 */
     }
     
-    /* 优化移动设备排版 */
+    /* 浼樺寲绉诲姩璁惧鎺掔増 */
     @media (max-width: 768px) {
       .ios-btn-group {
         flex-direction: column;
@@ -668,12 +671,12 @@
       }
     }
     
-    /* iOS风格排行榜样式增强 */
+    /* iOS椋庢牸鎺掕姒滄牱寮忓綃寮?*/
     .leaderboard-section {
       margin-bottom: 30px;
     }
     
-    /* iOS风格分段控制器 */
+    /* iOS椋庢牸鍒嗘鎺у埗鍣?*/
     .ios-segment-control {
       display: flex;
       background-color: rgba(120, 120, 128, 0.12);
@@ -728,7 +731,7 @@
       color: var(--text-color-dark);
     }
     
-    /* 分段控制器选择器 */
+    /* 鍒嗘鎺у埗鍣ㄩ€夋嫨鍣?*/
     .segment-selector {
       position: absolute;
       height: calc(100% - 6px);
@@ -754,7 +757,7 @@
       line-height: 1;
     }
     
-    /* iOS表格卡片样式 */
+    /* iOS琛ㄦ牸鍗＄墖鏍峰紡 */
     .ios-card-table {
       border-radius: 12px;
       background-color: var(--card-bg-light);
@@ -772,7 +775,7 @@
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     }
     
-    /* 表格头部样式 */
+    /* 琛ㄦ牸澶撮儴鏍峰紡 */
     .ios-table-header {
       padding: 15px;
       border-bottom: 1px solid rgba(60, 60, 67, 0.1);
@@ -805,7 +808,7 @@
       padding-right: 15px;
     }
     
-    /* 表格内容样式 */
+    /* 琛ㄦ牸鍐呭鏍峰紡 */
     .ios-table-row {
       display: flex;
       padding: 14px 15px;
@@ -868,7 +871,7 @@
       color: var(--ios-blue-dark);
     }
     
-    /* 前三名特殊样式 */
+    /* 鍓嶄笁鍚嶇壒娈婃牱寮?*/
     .ios-table-row.top-rank {
       position: relative;
     }
@@ -904,7 +907,7 @@
       background: linear-gradient(to right, #CD7F32, transparent 80%);
     }
     
-    /* 排名标记 */
+    /* 鎺掑悕鏍囪 */
     .rank-medal {
       width: 28px;
       height: 28px;
@@ -949,7 +952,7 @@
       color: white;
     }
     
-    /* 当前用户突出显示 */
+    /* 褰撳墠鐢ㄦ埛绐佸嚭鏄剧ず */
     .ios-table-row.current-user {
       background-color: rgba(0, 122, 255, 0.08);
       font-weight: 500;
@@ -960,7 +963,7 @@
       background-color: rgba(10, 132, 255, 0.15);
     }
     
-    /* 无数据提示 */
+    /* 鏃犳暟鎹彁绀?*/
     .ios-empty-state {
       padding: 40px 20px;
       text-align: center;
@@ -980,14 +983,14 @@
       opacity: 0.5;
     }
     
-    /* 加载动画 */
+    /* 鍔犺浇鍔ㄧ敾 */
     .ios-loading {
       display: none;
       padding: 30px;
       text-align: center;
     }
     
-    /* 优化的iOS风格加载动画 */
+    /* 浼樺寲鐨刬OS椋庢牸鍔犺浇鍔ㄧ敾 */
     .ios-loader {
       position: relative;
       display: flex;
@@ -1005,7 +1008,7 @@
       width: 200px;
     }
     
-    /* 加载动画圆环 */
+    /* 鍔犺浇鍔ㄧ敾鍦嗙幆 */
     .ios-loader-ring {
       position: relative;
       width: 60px;
@@ -1108,7 +1111,7 @@
       }
     }
     
-    /* 气泡动画效果 */
+    /* 姘旀场鍔ㄧ敾鏁堟灉 */
     .bubble {
       position: absolute;
       width: 16px;
@@ -1136,7 +1139,7 @@
       }
     }
     
-    /* 加载器周围的光晕效果 */
+    /* 鍔犺浇鍣ㄥ懆鍥寸殑鍏夋檿鏁堟灉 */
     .ios-loader::after {
       content: '';
       position: absolute;
@@ -1175,7 +1178,7 @@
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
     }
     
-    /* 美化用户信息卡片 */
+    /* 缇庡寲鐢ㄦ埛淇℃伅鍗＄墖 */
     .info-card {
       overflow: visible;
       transform-style: preserve-3d;
@@ -1191,7 +1194,7 @@
       transform: translateZ(10px);
     }
     
-    /* 信息值标签的美化 */
+    /* 淇℃伅鍊兼爣绛剧殑缇庡寲 */
     .info-value {
       transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
       box-shadow: 0 4px 10px rgba(0, 122, 255, 0.1);
@@ -1236,27 +1239,7 @@
       box-shadow: 0 8px 20px rgba(10, 132, 255, 0.25);
     }
     
-    /* 标题增强 */
-    .ios-section-heading {
-      font-size: 2rem;
-      letter-spacing: -0.02em;
-      transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
-    }
-    
-    .ios-section-heading:hover {
-      transform: scale(1.02);
-    }
-    
-    .ios-section-heading::after {
-      transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
-      height: 4px;
-    }
-    
-    .ios-section-heading:hover::after {
-      width: 80px;
-    }
-    
-    /* 改进排行榜表格样式 */
+    /* 鏍囬鎺掕姒滆〃鏍兼牱寮?*/
     .ios-card-table {
       transition: transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1),
                   box-shadow 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
@@ -1272,7 +1255,8 @@
       box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
     }
     
-    /* 排行榜行悬停效果增强 */
+    
+    /* 鎺掕姒滆鎮仠鏁堟灉澧炲己 */
     .ios-table-row {
       transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
       position: relative;
@@ -1308,7 +1292,7 @@
       );
     }
     
-    /* 排行榜徽章的美化 */
+    /* 鎺掕姒滃窘绔犵殑缇庡寲 */
     .rank-medal {
       transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
     }
@@ -1329,7 +1313,7 @@
       transform: scale(1.1) rotate(5deg);
     }
     
-    /* 内容容器美化 */
+    /* 鍐呭瀹瑰櫒缇庡寲 */
     .content-container {
       transition: all 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
       overflow: visible;
@@ -1344,7 +1328,7 @@
       box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
     }
     
-    /* 主题切换按钮增强 */
+    /* 涓婚鍒囨崲鎸夐挳澧炲己 */
     .theme-toggle {
       transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
     }
@@ -1367,7 +1351,7 @@
       transform: scale(1.1);
     }
     
-    /* 分段控制器美化 */
+    /* 鍒嗘鎺у埗鍣ㄧ編鍖?*/
     .ios-segment-control {
       transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
@@ -1392,9 +1376,9 @@
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     }
     
-    /* 添加顶部信息栏样式 */
+    /* 娣诲姞椤堕儴淇℃伅鏍忔牱寮?*/
     .top-user-info-bar {
-      background-color: #262628; /* 更深的背景色 */
+      background-color: #262628; /* 鏇存繁鐨勮儗鏅壊 */
       color: #FFFFFF;
       padding: 15px 0;
       position: relative;
@@ -1544,7 +1528,7 @@
       background: linear-gradient(135deg, var(--ios-green), var(--ios-mint));
     }
     
-    /* 新增样式 - iOS风格成功按钮 */
+    /* 鏂板鏍峰紡 - iOS椋庢牸鎴愬姛鎸夐挳 */
     .btn-ios-success {
       background: linear-gradient(135deg, var(--ios-green), var(--ios-mint));
       color: white;
@@ -1575,14 +1559,14 @@
   </style>
 </head>
 <body class="auto-theme">
-<!-- 添加毛玻璃背景 -->
+<!-- 娣诲姞姣涚幓鐠冭儗鏅?-->
 <div class="frosted-glass"></div>
 
-<!-- 添加霓虹灯光效果 -->
+<!-- 娣诲姞闇撹櫣鐏厜鏁堟灉 -->
 <div class="glow-effect glow-blue"></div>
 <div class="glow-effect glow-purple"></div>
 
-<!-- 导航栏容器，将由JavaScript加载 -->
+<!-- 瀵艰埅鏍忓鍣紝灏嗙敱JavaScript鍔犺浇 -->
 <div id="navbar-container"></div>
 
 <!-- Main content starts here -->
@@ -1593,16 +1577,16 @@
       <div class="info-card fade-in-up delay-2">
         <div class="card-body">
           <h5 class="info-title">My School</h5>
-          <p class="card-text">Your school is: <span class="info-value" id="userSchool">加载中Loading...</span></p>
+          <p class="card-text">Your school is: <span class="info-value" id="userSchool">鍔犺浇涓璍oading...</span></p>
           
           <h5 class="info-title">My Region</h5>
-          <p class="card-text">You are at: <span class="info-value" id="userLocation">加载中Loading...</span></p>
+          <p class="card-text">You are at: <span class="info-value" id="userLocation">鍔犺浇涓璍oading...</span></p>
           
           <h5 class="info-title">My Carbon Credits</h5>
-          <p class="card-text">Your current carbon credits balance is: <span class="info-value" id="userPoints">加载中Loading...</span></p>
+          <p class="card-text">Your current carbon credits balance is: <span class="info-value" id="userPoints">鍔犺浇涓璍oading...</span></p>
           
           <h5 class="info-title">My Carbon Reduction (CO2 in kg)</h5>
-          <p class="card-text">You have saved a total of: <span class="info-value" id="userReduction">加载中Loading...</span></p>
+          <p class="card-text">You have saved a total of: <span class="info-value" id="userReduction">鍔犺浇涓璍oading...</span></p>
           
           <div class="text-right mt-4">
             <button type="button" class="btn btn-ios-primary ios-float" data-toggle="modal" data-target="#editUserModal">
@@ -1621,7 +1605,7 @@
 <div class="container content-container fade-in-up delay-4">
   <h2 class="ios-section-heading">Carbon Credits Leaderboards</h2>
   
-  <!-- iOS风格分段控制器 -->
+  <!-- iOS椋庢牸鍒嗘鎺у埗鍣?-->
   <div class="ios-segment-control">
     <button class="segment active" data-type="all">
       <i class="fas fa-globe-asia"></i>Global
@@ -1635,9 +1619,9 @@
     <div class="segment-selector"></div>
       </div>
   
-  <!-- iOS风格卡片表格 -->
+  <!-- iOS椋庢牸鍗＄墖琛ㄦ牸 -->
   <div class="ios-card-table fade-in-up delay-5">
-    <!-- 加载动画 -->
+    <!-- 鍔犺浇鍔ㄧ敾 -->
     <div class="ios-loading">
       <div class="ios-loader">
         <div class="ios-loader-ring"></div>
@@ -1646,8 +1630,8 @@
           <div class="ios-loader-dot"></div>
           <div class="ios-loader-dot"></div>
           </div>
-        <div class="ios-loader-text">加载排行榜数据...</div>
-        <!-- 气泡效果 -->
+        <div class="ios-loader-text">鍔犺浇鎺掕姒滄暟鎹?..</div>
+        <!-- 姘旀场鏁堟灉 -->
         <div class="bubble" style="left: 20%; animation-delay: 0s;"></div>
         <div class="bubble" style="left: 40%; animation-delay: 1s;"></div>
         <div class="bubble" style="left: 60%; animation-delay: 0.5s;"></div>
@@ -1655,19 +1639,19 @@
           </div>
             </div>
 
-    <!-- 排行榜内容区域 -->
+    <!-- 鎺掕姒滃唴瀹瑰尯鍩?-->
     <div id="leaderboard-content">
-      <!-- 内容将由JavaScript动态生成 -->
+      <!-- 鍐呭灏嗙敱JavaScript鍔ㄦ€佺敓鎴?-->
           </div>
           </div>
         </div>
 
-<!-- 添加编辑个人资料的模态窗口 -->
+<!-- 娣诲姞缂栬緫涓汉璧勬枡鐨勬ā鎬佺獥鍙?-->
 <div class="modal fade" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="editUserModalLabel">编辑个人资料 Edit Profile</h5>
+        <h5 class="modal-title" id="editUserModalLabel">缂栬緫涓汉璧勬枡 Edit Profile</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -1675,30 +1659,30 @@
       <div class="modal-body">
         <form id="editUserForm">
           <div class="form-group">
-            <label for="userCountrySelect">国家/地区 Country/Region</label>
+            <label for="userCountrySelect">鍥藉/鍦板尯 Country/Region</label>
             <select class="form-control" id="userCountrySelect">
-              <option value="">加载中Loading...</option>
+              <option value="">鍔犺浇涓璍oading...</option>
             </select>
           </div>
           <div class="form-group">
-            <label for="userStateSelect">省份/省 State/Province</label>
+            <label for="userStateSelect">鐪佷唤/鐪?State/Province</label>
             <select class="form-control" id="userStateSelect">
-              <option value="">请先选择国家 Please select a country first</option>
+              <option value="">璇峰厛閫夋嫨鍥藉 Please select a country first</option>
             </select>
           </div>
           <div class="form-group">
-            <label for="userSchoolSelect">学校 School</label>
+            <label for="userSchoolSelect">瀛︽牎 School</label>
             <select class="form-control" id="userSchoolSelect">
-              <option value="">加载中Loading...</option>
+              <option value="">鍔犺浇涓璍oading...</option>
             </select>
           </div>
           <div class="form-group" id="userSchoolInputGroup" style="display: none;">
-            <label for="userSchoolInput">输入学校名称 Enter School Name</label>
-            <input type="text" class="form-control" id="userSchoolInput" placeholder="请输入学校名">
+            <label for="userSchoolInput">杈撳叆瀛︽牎鍚嶇О Enter School Name</label>
+            <input type="text" class="form-control" id="userSchoolInput" placeholder="璇疯緭鍏ュ鏍″悕">
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">取消 Cancel</button>
-            <button type="submit" class="btn btn-ios-primary">保存 Save</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">鍙栨秷 Cancel</button>
+            <button type="submit" class="btn btn-ios-primary">淇濆瓨 Save</button>
           </div>
         </form>
       </div>
@@ -1706,53 +1690,53 @@
   </div>
 </div>
 
-<!-- 主题切换按钮 -->
+<!-- 涓婚鍒囨崲鎸夐挳 -->
 <div class="theme-toggle" id="themeToggle">
   <i class="fas fa-moon"></i>
 </div>
 
-<!-- 复制您主页的页脚 -->
+<!-- 澶嶅埗鎮ㄤ富椤电殑椤佃剼 -->
 <div id="footer-placeholder"></div>
 
 <script>
   $(document).ready(function() {
-    // 主题切换功能
+    // 涓婚鍒囨崲鍔熻兘
     initThemeToggle();
     
-    // 添加按钮点击状态切换
+    // 娣诲姞鎸夐挳鐐瑰嚮鐘舵€佸垏鎹?
     $('.ios-btn-group .btn').click(function() {
       $('.ios-btn-group .btn').removeClass('active');
       $(this).addClass('active');
     });
     
-    // 添加历史记录查看按钮点击事件
+    // 娣诲姞鍘嗗彶璁板綍鏌ョ湅鎸夐挳鐐瑰嚮浜嬩欢
     $('#viewHistoryBtn').on('click', function() {
       window.location.href = 'pthis.html';
     });
     
-    // 初始化排行榜选择器
+    // 鍒濆鍖栨帓琛屾閫夋嫨鍣?
     bindRankingButtons();
     
-    // 初始化选择器位置 - 修复选择器错位问题
-    setTimeout(initSegmentSelector, 100); // 添加小延迟确保DOM完全加载
+    // 鍒濆鍖栭€夋嫨鍣ㄤ綅缃?- 淇閫夋嫨鍣ㄩ敊浣嶉棶棰?
+    setTimeout(initSegmentSelector, 100); // 娣诲姞灏忓欢杩熺'淇滵OM瀹屽叏鍔犺浇
     
-    // 窗口大小变化时重新计算选择器位置
+    // 绐楀彛澶у皬鍙樺寲鏃堕噸鏂拌绠楅€夋嫨鍣ㄤ綅缃?
     $(window).on('resize', function() {
       initSegmentSelector();
     });
     
-    // 加载全球排行榜
+    // 鍔犺浇鍏ㄧ悆鎺掕姒?
     switchRanking('all');
     
-    // 加载用户数据
+    // 鍔犺浇鐢ㄦ埛鏁版嵁
     loadUserData();
     
-    // 监听模态窗口打开事件，预填充用户资料
+    // 鐩戝惉妯℃€佺獥鍙ｆ墦寮€浜嬩欢锛岄濉厖鐢ㄦ埛璧勬枡
     $('#editUserModal').on('show.bs.modal', function () {
       prepopulateUserForm();
     });
 
-    // 监听学校选择框的变化
+    // 鐩戝惉瀛︽牎閫夋嫨妗嗙殑鍙樺寲
     $('#userSchoolSelect').change(function () {
       if ($(this).val() == 'other') {
         $('#userSchoolInputGroup').show();
@@ -1761,35 +1745,52 @@
       }
     });
 
-    // 监听表单提交事件
+    // Listen for country select changes to update province/state data
+    $('#userCountrySelect').change(function() {
+      const countryCode = $(this).val();
+      if (countryCode) {
+        // Update province/state options after country selection
+        updateStates(countryCode).catch(error => {
+          console.error('Failed to update states/provinces:', error);
+        });
+      } else {
+        // Clear province/state dropdown if no country is selected
+        const statesSelect = document.getElementById('userStateSelect');
+        if (statesSelect) {
+          statesSelect.innerHTML = '<option value="">Please select a country first</option>';
+        }
+      }
+    });
+
+    // 鐩戝惉琛ㄥ崟鎻愪氦浜嬩欢
     $('#editUserForm').submit(function (e) {
       e.preventDefault();
       
-      // 显示加载状态
+      // 鏄剧ず鍔犺浇鐘舵€?
       const submitBtn = $(this).find('button[type="submit"]');
       const originalBtnText = submitBtn.html();
-      submitBtn.html('<i class="fas fa-spinner fa-spin mr-2"></i>保存中...');
+      submitBtn.html('<i class="fas fa-spinner fa-spin mr-2"></i>淇濆瓨涓?..');
       submitBtn.prop('disabled', true);
       
       var school = $('#userSchoolSelect').val();
-      var schoolName = ''; // 用于存储学校名称
+      var schoolName = ''; // 鐢ㄤ簬瀛樺偍瀛︽牎鍚嶇О
       var isNewSchool = false;
 
-      // 检查用户是否选择了"其他"选项
+      // 妫€鏌ョ敤鎴锋槸鍚﹂€夋嫨浜?鍏朵粬"閫夐」
       if (school === 'other') {
-        schoolName = $('#userSchoolInput').val(); // 从输入框获取学校名称
+        schoolName = $('#userSchoolInput').val(); // 浠庤緭鍏ユ鑾峰彇瀛︽牎鍚嶇О
         if (!schoolName || schoolName.trim() === '') {
-          // 显示错误提示
-          showIosAlert('请输入学校名称 / Please enter a school name');
+          // 鏄剧ず閿欒鎻愮ず
+          showAlert('璇疯緭鍏ュ鑾峰彇绉?/ Please enter a school name', 'warning');
           submitBtn.html(originalBtnText);
           submitBtn.prop('disabled', false);
           return;
         }
         isNewSchool = true;
       } else if (school) {
-        // 从下拉列表中获取学校名称
+        // 浠庝笅鎷夊垪琛ㄤ腑鑾峰彇瀛︽牎鍚嶇О
         schoolName = $('#userSchoolSelect option:selected').text();
-        if (schoolName === '请选择学校Select school') {
+        if (schoolName === '璇烽€夋嫨瀛︽牎Select school') {
           schoolName = '';
         }
       }
@@ -1798,52 +1799,52 @@
       var state = $('#userStateSelect').val();
       var token = localStorage.getItem('token');
       
-      // 构建请求数据
+      // 鏋勫缓璇锋眰鏁版嵁
       var requestData = {
         token: token
       };
       
-      // 只包含有值的字段
+      // 鍙寘鍚湁鍊肩殑瀛楁閿欙紝璁剧疆璇锋眰鍙傛暟
       if (schoolName) requestData.school = schoolName;
       if (state) requestData.state = state;
       if (country) requestData.country = country;
       if (isNewSchool) requestData.new_sch = true;
       
-      // 提交数据到后端
+      // 鎻愪氦鏁版嵁鍒板悗绔?
       $.ajax({
         type: 'POST',
         url: 'edit_user_info.php',
         data: requestData,
         dataType: 'json',
         success: function (response) {
-          // 恢复按钮状态
+          // 鎭㈠鎸夐挳鐘舵€?
           submitBtn.html(originalBtnText);
           submitBtn.prop('disabled', false);
           
           if (response.success) {
-            // 显示成功消息
-            showIosAlert('信息更新成功！Profile updated successfully!');
+            // 鏄剧ず鎴愬姛娑堟伅
+            showAlert('淇℃伅鏇存柊鎴愬姛锛丳rofile updated successfully!', 'success');
             $('#editUserModal').modal('hide');
             
-            // 刷新用户数据
+            // 鍒锋柊鐢ㄦ埛鏁版嵁
             loadUserData();
           } else {
-            // 显示错误消息
-            showIosAlert('更新失败: ' + (response.error || '未知错误'));
+            // 鏄剧ず閿欒鎻愮ず娑堟伅
+            showAlert('鏇存柊澶辫触: ' + (response.error || '鏈閿欙紝璇风◢鍚庡啀璇?, 'error');
           }
         },
         error: function (xhr, status, error) {
-          // 恢复按钮状态
+          // 鎭㈠鎸夐挳鐘舵€?
           submitBtn.html(originalBtnText);
           submitBtn.prop('disabled', false);
           
-          console.error('更新用户信息失败:', xhr.responseText);
-          showIosAlert('更新信息时出错，请稍后再试');
+          console.error('鏇存柊鐢ㄦ埛淇℃伅澶辫触:', xhr.responseText);
+          showAlert('鏇存柊淇℃伅鏃跺嚭閿欙紝璇风◢鍚庡啀璇?, 'error');
         }
       });
     });
 
-    // 创建气泡动画效果
+    // 鍒涘缓姘旀场鍔ㄧ敾鏁堟灉
     function createBubbles() {
       const loader = document.querySelector('.ios-loader');
       if (loader) {
@@ -1854,7 +1855,7 @@
           bubble.style.animationDuration = (Math.random() * 2 + 2) + 's';
           loader.appendChild(bubble);
           
-          // 动画结束后移除气泡
+          // 鍔ㄧ敾缁撴潫鍚庣Щ闄ゆ皵娉?
           setTimeout(() => {
             bubble.remove();
           }, 3000);
@@ -1862,18 +1863,19 @@
       }
     }
     
-    // 初始化气泡效果
+    // 鍒濆鍖栨皵娉℃晥鏋?
     createBubbles();
   });
   
-  // 加载用户数据
+  // 鍔犺浇鐢ㄦ埛鏁版嵁
   function loadUserData() {
     var token = localStorage.getItem('token');
     if (!token) {
-      $('#userPoints').text('未登录');
-      $('#topUserReduction').text('未登录');
-      alert('请先登录！');
-      window.location.href = 'index.html';
+      $('#userPoints').text('鏈櫥褰?);
+      $('#topUserReduction').text('鏈櫥褰?);
+      showAlert('璇峰厛鐧诲綍锛?, 'warning', function() {
+        window.location.href = 'index.html';
+      });
       return;
     }
     
@@ -1884,42 +1886,43 @@
       dataType: 'json',
         success: function (response) {
         if (response.success) {
-          // 更新页面上的用户信息
+          // 鏇存柊椤甸潰涓婄殑鐢ㄦ埛淇℃伅
           $('#userPoints').text(response.userPoints);
           var carbonReduction = response.userPoints / 10;
           $('#userReduction').text(carbonReduction);
           $('#topUserReduction').text(carbonReduction);
-          $('#userSchool').text(response.school || '未设置');
-          $('#userLocation').text(response.location || '未设置');
+          $('#userSchool').text(response.school || '鏈櫥褰?);
+          $('#userLocation').text(response.location || '鏈櫥褰?);
           
-          // 保存用户数据到本地存储，方便表单预填充
+          // 淇濆瓨鐢ㄦ埛鏁版嵁鍒版湰鍦板瓨鍌紝鏂逛究琛ㄥ崟棰勫～鍏?
           localStorage.setItem('userSchool', response.school || '');
           localStorage.setItem('userLocation', response.location || '');
           localStorage.setItem('userCountry', response.country || '');
           localStorage.setItem('userState', response.state || '');
         } else {
-          $('#userPoints').text('无法加载积分');
-          $('#topUserReduction').text('无法加载');
-          console.error('获取积分失败:', response.error);
+          $('#userPoints').text('鏃犳硶鍔犺浇绉垎');
+          $('#topUserReduction').text('鏃犳硶鍔犺浇');
+          console.error('鑾峰彇绉垎澶辫触:', response.error);
+          showAlert('璇锋眰鐢ㄦ埛鏁版嵁澶辫触锛岃绋嶅悗鍐嶈瘯', 'error');
         }
       },
       error: function (jqXHR, textStatus, errorThrown) {
-        console.log('服务器响应内容', jqXHR.responseText);
-        $('#userPoints').text('无法加载积分');
-        $('#topUserReduction').text('无法加载');
-        showIosAlert('请求用户数据失败，请稍后再试');
+        console.log('鏈嶅姟鍣ㄥ搷搴斿唴瀹?, jqXHR.responseText);
+        $('#userPoints').text('鏃犳硶鍔犺浇绉垎');
+        $('#topUserReduction').text('鏃犳硶鍔犺浇');
+        showAlert('璇锋眰鐢ㄦ埛鏁版嵁澶辫触锛岃绋嶅悗鍐嶈瘯', 'error');
       }
     });
   }
   
-  // 预填充用户表单
+  // 棰勫～鍏呯敤鎴疯〃鍗?
   function prepopulateUserForm() {
-    // 确保国家和学校数据已加载
+    // 纭繚鍥藉鍜屽鏍℃暟鎹凡鍔犺浇
     loadCountries().then(function() {
       const userCountry = localStorage.getItem('userCountry');
       if (userCountry) {
         $('#userCountrySelect').val(userCountry);
-        // 加载并选择用户的州/省
+        // 鍔犺浇骞堕€夋嫨鐢ㄦ埛鐨勫窞/鐪?
         updateStates(userCountry).then(function() {
           const userState = localStorage.getItem('userState');
           if (userState) {
@@ -1929,21 +1932,21 @@
       }
     });
     
-    // 加载学校列表后设置用户的学校
+    // 鍔犺浇瀛︽牎鍒楄〃鍚庤鏆楁ā寮忓彉鍖?
     loadSchools().then(function() {
       const userSchool = localStorage.getItem('userSchool');
       if (userSchool) {
-        // 检查下拉列表中是否有该学校
+        // 妫€鏌ヤ笅鎷夊垪琛ㄤ腑鏄惁鏈夎瀛︽牎
         let schoolFound = false;
         $('#userSchoolSelect option').each(function() {
           if ($(this).text() === userSchool) {
             $('#userSchoolSelect').val($(this).val());
             schoolFound = true;
-            return false; // 跳出循环
+            return false; // 璺冲嚭寰幆
           }
         });
         
-        // 如果下拉列表中没有该学校，选择"其他"并填充输入框
+        // 濡傛灉涓嬫媺鍒楄〃涓緷病鏈夎瀛︽牎锛岄€夋嫨"鍏朵粬"骞跺～鍏呰緭鍏ユ鑾峰彇
         if (!schoolFound && userSchool !== '') {
           $('#userSchoolSelect').val('other');
           $('#userSchoolInputGroup').show();
@@ -1953,7 +1956,7 @@
     });
   }
   
-  // 修改loadCountries函数为Promise形式
+  // 淇敼loadCountries鍑芥暟涓篜romise褰㈠紡
   function loadCountries() {
     return new Promise((resolve, reject) => {
     fetch('./countries.json')
@@ -1961,7 +1964,7 @@
       .then(data => {
           const countrySelect = document.getElementById('userCountrySelect');
           if (countrySelect) {
-            countrySelect.innerHTML = ''; // 清空现有选项
+            countrySelect.innerHTML = ''; // 娓呯┖鐜版湁閫夐」
         data.forEach(country => {
               const option = document.createElement('option');
               option.value = country.code;
@@ -1981,7 +1984,7 @@
     });
   }
   
-  // 修改updateStates函数为Promise形式
+  // 淇敼updateStates鍑芥暟涓篜romise褰㈠紡
   function updateStates(countryCode) {
     return new Promise((resolve, reject) => {
     fetch('./countries.json')
@@ -2012,7 +2015,7 @@
     });
   }
   
-  // 修改loadSchools函数为Promise形式
+  // 淇敼loadSchools鍑芥暟涓篜romise褰㈠紡
   function loadSchools() {
     return new Promise((resolve, reject) => {
       var token = localStorage.getItem('token');
@@ -2025,11 +2028,11 @@
       success: function (data) {
           var schoolSelect = document.getElementById('userSchoolSelect');
           if (schoolSelect) {
-            var schoolOptions = '<option value="">请选择学校Select school</option>';
+            var schoolOptions = '<option value="">璇烽€夋嫨瀛︽牎Select school</option>';
         $.each(data, function (index, school) {
               schoolOptions += '<option value="' + school.id + '">' + school.name + '</option>';
             });
-            schoolOptions += '<option value="other">其他Other（自行输入Enter new）</option>';
+            schoolOptions += '<option value="other">鍏朵粬Other锛堣嚜琛岃緭鍏鑾峰彇nter new锛?/option>';
             $('#userSchoolSelect').html(schoolOptions);
             resolve();
           } else {
@@ -2038,34 +2041,34 @@
           }
       },
       error: function (xhr, status, error) {
-          console.error('加载学校列表失败:', error);
+          console.error('鍔犺浇瀛︽牎鍒楄〃澶辫触:', error);
           reject(error);
         }
       });
     });
   }
   
-  // 绑定排行榜按钮事件
+  // 缁戝畾鎺掕緷鍔犵偣鍑讳簨浠?
   function bindRankingButtons() {
     $('.ios-segment-control .segment').off('click');
     
     $('.ios-segment-control .segment').on('click', function() {
       const type = $(this).data('type');
       
-      // 更新active状态
+      // 鏇存柊active鐘舵€?
       $('.ios-segment-control .segment').removeClass('active');
       $(this).addClass('active');
       
-      // 使用新方法计算并更新选择器位置
+      // 浣跨敤鏂版柟娉曡绠楀苟鏇存柊閫夋嫨鍣ㄤ綅缃?
       moveSelector(this);
       
-      // 加载对应排行榜
+      // 鍔犺浇瀵瑰簲鎺掕緷鍔?
       if (type === 'local') {
         var userLocation = $('#userLocation').text().trim();
-        if (!userLocation || userLocation === '未设置') {
-          showIosAlert('用户地区信息未设置，请先编辑个人资料');
+        if (!userLocation || userLocation === '鏈櫥褰?) {
+          showAlert('鐢ㄦ埛鍦板尯淇℃伅鏈櫥褰?紝璇峰厛缂栬緫涓緷汉璧勬枡', 'warning');
           
-          // 恢复到全球排行榜
+          // 鎭㈠鍒板叏鐞冩帓琛屾鐘舵€?
           setTimeout(function() {
             $('.ios-segment-control .segment[data-type="all"]').click();
           }, 300);
@@ -2074,10 +2077,10 @@
         }
       } else if (type === 'school') {
         var userSchool = $('#userSchool').text().trim();
-        if (!userSchool || userSchool === '未设置') {
-          showIosAlert('用户学校信息未设置，请先编辑个人资料');
+        if (!userSchool || userSchool === '鏈櫥褰?) {
+          showAlert('鐢ㄦ埛瀛︽牎淇℃伅鏈櫥褰?紝璇峰厛缂栬緫涓緷汉璧勬枡', 'warning');
           
-          // 恢复到全球排行榜
+          // 鎭㈠鍒板叏鐞冩帓琛屾鐘舵€?
           setTimeout(function() {
             $('.ios-segment-control .segment[data-type="all"]').click();
           }, 300);
@@ -2090,43 +2093,43 @@
     });
   }
   
-  // 移动选择器到指定元素位置
+  // 绉诲姩閫夋嫨鍣ㄥ埌鎸囧畾鍏冪礌浣嶇疆
   function moveSelector(target) {
     const selector = document.querySelector('.segment-selector');
     if (!selector || !target) return;
     
-    // 获取控制器容器
+    // 鑾峰彇鎺у埗鍣ㄥ鍚?
     const container = target.parentElement;
     
-    // 获取目标按钮的位置信息
+    // 鑾峰彇鐩爣鎸夐挳鍦ㄥ鍚?
     const targetRect = target.getBoundingClientRect();
     const containerRect = container.getBoundingClientRect();
     
-    // 计算目标按钮在容器中的相对位置
+    // 璁＄畻鐩爣鎸夐挳鍦ㄥ鍚?
     const relativeLeft = targetRect.left - containerRect.left;
     
-    // 设置选择器宽度与目标按钮一致（减去padding）
+    // 璁剧疆閫夋嫨鍣ㄥ鍚?
     selector.style.width = `${targetRect.width - 6}px`;
     
-    // 设置选择器的水平位置
+    // 璁剧疆閫夋嫨鍣ㄧ殑姘村钩浣嶇疆
     selector.style.transform = `translateX(${relativeLeft}px)`;
   }
   
-  // 初始化选择器位置函数 - 新函数
+  // 鍒濆鍖栭€夋嫨鍣ㄤ綅缃嚱鏁?- 鏂板嚱鏁?
   function initSegmentSelector() {
-    // 获取活跃的段落
+    // 鑾峰彇娲昏穬鐨勬鍚?
     const activeSegment = document.querySelector('.ios-segment-control .segment.active');
     if (!activeSegment) return;
     
-    // 使用新方法移动选择器
+    // 浣跨敤鏂版柟娉曠鍔ㄩ€夋嫨鍣?
     moveSelector(activeSegment);
   }
   
-  // 切换排行榜类型
+  // 鍒囨崲鎺掕緷鍔犵偣鍑讳簨浠?
   function switchRanking(type) {
-    console.log('切换排行榜类型', type);
+    console.log('鍒囨崲鎺掕緷鍔犵偣鍑讳簨浠?, type);
     
-    // 显示加载动画
+    // 鏄剧ず鍔犺浇鍔ㄧ敾
     $('#leaderboard-content').hide();
     $('.ios-loading').show();
     
@@ -2138,30 +2141,30 @@
       type: type,
     };
 
-    // 根据排行榜类型，设置请求参数
+    // 鏍规嵁鎺掕緷鍔犵偣鍑讳簨鍔?
     if (type === 'local') {
       data.location = userLocation;
     } else if (type === 'school') {
       data.school = userSchool;
     }
 
-    // 向后端发送请求，获取排行榜数据
+    // 鍚戝悗绔彂閫佽緷鍔?
     $.ajax({
       url: 'get_rank.php',
       type: 'POST',
       dataType: 'json',
       data: data,
       success: function (response) {
-        // 隐藏加载动画
+        // 闅愯棌鍔犺浇鍔ㄧ敾
         $('.ios-loading').hide();
         $('#leaderboard-content').show();
         
         if (response.success) {
-          // 清空现有排行榜
+          // 娓呯┖鐜版湁鎺掕緷鍔?
           $('#leaderboard-content').empty();
           
           if (response.ranking && response.ranking.length > 0) {
-            // 添加表格头部
+            // 娣诲姞琛ㄦ牸澶撮儴
             const tableHeader = $('<div class="ios-table-header">').append(
               $('<div class="col-rank">').text('Rank'),
               $('<div class="col-user">').text('Username'),
@@ -2171,7 +2174,7 @@
             
             var currentUsername = localStorage.getItem('username');
             
-            // 遍历排行榜数据并添加到表格中
+            // 閬嶅巻鎺掕緷鍔犵偣鍑讳簨鍔?
             $.each(response.ranking, function (index, user) {
               var rank = index + 1;
               var rankClass = '';
@@ -2180,7 +2183,7 @@
             if (rank <= 3) {
                 rankClass = 'top-rank rank-' + rank;
                 
-                // 修复徽章视觉问题
+                // 淇鐘舵寰界珷瑙嗚闂鎸夐挳
                 if (rank === 1) {
                   rankHtml = '<div class="rank-medal gold"><i class="fas fa-trophy"></i></div>';
                 } else if (rank === 2) {
@@ -2192,12 +2195,12 @@
                 rankHtml = '<div class="rank-medal normal">' + rank + '</div>';
               }
               
-              // 如果是当前用户，添加高亮类
+              // 濡傛灉鏄綋鍓嶇敤鎴凤紝娣诲姞楂樹寒绫?
               if (user.username === currentUsername) {
                 rankClass += ' current-user';
               }
               
-              // 创建行元素
+              // 鍒涘缓琛屽厓绱?
               const row = $('<div class="ios-table-row ' + rankClass + '">').append(
                 $('<div class="col-rank">').html(rankHtml),
                 $('<div class="col-user">').text(user.username),
@@ -2207,7 +2210,7 @@
               $('#leaderboard-content').append(row);
             });
           } else {
-            // 显示无数据状态
+            // 鏄剧ず鏃犳暟鎹姸鎬?
             const emptyState = $('<div class="ios-empty-state">').append(
               $('<i class="fas fa-trophy"></i>'),
               $('<p>').text('No ranking data available.')
@@ -2215,7 +2218,7 @@
             $('#leaderboard-content').append(emptyState);
           }
         } else {
-          // 显示错误信息
+          // 鏄剧ず閿欒鎻愮ず淇℃伅
           const errorState = $('<div class="ios-empty-state">').append(
             $('<i class="fas fa-exclamation-circle"></i>'),
             $('<p>').text('Failed to load ranking data: ' + (response.error || 'Unknown error'))
@@ -2224,11 +2227,11 @@
         }
       },
       error: function () {
-        // 隐藏加载动画
+        // 闅愯棌鍔犺浇鍔ㄧ敾
         $('.ios-loading').hide();
         $('#leaderboard-content').show();
         
-        // 显示错误信息
+        // 鏄剧ず閿欒鎻愮ず淇℃伅
         const errorState = $('<div class="ios-empty-state">').append(
           $('<i class="fas fa-exclamation-circle"></i>'),
           $('<p>').text('Failed to connect to the server. Please try again later.')
@@ -2238,13 +2241,13 @@
     });
   }
   
-  // 主题切换功能初始化
+  // 涓婚鍒囨崲鍔熻兘鍒濆鍖?
   function initThemeToggle() {
     const body = document.body;
     const themeToggle = document.getElementById('themeToggle');
     const icon = themeToggle.querySelector('i');
     
-    // 检查用户是否有保存的偏好
+    // 妫€鏌ョ敤鎴锋槸鍚︽湁淇濆瓨鐨勫亸濂?
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme) {
       body.className = savedTheme;
@@ -2257,7 +2260,7 @@
       updateThemeIcon('auto-theme');
     }
     
-    // 监听系统暗模式变化
+    // 鐩戝惉绯荤粺鏆楁ā寮忓彉鍖?
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
       if (body.classList.contains('auto-theme')) {
         if (e.matches) {
@@ -2269,7 +2272,7 @@
       }
     });
     
-    // 为主题切换按钮添加点击事件
+    // 涓轰富棰樺垏鎹㈡寜閽坊鍔犵偣鍑讳簨浠?
     themeToggle.addEventListener('click', function() {
       if (body.classList.contains('auto-theme')) {
         body.classList.remove('auto-theme');
@@ -2292,7 +2295,7 @@
     });
   }
   
-  // 更新主题图标
+  // 鏇存柊涓婚鍥炬爣
   function updateThemeIcon(theme) {
     const icon = document.querySelector('#themeToggle i');
     if (!icon) return;
@@ -2302,7 +2305,7 @@
     } else if (theme.includes('light-theme')) {
       icon.className = 'fas fa-moon';
     } else {
-      // 自动主题
+      // 鑷姩涓婚鍥炬爣
       if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
         icon.className = 'fas fa-sun';
       } else {
@@ -2311,67 +2314,16 @@
     }
   }
   
-  // 登出功能
+  // 鐧诲嚭鍔熻兘
   function logout() {
-    localStorage.removeItem('token'); // 确保移除正确的 localStorage 键
-    // 更新UI为未登录状态
+    localStorage.removeItem('token'); // 纭繚绉婚櫎姝ｇ'鐨?localStorage 閿?
+    // 鏇存柊UI涓烘湭鐧诲綍鐘舵€?
     $('#userStatus').text('');
     $('#logoutButton').hide();
     $('#loginButton').show();
     Redirect('index.html');
   }
   
-  // 页面跳转功能
+  // 椤甸潰璺宠浆鍔熻兘
   function Redirect(webpage) {
-    window.location = webpage;
-  }
-  
-  // iOS风格提示框改进版
-  function showIosAlert(message) {
-    // 创建iOS风格的提示框
-    const alertDiv = $('<div>').addClass('ios-alert')
-      .css({
-        'position': 'fixed',
-        'bottom': '20%',
-        'left': '50%',
-        'transform': 'translateX(-50%)',
-        'background-color': 'rgba(60, 60, 67, 0.7)',
-        'color': 'white',
-        'padding': '12px 20px',
-        'border-radius': '8px',
-        'max-width': '80%',
-        'text-align': 'center',
-        'z-index': '9999',
-        'font-size': '15px',
-        'opacity': '0',
-        'transition': 'opacity 0.2s ease',
-        'backdrop-filter': 'blur(10px)',
-        '-webkit-backdrop-filter': 'blur(10px)'
-      })
-      .text(message);
-    
-    // 为深色模式调整样式
-    if (document.body.classList.contains('dark-theme') || 
-        (document.body.classList.contains('auto-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-      alertDiv.css('background-color', 'rgba(70, 70, 77, 0.8)');
-    }
-    
-    // 添加到页面
-    $('body').append(alertDiv);
-    
-    // 显示提示框
-    setTimeout(() => {
-      alertDiv.css('opacity', '1');
-    }, 10);
-    
-    // 3秒后淡出并移除
-    setTimeout(() => {
-      alertDiv.css('opacity', '0');
-      setTimeout(() => {
-        alertDiv.remove();
-      }, 300);
-    }, 3000);
-  }
-</script>
-</body>
-</html>
+</script></body></html>

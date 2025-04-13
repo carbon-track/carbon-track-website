@@ -10,119 +10,304 @@
     <!-- 自定义样式 -->
     <style>
         body {
-            background-color: #f4f6f9;
-        }
-        .navbar {
-            background-color: #3c8dbc;
-        }
-        .navbar-brand, .navbar-nav .nav-link {
-            color: #fff;
-        }
-        .navbar-brand:hover, .navbar-nav .nav-link:hover {
-            color: #e0e0e0;
-        }
-        .card {
-            border: none;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
-            background-color: #fff;
-        }
-        .card-header {
-            background-color: #fff;
-            border-bottom: none;
-        }
-        .card-header h2 {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
-            font-size: 1.5rem;
+            padding: 0;
+            background-color: #f5f5f7;
             color: #333;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
-        .icon-large {
-            font-size: 2rem;
-            color: #3c8dbc;
+
+        /* 深色模式 */
+        body.dark-theme, 
+        body.auto-theme.dark-mode {
+            background-color: #000000;
+            color: #f5f5f7;
         }
-        .stat-card {
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        .stat-card:hover {
-            transform: translateY(-5px);
-        }
-        .stat-card .card-body {
+
+        .container-fluid {
             padding: 20px;
         }
-        .stat-card .fa-3x {
-            font-size: 3rem;
-        }
-        .stat-card .card-title {
-            margin-top: 15px;
-            font-size: 1.2rem;
-            font-weight: bold;
-        }
-        .stat-card .card-text {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #333;
-        }
-        .btn-primary {
-            background-color: #3c8dbc;
-            border-color: #367fa9;
-        }
-        .btn-primary:hover {
-            background-color: #367fa9;
-            border-color: #204d74;
-        }
-        .no-data {
-            text-align: center;
-            font-size: 18px;
-            color: #666;
-            padding: 20px;
+
+        #header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px;
             background-color: #fff;
-            border-radius: 5px;
-            animation: fadeIn 0.5s ease-in-out;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 16px;
+            margin-bottom: 20px;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
         }
-        /* 图表容器 */
-        .chart-container {
-            position: relative;
-            height: 40vh;
+
+        body.dark-theme #header,
+        body.auto-theme.dark-mode #header {
+            background-color: #1c1c1e;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        #header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        body.dark-theme #header h1,
+        body.auto-theme.dark-mode #header h1 {
+            color: #ffffff;
+        }
+
+        .card {
+            background-color: #fff;
+            border-radius: 16px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        body.dark-theme .card,
+        body.auto-theme.dark-mode .card {
+            background-color: #2c2c2e;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            padding: 15px 20px;
+            font-weight: 600;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        body.dark-theme .card-header,
+        body.auto-theme.dark-mode .card-header {
+            background-color: #2c2c2e;
+            border-bottom: 1px solid #38383a;
+            color: #ffffff;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .stat-card {
+            background-color: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            text-align: center;
+            height: 100%;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        body.dark-theme .stat-card,
+        body.auto-theme.dark-mode .stat-card {
+            background-color: #2c2c2e;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+            color: #007aff;
+        }
+
+        .stat-number {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+            transition: color 0.3s ease;
+        }
+
+        body.dark-theme .stat-number,
+        body.auto-theme.dark-mode .stat-number {
+            color: #ffffff;
+        }
+
+        .stat-title {
+            font-size: 14px;
+            color: #6c757d;
+            transition: color 0.3s ease;
+        }
+
+        body.dark-theme .stat-title,
+        body.auto-theme.dark-mode .stat-title {
+            color: #8e8e93;
+        }
+
+        .table {
             width: 100%;
+            margin-bottom: 1rem;
+            background-color: transparent;
         }
-        /* 错误日志动画 */
-        .fade-in {
-            animation: fadeIn 0.5s ease-in-out;
+
+        .table th,
+        .table td {
+            padding: 12px 15px;
+            vertical-align: top;
+            border-top: 1px solid #dee2e6;
+            transition: border-color 0.3s ease, color 0.3s ease;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+
+        body.dark-theme .table th,
+        body.auto-theme.dark-mode .table th {
+            color: #8e8e93;
+            border-top: 1px solid #38383a;
         }
-        /* 响应式调整 */
-        @media (max-width: 768px) {
-            .form-inline input, .form-inline select, .form-inline button, .form-check {
-                width: 100%;
-                margin-bottom: 10px;
-            }
+
+        body.dark-theme .table td,
+        body.auto-theme.dark-mode .table td {
+            color: #ffffff;
+            border-top: 1px solid #38383a;
         }
-        /* 错误日志折叠样式 */
-        .error-log-header {
+
+        .table thead th {
+            vertical-align: bottom;
+            border-bottom: 2px solid #dee2e6;
             background-color: #f8f9fa;
-            border-bottom: 1px solid #dee2e6;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
         }
-        .error-log-card-body {
-            padding: 15px;
-            border: 1px solid #dee2e6;
-            border-top: none;
+
+        body.dark-theme .table thead th,
+        body.auto-theme.dark-mode .table thead th {
+            background-color: #2c2c2e;
+            border-bottom: 2px solid #38383a;
         }
-        .error-log-details {
-            margin-top: 10px;
+
+        .table tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+            transition: background-color 0.3s ease;
         }
-        .error-log-details p {
-            margin: 5px 0;
+
+        body.dark-theme .table tbody tr:hover,
+        body.auto-theme.dark-mode .table tbody tr:hover {
+            background-color: rgba(255, 255, 255, 0.05);
         }
-        .error-log-details pre {
-            background-color: #f8f9fa;
-            padding: 10px;
-            border-radius: 5px;
-            overflow-x: auto;
+
+        .form-control {
+            display: block;
+            width: 100%;
+            padding: 0.375rem 0.75rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #495057;
+            background-color: #fff;
+            background-clip: padding-box;
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+        }
+
+        body.dark-theme .form-control,
+        body.auto-theme.dark-mode .form-control {
+            color: #ffffff;
+            background-color: #2c2c2e;
+            border-color: #38383a;
+        }
+
+        .form-control:focus {
+            color: #495057;
+            background-color: #fff;
+            border-color: #80bdff;
+            outline: 0;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+
+        body.dark-theme .form-control:focus,
+        body.auto-theme.dark-mode .form-control:focus {
+            color: #ffffff;
+            background-color: #3a3a3c;
+            border-color: #0a84ff;
+            box-shadow: 0 0 0 0.2rem rgba(10, 132, 255, 0.25);
+        }
+
+        .btn-primary {
+            color: #fff;
+            background-color: #007aff;
+            border-color: #007aff;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        body.dark-theme .btn-primary,
+        body.auto-theme.dark-mode .btn-primary {
+            background-color: #0a84ff;
+            border-color: #0a84ff;
+        }
+
+        .btn-primary:hover {
+            color: #fff;
+            background-color: #0069d9;
+            border-color: #0062cc;
+        }
+
+        body.dark-theme .btn-primary:hover,
+        body.auto-theme.dark-mode .btn-primary:hover {
+            background-color: #0077e6;
+            border-color: #0071d9;
+        }
+
+        /* 加载提示 */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner-border {
+            display: inline-block;
+            width: 2rem;
+            height: 2rem;
+            vertical-align: text-bottom;
+            border: 0.25em solid currentColor;
+            border-right-color: transparent;
+            border-radius: 50%;
+            animation: spinner-border 0.75s linear infinite;
+        }
+        
+        /* 添加顶部类型过滤按钮组样式 */
+        .error-type-filter {
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .filter-btn {
+            padding: 8px 16px;
+            border-radius: 20px;
+            background-color: #f0f0f0;
+            color: #333;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        body.dark-theme .filter-btn,
+        body.auto-theme.dark-mode .filter-btn {
+            background-color: #2c2c2e;
+            color: #ffffff;
+        }
+        
+        .filter-btn:hover {
+            background-color: #e0e0e0;
+        }
+        
+        body.dark-theme .filter-btn:hover,
+        body.auto-theme.dark-mode .filter-btn:hover {
+            background-color: #3a3a3c;
+        }
+        
+        .filter-btn.active {
+            background-color: #007aff;
+            color: white;
+        }
+        
+        body.dark-theme .filter-btn.active,
+        body.auto-theme.dark-mode .filter-btn.active {
+            background-color: #0a84ff;
         }
     </style>
     <!-- 引入 Chart.js -->
@@ -299,6 +484,8 @@
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
 <!-- Bootstrap JS -->
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<!-- 引入工具函数 -->
+<script src="js/utils.js"></script>
 <!-- 自定义脚本 -->
 <script>
     // 从 Cookie 中获取 Token
@@ -307,7 +494,7 @@
     }
 
     let token = getTokenFromCookie();
-    alert(token);
+    showAlert('令牌: ' + token, 'info');
     // 验证令牌
     function authenticate() {
         const formData = new URLSearchParams();
@@ -323,7 +510,7 @@
         .then(response => response.json())
         .then(data => {
             if (!data.success) {
-                alert('认证失败: ' + token);
+                showAlert('认证失败: ' + token, 'error');
                 window.location.href = '/'; // 重定向到主页或登录页
             } else {
                 // 加载统计数据和错误日志
@@ -353,7 +540,7 @@
                 renderDailyErrorChart(data.dailyErrorStats);
                 renderWeeklyErrorChart(data.weeklyErrorStats);
                 updateStatCards(data.errorTypeStats);
-                // 初始加载“按小时错误统计”图表，默认时间范围为最近一天
+                // 初始加载"按小时错误统计"图表，默认时间范围为最近一天
                 const today = new Date();
                 const yesterday = new Date();
                 yesterday.setDate(today.getDate() - 1);
@@ -361,7 +548,7 @@
                 document.getElementById('hourly_end_date').value = today.toISOString().split('T')[0];
                 loadHourlyErrorStats();
             } else {
-                alert('加载错误统计数据失败: ' + data.error);
+                showAlert('加载错误统计数据失败: ' + data.error, 'error');
             }
         })
         .catch(error => {
@@ -412,9 +599,15 @@
         const labels = stats.map(item => item.error_type);
         const counts = stats.map(item => parseInt(item.count));
 
-        const backgroundColors = [
-            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#FF6384', '#36A2EB'
-        ];
+        // 确定使用的颜色方案 - 检测深色模式
+        const isDarkMode = document.body.classList.contains('dark-theme') || 
+                          (document.body.classList.contains('auto-theme') && 
+                          window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+        // 根据模式选择颜色
+        const backgroundColors = isDarkMode ? 
+            ['#FF453A', '#FF9F0A', '#FFD60A', '#30D158', '#64D2FF', '#0A84FF', '#5E5CE6', '#BF5AF2'] : // 深色模式
+            ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#FF6384', '#36A2EB'];  // 浅色模式
 
         new Chart(ctx, {
             type: 'doughnut',
@@ -430,6 +623,9 @@
                 plugins: {
                     legend: {
                         position: 'right',
+                        labels: {
+                            color: isDarkMode ? '#FFFFFF' : '#333333' // 文字颜色适应模式
+                        }
                     },
                     datalabels: {
                         formatter: (value, ctx) => {
@@ -449,6 +645,11 @@
         const labels = stats.map(item => item.date);
         const counts = stats.map(item => parseInt(item.count));
 
+        // 确定使用的颜色方案
+        const isDarkMode = document.body.classList.contains('dark-theme') || 
+                          (document.body.classList.contains('auto-theme') && 
+                          window.matchMedia('(prefers-color-scheme: dark)').matches);
+
         new Chart(ctx, {
             type: 'bar',
             data: {
@@ -456,8 +657,8 @@
                 datasets: [{
                     label: '错误数',
                     data: counts,
-                    backgroundColor: '#36A2EB',
-                    borderColor: '#367fa9',
+                    backgroundColor: isDarkMode ? '#64D2FF' : '#36A2EB',
+                    borderColor: isDarkMode ? '#0A84FF' : '#367fa9',
                     borderWidth: 1
                 }]
             },
@@ -467,17 +668,29 @@
                     y: {
                         beginAtZero: true,
                         ticks: {
-                            stepSize: 1
+                            stepSize: 1,
+                            color: isDarkMode ? '#E5E5EA' : '#333333' // 刻度颜色适应模式
                         },
                         title: {
                             display: true,
-                            text: '错误数'
+                            text: '错误数',
+                            color: isDarkMode ? '#FFFFFF' : '#333333' // 标题颜色适应模式
+                        },
+                        grid: {
+                            color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' // 网格线颜色适应模式
                         }
                     },
                     x: {
                         title: {
                             display: true,
-                            text: '日期'
+                            text: '日期',
+                            color: isDarkMode ? '#FFFFFF' : '#333333' // 标题颜色适应模式
+                        },
+                        ticks: {
+                            color: isDarkMode ? '#E5E5EA' : '#333333' // 刻度颜色适应模式
+                        },
+                        grid: {
+                            color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' // 网格线颜色适应模式
                         }
                     }
                 },
@@ -497,7 +710,7 @@
 
         // 检查日期输入
         if (!startDate || !endDate) {
-            alert('请同时选择开始日期和结束日期进行按小时统计。');
+            showAlert('请同时选择开始日期和结束日期进行按小时统计。', 'warning');
             return;
         }
 
@@ -519,18 +732,23 @@
                 renderHourlyErrorChart(data.hourlyErrorStats, startDate, endDate);
             } else {
                 console.error('加载按小时错误统计数据失败:', data.error);
-                alert('加载按小时错误统计数据失败: ' + (data.error || '未知错误'));
+                showAlert('加载按小时错误统计数据失败: ' + (data.error || '未知错误'), 'error');
             }
         })
         .catch(error => {
             console.error('加载按小时错误统计数据错误:', error);
-            alert('加载按小时错误统计数据时发生错误。');
+            showAlert('加载按小时错误统计数据时发生错误。', 'error');
         });
     }
 
     // 渲染按小时错误统计图表
     function renderHourlyErrorChart(stats, startDate, endDate) {
         const ctx = document.getElementById('hourlyErrorChart').getContext('2d');
+
+        // 确定使用的颜色方案
+        const isDarkMode = document.body.classList.contains('dark-theme') || 
+                          (document.body.classList.contains('auto-theme') && 
+                          window.matchMedia('(prefers-color-scheme: dark)').matches);
 
         // 生成指定日期范围内的所有小时
         const start = new Date(startDate);
@@ -577,7 +795,8 @@
                     label: '错误数',
                     data: counts,
                     fill: false,
-                    borderColor: '#FF6384',
+                    borderColor: isDarkMode ? '#FF453A' : '#FF6384',
+                    pointBackgroundColor: isDarkMode ? '#FF453A' : '#FF6384',
                     tension: 0.1
                 }]
             },
@@ -595,14 +814,28 @@
                         },
                         title: {
                             display: true,
-                            text: '时间'
+                            text: '时间',
+                            color: isDarkMode ? '#FFFFFF' : '#333333'
+                        },
+                        ticks: {
+                            color: isDarkMode ? '#E5E5EA' : '#333333'
+                        },
+                        grid: {
+                            color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
                         }
                     },
                     y: {
                         beginAtZero: true,
                         title: {
                             display: true,
-                            text: '错误数'
+                            text: '错误数',
+                            color: isDarkMode ? '#FFFFFF' : '#333333'
+                        },
+                        ticks: {
+                            color: isDarkMode ? '#E5E5EA' : '#333333'
+                        },
+                        grid: {
+                            color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
                         }
                     }
                 },
@@ -616,61 +849,71 @@
     }
 
     // 渲染按星期错误统计图表
-function renderWeeklyErrorChart(stats) {
-    console.log('渲染按星期错误统计图表的数据:', stats); // 调试日志
-    if (!stats || stats.length === 0) {
-        console.error('weeklyErrorStats 数据未定义或为空。');
-        return;
-    }
-
-    const ctx = document.getElementById('weeklyErrorChart').getContext('2d');
-    const labels = ['星期一','星期二', '星期三', '星期四', '星期五', '星期六', '星期日'];
-    const counts = Array(7).fill(0);
-
-    stats.forEach(item => {
-        const weekday = parseInt(item.weekday);
-        const count = parseInt(item.count);
-
-        if (weekday >= 0 && weekday < 7) {
-            counts[weekday] = count;
-        } else {
-            console.warn(`无效的 weekday 值: ${item.weekday}`);
+    function renderWeeklyErrorChart(stats) {
+        console.log('渲染按星期错误统计图表的数据:', stats); // 调试日志
+        if (!stats || stats.length === 0) {
+            console.error('weeklyErrorStats 数据未定义或为空。');
+            return;
         }
-    });
 
-    console.log('Weekly Counts:', counts); // 确认 counts 数组
+        const ctx = document.getElementById('weeklyErrorChart').getContext('2d');
+        const labels = ['星期一','星期二', '星期三', '星期四', '星期五', '星期六', '星期日'];
+        const counts = Array(7).fill(0);
 
-    new Chart(ctx, {
-        type: 'polarArea',
-        data: {
-            labels: labels,
-            datasets: [{
-                data: counts,
-                backgroundColor: [
-                    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#FF6384'
-                ]
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'right',
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            // 使用 context.raw 直接获取数据值
-                            const value = context.raw;
-                            return `${context.label}: ${value}`;
+        // 确定使用的颜色方案
+        const isDarkMode = document.body.classList.contains('dark-theme') || 
+                          (document.body.classList.contains('auto-theme') && 
+                          window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+        // 适应深色模式的颜色
+        const backgroundColors = isDarkMode ? 
+            ['#FF453A', '#FF9F0A', '#FFD60A', '#30D158', '#64D2FF', '#0A84FF', '#5E5CE6'] : // 深色模式
+            ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#FF6384'];  // 浅色模式
+
+        stats.forEach(item => {
+            const weekday = parseInt(item.weekday);
+            const count = parseInt(item.count);
+
+            if (weekday >= 0 && weekday < 7) {
+                counts[weekday] = count;
+            } else {
+                console.warn(`无效的 weekday 值: ${item.weekday}`);
+            }
+        });
+
+        console.log('Weekly Counts:', counts); // 确认 counts 数组
+
+        new Chart(ctx, {
+            type: 'polarArea',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: counts,
+                    backgroundColor: backgroundColors
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            color: isDarkMode ? '#FFFFFF' : '#333333' // 文字颜色适应模式
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                // 使用 context.raw 直接获取数据值
+                                const value = context.raw;
+                                return `${context.label}: ${value}`;
+                            }
                         }
                     }
                 }
             }
-        }
-    });
-}
-
+        });
+    }
 
     // 加载错误日志列表
     function loadErrorLogs(specialType) {
@@ -705,7 +948,7 @@ function renderWeeklyErrorChart(stats) {
             if (data.success) {
                 renderErrorLogs(data.data);
             } else {
-                alert('加载错误日志失败: ' + data.error);
+                showAlert('加载错误日志失败: ' + data.error, 'error');
             }
         })
         .catch(error => {
