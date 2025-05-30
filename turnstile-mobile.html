@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Turnstile Verification</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+</head>
+<body>
+  <div class="cf-turnstile"
+       data-sitekey="0x4AAAAAABD07zmMDmgwgTsL"
+       data-callback="onVerify"
+       data-theme="light">
+  </div>
+
+  <script>
+    function onVerify(token) {
+      window.webkit.messageHandlers.turnstileToken.postMessage(token);
+    }
+  </script>
+</body>
+</html>
