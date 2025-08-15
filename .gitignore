@@ -19,3 +19,6 @@ gitpull.php
 chkreadstatus_log.txt
 getmsg_log.txt
 *.sql
+
+# 本地Run
+.vscode/launch.json
