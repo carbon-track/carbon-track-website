@@ -19,7 +19,7 @@
 }*/
 @font-face {
     font-family: 'abril';
-    src: url('/fonts/abril.woff') format('woff');
+    src: url('/fonts_old/abril.woff') format('woff');
     font-weight: normal;
     font-style: normal;
 }
@@ -41,15 +41,14 @@
 
         /* 设置背景颜色和字体 */
         body {
-            background-color: #f0f0f0;
-            font-family: 'junransong','anton';
+            background-color: var(--ios-secondary-background);
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Helvetica, Arial, sans-serif;
         }
 
-        /* 设置导航栏样式 */
-        .navbar {
+        /* 设置导航栏样式（仅用于仍使用旧导航的页面，避免与新导航冲突） */
+        .navbar.legacy-navbar {
             background-color: #002D69;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            font-family: 'cusong','anton';
                 padding-left: 40px; /* 增加左侧内边距 */
     padding-right: 40px; /* 增加右侧内边距 */
         }
@@ -195,17 +194,16 @@
 
         .carousel-item img {
             height: 100%;
+            width: 100%;
             object-fit: cover;
-                display: block;
-    margin-left: auto;
-    margin-right: auto;
-    width: auto; /* 如果您希望图片宽度自适应，可以设置为auto */
-    max-width: auto; /* 确保图片不会超过容器宽度 */
-    max-height: auto; /* 如果您希望高度自适应，可以设置为auto */
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
         }
         .carousel-inner img {
-    width: 250%; /* 使图片宽度占满容器 */
-    object-fit: cover; /* 可选：保持图片的宽高比 */
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
         /* 设置内容区域的样式 */
         .container {

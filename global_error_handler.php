@@ -144,6 +144,7 @@ function handleApiError($statusCode, $error)
         'message' => $responseMessage,
         'timestamp' => date('Y-m-d H:i:s')
     ], JSON_UNESCAPED_UNICODE);
+    exit;
 }
 
 /**

@@ -60,7 +60,7 @@ function showAlert(message, type = 'info', callback = null) {
     // Create modal HTML
     const modalId = 'iosAlertModal';
     const modalHTML = `
-    <div class="modal fade ios-alert-modal ${themeClass}" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal fade ios-alert-modal ${themeClass}" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
@@ -70,7 +70,7 @@ function showAlert(message, type = 'info', callback = null) {
                     ${message} 
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-ios alert-ok-button" data-bs-dismiss="modal">OK</button> 
+                    <button type="button" class="btn btn-ios alert-ok-button" data-bs-dismiss="modal" data-dismiss="modal">OK</button> 
                 </div>
             </div>
         </div>
@@ -81,7 +81,6 @@ function showAlert(message, type = 'info', callback = null) {
     document.body.insertAdjacentHTML('beforeend', modalHTML);
 
     const modalElement = document.getElementById(modalId);
-    const modal = new bootstrap.Modal(modalElement);
     const okButton = modalElement.querySelector('.alert-ok-button'); // Select the button
 
     // --- Start Debug Logging & Explicit Handler ---
@@ -133,9 +132,33 @@ function showAlert(message, type = 'info', callback = null) {
         }
     }, { once: true }); // Use { once: true } for automatic listener removal
 
-    // Show the modal
-    console.log(`[showAlert] Calling modal.show() for #${modalId}`);
-    modal.show();
+    // Show the modal (support Bootstrap 5 and fallback to Bootstrap 4 jQuery plugin)
+    console.log(`[showAlert] Showing modal #${modalId} with compatibility handling`);
+    try {
+        if (window.bootstrap && typeof window.bootstrap.Modal === 'function') {
+            const bs5Modal = new window.bootstrap.Modal(modalElement, { backdrop: 'static', keyboard: false });
+            bs5Modal.show();
+        } else if (typeof window.$ === 'function' && typeof window.$.fn.modal === 'function') {
+            window.$(modalElement).modal({ backdrop: 'static', keyboard: false, show: true });
+        } else {
+            // Ultimate fallback
+            alert(`${title}:\n\n${message.replace(/<[^>]*>/g, '')}`);
+            // Cleanup and callback
+            modalElement.remove();
+            if (callback && typeof callback === 'function') {
+                try { callback(); } catch (e) { console.error('showAlert callback error (fallback):', e); }
+            }
+            return;
+        }
+    } catch (e) {
+        console.error('[showAlert] Error showing modal, falling back to alert()', e);
+        alert(`${title}:\n\n${message.replace(/<[^>]*>/g, '')}`);
+        modalElement.remove();
+        if (callback && typeof callback === 'function') {
+            try { callback(); } catch (err) { console.error('showAlert callback error (catch):', err); }
+        }
+        return;
+    }
 }
 
 /**
