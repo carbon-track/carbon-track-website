@@ -33,7 +33,7 @@ try {
     if (!isAdmin($email)) {
         handleApiError(403, 'Access denied.');
     }
-
+    handleApiError(403, 'Access denied.');
     global $pdo; // Ensure $pdo from db.php is accessible
     if (!isset($pdo)) {
         require_once 'db.php';

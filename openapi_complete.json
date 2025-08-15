@@ -1349,5 +1349,20 @@
                 }
             }
         }
-    }
+    },
+    "components": {
+        "securitySchemes": {
+            "tokenAuth": {
+                "type": "apiKey",
+                "in": "formData",
+                "name": "token",
+                "description": "Encrypted authentication token obtained from login.php"
+            }
+        }
+    },
+    "security": [
+        {
+            "tokenAuth": []
+        }
+    ]
 }
