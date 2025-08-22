@@ -186,43 +186,63 @@ foreach ($phpFiles as $file) {
         ]
     ];
     
-    // Check for JSON responses
+    // Check for JSON responses - improved detection
+    $responseMatches = [];
+    
+    // Look for json_encode with array literals: json_encode(['key' => value])
     if (preg_match('/json_encode\(\s*\[([^\]]+)\]\s*\)/', $content, $matches)) {
         $responseProps = $matches[1];
         preg_match_all('/[\'"]([^\'"]+)[\'"]\s*=>\s*/', $responseProps, $propMatches);
-        
-        if (!empty($propMatches[1])) {
-            $responseProperties = ['success' => ['type' => 'boolean']];
-            
-            foreach ($propMatches[1] as $prop) {
-                if ($prop !== 'success') {
-                    // Try to determine property type
-                    $type = 'string';
-                    
-                    if (strpos($prop, 'count') !== false || 
-                        strpos($prop, 'id') !== false || 
-                        strpos($prop, 'points') !== false) {
-                        $type = 'integer';
-                    } else if (strpos($prop, 'is_') === 0 || 
-                              $prop === 'success') {
-                        $type = 'boolean';
-                    } else if (strpos($prop, 'list') !== false || 
-                              strpos($prop, 'array') !== false ||
-                              strpos($prop, 's') === strlen($prop) - 1) { // Plural names often indicate arrays
-                        $type = 'array';
-                        $responseProperties[$prop] = [
-                            'type' => 'array',
-                            'items' => ['type' => 'object']
-                        ];
-                        continue;
-                    }
-                    
-                    $responseProperties[$prop] = ['type' => $type];
-                }
+        $responseMatches = array_merge($responseMatches, $propMatches[1]);
+    }
+    
+    // Look for json_encode with variables: json_encode($response)
+    if (preg_match_all('/json_encode\(\s*\$([a-zA-Z_][a-zA-Z0-9_]*)\s*\)/', $content, $matches)) {
+        foreach ($matches[1] as $varName) {
+            // Look for variable assignment patterns like $response = ['key' => ...]
+            if (preg_match('/\$' . preg_quote($varName, '/') . '\s*=\s*\[([^\]]+)\]/', $content, $varMatches)) {
+                preg_match_all('/[\'"]([^\'"]+)[\'"]\s*=>\s*/', $varMatches[1], $propMatches);
+                $responseMatches = array_merge($responseMatches, $propMatches[1]);
             }
-            
-            $successResponse['content']['application/json']['schema']['properties'] = $responseProperties;
         }
+    }
+    
+    if (!empty($responseMatches)) {
+        $responseProperties = ['success' => ['type' => 'boolean']];
+        
+        foreach (array_unique($responseMatches) as $prop) {
+            if ($prop !== 'success') {
+                // Try to determine property type
+                $type = 'string';
+                
+                if (strpos($prop, 'count') !== false || 
+                    strpos($prop, 'id') !== false || 
+                    strpos($prop, 'points') !== false) {
+                    $type = 'integer';
+                } else if (strpos($prop, 'is_') === 0 || 
+                          $prop === 'success') {
+                    $type = 'boolean';
+                } else if ($prop === 'messages' || $prop === 'data' || $prop === 'users' || 
+                          $prop === 'leaderboard' || strpos($prop, 'list') !== false || 
+                          strpos($prop, 'array') !== false ||
+                          (strpos($prop, 's') === strlen($prop) - 1 && strlen($prop) > 3)) {
+                    $type = 'array';
+                    $responseProperties[$prop] = [
+                        'type' => 'array',
+                        'items' => ['type' => 'object']
+                    ];
+                    continue;
+                } else if ($prop === 'debug' || strpos($prop, 'info') !== false) {
+                    $type = 'object';
+                    $responseProperties[$prop] = ['type' => 'object'];
+                    continue;
+                }
+                
+                $responseProperties[$prop] = ['type' => $type];
+            }
+        }
+        
+        $successResponse['content']['application/json']['schema']['properties'] = $responseProperties;
     }
     
     // Determine error responses
