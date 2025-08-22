@@ -111,6 +111,49 @@ foreach ($phpFiles as $file) {
         }
     }
     
+    // Check for JSON input parameters (file_get_contents('php://input') + json_decode)
+    if (preg_match('/file_get_contents\([\'"]php:\/\/input[\'"]\)/', $content) && 
+        preg_match('/json_decode\(/', $content)) {
+        
+        // Look for parameters accessed via $data['param']
+        if (preg_match_all('/\$data\[[\'"]([^\'"]+)[\'"]\]/', $content, $matches)) {
+            $jsonParams = array_unique($matches[1]);
+            
+            $properties = [];
+            $required = [];
+            
+            foreach ($jsonParams as $param) {
+                $properties[$param] = ['type' => 'string'];
+                
+                // Check if parameter is required - look for patterns like:
+                // if (!isset($data['token']))
+                // if (!$data['token'])
+                if (preg_match('/!\s*isset\(\s*\$data\[[\'"]' . preg_quote($param, '/') . '[\'"]\]\s*\)/', $content) || 
+                    preg_match('/if\s*\(\s*!\s*\$data\[[\'"]' . preg_quote($param, '/') . '[\'"]\]/', $content)) {
+                    $required[] = $param;
+                }
+            }
+            
+            if (!empty($properties)) {
+                // Only set JSON requestBody if no form-encoded requestBody was already set
+                if (!$requestBody) {
+                    $requestBody = [
+                        'required' => true,
+                        'content' => [
+                            'application/json' => [
+                                'schema' => [
+                                    'type' => 'object',
+                                    'properties' => $properties,
+                                    'required' => $required
+                                ]
+                            ]
+                        ]
+                    ];
+                }
+            }
+        }
+    }
+    
     // Check for GET parameters
     if (preg_match_all('/\$_GET\[[\'"]([^\'"]+)[\'"]\]/', $content, $matches)) {
         $getParams = array_unique($matches[1]);
