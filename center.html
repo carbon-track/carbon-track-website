@@ -49,10 +49,13 @@
     
     /* 鍩虹鏍峰紡 */
     body {
+      padding-top: 70px; /* 为固定的导航栏留出空间 */
       background-color: var(--bg-color-light);
       color: var(--text-color-light);
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       transition: background-color 0.3s ease, color 0.3s ease;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
     
     /* 鏆楄壊妯″紡鏍峰紡 */
@@ -854,6 +857,74 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      display: flex;
+      align-items: center;
+    }
+
+    /* 用户头像样式 */
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      margin-right: 10px;
+      object-fit: cover;
+      border: 2px solid rgba(0, 122, 255, 0.1);
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .user-avatar:hover {
+      transform: scale(1.1);
+      border-color: rgba(0, 122, 255, 0.3);
+    }
+
+    /* 前三名特殊样式 */
+    .ios-table-row.top-rank {
+      background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 255, 255, 0.05));
+      border-left: 4px solid #FFD700;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .ios-table-row.rank-1 {
+      border-left-color: #FFD700;
+      background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 255, 255, 0.05));
+    }
+
+    .ios-table-row.rank-2 {
+      border-left-color: #C0C0C0;
+      background: linear-gradient(135deg, rgba(192, 192, 192, 0.15), rgba(255, 255, 255, 0.05));
+    }
+
+    .ios-table-row.rank-3 {
+      border-left-color: #CD7F32;
+      background: linear-gradient(135deg, rgba(205, 127, 50, 0.15), rgba(255, 255, 255, 0.05));
+    }
+
+    body.dark-theme .ios-table-row.top-rank,
+    body.auto-theme.dark-mode .ios-table-row.top-rank {
+      background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(0, 0, 0, 0.1));
+    }
+
+    /* 前三名头像特殊效果 */
+    .top-rank .user-avatar {
+      border-width: 3px;
+      box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3);
+    }
+
+    .rank-1 .user-avatar {
+      border-color: #FFD700;
+      box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+    }
+
+    .rank-2 .user-avatar {
+      border-color: #C0C0C0;
+      box-shadow: 0 4px 15px rgba(192, 192, 192, 0.4);
+    }
+
+    .rank-3 .user-avatar {
+      border-color: #CD7F32;
+      box-shadow: 0 4px 15px rgba(205, 127, 50, 0.4);
     }
     
     .ios-table-row .col-points {
@@ -909,33 +980,42 @@
     
     /* 鎺掑悕鏍囪 */
     .rank-medal {
-      width: 28px;
-      height: 28px;
+      width: 32px;
+      height: 32px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       border-radius: 50%;
-      margin-right: 10px;
+      margin-right: 12px;
       font-size: 14px;
       color: white;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.2);
       position: relative;
       flex-shrink: 0;
+      font-weight: 600;
     }
     
     .rank-medal.gold {
       background-color: #FFD700;
       background-image: linear-gradient(135deg, #FFD700, #FFC107);
+      color: #B8860B;
     }
     
     .rank-medal.silver {
       background-color: #C0C0C0;
       background-image: linear-gradient(135deg, #E0E0E0, #9E9E9E);
+      color: #696969;
     }
     
     .rank-medal.bronze {
       background-color: #CD7F32;
-      background-image: linear-gradient(135deg, #D4A676, #A56C50);
+      background-image: linear-gradient(135deg, #CD7F32, #8B4513);
+      color: #654321;
+    }
+
+    .rank-medal i {
+      font-size: 16px;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
     }
     
     .rank-medal.normal {
@@ -2355,40 +2435,123 @@
             
             var currentUsername = localStorage.getItem('username');
             
-            // 閬嶅巻鎺掕緷鍔犵偣鍑讳簨鍔?
-            $.each(response.ranking, function (index, user) {
-              var rank = index + 1;
-              var rankClass = '';
-              var rankHtml = '';
-              
-            if (rank <= 3) {
-                rankClass = 'top-rank rank-' + rank;
-                
-                // 淇鐘舵寰界珷瑙嗚闂鎸夐挳
-                if (rank === 1) {
-                  rankHtml = '<div class="rank-medal gold"><i class="fas fa-trophy"></i></div>';
-                } else if (rank === 2) {
-                  rankHtml = '<div class="rank-medal silver"><i class="fas fa-medal"></i></div>';
-                } else {
-                  rankHtml = '<div class="rank-medal bronze"><i class="fas fa-award"></i></div>';
+            // 遍历排行榜数据并获取头像信息
+            const usernames = response.ranking.map(user => user.username);
+            
+            // 获取用户头像信息
+            $.ajax({
+              url: 'get_users_avatars.php', 
+              type: 'POST',
+              dataType: 'json',
+              data: { 
+                token: token,
+                userIds: JSON.stringify(usernames)
+              },
+              success: function(avatarResponse) {
+                const avatarMap = {};
+                if (avatarResponse && avatarResponse.success && avatarResponse.avatars) {
+                  avatarResponse.avatars.forEach(avatar => {
+                    avatarMap[avatar.username] = avatar.avatar_url || 'img/avatars/avatar1.svg';
+                  });
                 }
-              } else {
-                rankHtml = '<div class="rank-medal normal">' + rank + '</div>';
+                
+                // 渲染排行榜行
+                $.each(response.ranking, function (index, user) {
+                  var rank = index + 1;
+                  var rankClass = '';
+                  var rankHtml = '';
+                  
+                  if (rank <= 3) {
+                    rankClass = 'top-rank rank-' + rank;
+                    
+                    // 修复状态徽章视觉问题按钮
+                    if (rank === 1) {
+                      rankHtml = '<div class="rank-medal gold"><i class="fas fa-trophy"></i></div>';
+                    } else if (rank === 2) {
+                      rankHtml = '<div class="rank-medal silver"><i class="fas fa-medal"></i></div>';
+                    } else {
+                      rankHtml = '<div class="rank-medal bronze"><i class="fas fa-award"></i></div>';
+                    }
+                  } else {
+                    rankHtml = '<div class="rank-medal normal">' + rank + '</div>';
+                  }
+                  
+                  // 如果是当前用户，添加高亮类
+                  if (user.username === currentUsername) {
+                    rankClass += ' current-user';
+                  }
+                  
+                  // 获取用户头像URL
+                  const avatarUrl = avatarMap[user.username] || 'img/avatars/avatar1.svg';
+                  
+                  // 创建用户信息容器（包含头像和用户名）
+                  const userContainer = $('<div class="col-user">');
+                  if (rank <= 3) {
+                    // 前三名显示头像
+                    userContainer.append(
+                      $('<img class="user-avatar">').attr('src', avatarUrl).attr('alt', user.username),
+                      $('<span>').text(user.username)
+                    );
+                  } else {
+                    // 其他排名只显示用户名
+                    userContainer.text(user.username);
+                  }
+                  
+                  // 创建行元素
+                  const row = $('<div class="ios-table-row ' + rankClass + '">').append(
+                    $('<div class="col-rank">').html(rankHtml),
+                    userContainer,
+                    $('<div class="col-points">').text(user.points)
+                  );
+                  
+                  $('#leaderboard-content').append(row);
+                });
+              },
+              error: function() {
+                // 如果获取头像失败，使用默认头像渲染
+                $.each(response.ranking, function (index, user) {
+                  var rank = index + 1;
+                  var rankClass = '';
+                  var rankHtml = '';
+                  
+                  if (rank <= 3) {
+                    rankClass = 'top-rank rank-' + rank;
+                    
+                    if (rank === 1) {
+                      rankHtml = '<div class="rank-medal gold"><i class="fas fa-trophy"></i></div>';
+                    } else if (rank === 2) {
+                      rankHtml = '<div class="rank-medal silver"><i class="fas fa-medal"></i></div>';
+                    } else {
+                      rankHtml = '<div class="rank-medal bronze"><i class="fas fa-award"></i></div>';
+                    }
+                  } else {
+                    rankHtml = '<div class="rank-medal normal">' + rank + '</div>';
+                  }
+                  
+                  if (user.username === currentUsername) {
+                    rankClass += ' current-user';
+                  }
+                  
+                  // 创建用户信息容器
+                  const userContainer = $('<div class="col-user">');
+                  if (rank <= 3) {
+                    userContainer.append(
+                      $('<img class="user-avatar">').attr('src', 'img/avatars/avatar1.svg').attr('alt', user.username),
+                      $('<span>').text(user.username)
+                    );
+                  } else {
+                    userContainer.text(user.username);
+                  }
+                  
+                  const row = $('<div class="ios-table-row ' + rankClass + '">').append(
+                    $('<div class="col-rank">').html(rankHtml),
+                    userContainer,
+                    $('<div class="col-points">').text(user.points)
+                  );
+                  
+                  $('#leaderboard-content').append(row);
+                });
               }
-              
-              // 濡傛灉鏄綋鍓嶇敤鎴凤紝娣诲姞楂樹寒绫?
-              if (user.username === currentUsername) {
-                rankClass += ' current-user';
-              }
-              
-              // 鍒涘缓琛屽厓绱?
-              const row = $('<div class="ios-table-row ' + rankClass + '">').append(
-                $('<div class="col-rank">').html(rankHtml),
-                $('<div class="col-user">').text(user.username),
-                $('<div class="col-points">').text(user.points)
-              );
-              
-              $('#leaderboard-content').append(row);
             });
           } else {
             // 鏄剧ず鏃犳暟鎹姸鎬?
