@@ -13,8 +13,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             handleApiError(401, 'Invalid token.');
         }
 
-        // 获取用户积分
-        $stmtUser = $pdo->prepare("SELECT points, school, location FROM users WHERE email = :email");
+    // 获取用户积分与头像
+    $stmtUser = $pdo->prepare("SELECT points, school, location, avatar, avatar_id FROM users WHERE email = :email");
         $stmtUser->bindParam(':email', $email, PDO::PARAM_STR);
         $stmtUser->execute();
         $userInfo = $stmtUser->fetch(PDO::FETCH_ASSOC); // 使用fetch获取一行数据
@@ -26,12 +26,34 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $leaderboard = $stmtLeaderboard->fetchAll();
 
         if ($userInfo) {
+            // 解析头像URL（优先使用avatar_id关联的avatars表）
+            $avatarUrl = null;
+            $avatarId = isset($userInfo['avatar_id']) ? intval($userInfo['avatar_id']) : null;
+            if ($avatarId) {
+                $stmtA = $pdo->prepare("SELECT filename FROM avatars WHERE id = :id AND active = 1");
+                $stmtA->execute([':id' => $avatarId]);
+                $rowA = $stmtA->fetch(PDO::FETCH_ASSOC);
+                if ($rowA && !empty($rowA['filename'])) {
+                    $avatarUrl = 'img/avatars/' . $rowA['filename'];
+                }
+            }
+            // 若未找到，退回到legacy filename
+            if (!$avatarUrl && !empty($userInfo['avatar'])) {
+                $avatarUrl = 'img/avatars/' . $userInfo['avatar'];
+            }
+            // 最终兜底
+            if (!$avatarUrl) {
+                $avatarUrl = 'img/avatars/avatar1.svg';
+            }
             echo json_encode([
                 'success' => true,
                 'userPoints' => $userInfo['points'],
                 'leaderboard' => $leaderboard,
                 'school' => $userInfo['school'],
-                'location' => $userInfo['location']
+                'location' => $userInfo['location'],
+                'avatar' => isset($userInfo['avatar']) ? $userInfo['avatar'] : null,
+                'avatar_id' => $avatarId,
+                'avatar_url' => $avatarUrl
             ]);
         } else {
             handleApiError(404, 'User not found.');
@@ -45,4 +67,4 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     handleApiError(405, 'Invalid request method.');
 }
 
-?>
+// No closing PHP tag to avoid accidental output

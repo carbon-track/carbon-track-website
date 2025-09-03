@@ -40,11 +40,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $params[':location'] = sanitizeInput($_POST['state']);
         }
 
+        // 允许更新头像（仅限预设文件名）
+        if (isset($_POST['avatar']) && !empty(trim($_POST['avatar']))) {
+            $avatar = basename(sanitizeInput($_POST['avatar'])); // 防止路径穿越
+            // 仅允许以 avatar 开头且为 svg/png/jpg 的文件
+            if (preg_match('/^avatar\d+\.(svg|png|jpg|jpeg)$/i', $avatar)) {
+                $updateFields[] = "avatar = :avatar";
+                $params[':avatar'] = $avatar;
+            } else {
+                handleApiError(400, '非法的头像选项');
+            }
+        }
+
         if (empty($updateFields)) {
             handleApiError(400, '没有提供更新信息');
         }
 
-        $sql = "UPDATE users SET " . join(', ', $updateFields) . " WHERE email = :email";
+    $sql = "UPDATE users SET " . join(', ', $updateFields) . " WHERE email = :email";
         $params[':email'] = $email;
 
         $stmt = $pdo->prepare($sql);
@@ -56,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 echo json_encode(['success' => true, 'message' => '未进行任何更改（可能数据未变动）。']);
             }
         } else {
-            throw new Exception('未能更新用户信息。');
+            handleApiError(500, '未能更新用户信息。');
         }
 
     } catch (PDOException $e) {
@@ -67,4 +79,4 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 } else {
     handleApiError(405, 'Invalid request method');
 }
-?>
+// No closing PHP tag

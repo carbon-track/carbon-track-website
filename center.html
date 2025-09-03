@@ -1085,8 +1085,9 @@
       margin-top: 8px;
       color: var(--muted-text-light);
       opacity: 0.9;
-      background: linear-gradient(135deg, var(--ios-blue-light), var(--ios-purple-light));
-      -webkit-background-clip: text;
+  background: linear-gradient(135deg, var(--ios-blue-light), var(--ios-purple-light));
+  background-clip: text;
+  -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       animation: ios-loader-text-pulse 1.5s infinite ease-in-out;
     }
@@ -1556,6 +1557,53 @@
     body.auto-theme.dark-mode .btn-ios-success:hover {
       box-shadow: 0 8px 25px rgba(48, 209, 88, 0.4);
     }
+
+    /* 头像展示与选择样式 */
+    .avatar-display {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .avatar-img {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: var(--bg-color-light);
+      border: 2px solid var(--border-color-light);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    body.dark-theme .avatar-img,
+    body.auto-theme.dark-mode .avatar-img {
+      background: var(--bg-color-dark);
+      border-color: var(--border-color-dark);
+    }
+    .avatar-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .avatar-option {
+      padding: 10px;
+      border-radius: 12px;
+      border: 2px solid transparent;
+      background: var(--card-bg-light);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: transform .15s ease, border-color .2s ease, box-shadow .2s ease, background .2s ease;
+    }
+    body.dark-theme .avatar-option,
+    body.auto-theme.dark-mode .avatar-option {
+      background: var(--card-bg-dark);
+    }
+    .avatar-option:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
+    .avatar-option.selected { border-color: var(--ios-blue-light); box-shadow: 0 0 0 4px rgba(0,122,255,0.12); }
+    body.dark-theme .avatar-option.selected,
+    body.auto-theme.dark-mode .avatar-option.selected { border-color: var(--ios-blue-dark); box-shadow: 0 0 0 4px rgba(10,132,255,0.2); }
+    .avatar-option img { width: 72px; height: 72px; border-radius: 50%; object-fit: cover; }
   </style>
 </head>
 <body class="auto-theme">
@@ -1576,6 +1624,18 @@
     <div class="col-md-12">
       <div class="info-card fade-in-up delay-2">
         <div class="card-body">
+          <div class="avatar-display">
+            <img id="userAvatarImg" class="avatar-img" src="img/avatars/avatar1.svg" alt="User Avatar" />
+            <div>
+              <div class="info-title">My Avatar</div>
+              <div>
+                <button type="button" class="btn btn-sm btn-ios-primary ml-0" data-toggle="modal" data-target="#changeAvatarModal" id="changeAvatarBtn">
+                  <i class="fas fa-user-circle mr-2"></i>Change Avatar
+                </button>
+              </div>
+            </div>
+          </div>
+
           <h5 class="info-title">My School</h5>
           <p class="card-text">Your school is: <span class="info-value" id="userSchool">鍔犺浇涓璍oading...</span></p>
           
@@ -1647,8 +1707,8 @@
         </div>
 
 <!-- 娣诲姞缂栬緫涓汉璧勬枡鐨勬ā鎬佺獥鍙?-->
-<div class="modal fade" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
+<div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="editUserModalLabel">缂栬緫涓汉璧勬枡 Edit Profile</h5>
@@ -1689,6 +1749,29 @@
     </div>
   </div>
 </div>
+
+<!-- 更改头像 Modal -->
+<div class="modal fade" id="changeAvatarModal" tabindex="-1" aria-labelledby="changeAvatarLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="changeAvatarLabel">选择头像 Choose an Avatar</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="avatar-grid" id="avatarGrid">
+          <!-- Avatars will be loaded dynamically -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">取消 Cancel</button>
+        <button type="button" class="btn btn-ios-primary" id="saveAvatarBtn">保存 Save</button>
+      </div>
+    </div>
+  </div>
+  </div>
 
 <!-- 涓婚鍒囨崲鎸夐挳 -->
 <div class="theme-toggle" id="themeToggle">
@@ -1734,6 +1817,68 @@
     // 鐩戝惉妯℃€佺獥鍙ｆ墦寮€浜嬩欢锛岄濉厖鐢ㄦ埛璧勬枡
     $('#editUserModal').on('show.bs.modal', function () {
       prepopulateUserForm();
+    });
+
+    // 更改头像：点击选中效果（ID-based）
+    $('#avatarGrid').on('click', '.avatar-option', function() {
+      $('#avatarGrid .avatar-option').removeClass('selected');
+      $(this).addClass('selected');
+    });
+
+    // 打开头像弹窗时加载并预选当前头像
+    $('#changeAvatarModal').on('show.bs.modal', function() {
+      loadAvatarChoices();
+    });
+
+    // 保存头像（通过avatar_id）
+    $('#saveAvatarBtn').on('click', function() {
+      const selectedId = $('#avatarGrid .avatar-option.selected').data('id');
+      if (!selectedId) {
+        showAlert('请选择一个头像 Please choose an avatar', 'warning');
+        return;
+      }
+      const token = localStorage.getItem('token');
+      if (!token) {
+        showAlert('请先登录 Please log in', 'warning');
+        return;
+      }
+      const btn = $(this);
+      const original = btn.html();
+      btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-2"></i>保存中...');
+
+      $.ajax({
+        type: 'POST',
+        url: 'set_user_avatar.php',
+        data: { token: token, avatar_id: selectedId },
+        dataType: 'json',
+        success: function(resp){
+          btn.prop('disabled', false).html(original);
+          if (resp && resp.success) {
+            // 更新本地与页面
+            const selectedUrl = $('#avatarGrid .avatar-option.selected img').attr('src');
+            localStorage.setItem('userAvatarId', String(selectedId));
+            if (selectedUrl) localStorage.setItem('userAvatarUrl', selectedUrl);
+            $('#userAvatarImg').attr('src', selectedUrl || 'img/avatars/avatar1.svg');
+            $('#changeAvatarModal').modal('hide');
+            showAlert('头像已更新 Avatar updated', 'success');
+            // 更新导航栏头像（如果函数可用）
+            if (typeof fetchAndRenderNavbarAvatar === 'function') {
+              fetchAndRenderNavbarAvatar();
+            } else {
+              const cachedUrl = localStorage.getItem('userAvatarUrl');
+              if (cachedUrl) $('#navbarUserAvatar').attr('src', cachedUrl);
+              $('#navbarAvatarContainer').show();
+            }
+          } else {
+            showAlert('更新失败: ' + (resp && (resp.error || resp.message) || 'Unknown error'), 'error');
+          }
+        },
+        error: function(xhr){
+          btn.prop('disabled', false).html(original);
+          showAlert('服务器错误，稍后再试 Server error', 'error');
+          console.error(xhr.responseText);
+        }
+      });
     });
 
     // 鐩戝惉瀛︽牎閫夋嫨妗嗙殑鍙樺寲
@@ -1829,8 +1974,8 @@
             // 鍒锋柊鐢ㄦ埛鏁版嵁
             loadUserData();
           } else {
-            // 鏄剧ず閿欒鎻愮ず娑堟伅
-            showAlert('鏇存柊澶辫触: ' + (response.error || '鏈閿欙紝璇风◢鍚庡啀璇?, 'error');
+            // 显示错误提示
+            showAlert('更新失败: ' + (response.error || '发生错误，请稍后再试'), 'error');
           }
         },
         error: function (xhr, status, error) {
@@ -1838,8 +1983,8 @@
           submitBtn.html(originalBtnText);
           submitBtn.prop('disabled', false);
           
-          console.error('鏇存柊鐢ㄦ埛淇℃伅澶辫触:', xhr.responseText);
-          showAlert('鏇存柊淇℃伅鏃跺嚭閿欙紝璇风◢鍚庡啀璇?, 'error');
+          console.error('更新用户信息失败:', xhr.responseText);
+          showAlert('更新信息时出错，请稍后再试', 'error');
         }
       });
     });
@@ -1871,9 +2016,9 @@
   function loadUserData() {
     var token = localStorage.getItem('token');
     if (!token) {
-      $('#userPoints').text('鏈櫥褰?);
-      $('#topUserReduction').text('鏈櫥褰?);
-      showAlert('璇峰厛鐧诲綍锛?, 'warning', function() {
+      $('#userPoints').text('未登录');
+      $('#topUserReduction').text('未登录');
+      showAlert('请先登录', 'warning', function() {
         window.location.href = 'index.html';
       });
       return;
@@ -1891,8 +2036,14 @@
           var carbonReduction = response.userPoints / 10;
           $('#userReduction').text(carbonReduction);
           $('#topUserReduction').text(carbonReduction);
-          $('#userSchool').text(response.school || '鏈櫥褰?);
-          $('#userLocation').text(response.location || '鏈櫥褰?);
+          $('#userSchool').text(response.school || '未设置');
+          $('#userLocation').text(response.location || '未设置');
+
+          // 头像显示（优先使用后端avatar_url/avatar_id）
+          var avatarUrl = response.avatar_url || localStorage.getItem('userAvatarUrl') || 'img/avatars/avatar1.svg';
+          $('#userAvatarImg').attr('src', avatarUrl);
+          if (response.avatar_id) localStorage.setItem('userAvatarId', String(response.avatar_id));
+          localStorage.setItem('userAvatarUrl', avatarUrl);
           
           // 淇濆瓨鐢ㄦ埛鏁版嵁鍒版湰鍦板瓨鍌紝鏂逛究琛ㄥ崟棰勫～鍏?
           localStorage.setItem('userSchool', response.school || '');
@@ -1907,10 +2058,40 @@
         }
       },
       error: function (jqXHR, textStatus, errorThrown) {
-        console.log('鏈嶅姟鍣ㄥ搷搴斿唴瀹?, jqXHR.responseText);
+  console.log('服务器响应内容:', jqXHR.responseText);
         $('#userPoints').text('鏃犳硶鍔犺浇绉垎');
         $('#topUserReduction').text('鏃犳硶鍔犺浇');
         showAlert('璇锋眰鐢ㄦ埛鏁版嵁澶辫触锛岃绋嶅悗鍐嶈瘯', 'error');
+      }
+    });
+  }
+
+  // 动态加载可选头像列表（支持PNG/SVG，基于ID）
+  function loadAvatarChoices() {
+    const grid = $('#avatarGrid');
+    const currentId = parseInt(localStorage.getItem('userAvatarId') || '0', 10);
+    grid.empty();
+    $.ajax({
+      url: 'list_avatars.php',
+      type: 'GET',
+      dataType: 'json',
+      success: function(resp) {
+        if (resp && resp.success && Array.isArray(resp.avatars)) {
+          resp.avatars.forEach(function(a){
+            const item = $('<div class="avatar-option" tabindex="0"></div>')
+              .attr('data-id', a.id)
+              .append($('<img>').attr('src', a.url).attr('alt', a.filename));
+            if (currentId && a.id === currentId) {
+              item.addClass('selected');
+            }
+            grid.append(item);
+          });
+        } else {
+          grid.html('<div class="text-muted">无法加载头像列表</div>');
+        }
+      },
+      error: function() {
+        grid.html('<div class="text-danger">加载头像失败，请稍后重试</div>');
       }
     });
   }
@@ -2065,8 +2246,8 @@
       // 鍔犺浇瀵瑰簲鎺掕緷鍔?
       if (type === 'local') {
         var userLocation = $('#userLocation').text().trim();
-        if (!userLocation || userLocation === '鏈櫥褰?) {
-          showAlert('鐢ㄦ埛鍦板尯淇℃伅鏈櫥褰?紝璇峰厛缂栬緫涓緷汉璧勬枡', 'warning');
+        if (!userLocation || userLocation === '未设置') {
+          showAlert('用户地区信息未设置，请先在“编辑个人资料”中完善', 'warning');
           
           // 鎭㈠鍒板叏鐞冩帓琛屾鐘舵€?
           setTimeout(function() {
@@ -2077,8 +2258,8 @@
         }
       } else if (type === 'school') {
         var userSchool = $('#userSchool').text().trim();
-        if (!userSchool || userSchool === '鏈櫥褰?) {
-          showAlert('鐢ㄦ埛瀛︽牎淇℃伅鏈櫥褰?紝璇峰厛缂栬緫涓緷汉璧勬枡', 'warning');
+        if (!userSchool || userSchool === '未设置') {
+          showAlert('用户学校信息未设置，请先在“编辑个人资料”中完善', 'warning');
           
           // 鎭㈠鍒板叏鐞冩帓琛屾鐘舵€?
           setTimeout(function() {
@@ -2127,7 +2308,7 @@
   
   // 鍒囨崲鎺掕緷鍔犵偣鍑讳簨浠?
   function switchRanking(type) {
-    console.log('鍒囨崲鎺掕緷鍔犵偣鍑讳簨浠?, type);
+    console.log('Switch leaderboard type:', type);
     
     // 鏄剧ず鍔犺浇鍔ㄧ敾
     $('#leaderboard-content').hide();

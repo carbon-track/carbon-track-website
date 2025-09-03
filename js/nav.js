@@ -1158,6 +1158,12 @@ function loadNavbar() {
                             <span class="badge badge-danger badge-counter" id="unreadMessagesCount" style="display: none;">0</span>
                         </a>
                     </div>
+                    <!-- User avatar -->
+                    <div class="nav-item mr-2 logoutControl" id="navbarAvatarContainer" style="display:none;">
+                        <a class="nav-link p-0" href="center.html" title="Profile">
+                            <img id="navbarUserAvatar" src="img/avatars/avatar1.svg" alt="Avatar" style="width:32px;height:32px;border-radius:50%;object-fit:cover;border:1px solid rgba(255,255,255,.4);">
+                        </a>
+                    </div>
                     <span class="navbar-text mx-2 text-light" id="userStatus">Please login or register:</span>
                     <div class="nav-item auth-buttons">
                         <!-- Use iOS-style button classes -->
@@ -1183,6 +1189,7 @@ function loadNavbar() {
     // Check for unread messages when navbar is loaded (only if logged in)
     if (localStorage.getItem('loggedIn')) {
         checkUnreadMessages();
+        fetchAndRenderNavbarAvatar();
     }
     
     // Clear any previous body padding (to fix desktop whitespace)
@@ -1336,6 +1343,7 @@ function setupNavbarEventListeners() {
     // Check for unread messages when navbar is loaded (only if logged in)
     if (localStorage.getItem('loggedIn')) {
         checkUnreadMessages();
+        fetchAndRenderNavbarAvatar();
     }
     
     // Clear any previous body padding (to fix desktop whitespace)
@@ -1550,6 +1558,40 @@ function setupNavbarEventListeners() {
     $(window).resize(function() {
         applyMobileStyles();
     });
+}
+
+// Fetch current user info to render avatar in navbar
+function fetchAndRenderNavbarAvatar() {
+    try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        $.ajax({
+            url: 'get_user_points.php',
+            type: 'POST',
+            data: { token: token },
+            dataType: 'json',
+            success: function(resp) {
+                if (resp && resp.success) {
+                    const url = resp.avatar_url || (resp.avatar ? ('img/avatars/' + resp.avatar) : null) || 'img/avatars/avatar1.svg';
+                    $('#navbarUserAvatar').attr('src', url);
+                    $('#navbarAvatarContainer').show();
+                    // Cache locally for other pages
+                    localStorage.setItem('userAvatarUrl', url);
+                    if (resp.avatar_id) localStorage.setItem('userAvatarId', resp.avatar_id);
+                }
+            },
+            error: function(){
+                // fallback to cached
+                const url = localStorage.getItem('userAvatarUrl');
+                if (url) {
+                    $('#navbarUserAvatar').attr('src', url);
+                    $('#navbarAvatarContainer').show();
+                }
+            }
+        });
+    } catch (e) {
+        console.error('Failed to fetch avatar for navbar:', e);
+    }
 }
 
 // 初始化所有模态框

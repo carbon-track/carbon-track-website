@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Avatar Management - CarbonTrack</title>
+  <link rel="stylesheet" href="./css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="./css/ios-design.css">
+  <link rel="stylesheet" href="./css/index.css">
+  <script src="js/jquery.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/nav.js"></script>
+  <style>
+    .avatar-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(120px,1fr)); gap:16px; }
+    .avatar-card { border:1px solid var(--ios-separator); border-radius:12px; padding:12px; text-align:center; background:var(--ios-system-background); }
+    .avatar-card img { width:80px; height:80px; border-radius:50%; object-fit:cover; }
+    .avatar-actions { margin-top:8px; display:flex; justify-content:center; gap:8px; }
+    .avatar-active { font-size:12px; margin-top:6px; }
+  </style>
+</head>
+<body class="auto-theme">
+  <div id="navbar-container"></div>
+  <div class="container mt-4">
+    <h3 class="mb-3"><i class="fas fa-user-circle mr-2"></i>Avatar Management</h3>
+
+    <div class="card mb-3">
+      <div class="card-body">
+        <form id="uploadForm" class="form-inline">
+          <div class="form-group mr-2">
+            <input type="file" id="avatarFile" class="form-control-file" accept="image/png,image/svg+xml,image/jpeg">
+          </div>
+          <button type="submit" class="btn btn-ios-primary">Upload Avatar</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <div id="avatarsContainer" class="avatar-grid"></div>
+      </div>
+    </div>
+  </div>
+
+<script>
+$(function(){
+  // Admin guard
+  const token = localStorage.getItem('token');
+  if (!token) { showAlert('请先登录', 'warning', ()=>location.href='index.html'); return; }
+  $.post('verify_admin.php', { token: token }, function(resp){
+    if (!(resp && resp.success && resp.isAdmin)) {
+      showAlert('需要管理员权限', 'error', ()=>location.href='index.html');
+      return;
+    }
+    loadAvatars();
+  }, 'json').fail(function(){ showAlert('无法验证管理员权限', 'error', ()=>location.href='index.html'); });
+
+  function loadAvatars(){
+    $('#avatarsContainer').html('<div class="text-muted">Loading...</div>');
+    $.post('admin_list_avatars.php', { token: localStorage.getItem('token') }, function(resp){
+      const wrap = $('#avatarsContainer').empty();
+      if (!(resp && resp.success)) { wrap.html('<div class="text-danger">加载失败</div>'); return; }
+      resp.avatars.forEach(a=>{
+        const card = $('<div class="avatar-card"></div>');
+        card.append($('<img>').attr('src', a.url).attr('alt', a.filename));
+        card.append($('<div class="small text-muted mt-2"></div>').text(a.filename));
+        card.append($('<div class="avatar-active"></div>').html(a.active ? '<span class="badge badge-success">Active</span>' : '<span class="badge badge-secondary">Inactive</span>'));
+        const actions = $('<div class="avatar-actions"></div>');
+        const toggleBtn = $('<button class="btn btn-sm btn-outline-primary">Toggle</button>').click(()=>toggleActive(a.id, a.active ? 0 : 1));
+        const deleteBtn = $('<button class="btn btn-sm btn-outline-danger">Delete</button>').click(()=>deleteAvatar(a.id));
+        actions.append(toggleBtn, deleteBtn);
+        card.append(actions);
+        wrap.append(card);
+      });
+    }, 'json').fail(function(){ $('#avatarsContainer').html('<div class="text-danger">加载失败</div>'); });
+  }
+
+  function toggleActive(id, active){
+    $.post('admin_edit_avatar.php', { token: localStorage.getItem('token'), id: id, active: active }, function(resp){
+      if (resp && resp.success) { showAlert('已更新', 'success'); loadAvatars(); }
+      else { showAlert('更新失败', 'error'); }
+    }, 'json').fail(function(){ showAlert('更新失败', 'error'); });
+  }
+
+  function deleteAvatar(id){
+    if (!confirm('确定要删除该头像吗？这将使其不可用。')) return;
+    $.post('admin_delete_avatar.php', { token: localStorage.getItem('token'), id: id }, function(resp){
+      if (resp && resp.success) { showAlert('已删除', 'success'); loadAvatars(); }
+      else { showAlert('删除失败', 'error'); }
+    }, 'json').fail(function(){ showAlert('删除失败', 'error'); });
+  }
+
+  $('#uploadForm').on('submit', function(e){
+    e.preventDefault();
+    const file = $('#avatarFile')[0].files[0];
+    if (!file) { showAlert('请选择文件', 'warning'); return; }
+    const fd = new FormData();
+    fd.append('token', localStorage.getItem('token'));
+    fd.append('file', file);
+    $.ajax({
+      url: 'admin_upload_avatar.php',
+      method: 'POST',
+      data: fd,
+      processData: false,
+      contentType: false,
+      dataType: 'json',
+      success: function(resp){ if (resp && resp.success) { showAlert('上传成功', 'success'); $('#avatarFile').val(''); loadAvatars(); } else { showAlert('上传失败', 'error'); } },
+      error: function(){ showAlert('上传失败', 'error'); }
+    });
+  });
+});
+</script>
+
+</body>
+</html>
