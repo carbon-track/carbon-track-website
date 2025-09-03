@@ -13,8 +13,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             handleApiError(401, 'Invalid token.');
         }
 
-    // 获取用户积分与头像
-    $stmtUser = $pdo->prepare("SELECT points, school, location, avatar, avatar_id FROM users WHERE email = :email");
+    // 获取用户积分与头像（仅依赖 avatar_id，兼容无 legacy `avatar` 列的数据库）
+    $stmtUser = $pdo->prepare("SELECT points, school, location, avatar_id FROM users WHERE email = :email");
         $stmtUser->bindParam(':email', $email, PDO::PARAM_STR);
         $stmtUser->execute();
         $userInfo = $stmtUser->fetch(PDO::FETCH_ASSOC); // 使用fetch获取一行数据
@@ -37,10 +37,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $avatarUrl = 'img/avatars/' . $rowA['filename'];
                 }
             }
-            // 若未找到，退回到legacy filename
-            if (!$avatarUrl && !empty($userInfo['avatar'])) {
-                $avatarUrl = 'img/avatars/' . $userInfo['avatar'];
-            }
             // 最终兜底
             if (!$avatarUrl) {
                 $avatarUrl = 'img/avatars/avatar1.svg';
@@ -51,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 'leaderboard' => $leaderboard,
                 'school' => $userInfo['school'],
                 'location' => $userInfo['location'],
-                'avatar' => isset($userInfo['avatar']) ? $userInfo['avatar'] : null,
+                'avatar' => null,
                 'avatar_id' => $avatarId,
                 'avatar_url' => $avatarUrl
             ]);

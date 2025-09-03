@@ -117,14 +117,14 @@
     /* Admin Navigation Bar Styles (Keep existing) */
     .admin-nav {
       background-color: var(--ios-secondary-system-background);
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
       position: sticky;
-      top: 56px; /* Adjust based on main navbar height */
-      z-index: 100;
-      padding: 8px 0;
+      top: var(--admin-nav-offset, 72px); /* Offset equals main navbar height */
+      z-index: 101; /* above main navbar background */
+      padding: 10px 0;
       border-bottom: 1px solid var(--ios-separator); /* Use CSS var */
-      margin-bottom: 10px;
-      transition: background-color 0.3s ease, border-color 0.3s ease; /* Add transition */
+      margin-bottom: 12px;
+      transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; /* Add transition */
     }
 
     .admin-nav-list {
@@ -445,6 +445,15 @@
       success: function(response) {
         if (response.success && response.isAdmin) {
           isAdmin = true;
+           // Compute main navbar height to avoid overlap and set CSS var
+           const navHost = document.getElementById('navbar-container');
+           let navHeight = 0;
+           if (navHost && navHost.firstElementChild) {
+             navHeight = navHost.firstElementChild.offsetHeight || 0;
+           }
+           if (!navHeight) { navHeight = 72; } // sane default
+           document.documentElement.style.setProperty('--admin-nav-offset', (navHeight) + 'px');
+
            $('.admin-nav').show(); // Show admin nav only if admin
            // Add User Management link dynamically if needed (or ensure it's correct)
            $('#userMgmtNav').attr('href', 'usermgmt.html'); 
@@ -466,6 +475,12 @@
     
     // Set Active Nav Item
     setActiveNavItem();
+
+    // Add extra spacing below header to avoid visual crowding with sticky nav
+    const headerEl = document.querySelector('.admin-header');
+    if (headerEl) {
+      headerEl.style.marginTop = '8px';
+    }
 
     // ----- START: Theme Toggling Logic -----
     const savedTheme = localStorage.getItem('theme');
