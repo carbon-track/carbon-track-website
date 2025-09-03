@@ -29,69 +29,130 @@
     .admin-header {
       background: linear-gradient(135deg, var(--ios-blue), var(--ios-purple));
       color: white;
-      padding: 80px 0 60px;
+      padding: 50px 0 40px;
       text-align: center;
-      border-radius: 0 0 24px 24px;
-      margin-bottom: 40px;
-      position: relative; /* Needed for potential pseudo-elements */
+      border-radius: 0 0 20px 20px;
+      margin: 0 0 40px 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .admin-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="25" cy="25" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1.5" fill="rgba(255,255,255,0.1)"/><circle cx="85" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="15" cy="85" r="1.5" fill="rgba(255,255,255,0.1)"/></svg>');
+      pointer-events: none;
     }
     
     .admin-header h1 {
-      font-weight: 700;
-      margin-bottom: 16px;
-      color: white; /* Ensure text is white */
+      font-weight: 800;
+      margin-bottom: 20px;
+      color: white;
+      font-size: 3rem;
+      letter-spacing: -0.025em;
+      position: relative;
+      z-index: 1;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+      animation: fadeInUp 0.8s ease-out;
     }
     
-    .admin-header p {
-      opacity: 0.9;
+        .admin-header p {
+      opacity: 0.95;
       max-width: 600px;
       margin: 0 auto;
-      font-size: 1.1rem;
-      color: white; /* Ensure text is white */
+      font-size: 1.15rem;
+      color: white;
+      position: relative;
+      z-index: 1;
+      line-height: 1.5;
     }
     
     /* Admin Card Styles */
+    .admin-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      padding: 0 8px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
     .admin-card {
-      border-radius: 24px;
+      background: var(--card-bg);
+      border-radius: 20px;
+      border: 1px solid var(--border-color);
+      padding: 32px 24px;
+      text-align: center;
+      transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+      position: relative;
       overflow: hidden;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
-      margin-bottom: 30px;
-      transition: transform 0.4s var(--animation-timing-apple),
-                  box-shadow 0.4s var(--animation-timing-apple),
-                  background-color 0.3s ease, color 0.3s ease; /* Add bg/color transition */
-      height: 100%;
-      background-color: var(--ios-system-background);
-      color: var(--ios-label); /* Use CSS variable */
+      box-shadow: 0 8px 32px rgba(0,0,0,0.06);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      animation: slideInCard 0.6s ease-out;
+      animation-fill-mode: both;
     }
-    
+
+    .admin-card:nth-child(1) { animation-delay: 0.1s; }
+    .admin-card:nth-child(2) { animation-delay: 0.2s; }
+    .admin-card:nth-child(3) { animation-delay: 0.3s; }
+    .admin-card:nth-child(4) { animation-delay: 0.4s; }
+    .admin-card:nth-child(5) { animation-delay: 0.5s; }
+    .admin-card:nth-child(6) { animation-delay: 0.6s; }
+
+    .admin-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--ios-blue), var(--ios-purple));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
     .admin-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.1);
+      transform: translateY(-12px) scale(1.02);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.12);
+      border-color: var(--ios-blue);
     }
-    
-    .admin-card-body {
+
+    .admin-card:hover::before {
+      opacity: 1;
+    }    .admin-card-body {
       padding: 24px;
       text-align: center;
     }
     
     .admin-card-icon {
-      font-size: 3rem;
-      margin-bottom: 16px;
+      font-size: 3.5rem;
+      margin-bottom: 20px;
       background: linear-gradient(135deg, var(--ios-blue), var(--ios-purple));
+      background-clip: text;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
     }
     
     .admin-card-title {
       font-weight: 700;
-      margin-bottom: 12px;
-      font-size: 1.3rem;
-      color: var(--ios-label); /* Use CSS variable */
+      margin-bottom: 16px;
+      font-size: 1.4rem;
+      color: var(--ios-label);
+      letter-spacing: -0.01em;
     }
     
     .admin-card-text {
-      color: var(--ios-secondary-label); /* Use CSS variable */
+      color: var(--ios-secondary-label);
       margin-bottom: 24px;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      opacity: 0.8;
     }
     
     .admin-card-link {
@@ -99,32 +160,75 @@
       background: linear-gradient(135deg, var(--ios-blue), var(--ios-indigo));
       color: white;
       border: none;
-      border-radius: 12px;
-      padding: 12px 24px;
+      border-radius: 14px;
+      padding: 16px 32px;
       font-weight: 600;
-      transition: all 0.3s var(--animation-timing-apple);
+      font-size: 0.95rem;
+      letter-spacing: -0.005em;
+      transition: all 0.35s var(--animation-timing-apple);
       text-decoration: none;
-      box-shadow: 0 6px 16px rgba(0, 122, 255, 0.15);
+      box-shadow: 
+        0 6px 20px rgba(0, 122, 255, 0.15),
+        0 2px 8px rgba(0, 0, 0, 0.08);
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      min-width: 140px;
+      text-align: center;
+    }
+
+    .admin-card-link::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s ease;
     }
     
     .admin-card-link:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(0, 122, 255, 0.25);
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 
+        0 12px 35px rgba(0, 122, 255, 0.3),
+        0 4px 15px rgba(0, 0, 0, 0.12);
       color: white;
-      text-decoration: none;
+      background: linear-gradient(135deg, #0066cc, #4c6ef5);
     }
 
-    /* Admin Navigation Bar Styles (Keep existing) */
+    .admin-card-link:hover::before {
+      left: 100%;
+    }
+
+    .admin-card-link:active {
+      transform: translateY(-1px) scale(0.98);
+      box-shadow: 
+        0 6px 20px rgba(0, 122, 255, 0.2),
+        0 2px 8px rgba(0, 0, 0, 0.1);
+      transition: all 0.15s ease;
+    }
+
+    .admin-card-link:focus {
+      outline: none;
+      box-shadow: 
+        0 6px 20px rgba(0, 122, 255, 0.15),
+        0 0 0 3px rgba(0, 122, 255, 0.1);
+    }
+
+    /* Admin Navigation Bar Styles */
     .admin-nav {
-      background-color: var(--ios-secondary-system-background);
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
       position: sticky;
-      top: var(--admin-nav-offset, 72px); /* Offset equals main navbar height */
-      z-index: 101; /* above main navbar background */
-      padding: 10px 0;
-      border-bottom: 1px solid var(--ios-separator); /* Use CSS var */
-      margin-bottom: 12px;
-      transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; /* Add transition */
+      top: 0; /* Stick to very top, no offset needed */
+      z-index: 1020; /* Above main navbar */
+      padding: 8px 0;
+      border-bottom: none;
+      margin-bottom: 0;
+      transition: all 0.3s ease;
     }
 
     .admin-nav-list {
@@ -134,10 +238,10 @@
       padding: 0;
       justify-content: center;
       flex-wrap: wrap;
+      gap: 4px;
     }
 
     .admin-nav-item {
-      margin: 0 8px;
       position: relative;
     }
 
@@ -145,17 +249,18 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 10px 16px;
-      color: var(--ios-secondary-label); /* Use CSS var */
+      padding: 8px 16px;
+      color: var(--ios-secondary-label);
       text-decoration: none;
       transition: all 0.2s ease;
-      border-radius: 12px;
+      border-radius: 8px;
       font-weight: 500;
+      font-size: 13px;
     }
 
     .admin-nav-link i {
-      font-size: 20px;
-      margin-bottom: 4px;
+      font-size: 18px;
+      margin-bottom: 2px;
     }
 
     .admin-nav-link:hover {
@@ -244,10 +349,10 @@
     /* Dark mode for Admin Nav */
     body.dark-theme .admin-nav,
     body.auto-theme.dark-mode .admin-nav {
-      background-color: rgba(28, 28, 30, 0.85); /* Slightly transparent secondary background */
-      border-bottom: 1px solid var(--ios-separator);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      background: rgba(28, 28, 30, 0.95);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1);
     }
     
     body.dark-theme .admin-nav-link,
@@ -307,6 +412,53 @@
       
       .admin-nav-link {
         padding: 8px 12px;
+      }
+    }
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideInCard {
+      from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    /* Responsive improvements */
+    @media (max-width: 768px) {
+      .admin-header h1 {
+        font-size: 2.2rem;
+      }
+      
+      .admin-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+      
+      .admin-card-link {
+        padding: 14px 24px;
+        font-size: 0.9rem;
       }
     }
   </style>
@@ -374,46 +526,38 @@
 </header>
 
 <!-- Management Cards -->
-<div class="container">
-  <div class="row">
-    <div class="col-lg-4 col-md-6">
-      <div class="admin-card ios-hover-effect">
-        <div class="admin-card-body">
-          <div class="admin-card-icon"><i class="fas fa-clipboard-check"></i></div>
-          <h3 class="admin-card-title">Carbon Review</h3>
-          <p class="admin-card-text">Review and approve pending user carbon reduction submissions.</p>
-          <a href="ptmgmt.html" class="admin-card-link">Go to Carbon Review</a>
-        </div>
-      </div>
-          </div>
-    <div class="col-lg-4 col-md-6">
-      <div class="admin-card ios-hover-effect">
-        <div class="admin-card-body">
-          <div class="admin-card-icon"><i class="fas fa-store"></i></div>
-          <h3 class="admin-card-title">Product Management</h3>
-          <p class="admin-card-text">Add, edit, or remove products from the Carbon Store.</p>
-          <a href="productmgmt.html" class="admin-card-link">Go to Product Management</a>
-        </div>
+<div class="container" style="padding-top: 40px; padding-bottom: 60px;">
+  <div class="admin-cards-grid">
+    <div class="admin-card ios-hover-effect">
+      <div class="admin-card-body">
+        <div class="admin-card-icon"><i class="fas fa-clipboard-check"></i></div>
+        <h3 class="admin-card-title">Carbon Review</h3>
+        <p class="admin-card-text">Review and approve pending user carbon reduction submissions.</p>
+        <a href="ptmgmt.html" class="admin-card-link">Go to Carbon Review</a>
       </div>
     </div>
-    <div class="col-lg-4 col-md-6">
-      <div class="admin-card ios-hover-effect">
-        <div class="admin-card-body">
-          <div class="admin-card-icon"><i class="fas fa-users"></i></div>
-          <h3 class="admin-card-title">User Management</h3>
-          <p class="admin-card-text">View, edit, or manage user accounts and their details.</p>
-          <a href="usermgmt.html" class="admin-card-link">Go to User Management</a>
-        </div>
+    <div class="admin-card ios-hover-effect">
+      <div class="admin-card-body">
+        <div class="admin-card-icon"><i class="fas fa-store"></i></div>
+        <h3 class="admin-card-title">Product Management</h3>
+        <p class="admin-card-text">Add, edit, or remove products from the Carbon Store.</p>
+        <a href="productmgmt.html" class="admin-card-link">Go to Product Management</a>
       </div>
     </div>
-     <div class="col-lg-4 col-md-6">
-      <div class="admin-card ios-hover-effect">
-        <div class="admin-card-body">
-          <div class="admin-card-icon"><i class="fas fa-bug"></i></div>
-          <h3 class="admin-card-title">Error Dashboard</h3>
-          <p class="admin-card-text">Monitor website errors and system health.</p>
-          <a href="error_dashboard.html" class="admin-card-link">Go to Error Dashboard</a>
-        </div>
+    <div class="admin-card ios-hover-effect">
+      <div class="admin-card-body">
+        <div class="admin-card-icon"><i class="fas fa-users"></i></div>
+        <h3 class="admin-card-title">User Management</h3>
+        <p class="admin-card-text">View, edit, or manage user accounts and their details.</p>
+        <a href="usermgmt.html" class="admin-card-link">Go to User Management</a>
+      </div>
+    </div>
+     <div class="admin-card ios-hover-effect">
+      <div class="admin-card-body">
+        <div class="admin-card-icon"><i class="fas fa-bug"></i></div>
+        <h3 class="admin-card-title">Error Dashboard</h3>
+        <p class="admin-card-text">Monitor website errors and system health.</p>
+        <a href="error_dashboard.html" class="admin-card-link">Go to Error Dashboard</a>
       </div>
     </div>
   </div>
@@ -445,15 +589,6 @@
       success: function(response) {
         if (response.success && response.isAdmin) {
           isAdmin = true;
-           // Compute main navbar height to avoid overlap and set CSS var
-           const navHost = document.getElementById('navbar-container');
-           let navHeight = 0;
-           if (navHost && navHost.firstElementChild) {
-             navHeight = navHost.firstElementChild.offsetHeight || 0;
-           }
-           if (!navHeight) { navHeight = 72; } // sane default
-           document.documentElement.style.setProperty('--admin-nav-offset', (navHeight) + 'px');
-
            $('.admin-nav').show(); // Show admin nav only if admin
            // Add User Management link dynamically if needed (or ensure it's correct)
            $('#userMgmtNav').attr('href', 'usermgmt.html'); 
@@ -473,14 +608,32 @@
       return; 
     }
     
+    // Function to set the active nav item based on current page
+    function setActiveNavItem() {
+      var currentPath = window.location.pathname;
+      var filename = currentPath.substring(currentPath.lastIndexOf('/') + 1);
+      
+      // Remove active class from all nav items first
+      $('.admin-nav-item').removeClass('active');
+      
+      // Add active class to the appropriate nav item
+      if (filename === 'productmgmt.html') {
+        $('.admin-nav-item:has(a[href="productmgmt.html"])').addClass('active');
+      } else if (filename === 'usermgmt.html') {
+        $('.admin-nav-item:has(a[href="usermgmt.html"])').addClass('active');
+      } else if (filename === 'avatar_mgmt.html') {
+        $('.admin-nav-item:has(a[href="avatar_mgmt.html"])').addClass('active');
+      } else if (filename === 'error_dashboard.html') {
+        $('.admin-nav-item:has(a[href="error_dashboard.html"])').addClass('active');
+      } else if (filename === 'mgmt.html' || filename === '') {
+         // Default to Admin Dashboard if on mgmt.html or root path within admin context
+         $('.admin-nav-item:has(a[href="mgmt.html"])').addClass('active');
+      }
+    }
+    
     // Set Active Nav Item
     setActiveNavItem();
-
-    // Add extra spacing below header to avoid visual crowding with sticky nav
-    const headerEl = document.querySelector('.admin-header');
-    if (headerEl) {
-      headerEl.style.marginTop = '8px';
-    }
+  }); // End of document ready
 
     // ----- START: Theme Toggling Logic -----
     const savedTheme = localStorage.getItem('theme');
@@ -549,39 +702,15 @@
           icon.className = 'fas fa-sun'; // Show sun in dark mode
         } else if (theme.includes('light-theme')) {
           icon.className = 'fas fa-moon'; // Show moon in light mode
-        } else { // Auto theme
-          // Show the icon corresponding to the CURRENTLY DETECTED system theme
-          if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            icon.className = 'fas fa-sun'; // System is dark, show sun
-          } else {
-            icon.className = 'fas fa-moon'; // System is light, show moon
-          }
+        } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          // Auto theme - System is dark, show sun
+          icon.className = 'fas fa-sun';
+        } else {
+          // Auto theme - System is light, show moon
+          icon.className = 'fas fa-moon';
         }
       }
       // ----- END: Theme Toggling Logic -----
-
-  }); // End of document ready
-
-  // Function to set the active nav item based on current page
-  function setActiveNavItem() {
-    var currentPath = window.location.pathname;
-    var filename = currentPath.substring(currentPath.lastIndexOf('/') + 1);
-
-    $('.admin-nav-item').removeClass('active');
-
-    if (filename === 'ptmgmt.html') {
-      $('.admin-nav-item:has(a[href="ptmgmt.html"])').addClass('active');
-    } else if (filename === 'productmgmt.html') {
-      $('.admin-nav-item:has(a[href="productmgmt.html"])').addClass('active');
-    } else if (filename === 'usermgmt.html') {
-      $('.admin-nav-item:has(a[href="usermgmt.html"])').addClass('active');
-     } else if (filename === 'error_dashboard.html') {
-      $('.admin-nav-item:has(a[href="error_dashboard.html"])').addClass('active');
-    } else if (filename === 'mgmt.html' || filename === '') {
-       // Default to Admin Dashboard if on mgmt.html or root path within admin context
-       $('.admin-nav-item:has(a[href="mgmt.html"])').addClass('active');
-    }
-  }
 </script>
 
 </body>
