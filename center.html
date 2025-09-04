@@ -639,10 +639,7 @@
     }
     
     /* 璁剧疆鏂囨湰楂樺姣斿害 - 璁╅粦澶滄ā寮忔洿娓呮櫚鍙鈝鈝 */
-    body.dark-theme,
-    body.auto-theme.dark-mode {
-      --text-color-dark: #ffffff; /* 纭繚鐧借壊瓒冲鏄庝寒 */
-    }
+    /* 已移除重复的body.dark-theme, body.auto-theme.dark-mode定义 */
     
     /* 浼樺寲绉诲姩璁惧鎺掔増 */
     @media (max-width: 768px) {
@@ -878,53 +875,86 @@
       border-color: rgba(0, 122, 255, 0.3);
     }
 
-    /* 前三名特殊样式 */
-    .ios-table-row.top-rank {
-      background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 255, 255, 0.05));
-      border-left: 4px solid #FFD700;
+    /* 排行榜样式全部限定在 #leaderboard-content 下，避免全局冲突 */
+    #leaderboard-content .ios-table-row.top-rank {
+      background: linear-gradient(135deg, rgba(255, 215, 0, 0.08), rgba(255, 255, 255, 0.03));
       position: relative;
       overflow: hidden;
     }
-
-    .ios-table-row.rank-1 {
-      border-left-color: #FFD700;
+    #leaderboard-content .ios-table-row.top-rank::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 6px;
+      border-radius: 6px;
+      z-index: 1;
+      background: linear-gradient(180deg, #FFD700 0%, #C0C0C0 50%, #CD7F32 100%);
+      opacity: 0.85;
+    }
+    #leaderboard-content .ios-table-row.rank-1::before { background: #FFD700; }
+    #leaderboard-content .ios-table-row.rank-2::before { background: #C0C0C0; }
+    #leaderboard-content .ios-table-row.rank-3::before { background: #CD7F32; }
+    #leaderboard-content .ios-table-row.rank-1 {
       background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 255, 255, 0.05));
     }
-
-    .ios-table-row.rank-2 {
-      border-left-color: #C0C0C0;
+    #leaderboard-content .ios-table-row.rank-2 {
       background: linear-gradient(135deg, rgba(192, 192, 192, 0.15), rgba(255, 255, 255, 0.05));
     }
-
-    .ios-table-row.rank-3 {
-      border-left-color: #CD7F32;
+    #leaderboard-content .ios-table-row.rank-3 {
       background: linear-gradient(135deg, rgba(205, 127, 50, 0.15), rgba(255, 255, 255, 0.05));
     }
-
-    body.dark-theme .ios-table-row.top-rank,
-    body.auto-theme.dark-mode .ios-table-row.top-rank {
-      background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(0, 0, 0, 0.1));
+    #leaderboard-content .ios-table-row .col-rank {
+      padding-left: 12px;
     }
-
-    /* 前三名头像特殊效果 */
-    .top-rank .user-avatar {
-      border-width: 3px;
-      box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3);
+    #leaderboard-content .ios-table-header .col-rank {
+      padding-left: 12px;
     }
-
-    .rank-1 .user-avatar {
+    /* 头像圆环修饰 */
+    #leaderboard-content .avatar-wrap {
+      display: inline-block;
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      overflow: hidden;
+      position: relative;
+      margin-right: 10px;
+      vertical-align: middle;
+      background: transparent;
+    }
+    #leaderboard-content .avatar-wrap::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 2;
+      border: 2.5px solid #e0e0e0;
+      box-sizing: border-box;
+      opacity: 0.7;
+    }
+    #leaderboard-content .ios-table-row.rank-1 .avatar-wrap::before {
       border-color: #FFD700;
-      box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+      box-shadow: 0 0 8px 2px #FFD70044;
+      opacity: 0.9;
     }
-
-    .rank-2 .user-avatar {
+    #leaderboard-content .ios-table-row.rank-2 .avatar-wrap::before {
       border-color: #C0C0C0;
-      box-shadow: 0 4px 15px rgba(192, 192, 192, 0.4);
+      box-shadow: 0 0 8px 2px #C0C0C044;
+      opacity: 0.9;
     }
-
-    .rank-3 .user-avatar {
+    #leaderboard-content .ios-table-row.rank-3 .avatar-wrap::before {
       border-color: #CD7F32;
-      box-shadow: 0 4px 15px rgba(205, 127, 50, 0.4);
+      box-shadow: 0 0 8px 2px #CD7F3244;
+      opacity: 0.9;
+    }
+    #leaderboard-content .avatar-wrap img.user-avatar {
+      width: 100%; height: 100%;
+      border-radius: 50%;
+      display: block;
+      object-fit: cover;
+      position: relative;
+      z-index: 1;
+      border: none;
+      background: #fff;
     }
     
     .ios-table-row .col-points {
@@ -1260,11 +1290,7 @@
     }
     
     /* 缇庡寲鐢ㄦ埛淇℃伅鍗＄墖 */
-    .info-card {
-      overflow: visible;
-      transform-style: preserve-3d;
-      perspective: 1000px;
-    }
+    /* 已移除重复的.info-card定义 */
     
     .info-card .card-body {
       padding: 30px;
@@ -1276,12 +1302,7 @@
     }
     
     /* 淇℃伅鍊兼爣绛剧殑缇庡寲 */
-    .info-value {
-      transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
-      box-shadow: 0 4px 10px rgba(0, 122, 255, 0.1);
-      position: relative;
-      overflow: hidden;
-    }
+    /* 已移除重复的.info-value定义 */
     
     .info-value::after {
       content: '';
@@ -1310,10 +1331,7 @@
       transform: rotate(45deg) translateY(100%);
     }
     
-    body.dark-theme .info-value,
-    body.auto-theme.dark-mode .info-value {
-      box-shadow: 0 4px 10px rgba(10, 132, 255, 0.15);
-    }
+    /* 已移除重复的body.dark-theme .info-value, body.auto-theme.dark-mode .info-value定义 */
     
     body.dark-theme .info-value:hover,
     body.auto-theme.dark-mode .info-value:hover {
@@ -1321,10 +1339,7 @@
     }
     
     /* 鏍囬鎺掕姒滆〃鏍兼牱寮?*/
-    .ios-card-table {
-      transition: transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1),
-                  box-shadow 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
-    }
+    /* 已移除重复的.ios-card-table定义 */
     
     .ios-card-table:hover {
       transform: translateY(-5px);
@@ -1338,11 +1353,7 @@
     
     
     /* 鎺掕姒滆鎮仠鏁堟灉澧炲己 */
-    .ios-table-row {
-      transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
-      position: relative;
-      overflow: hidden;
-    }
+    /* 已移除重复的.ios-table-row定义 */
     
     .ios-table-row::after {
       content: '';
@@ -1374,31 +1385,20 @@
     }
     
     /* 鎺掕姒滃窘绔犵殑缇庡寲 */
-    .rank-medal {
-      transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
-    }
+    /* 已移除重复的.rank-medal定义 */
     
-    .rank-medal.gold {
-      box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
-    }
+    /* 已移除重复的.rank-medal.gold定义 */
     
-    .rank-medal.silver {
-      box-shadow: 0 5px 15px rgba(192, 192, 192, 0.3);
-    }
+    /* 已移除重复的.rank-medal.silver定义 */
     
-    .rank-medal.bronze {
-      box-shadow: 0 5px 15px rgba(205, 127, 50, 0.3);
-    }
+    /* 已移除重复的.rank-medal.bronze定义 */
     
     .ios-table-row:hover .rank-medal {
       transform: scale(1.1) rotate(5deg);
     }
     
     /* 鍐呭瀹瑰櫒缇庡寲 */
-    .content-container {
-      transition: all 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
-      overflow: visible;
-    }
+    /* 已移除重复的.content-container定义 */
     
     .content-container:hover {
       box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
@@ -1410,9 +1410,7 @@
     }
     
     /* 涓婚鍒囨崲鎸夐挳澧炲己 */
-    .theme-toggle {
-      transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
-    }
+    /* 已移除重复的.theme-toggle定义 */
     
     .theme-toggle:hover {
       transform: scale(1.1) rotate(5deg);
@@ -1424,19 +1422,14 @@
       box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
     }
     
-    .theme-toggle i {
-      transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
-    }
+    /* 已移除重复的.theme-toggle i定义 */
     
     .theme-toggle:hover i {
       transform: scale(1.1);
     }
     
     /* 鍒嗘鎺у埗鍣ㄧ編鍖?*/
-    .ios-segment-control {
-      transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-    }
+    /* 已移除重复的.ios-segment-control定义 */
     
     .ios-segment-control:hover {
       box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
@@ -1447,15 +1440,9 @@
       box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
     }
     
-    .segment-selector {
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
-    }
+    /* 已移除重复的.segment-selector定义 */
     
-    body.dark-theme .segment-selector,
-    body.auto-theme.dark-mode .segment-selector {
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    }
+    /* 已移除重复的body.dark-theme .segment-selector, body.auto-theme.dark-mode .segment-selector定义 */
     
     /* 娣诲姞椤堕儴淇℃伅鏍忔牱寮?*/
     .top-user-info-bar {
@@ -2487,9 +2474,12 @@
                   // 创建用户信息容器（包含头像和用户名）
                   const userContainer = $('<div class="col-user">');
                   if (rank <= 3) {
-                    // 前三名显示头像
+                    // 前三名显示头像（圆环包裹）
+                    const avatarWrap = $('<span class="avatar-wrap"></span>').append(
+                      $('<img class="user-avatar">').attr('src', avatarUrl).attr('alt', user.username)
+                    );
                     userContainer.append(
-                      $('<img class="user-avatar">').attr('src', avatarUrl).attr('alt', user.username),
+                      avatarWrap,
                       $('<span>').text(user.username)
                     );
                   } else {
@@ -2587,16 +2577,15 @@
   
   // 涓婚鍒囨崲鍔熻兘鍒濆鍖?
   function initThemeToggle() {
-    const body = document.body;
-    const themeToggle = document.getElementById('themeToggle');
-    const icon = themeToggle.querySelector('i');
+  const body = document.body;
+  const themeToggle = document.getElementById('themeToggle');
     
     // 妫€鏌ョ敤鎴锋槸鍚︽湁淇濆瓨鐨勫亸濂?
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme) {
       body.className = savedTheme;
       updateThemeIcon(savedTheme);
-      } else {
+    } else {
       body.classList.add('auto-theme');
       if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
         body.classList.add('dark-mode');
@@ -2649,12 +2638,14 @@
     } else if (theme.includes('light-theme')) {
       icon.className = 'fas fa-moon';
     } else {
-      // 鑷姩涓婚鍥炬爣
+      // 自动主题图标
+      let iconClass;
       if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        icon.className = 'fas fa-sun';
+        iconClass = 'fas fa-sun';
       } else {
-        icon.className = 'fas fa-moon';
+        iconClass = 'fas fa-moon';
       }
+      icon.className = iconClass;
     }
   }
   

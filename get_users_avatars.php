@@ -1,7 +1,7 @@
 <?php
 require_once 'global_variables.php';
 require_once 'global_error_handler.php';
-require 'db.php';
+require_once 'db.php';
 
 header('Content-Type: application/json');
 
@@ -57,4 +57,3 @@ try {
     logException($e);
 }
 
-// No closing tag
