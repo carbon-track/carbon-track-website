@@ -881,30 +881,34 @@
       position: relative;
       overflow: hidden;
     }
-    #leaderboard-content .ios-table-row.top-rank::before {
+    /* 将左侧彩条绘制在排名列上，避免与背景伪元素冲突 */
+    #leaderboard-content .ios-table-row.top-rank .col-rank { position: relative; }
+    #leaderboard-content .ios-table-row.top-rank .col-rank::before {
       content: '';
       position: absolute;
-      left: 0; top: 0; bottom: 0;
+      left: -12px; /* 对齐到行左内边缘 */
+      top: 4px;
+      bottom: 4px;
       width: 6px;
-      border-radius: 6px;
-      z-index: 1;
-      background: linear-gradient(180deg, #FFD700 0%, #C0C0C0 50%, #CD7F32 100%);
-      opacity: 0.85;
+      border-radius: 3px;
+      z-index: 3; /* 高于行的hover遮罩 */
+      background: #FFD700; /* 默认给rank-1颜色，具体在下面覆盖 */
+      pointer-events: none;
     }
-    #leaderboard-content .ios-table-row.rank-1::before { background: #FFD700; }
-    #leaderboard-content .ios-table-row.rank-2::before { background: #C0C0C0; }
-    #leaderboard-content .ios-table-row.rank-3::before { background: #CD7F32; }
+    #leaderboard-content .ios-table-row.rank-1 .col-rank::before { background: #FFD700; }
+    #leaderboard-content .ios-table-row.rank-2 .col-rank::before { background: #C0C0C0; }
+    #leaderboard-content .ios-table-row.rank-3 .col-rank::before { background: #CD7F32; }
     #leaderboard-content .ios-table-row.rank-1 {
-      background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 255, 255, 0.05));
+      background: linear-gradient(135deg, rgba(255, 215, 0, 0.12), rgba(255, 255, 255, 0.03));
     }
     #leaderboard-content .ios-table-row.rank-2 {
-      background: linear-gradient(135deg, rgba(192, 192, 192, 0.15), rgba(255, 255, 255, 0.05));
+      background: linear-gradient(135deg, rgba(192, 192, 192, 0.12), rgba(255, 255, 255, 0.03));
     }
     #leaderboard-content .ios-table-row.rank-3 {
-      background: linear-gradient(135deg, rgba(205, 127, 50, 0.15), rgba(255, 255, 255, 0.05));
+      background: linear-gradient(135deg, rgba(205, 127, 50, 0.12), rgba(255, 255, 255, 0.03));
     }
     #leaderboard-content .ios-table-row .col-rank {
-      padding-left: 12px;
+      padding-left: 12px; /* 保持与竖条间距 */
     }
     #leaderboard-content .ios-table-header .col-rank {
       padding-left: 12px;
