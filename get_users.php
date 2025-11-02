@@ -38,13 +38,13 @@ try {
         }
     }
     
-    // Base query
-    $sql = "SELECT id, username, email, points, school, lastlgn FROM users";
+    // Base query - exclude soft-deleted accounts
+    $sql = "SELECT id, username, email, points, school, lastlgn, status FROM users WHERE status <> 'deleted'";
     $params = [];
 
     // Add search condition if search term exists
     if (!empty($searchTerm)) {
-        $sql .= " WHERE username LIKE :search OR email LIKE :search";
+        $sql .= " AND (username LIKE :search OR email LIKE :search)";
         $params[':search'] = '%' . $searchTerm . '%';
     }
     

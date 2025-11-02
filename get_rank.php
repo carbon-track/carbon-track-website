@@ -19,14 +19,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $location = sanitizeInput($_POST['location'] ?? '');
         $school = sanitizeInput($_POST['school'] ?? '');
 
-        $sql = "SELECT username, points FROM users";
+        $sql = "SELECT username, points FROM users WHERE status = 'active'";
         $params = [];
 
         if ($type === 'local' && !empty($location)) {
-            $sql .= " WHERE location = :location";
+            $sql .= " AND location = :location";
             $params[':location'] = $location;
         } elseif ($type === 'school' && !empty($school)) {
-            $sql .= " WHERE school = :school";
+            $sql .= " AND school = :school";
             $params[':school'] = $school;
         }
 

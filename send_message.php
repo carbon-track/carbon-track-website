@@ -15,19 +15,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // 处理参数
         $token = sanitizeInput($_POST['token']);
         $email = opensslDecrypt($token);
-        $receiverId = sanitizeInput($_POST['receiverId']);
+        $receiverId = filter_var(sanitizeInput($_POST['receiverId']), FILTER_VALIDATE_INT);
         $message = sanitizeInput($_POST['message']);
 
         // 验证邮箱格式
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             handleApiError(401, 'Invalid token');
         }
+        if ($receiverId === false || $receiverId <= 0) {
+            handleApiError(400, 'Invalid receiver.');
+        }
 
         // 连接数据库
         $pdo = new PDO($dsn, $user, $pass, $options);
         
         // 获取发送者ID
-        $stmtSender = $pdo->prepare("SELECT id FROM users WHERE email = :email");
+        $stmtSender = $pdo->prepare("SELECT id FROM users WHERE email = :email AND status = 'active'");
         $stmtSender->bindParam(':email', $email, PDO::PARAM_STR);
         $stmtSender->execute();
         $senderData = $stmtSender->fetch(PDO::FETCH_ASSOC);
@@ -37,6 +40,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
         
         $senderId = $senderData['id'];
+        $stmtReceiver = $pdo->prepare("SELECT id FROM users WHERE id = :id AND status = 'active'");
+        $stmtReceiver->bindParam(':id', $receiverId, PDO::PARAM_INT);
+        $stmtReceiver->execute();
+        if (!$stmtReceiver->fetch(PDO::FETCH_ASSOC)) {
+            handleApiError(404, 'Receiver not found or inactive');
+        }
         
         // 生成当前时间戳
         $currentTime = date('Y-m-d H:i:s');

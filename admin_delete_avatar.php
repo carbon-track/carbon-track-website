@@ -36,7 +36,7 @@ try {
     $row = $default->fetch(PDO::FETCH_ASSOC);
     if ($row) {
         $defId = intval($row['id']);
-        $pdo->prepare('UPDATE users SET avatar_id = :def WHERE avatar_id = :old')->execute([':def' => $defId, ':old' => $id]);
+        $pdo->prepare("UPDATE users SET avatar_id = :def WHERE avatar_id = :old AND status = 'active'")->execute([':def' => $defId, ':old' => $id]);
     }
 
     echo json_encode(['success' => true]);

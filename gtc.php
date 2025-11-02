@@ -17,7 +17,7 @@ try {
          handleApiError(500, 'Database connection is not available.');
     }
     
-    $stmt = $pdo->query("SELECT COUNT(*) AS user_count FROM users");
+    $stmt = $pdo->query("SELECT COUNT(*) AS user_count FROM users WHERE status = 'active'");
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
     
     // Check if fetch was successful

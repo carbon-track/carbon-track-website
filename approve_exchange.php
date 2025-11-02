@@ -29,7 +29,7 @@ try {
     $pdo->beginTransaction();
 
     // 1. Get Admin ID
-    $stmtAdmin = $pdo->prepare("SELECT id FROM users WHERE email = :email");
+    $stmtAdmin = $pdo->prepare("SELECT id FROM users WHERE email = :email AND status = 'active'");
     $stmtAdmin->bindParam(':email', $adminEmail, PDO::PARAM_STR);
     $stmtAdmin->execute();
     $adminId = $stmtAdmin->fetchColumn();
@@ -55,7 +55,7 @@ try {
 
     // 3. Verify User Points and Product Stock AGAIN
     // Lock user and product rows for consistency
-    $stmtUserCheck = $pdo->prepare("SELECT points FROM users WHERE id = :userId FOR UPDATE");
+    $stmtUserCheck = $pdo->prepare("SELECT points FROM users WHERE id = :userId AND status = 'active' FOR UPDATE");
     $stmtUserCheck->bindParam(':userId', $userId, PDO::PARAM_INT);
     $stmtUserCheck->execute();
     $currentUserPoints = $stmtUserCheck->fetchColumn();
@@ -86,7 +86,7 @@ try {
 
     // 4. Perform Updates
     // Deduct points
-    $stmtUpdatePoints = $pdo->prepare("UPDATE users SET points = points - :pointsCost WHERE id = :userId");
+    $stmtUpdatePoints = $pdo->prepare("UPDATE users SET points = points - :pointsCost WHERE id = :userId AND status = 'active'");
     $stmtUpdatePoints->bindParam(':pointsCost', $pointsCost, PDO::PARAM_INT);
     $stmtUpdatePoints->bindParam(':userId', $userId, PDO::PARAM_INT);
     $stmtUpdatePoints->execute();

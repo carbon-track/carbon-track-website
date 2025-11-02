@@ -30,12 +30,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'], $_POST['cf_t
              handleApiError(500, 'Database connection is not available.');
         }
 
-        $stmt = $pdo->prepare("SELECT id FROM users WHERE email = :email");
+        $stmt = $pdo->prepare("SELECT id FROM users WHERE email = :email AND status = 'active'");
         $stmt->bindParam(':email', $email);
         $stmt->execute();
         // Use fetchColumn to just check existence, slightly more efficient
         if (!$stmt->fetchColumn()) { 
-            handleApiError(404, 'Email address not found.');
+            handleApiError(404, 'Email address not found or inactive.');
         }
 
         // 生成随机验证码

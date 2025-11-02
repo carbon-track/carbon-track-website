@@ -34,8 +34,11 @@ try {
     }
 
     // Update user's avatar_id
-    $stmtU = $pdo->prepare('UPDATE users SET avatar_id = :aid WHERE email = :email');
+    $stmtU = $pdo->prepare("UPDATE users SET avatar_id = :aid WHERE email = :email AND status = 'active'");
     $stmtU->execute([':aid' => $avatarId, ':email' => $email]);
+    if ($stmtU->rowCount() === 0) {
+        handleApiError(404, 'User not found or inactive.');
+    }
 
     echo json_encode(['success' => true, 'avatar_id' => $avatarId]);
 } catch (Exception $e) {

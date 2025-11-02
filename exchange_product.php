@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $pdo = new PDO($dsn, $user, $pass, $options);
         $pdo->beginTransaction();
 
-        $stmtUser = $pdo->prepare("SELECT points FROM users WHERE email = :email");
+        $stmtUser = $pdo->prepare("SELECT points FROM users WHERE email = :email AND status = 'active'");
         $stmtUser->bindParam(':email', $email, PDO::PARAM_STR);
         $stmtUser->execute();
         $userPoints = $stmtUser->fetchColumn();
@@ -43,8 +43,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmtProduct->execute();
         $productPoints = $stmtProduct->fetchColumn();
 
-        if ($userPoints !== false && $productPoints !== false && $userPoints >= $productPoints) {
-            $stmtUpdatePoints = $pdo->prepare("UPDATE users SET points = points - :productPoints WHERE email = :email");
+        if ($userPoints === false) {
+            $pdo->rollBack();
+            handleApiError(404, 'User not found or inactive.');
+        }
+
+        if ($productPoints === false) {
+            $pdo->rollBack();
+            handleApiError(404, 'Product not found.');
+        }
+
+        if ($userPoints >= $productPoints) {
+            $stmtUpdatePoints = $pdo->prepare("UPDATE users SET points = points - :productPoints WHERE email = :email AND status = 'active'");
             $stmtUpdatePoints->bindParam(':productPoints', $productPoints, PDO::PARAM_INT);
             $stmtUpdatePoints->bindParam(':email', $email, PDO::PARAM_STR);
             $stmtUpdatePoints->execute();

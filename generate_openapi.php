@@ -299,11 +299,18 @@ foreach ($phpFiles as $file) {
         ];
     }
     
+    // Merge responses while preserving status-code keys
+    $responses = array_replace(
+        ['200' => $successResponse],
+        $commonResponses,
+        $errorResponses
+    );
+
     // Create the path item
     $pathItem = [
         $method => [
             'summary' => ucfirst(str_replace('_', ' ', pathinfo($file, PATHINFO_FILENAME))),
-            'responses' => array_merge(['200' => $successResponse], $errorResponses)
+            'responses' => $responses
         ]
     ];
     

@@ -13,6 +13,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             handleApiError(401, 'Token不合法。');
         }
         $userId = getUid($pdo, $email);
+        if (!$userId) {
+            handleApiError(404, 'User not found or inactive.');
+        }
 
         $sql = "SELECT COUNT(*) AS unread_count FROM `messages` WHERE `receiver_id` = ? AND `is_read` = 0";
         $stmt = $pdo->prepare($sql);
@@ -21,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         try {
             $currentTime = date('Y-m-d H:i:s');
-            $updateSql = "UPDATE users SET lastlgn = :lastLoginTime WHERE id = :userId";
+            $updateSql = "UPDATE users SET lastlgn = :lastLoginTime WHERE id = :userId AND status = 'active'";
             $updateStmt = $pdo->prepare($updateSql);
             $updateStmt->bindParam(':lastLoginTime', $currentTime);
             $updateStmt->bindParam(':userId', $userId, PDO::PARAM_INT);

@@ -56,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             handleApiError(400, '没有提供更新信息');
         }
 
-    $sql = "UPDATE users SET " . join(', ', $updateFields) . " WHERE email = :email";
+    $sql = "UPDATE users SET " . join(', ', $updateFields) . " WHERE email = :email AND status = 'active'";
         $params[':email'] = $email;
 
         $stmt = $pdo->prepare($sql);

@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             SELECT p.id, p.email, p.time, p.img, p.points, p.auth, p.act, p.raw, p.notes, p.activity_date, 
                    u.username 
             FROM points_transactions p
-            LEFT JOIN users u ON p.email = u.email
+            LEFT JOIN users u ON p.email = u.email AND u.status = 'active'
             WHERE p.email = :email
         ");
         $stmt->bindParam(':email', $email, PDO::PARAM_STR);

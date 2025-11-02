@@ -14,13 +14,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
 
     // 获取用户积分与头像（仅依赖 avatar_id，兼容无 legacy `avatar` 列的数据库）
-    $stmtUser = $pdo->prepare("SELECT points, school, location, avatar_id FROM users WHERE email = :email");
+    $stmtUser = $pdo->prepare("SELECT points, school, location, avatar_id FROM users WHERE email = :email AND status = 'active'");
         $stmtUser->bindParam(':email', $email, PDO::PARAM_STR);
         $stmtUser->execute();
         $userInfo = $stmtUser->fetch(PDO::FETCH_ASSOC); // 使用fetch获取一行数据
+        if (!$userInfo) {
+            handleApiError(404, 'User not found or inactive.');
+        }
 
         // 获取全站积分排行榜
-        $stmtLeaderboard = $pdo->prepare("SELECT username, points FROM users WHERE location = :location ORDER BY points DESC LIMIT 10");
+        $stmtLeaderboard = $pdo->prepare("SELECT username, points FROM users WHERE location = :location AND status = 'active' ORDER BY points DESC LIMIT 10");
         $stmtLeaderboard->bindParam(':location', $userInfo['location'], PDO::PARAM_STR);
         $stmtLeaderboard->execute();
         $leaderboard = $stmtLeaderboard->fetchAll();
@@ -52,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 'avatar_url' => $avatarUrl
             ]);
         } else {
-            handleApiError(404, 'User not found.');
+            handleApiError(404, 'User not found or inactive.');
         }
     } catch (PDOException $e) {
         logException($e);
@@ -64,3 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 
 // No closing PHP tag to avoid accidental output
+
+
+
+

@@ -129,7 +129,7 @@ switch ($activity) {
     $pdo->beginTransaction();
     
     // Update user points
-    $updateSql = "UPDATE users SET points = points + :points WHERE id = :uid"; // Update by UID
+    $updateSql = "UPDATE users SET points = points + :points WHERE id = :uid AND status = 'active'"; // Update by UID
     $updateStmt = $pdo->prepare($updateSql);
     $updateStmt->bindParam(':points', $carbonSavings, PDO::PARAM_STR); // Points might be float
     $updateStmt->bindParam(':uid', $uid, PDO::PARAM_INT);

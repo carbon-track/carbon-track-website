@@ -153,6 +153,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   `points` double NOT NULL,
   `school` text NOT NULL,
   `location` text NOT NULL,
+  `status` enum('active','deleted') NOT NULL DEFAULT 'active',
   PRIMARY KEY (`id`),
   UNIQUE KEY `id` (`id`),
   UNIQUE KEY `id_2` (`id`)

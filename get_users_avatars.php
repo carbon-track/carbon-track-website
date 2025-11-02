@@ -32,7 +32,7 @@ try {
     $sql = "SELECT u.username, u.avatar_id, a.filename 
             FROM users u 
             LEFT JOIN avatars a ON u.avatar_id = a.id AND a.active = 1
-            WHERE u.username IN ($placeholders)";
+            WHERE u.username IN ($placeholders) AND u.status = 'active'";
     
     $stmt = $pdo->prepare($sql);
     $stmt->execute($userIds);

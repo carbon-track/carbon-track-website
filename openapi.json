@@ -11,11 +11,100 @@
         }
     ],
     "paths": {
+        "/add_avatar_column.php": {
+            "post": {
+                "summary": "Add avatar column",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/add_avatars_table.php": {
+            "post": {
+                "summary": "Add avatars table",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "error": {
+                                            "type": "string"
+                                        },
+                                        "sql_migration": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/add_product.php": {
             "post": {
                 "summary": "Add product",
-                "responses": [
-                    {
+                "responses": {
+                    "200": {
                         "description": "Successful response",
                         "content": {
                             "application/json": {
@@ -33,7 +122,7 @@
                             }
                         }
                     },
-                    {
+                    "500": {
                         "description": "Server error",
                         "content": {
                             "application/json": {
@@ -52,7 +141,7 @@
                             }
                         }
                     },
-                    {
+                    "401": {
                         "description": "Unauthorized",
                         "content": {
                             "application/json": {
@@ -71,7 +160,7 @@
                             }
                         }
                     }
-                ],
+                },
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -111,72 +200,11 @@
                 }
             }
         },
-        "/admin_emails.php": {
+        "/admin_delete_avatar.php": {
             "post": {
-                "summary": "Admin emails",
-                "responses": [
-                    {
-                        "description": "Successful response",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    {
-                        "description": "Server error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "error": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    {
-                        "description": "Forbidden",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                ]
-            }
-        },
-        "/approve_exchange.php": {
-            "post": {
-                "summary": "Approve exchange",
-                "responses": [
-                    {
+                "summary": "Admin delete avatar",
+                "responses": {
+                    "200": {
                         "description": "Successful response",
                         "content": {
                             "application/json": {
@@ -185,16 +213,13 @@
                                     "properties": {
                                         "success": {
                                             "type": "boolean"
-                                        },
-                                        "message": {
-                                            "type": "string"
                                         }
                                     }
                                 }
                             }
                         }
                     },
-                    {
+                    "500": {
                         "description": "Server error",
                         "content": {
                             "application/json": {
@@ -213,7 +238,7 @@
                             }
                         }
                     },
-                    {
+                    "400": {
                         "description": "Bad request",
                         "content": {
                             "application/json": {
@@ -232,7 +257,26 @@
                             }
                         }
                     },
-                    {
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
                         "description": "Forbidden",
                         "content": {
                             "application/json": {
@@ -251,7 +295,544 @@
                             }
                         }
                     }
-                ],
+                },
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "token": {
+                                        "type": "string"
+                                    },
+                                    "id": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "token",
+                                    "id"
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/admin_edit_avatar.php": {
+            "post": {
+                "summary": "Admin edit avatar",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "token": {
+                                        "type": "string"
+                                    },
+                                    "id": {
+                                        "type": "string"
+                                    },
+                                    "active": {
+                                        "type": "string"
+                                    },
+                                    "filename": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "token",
+                                    "id",
+                                    "active",
+                                    "filename"
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/admin_emails.php": {
+            "post": {
+                "summary": "Admin emails",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/admin_list_avatars.php": {
+            "post": {
+                "summary": "Admin list avatars",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "avatars": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "token": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "token"
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/admin_upload_avatar.php": {
+            "post": {
+                "summary": "Admin upload avatar",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "id": {
+                                            "type": "integer"
+                                        },
+                                        "url": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "token": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "token"
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/approve_exchange.php": {
+            "post": {
+                "summary": "Approve exchange",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -273,8 +854,8 @@
         "/approve_transaction.php": {
             "post": {
                 "summary": "Approve transaction",
-                "responses": [
-                    {
+                "responses": {
+                    "200": {
                         "description": "Successful response",
                         "content": {
                             "application/json": {
@@ -292,7 +873,7 @@
                             }
                         }
                     },
-                    {
+                    "500": {
                         "description": "Server error",
                         "content": {
                             "application/json": {
@@ -311,7 +892,7 @@
                             }
                         }
                     },
-                    {
+                    "400": {
                         "description": "Bad request",
                         "content": {
                             "application/json": {
@@ -330,7 +911,7 @@
                             }
                         }
                     },
-                    {
+                    "403": {
                         "description": "Forbidden",
                         "content": {
                             "application/json": {
@@ -349,7 +930,7 @@
                             }
                         }
                     }
-                ],
+                },
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -382,8 +963,8 @@
         "/calculate.php": {
             "post": {
                 "summary": "Calculate",
-                "responses": [
-                    {
+                "responses": {
+                    "200": {
                         "description": "Successful response",
                         "content": {
                             "application/json": {
@@ -404,7 +985,7 @@
                             }
                         }
                     },
-                    {
+                    "500": {
                         "description": "Server error",
                         "content": {
                             "application/json": {
@@ -423,7 +1004,7 @@
                             }
                         }
                     },
-                    {
+                    "400": {
                         "description": "Bad request",
                         "content": {
                             "application/json": {
@@ -442,7 +1023,7 @@
                             }
                         }
                     },
-                    {
+                    "403": {
                         "description": "Forbidden",
                         "content": {
                             "application/json": {
@@ -461,7 +1042,7 @@
                             }
                         }
                     }
-                ],
+                },
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -502,8 +1083,8 @@
         "/chkmsg.php": {
             "post": {
                 "summary": "Chkmsg",
-                "responses": [
-                    {
+                "responses": {
+                    "200": {
                         "description": "Successful response",
                         "content": {
                             "application/json": {
@@ -519,7 +1100,7 @@
                             }
                         }
                     },
-                    {
+                    "500": {
                         "description": "Server error",
                         "content": {
                             "application/json": {
@@ -538,7 +1119,7 @@
                             }
                         }
                     },
-                    {
+                    "401": {
                         "description": "Unauthorized",
                         "content": {
                             "application/json": {
@@ -557,7 +1138,7 @@
                             }
                         }
                     }
-                ],
+                },
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -579,8 +1160,8 @@
         "/chkreadstatus.php": {
             "post": {
                 "summary": "Chkreadstatus",
-                "responses": [
-                    {
+                "responses": {
+                    "200": {
                         "description": "Successful response",
                         "content": {
                             "application/json": {
@@ -601,7 +1182,7 @@
                             }
                         }
                     },
-                    {
+                    "500": {
                         "description": "Server error",
                         "content": {
                             "application/json": {
@@ -620,7 +1201,7 @@
                             }
                         }
                     },
-                    {
+                    "400": {
                         "description": "Bad request",
                         "content": {
                             "application/json": {
@@ -639,7 +1220,7 @@
                             }
                         }
                     },
-                    {
+                    "401": {
                         "description": "Unauthorized",
                         "content": {
                             "application/json": {
@@ -658,7 +1239,7 @@
                             }
                         }
                     },
-                    {
+                    "403": {
                         "description": "Forbidden",
                         "content": {
                             "application/json": {
@@ -677,7 +1258,7 @@
                             }
                         }
                     }
-                ],
+                },
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -701,11 +1282,11 @@
                 }
             }
         },
-        "/delete_product.php": {
+        "/deactivate_account.php": {
             "post": {
-                "summary": "Delete product",
-                "responses": [
-                    {
+                "summary": "Deactivate account",
+                "responses": {
+                    "200": {
                         "description": "Successful response",
                         "content": {
                             "application/json": {
@@ -723,7 +1304,7 @@
                             }
                         }
                     },
-                    {
+                    "500": {
                         "description": "Server error",
                         "content": {
                             "application/json": {
@@ -742,7 +1323,7 @@
                             }
                         }
                     },
-                    {
+                    "400": {
                         "description": "Bad request",
                         "content": {
                             "application/json": {
@@ -761,7 +1342,107 @@
                             }
                         }
                     },
-                    {
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "token": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "token"
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/delete_product.php": {
+            "post": {
+                "summary": "Delete product",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
                         "description": "Forbidden",
                         "content": {
                             "application/json": {
@@ -780,7 +1461,7 @@
                             }
                         }
                     }
-                ],
+                },
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -807,8 +1488,8 @@
         "/delete_user.php": {
             "post": {
                 "summary": "Delete user",
-                "responses": [
-                    {
+                "responses": {
+                    "200": {
                         "description": "Successful response",
                         "content": {
                             "application/json": {
@@ -826,7 +1507,7 @@
                             }
                         }
                     },
-                    {
+                    "500": {
                         "description": "Server error",
                         "content": {
                             "application/json": {
@@ -845,7 +1526,7 @@
                             }
                         }
                     },
-                    {
+                    "400": {
                         "description": "Bad request",
                         "content": {
                             "application/json": {
@@ -864,7 +1545,7 @@
                             }
                         }
                     },
-                    {
+                    "401": {
                         "description": "Unauthorized",
                         "content": {
                             "application/json": {
@@ -883,7 +1564,7 @@
                             }
                         }
                     },
-                    {
+                    "403": {
                         "description": "Forbidden",
                         "content": {
                             "application/json": {
@@ -902,7 +1583,7 @@
                             }
                         }
                     }
-                ],
+                },
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -927,8 +1608,8 @@
         "/edit_user_info.php": {
             "post": {
                 "summary": "Edit user info",
-                "responses": [
-                    {
+                "responses": {
+                    "200": {
                         "description": "Successful response",
                         "content": {
                             "application/json": {
@@ -946,7 +1627,7 @@
                             }
                         }
                     },
-                    {
+                    "500": {
                         "description": "Server error",
                         "content": {
                             "application/json": {
@@ -965,7 +1646,7 @@
                             }
                         }
                     },
-                    {
+                    "400": {
                         "description": "Bad request",
                         "content": {
                             "application/json": {
@@ -984,7 +1665,7 @@
                             }
                         }
                     },
-                    {
+                    "401": {
                         "description": "Unauthorized",
                         "content": {
                             "application/json": {
@@ -1003,7 +1684,7 @@
                             }
                         }
                     }
-                ],
+                },
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -1022,12 +1703,16 @@
                                     },
                                     "state": {
                                         "type": "string"
+                                    },
+                                    "avatar": {
+                                        "type": "string"
                                     }
                                 },
                                 "required": [
                                     "school",
                                     "new_sch",
-                                    "state"
+                                    "state",
+                                    "avatar"
                                 ]
                             }
                         }
@@ -1038,8 +1723,8 @@
         "/exchange_product.php": {
             "post": {
                 "summary": "Exchange product",
-                "responses": [
-                    {
+                "responses": {
+                    "200": {
                         "description": "Successful response",
                         "content": {
                             "application/json": {
@@ -1054,7 +1739,7 @@
                             }
                         }
                     },
-                    {
+                    "500": {
                         "description": "Server error",
                         "content": {
                             "application/json": {
@@ -1073,7 +1758,7 @@
                             }
                         }
                     },
-                    {
+                    "400": {
                         "description": "Bad request",
                         "content": {
                             "application/json": {
@@ -1092,7 +1777,7 @@
                             }
                         }
                     },
-                    {
+                    "401": {
                         "description": "Unauthorized",
                         "content": {
                             "application/json": {
@@ -1111,7 +1796,7 @@
                             }
                         }
                     },
-                    {
+                    "403": {
                         "description": "Forbidden",
                         "content": {
                             "application/json": {
@@ -1130,7 +1815,7 @@
                             }
                         }
                     }
-                ],
+                },
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -1162,8 +1847,8 @@
         "/fix.php": {
             "post": {
                 "summary": "Fix",
-                "responses": [
-                    {
+                "responses": {
+                    "200": {
                         "description": "Successful response",
                         "content": {
                             "application/json": {
@@ -1179,7 +1864,7 @@
                             }
                         }
                     },
-                    {
+                    "500": {
                         "description": "Server error",
                         "content": {
                             "application/json": {
@@ -1198,14 +1883,14 @@
                             }
                         }
                     }
-                ]
+                }
             }
         },
         "/gapthis.php": {
             "post": {
                 "summary": "Gapthis",
-                "responses": [
-                    {
+                "responses": {
+                    "200": {
                         "description": "Successful response",
                         "content": {
                             "application/json": {
@@ -1238,7 +1923,7 @@
                             }
                         }
                     },
-                    {
+                    "500": {
                         "description": "Server error",
                         "content": {
                             "application/json": {
@@ -1257,7 +1942,7 @@
                             }
                         }
                     },
-                    {
+                    "400": {
                         "description": "Bad request",
                         "content": {
                             "application/json": {
@@ -1276,7 +1961,7 @@
                             }
                         }
                     },
-                    {
+                    "401": {
                         "description": "Unauthorized",
                         "content": {
                             "application/json": {
@@ -1295,7 +1980,7 @@
                             }
                         }
                     }
-                ],
+                },
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -1331,8 +2016,8 @@
         "/get_config.php": {
             "post": {
                 "summary": "Get config",
-                "responses": [
-                    {
+                "responses": {
+                    "200": {
                         "description": "Successful response",
                         "content": {
                             "application/json": {
@@ -1350,7 +2035,7 @@
                             }
                         }
                     },
-                    {
+                    "500": {
                         "description": "Server error",
                         "content": {
                             "application/json": {
@@ -1369,14 +2054,14 @@
                             }
                         }
                     }
-                ]
+                }
             }
         },
         "/get_error_logs.php": {
             "post": {
                 "summary": "Get error logs",
-                "responses": [
-                    {
+                "responses": {
+                    "200": {
                         "description": "Successful response",
                         "content": {
                             "application/json": {
@@ -1397,7 +2082,7 @@
                             }
                         }
                     },
-                    {
+                    "500": {
                         "description": "Server error",
                         "content": {
                             "application/json": {
@@ -1416,7 +2101,7 @@
                             }
                         }
                     },
-                    {
+                    "400": {
                         "description": "Bad request",
                         "content": {
                             "application/json": {
@@ -1435,7 +2120,7 @@
                             }
                         }
                     },
-                    {
+                    "401": {
                         "description": "Unauthorized",
                         "content": {
                             "application/json": {
@@ -1454,7 +2139,7 @@
                             }
                         }
                     },
-                    {
+                    "403": {
                         "description": "Forbidden",
                         "content": {
                             "application/json": {
@@ -1473,14 +2158,14 @@
                             }
                         }
                     }
-                ]
+                }
             }
         },
         "/get_error_stats.php": {
             "post": {
                 "summary": "Get error stats",
-                "responses": [
-                    {
+                "responses": {
+                    "200": {
                         "description": "Successful response",
                         "content": {
                             "application/json": {
@@ -1519,7 +2204,7 @@
                             }
                         }
                     },
-                    {
+                    "500": {
                         "description": "Server error",
                         "content": {
                             "application/json": {
@@ -1538,7 +2223,7 @@
                             }
                         }
                     },
-                    {
+                    "400": {
                         "description": "Bad request",
                         "content": {
                             "application/json": {
@@ -1557,7 +2242,7 @@
                             }
                         }
                     },
-                    {
+                    "403": {
                         "description": "Forbidden",
                         "content": {
                             "application/json": {
@@ -1576,14 +2261,14 @@
                             }
                         }
                     }
-                ]
+                }
             }
         },
         "/get_exchange_requests.php": {
             "post": {
                 "summary": "Get exchange requests",
-                "responses": [
-                    {
+                "responses": {
+                    "200": {
                         "description": "Successful response",
                         "content": {
                             "application/json": {
@@ -1616,7 +2301,7 @@
                             }
                         }
                     },
-                    {
+                    "500": {
                         "description": "Server error",
                         "content": {
                             "application/json": {
@@ -1635,7 +2320,7 @@
                             }
                         }
                     },
-                    {
+                    "400": {
                         "description": "Bad request",
                         "content": {
                             "application/json": {
@@ -1654,7 +2339,7 @@
                             }
                         }
                     },
-                    {
+                    "403": {
                         "description": "Forbidden",
                         "content": {
                             "application/json": {
@@ -1673,7 +2358,7 @@
                             }
                         }
                     }
-                ],
+                },
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -1709,8 +2394,8 @@
         "/get_rank.php": {
             "post": {
                 "summary": "Get rank",
-                "responses": [
-                    {
+                "responses": {
+                    "200": {
                         "description": "Successful response",
                         "content": {
                             "application/json": {
@@ -1728,7 +2413,7 @@
                             }
                         }
                     },
-                    {
+                    "500": {
                         "description": "Server error",
                         "content": {
                             "application/json": {
@@ -1747,7 +2432,7 @@
                             }
                         }
                     },
-                    {
+                    "403": {
                         "description": "Forbidden",
                         "content": {
                             "application/json": {
@@ -1766,7 +2451,7 @@
                             }
                         }
                     }
-                ],
+                },
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -1797,8 +2482,8 @@
         "/get_schools.php": {
             "post": {
                 "summary": "Get schools",
-                "responses": [
-                    {
+                "responses": {
+                    "200": {
                         "description": "Successful response",
                         "content": {
                             "application/json": {
@@ -1814,7 +2499,7 @@
                             }
                         }
                     },
-                    {
+                    "500": {
                         "description": "Server error",
                         "content": {
                             "application/json": {
@@ -1833,7 +2518,7 @@
                             }
                         }
                     },
-                    {
+                    "400": {
                         "description": "Bad request",
                         "content": {
                             "application/json": {
@@ -1852,7 +2537,7 @@
                             }
                         }
                     },
-                    {
+                    "403": {
                         "description": "Forbidden",
                         "content": {
                             "application/json": {
@@ -1871,7 +2556,7 @@
                             }
                         }
                     }
-                ],
+                },
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -1895,8 +2580,8 @@
         "/get_user_points.php": {
             "post": {
                 "summary": "Get user points",
-                "responses": [
-                    {
+                "responses": {
+                    "200": {
                         "description": "Successful response",
                         "content": {
                             "application/json": {
@@ -1912,7 +2597,7 @@
                             }
                         }
                     },
-                    {
+                    "500": {
                         "description": "Server error",
                         "content": {
                             "application/json": {
@@ -1931,7 +2616,7 @@
                             }
                         }
                     },
-                    {
+                    "401": {
                         "description": "Unauthorized",
                         "content": {
                             "application/json": {
@@ -1950,7 +2635,7 @@
                             }
                         }
                     }
-                ],
+                },
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -1972,8 +2657,8 @@
         "/get_users.php": {
             "post": {
                 "summary": "Get users",
-                "responses": [
-                    {
+                "responses": {
+                    "200": {
                         "description": "Successful response",
                         "content": {
                             "application/json": {
@@ -1994,7 +2679,7 @@
                             }
                         }
                     },
-                    {
+                    "500": {
                         "description": "Server error",
                         "content": {
                             "application/json": {
@@ -2013,7 +2698,7 @@
                             }
                         }
                     },
-                    {
+                    "400": {
                         "description": "Bad request",
                         "content": {
                             "application/json": {
@@ -2032,7 +2717,7 @@
                             }
                         }
                     },
-                    {
+                    "401": {
                         "description": "Unauthorized",
                         "content": {
                             "application/json": {
@@ -2051,7 +2736,7 @@
                             }
                         }
                     },
-                    {
+                    "403": {
                         "description": "Forbidden",
                         "content": {
                             "application/json": {
@@ -2070,7 +2755,7 @@
                             }
                         }
                     }
-                ],
+                },
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -2095,11 +2780,118 @@
                 }
             }
         },
+        "/get_users_avatars.php": {
+            "post": {
+                "summary": "Get users avatars",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "avatars": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "token": {
+                                        "type": "string"
+                                    },
+                                    "userIds": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "token",
+                                    "userIds"
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/getmsg.php": {
             "post": {
                 "summary": "Getmsg",
-                "responses": [
-                    {
+                "responses": {
+                    "200": {
                         "description": "Successful response",
                         "content": {
                             "application/json": {
@@ -2123,7 +2915,7 @@
                             }
                         }
                     },
-                    {
+                    "500": {
                         "description": "Server error",
                         "content": {
                             "application/json": {
@@ -2142,7 +2934,7 @@
                             }
                         }
                     },
-                    {
+                    "400": {
                         "description": "Bad request",
                         "content": {
                             "application/json": {
@@ -2161,7 +2953,7 @@
                             }
                         }
                     },
-                    {
+                    "401": {
                         "description": "Unauthorized",
                         "content": {
                             "application/json": {
@@ -2180,7 +2972,7 @@
                             }
                         }
                     }
-                ],
+                },
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -2204,8 +2996,8 @@
         "/getpthis.php": {
             "post": {
                 "summary": "Getpthis",
-                "responses": [
-                    {
+                "responses": {
+                    "200": {
                         "description": "Successful response",
                         "content": {
                             "application/json": {
@@ -2226,7 +3018,7 @@
                             }
                         }
                     },
-                    {
+                    "500": {
                         "description": "Server error",
                         "content": {
                             "application/json": {
@@ -2245,7 +3037,7 @@
                             }
                         }
                     },
-                    {
+                    "400": {
                         "description": "Bad request",
                         "content": {
                             "application/json": {
@@ -2264,7 +3056,7 @@
                             }
                         }
                     },
-                    {
+                    "401": {
                         "description": "Unauthorized",
                         "content": {
                             "application/json": {
@@ -2283,7 +3075,7 @@
                             }
                         }
                     }
-                ],
+                },
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -2307,8 +3099,8 @@
         "/gtc.php": {
             "post": {
                 "summary": "Gtc",
-                "responses": [
-                    {
+                "responses": {
+                    "200": {
                         "description": "Successful response",
                         "content": {
                             "application/json": {
@@ -2324,7 +3116,7 @@
                             }
                         }
                     },
-                    {
+                    "500": {
                         "description": "Server error",
                         "content": {
                             "application/json": {
@@ -2343,14 +3135,14 @@
                             }
                         }
                     }
-                ]
+                }
             }
         },
         "/gtr.php": {
             "post": {
                 "summary": "Gtr",
-                "responses": [
-                    {
+                "responses": {
+                    "200": {
                         "description": "Successful response",
                         "content": {
                             "application/json": {
@@ -2366,7 +3158,7 @@
                             }
                         }
                     },
-                    {
+                    "500": {
                         "description": "Server error",
                         "content": {
                             "application/json": {
@@ -2385,14 +3177,14 @@
                             }
                         }
                     }
-                ]
+                }
             }
         },
         "/install.php": {
             "post": {
                 "summary": "Install",
-                "responses": [
-                    {
+                "responses": {
+                    "200": {
                         "description": "Successful response",
                         "content": {
                             "application/json": {
@@ -2410,7 +3202,7 @@
                             }
                         }
                     },
-                    {
+                    "500": {
                         "description": "Server error",
                         "content": {
                             "application/json": {
@@ -2429,7 +3221,7 @@
                             }
                         }
                     }
-                ],
+                },
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -2457,11 +3249,11 @@
                 }
             }
         },
-        "/merge_openapi.php": {
+        "/list_avatars.php": {
             "post": {
-                "summary": "Merge openapi",
-                "responses": [
-                    {
+                "summary": "List avatars",
+                "responses": {
+                    "200": {
                         "description": "Successful response",
                         "content": {
                             "application/json": {
@@ -2469,15 +3261,20 @@
                                     "type": "object",
                                     "properties": {
                                         "success": {
-                                            "type": "boolean",
-                                            "example": true
+                                            "type": "boolean"
+                                        },
+                                        "avatars": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
                     },
-                    {
+                    "500": {
                         "description": "Server error",
                         "content": {
                             "application/json": {
@@ -2496,14 +3293,155 @@
                             }
                         }
                     }
-                ]
+                }
+            }
+        },
+        "/login.php": {
+            "post": {
+                "summary": "Login",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "username": {
+                                        "type": "string"
+                                    },
+                                    "password": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": []
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/merge_openapi.php": {
+            "post": {
+                "summary": "Merge openapi",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         },
         "/product.php": {
             "post": {
                 "summary": "Product",
-                "responses": [
-                    {
+                "responses": {
+                    "200": {
                         "description": "Successful response",
                         "content": {
                             "application/json": {
@@ -2536,7 +3474,7 @@
                             }
                         }
                     },
-                    {
+                    "500": {
                         "description": "Server error",
                         "content": {
                             "application/json": {
@@ -2555,7 +3493,7 @@
                             }
                         }
                     },
-                    {
+                    "400": {
                         "description": "Bad request",
                         "content": {
                             "application/json": {
@@ -2574,7 +3512,7 @@
                             }
                         }
                     },
-                    {
+                    "401": {
                         "description": "Unauthorized",
                         "content": {
                             "application/json": {
@@ -2593,7 +3531,7 @@
                             }
                         }
                     }
-                ],
+                },
                 "parameters": [
                     {
                         "name": "page",
@@ -2641,8 +3579,8 @@
         "/recovery.php": {
             "post": {
                 "summary": "Recovery",
-                "responses": [
-                    {
+                "responses": {
+                    "200": {
                         "description": "Successful response",
                         "content": {
                             "application/json": {
@@ -2660,7 +3598,7 @@
                             }
                         }
                     },
-                    {
+                    "500": {
                         "description": "Server error",
                         "content": {
                             "application/json": {
@@ -2679,7 +3617,7 @@
                             }
                         }
                     },
-                    {
+                    "400": {
                         "description": "Bad request",
                         "content": {
                             "application/json": {
@@ -2698,7 +3636,7 @@
                             }
                         }
                     },
-                    {
+                    "403": {
                         "description": "Forbidden",
                         "content": {
                             "application/json": {
@@ -2717,7 +3655,7 @@
                             }
                         }
                     }
-                ],
+                },
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -2747,8 +3685,8 @@
         "/register.php": {
             "post": {
                 "summary": "Register",
-                "responses": [
-                    {
+                "responses": {
+                    "200": {
                         "description": "Successful response",
                         "content": {
                             "application/json": {
@@ -2763,7 +3701,7 @@
                             }
                         }
                     },
-                    {
+                    "500": {
                         "description": "Server error",
                         "content": {
                             "application/json": {
@@ -2782,7 +3720,7 @@
                             }
                         }
                     },
-                    {
+                    "400": {
                         "description": "Bad request",
                         "content": {
                             "application/json": {
@@ -2801,7 +3739,7 @@
                             }
                         }
                     },
-                    {
+                    "403": {
                         "description": "Forbidden",
                         "content": {
                             "application/json": {
@@ -2820,7 +3758,7 @@
                             }
                         }
                     }
-                ],
+                },
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -2854,8 +3792,8 @@
         "/reject_transaction.php": {
             "post": {
                 "summary": "Reject transaction",
-                "responses": [
-                    {
+                "responses": {
+                    "200": {
                         "description": "Successful response",
                         "content": {
                             "application/json": {
@@ -2873,7 +3811,7 @@
                             }
                         }
                     },
-                    {
+                    "500": {
                         "description": "Server error",
                         "content": {
                             "application/json": {
@@ -2892,7 +3830,7 @@
                             }
                         }
                     },
-                    {
+                    "400": {
                         "description": "Bad request",
                         "content": {
                             "application/json": {
@@ -2911,7 +3849,7 @@
                             }
                         }
                     },
-                    {
+                    "403": {
                         "description": "Forbidden",
                         "content": {
                             "application/json": {
@@ -2930,7 +3868,7 @@
                             }
                         }
                     }
-                ],
+                },
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -2958,8 +3896,8 @@
         "/rsm.php": {
             "post": {
                 "summary": "Rsm",
-                "responses": [
-                    {
+                "responses": {
+                    "200": {
                         "description": "Successful response",
                         "content": {
                             "application/json": {
@@ -2975,7 +3913,7 @@
                             }
                         }
                     },
-                    {
+                    "500": {
                         "description": "Server error",
                         "content": {
                             "application/json": {
@@ -2994,14 +3932,14 @@
                             }
                         }
                     }
-                ]
+                }
             }
         },
         "/sendRecoveryCode.php": {
             "post": {
                 "summary": "SendRecoveryCode",
-                "responses": [
-                    {
+                "responses": {
+                    "200": {
                         "description": "Successful response",
                         "content": {
                             "application/json": {
@@ -3019,7 +3957,7 @@
                             }
                         }
                     },
-                    {
+                    "500": {
                         "description": "Server error",
                         "content": {
                             "application/json": {
@@ -3038,7 +3976,7 @@
                             }
                         }
                     },
-                    {
+                    "403": {
                         "description": "Forbidden",
                         "content": {
                             "application/json": {
@@ -3057,7 +3995,7 @@
                             }
                         }
                     }
-                ],
+                },
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -3082,8 +4020,8 @@
         "/sendVerificationCode.php": {
             "post": {
                 "summary": "SendVerificationCode",
-                "responses": [
-                    {
+                "responses": {
+                    "200": {
                         "description": "Successful response",
                         "content": {
                             "application/json": {
@@ -3101,7 +4039,7 @@
                             }
                         }
                     },
-                    {
+                    "500": {
                         "description": "Server error",
                         "content": {
                             "application/json": {
@@ -3120,7 +4058,7 @@
                             }
                         }
                     },
-                    {
+                    "400": {
                         "description": "Bad request",
                         "content": {
                             "application/json": {
@@ -3139,7 +4077,7 @@
                             }
                         }
                     },
-                    {
+                    "403": {
                         "description": "Forbidden",
                         "content": {
                             "application/json": {
@@ -3158,7 +4096,7 @@
                             }
                         }
                     }
-                ],
+                },
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -3185,8 +4123,8 @@
         "/send_message.php": {
             "post": {
                 "summary": "Send message",
-                "responses": [
-                    {
+                "responses": {
+                    "200": {
                         "description": "Successful response",
                         "content": {
                             "application/json": {
@@ -3202,7 +4140,7 @@
                             }
                         }
                     },
-                    {
+                    "500": {
                         "description": "Server error",
                         "content": {
                             "application/json": {
@@ -3221,7 +4159,7 @@
                             }
                         }
                     },
-                    {
+                    "400": {
                         "description": "Bad request",
                         "content": {
                             "application/json": {
@@ -3240,7 +4178,7 @@
                             }
                         }
                     },
-                    {
+                    "401": {
                         "description": "Unauthorized",
                         "content": {
                             "application/json": {
@@ -3259,7 +4197,7 @@
                             }
                         }
                     }
-                ],
+                },
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -3291,8 +4229,8 @@
         "/sendmsg.php": {
             "post": {
                 "summary": "Sendmsg",
-                "responses": [
-                    {
+                "responses": {
+                    "200": {
                         "description": "Successful response",
                         "content": {
                             "application/json": {
@@ -3307,7 +4245,7 @@
                             }
                         }
                     },
-                    {
+                    "500": {
                         "description": "Server error",
                         "content": {
                             "application/json": {
@@ -3326,7 +4264,26 @@
                             }
                         }
                     },
-                    {
+                    "400": {
+                        "description": "Bad request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
                         "description": "Unauthorized",
                         "content": {
                             "application/json": {
@@ -3345,7 +4302,7 @@
                             }
                         }
                     }
-                ],
+                },
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -3370,11 +4327,115 @@
                 }
             }
         },
+        "/set_user_avatar.php": {
+            "post": {
+                "summary": "Set user avatar",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "avatar_id": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "token": {
+                                        "type": "string"
+                                    },
+                                    "avatar_id": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "token",
+                                    "avatar_id"
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/speccal.php": {
             "post": {
                 "summary": "Speccal",
-                "responses": [
-                    {
+                "responses": {
+                    "200": {
                         "description": "Successful response",
                         "content": {
                             "application/json": {
@@ -3395,7 +4456,7 @@
                             }
                         }
                     },
-                    {
+                    "500": {
                         "description": "Server error",
                         "content": {
                             "application/json": {
@@ -3414,7 +4475,7 @@
                             }
                         }
                     },
-                    {
+                    "400": {
                         "description": "Bad request",
                         "content": {
                             "application/json": {
@@ -3433,7 +4494,7 @@
                             }
                         }
                     },
-                    {
+                    "401": {
                         "description": "Unauthorized",
                         "content": {
                             "application/json": {
@@ -3452,7 +4513,7 @@
                             }
                         }
                     },
-                    {
+                    "403": {
                         "description": "Forbidden",
                         "content": {
                             "application/json": {
@@ -3471,7 +4532,7 @@
                             }
                         }
                     }
-                ],
+                },
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -3514,8 +4575,8 @@
         "/stm.php": {
             "post": {
                 "summary": "Stm",
-                "responses": [
-                    {
+                "responses": {
+                    "200": {
                         "description": "Successful response",
                         "content": {
                             "application/json": {
@@ -3533,7 +4594,7 @@
                             }
                         }
                     },
-                    {
+                    "500": {
                         "description": "Server error",
                         "content": {
                             "application/json": {
@@ -3552,7 +4613,7 @@
                             }
                         }
                     },
-                    {
+                    "400": {
                         "description": "Bad request",
                         "content": {
                             "application/json": {
@@ -3571,7 +4632,7 @@
                             }
                         }
                     }
-                ],
+                },
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -3595,8 +4656,8 @@
         "/update_factors.php": {
             "post": {
                 "summary": "Update factors",
-                "responses": [
-                    {
+                "responses": {
+                    "200": {
                         "description": "Successful response",
                         "content": {
                             "application/json": {
@@ -3620,7 +4681,7 @@
                             }
                         }
                     },
-                    {
+                    "500": {
                         "description": "Server error",
                         "content": {
                             "application/json": {
@@ -3639,14 +4700,14 @@
                             }
                         }
                     }
-                ]
+                }
             }
         },
         "/update_product.php": {
             "post": {
                 "summary": "Update product",
-                "responses": [
-                    {
+                "responses": {
+                    "200": {
                         "description": "Successful response",
                         "content": {
                             "application/json": {
@@ -3664,7 +4725,7 @@
                             }
                         }
                     },
-                    {
+                    "500": {
                         "description": "Server error",
                         "content": {
                             "application/json": {
@@ -3683,7 +4744,7 @@
                             }
                         }
                     },
-                    {
+                    "400": {
                         "description": "Bad request",
                         "content": {
                             "application/json": {
@@ -3702,7 +4763,7 @@
                             }
                         }
                     },
-                    {
+                    "401": {
                         "description": "Unauthorized",
                         "content": {
                             "application/json": {
@@ -3721,7 +4782,7 @@
                             }
                         }
                     }
-                ],
+                },
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -3767,8 +4828,8 @@
         "/update_user.php": {
             "post": {
                 "summary": "Update user",
-                "responses": [
-                    {
+                "responses": {
+                    "200": {
                         "description": "Successful response",
                         "content": {
                             "application/json": {
@@ -3786,7 +4847,7 @@
                             }
                         }
                     },
-                    {
+                    "500": {
                         "description": "Server error",
                         "content": {
                             "application/json": {
@@ -3805,7 +4866,7 @@
                             }
                         }
                     },
-                    {
+                    "400": {
                         "description": "Bad request",
                         "content": {
                             "application/json": {
@@ -3824,7 +4885,7 @@
                             }
                         }
                     },
-                    {
+                    "401": {
                         "description": "Unauthorized",
                         "content": {
                             "application/json": {
@@ -3843,7 +4904,7 @@
                             }
                         }
                     },
-                    {
+                    "403": {
                         "description": "Forbidden",
                         "content": {
                             "application/json": {
@@ -3862,7 +4923,7 @@
                             }
                         }
                     }
-                ],
+                },
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -3895,8 +4956,8 @@
         "/verify_admin.php": {
             "post": {
                 "summary": "Verify admin",
-                "responses": [
-                    {
+                "responses": {
+                    "200": {
                         "description": "Successful response",
                         "content": {
                             "application/json": {
@@ -3914,7 +4975,7 @@
                             }
                         }
                     },
-                    {
+                    "500": {
                         "description": "Server error",
                         "content": {
                             "application/json": {
@@ -3933,7 +4994,7 @@
                             }
                         }
                     },
-                    {
+                    "400": {
                         "description": "Bad request",
                         "content": {
                             "application/json": {
@@ -3952,7 +5013,7 @@
                             }
                         }
                     },
-                    {
+                    "401": {
                         "description": "Unauthorized",
                         "content": {
                             "application/json": {
@@ -3971,7 +5032,7 @@
                             }
                         }
                     }
-                ],
+                },
                 "requestBody": {
                     "required": true,
                     "content": {

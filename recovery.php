@@ -55,7 +55,7 @@ try {
     }
 
     // Check if email exists
-    $stmt = $pdo->prepare("SELECT id FROM users WHERE email = :email");
+    $stmt = $pdo->prepare("SELECT id FROM users WHERE email = :email AND status = 'active'");
     $stmt->bindParam(':email', $email);
     $stmt->execute();
 
@@ -67,7 +67,7 @@ try {
     $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
 
     // Update user password
-    $stmt = $pdo->prepare("UPDATE users SET password = :password WHERE email = :email");
+    $stmt = $pdo->prepare("UPDATE users SET password = :password WHERE email = :email AND status = 'active'");
     $stmt->bindParam(':password', $hashedPassword);
     $stmt->bindParam(':email', $email);
     

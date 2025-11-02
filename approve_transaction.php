@@ -53,7 +53,7 @@ function updateTransactionHistory($pdo, $transaction_id, $type, $uid) {
              error_log("[Approve Transaction] Approved 'ord' type transaction ID: {$transaction_id} for UID: {$actualUid}");
         } else if ($type === 'spec') {
             // For 'spec', add the points to the user account
-            $uptstmt = $pdo->prepare("UPDATE users SET points = points + :points WHERE id = :uid");
+            $uptstmt = $pdo->prepare("UPDATE users SET points = points + :points WHERE id = :uid AND status = 'active'");
              $uptstmt->bindParam(':points', $points, PDO::PARAM_STR); // Points can be float
              $uptstmt->bindParam(':uid', $actualUid, PDO::PARAM_INT);
             $uptstmt->execute();

@@ -906,7 +906,7 @@
         const username = $(this).closest('tr').find('td:eq(1)').text();
         
         // Use the showAlert function for a more iOS-like confirmation
-        showAlert(`Are you sure you want to delete user "${username}" (ID: ${userId})? This action cannot be undone.`, 'warning', function() {
+        showAlert(`Are you sure you want to deactivate user "${username}" (ID: ${userId})? The account will no longer be able to sign in.`, 'warning', function() {
             deleteUser(token, userId);
         });
     });
@@ -984,7 +984,7 @@
                   <td>
                       <div class="action-btns">
                           <button class="btn btn-sm action-btn edit-btn" data-id="${user.id}"><i class="fas fa-edit"></i> Edit</button>
-                          <button class="btn btn-sm action-btn delete-btn" data-id="${user.id}"><i class="fas fa-trash"></i> Delete</button>
+                          <button class="btn btn-sm action-btn delete-btn" data-id="${user.id}"><i class="fas fa-user-slash"></i> Deactivate</button>
                       </div>
                   </td>
               </tr>
@@ -1048,14 +1048,14 @@
           dataType: 'json',
           success: function(response) {
               if (response.success) {
-                  showAlert('User deleted successfully!', 'success');
+                  showAlert('User deactivated successfully!', 'success');
                   fetchUsers(token, $('#userSearchInput').val()); // Refresh list
               } else {
-                  showAlert(response.message || 'Failed to delete user.', 'error');
+                  showAlert(response.message || 'Failed to deactivate user.', 'error');
               }
           },
           error: function() {
-              showAlert('Failed to connect to server to delete user.', 'error');
+              showAlert('Failed to connect to server to deactivate user.', 'error');
           }
       });
   }

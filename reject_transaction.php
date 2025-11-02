@@ -48,7 +48,7 @@ function updateTransactionHistory($pdo, $transaction_id, $type) {
             // they might need to be deducted here. This logic depends heavily on the award flow.
             // **Assuming points were awarded before admin approval for 'ord'**: Deduct points.
              if ($points > 0) { // Only deduct if points were positive
-                 $emstmt = $pdo->prepare("UPDATE users SET points = points - :points WHERE id = :uid");
+                 $emstmt = $pdo->prepare("UPDATE users SET points = points - :points WHERE id = :uid AND status = 'active'");
                  $emstmt->bindParam(':uid', $actualUid, PDO::PARAM_INT);
                  $emstmt->bindParam(':points', $points, PDO::PARAM_STR);
             $emstmt->execute();

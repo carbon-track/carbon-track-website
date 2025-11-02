@@ -45,7 +45,7 @@ try {
         }
     }
 
-    $sql = "UPDATE users SET points = :points, school = :school WHERE id = :userId";
+    $sql = "UPDATE users SET points = :points, school = :school WHERE id = :userId AND status = 'active'";
     $stmt = $pdo->prepare($sql);
 
     $stmt->bindParam(':points', $points);

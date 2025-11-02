@@ -70,6 +70,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
 
         $id = getUid($pdo,$email);
+        if (!$id) {
+            handleApiError(404, 'User not found or inactive.');
+        }
         $carbonSavings = 0;
 
         // 碳核算算法2.0
@@ -194,7 +197,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         $pdo->beginTransaction();
 
-        $updateSql = "UPDATE users SET points = points + :points WHERE email = :email";
+        $updateSql = "UPDATE users SET points = points + :points WHERE email = :email AND status = 'active'";
         $updateStmt = $pdo->prepare($updateSql);
         $updateStmt->bindParam(':points', $carbonSavings, PDO::PARAM_STR);
         $updateStmt->bindParam(':email', $email, PDO::PARAM_STR);

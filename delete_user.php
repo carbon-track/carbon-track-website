@@ -20,10 +20,6 @@ try {
     if ($userId === false || $userId <= 0) {
         handleApiError(400, 'Invalid User ID.');
     }
-    
-    // Add check to prevent deleting self? (Optional)
-    if ($userId == $adminUserId) { handleApiError(400, 'Cannot delete your own account.'); }
-
     $email = opensslDecrypt($token);
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         handleApiError(401, 'Invalid or expired token.');
@@ -33,7 +29,6 @@ try {
     if (!isAdmin($email)) {
         handleApiError(403, 'Access denied.');
     }
-    handleApiError(403, 'Access denied.');
     global $pdo; // Ensure $pdo from db.php is accessible
     if (!isset($pdo)) {
         require_once 'db.php';
@@ -42,16 +37,20 @@ try {
         }
     }
 
-    $sql = "DELETE FROM users WHERE id = :userId";
+    $adminId = getUid($pdo, $email);
+    if ($adminId !== null && $adminId === $userId) {
+        handleApiError(400, 'Cannot deactivate your own account.');
+    }
+
+    $sql = "UPDATE users SET status = 'deleted' WHERE id = :userId AND status <> 'deleted'";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':userId', $userId, PDO::PARAM_INT);
 
     if ($stmt->execute()) {
         if ($stmt->rowCount() > 0) {
-            echo json_encode(['success' => true, 'message' => 'User deleted successfully.']);
-            // Optional: Consider deleting related data (transactions, messages) here or setting up cascading deletes in DB.
+            echo json_encode(['success' => true, 'message' => 'User deactivated successfully.']);
         } else {
-            handleApiError(404, 'User not found.');
+            handleApiError(404, 'User not found or already deactivated.');
         }
     } else {
          throw new Exception("Failed to execute user delete statement.");
