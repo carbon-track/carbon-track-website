@@ -1909,10 +1909,10 @@
     $('#deactivateAccountBtn').on('click', function() {
       const token = localStorage.getItem('token');
       if (!token) {
-        showAlert('���ȵ�¼ / Please log in first', 'warning', function() { window.location.href = 'index.html'; });
+        showAlert('请先登录 / Please log in first', 'warning', function() { window.location.href = 'index.html'; });
         return;
       }
-      if (!confirm('��ȷ���ύ�˺�ע���� Deactivate your account?')) {
+      if (!confirm('确定要停用您的账号吗？ Deactivate your account?')) {
         return;
       }
       const $btn = $(this);
@@ -1925,7 +1925,7 @@
         dataType: 'json'
       }).done(function(response) {
         if (response.success) {
-          showAlert('�˺��ѳɹ�ע���� Account deactivated successfully.', 'success', function() {
+          showAlert('账号已成功停用 Account deactivated successfully.', 'success', function() {
             if (typeof logout === 'function') {
               logout();
             } else {
@@ -1934,10 +1934,10 @@
             window.location.href = 'index.html';
           });
         } else {
-          showAlert(response.message || '��ʧ�ܣ�����������Ժ����� Failed to deactivate account.', 'error');
+          showAlert(response.message || '操作失败，请稍后再试 Failed to deactivate account.', 'error');
         }
       }).fail(function() {
-        showAlert('���ӷ�������ʧ�ܣ�����������Ժ����� Could not reach server.', 'error');
+        showAlert('无法连接到服务器，稍后重试 Could not reach server.', 'error');
       }).always(function() {
         $btn.prop('disabled', false).html(originalHtml);
       });
