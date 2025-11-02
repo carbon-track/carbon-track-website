@@ -1564,6 +1564,32 @@
     .reduction-history-btn:hover::before {
       transform: rotate(45deg) translateX(200%);
     }
+
+    /* 注：为 Deactivate Account 按钮添加 iOS 风格红色背景 */
+    .deactivate-btn {
+      background: linear-gradient(135deg, #FF3B30, #FF6B6B);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(255, 59, 48, 0.18);
+      transition: all 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
+      display: flex;
+      align-items: center;
+    }
+
+    .deactivate-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(255, 59, 48, 0.26);
+      color: white;
+    }
+
+    body.dark-theme .deactivate-btn,
+    body.auto-theme.dark-mode .deactivate-btn {
+      background: linear-gradient(135deg, #FF453A, #FF7A7A);
+      box-shadow: 0 4px 12px rgba(255, 69, 58, 0.25);
+    }
     
     @media (max-width: 768px) {
       .top-user-info-bar .container {
@@ -1736,7 +1762,7 @@
             <button type="button" class="btn btn-ios-success ios-float ml-2" id="viewHistoryBtn">
               <i class="fas fa-history mr-2"></i>View Carbon Reduction History
             </button>
-            <button type="button" class="btn btn-outline-danger ios-float ml-2" id="deactivateAccountBtn">
+            <button type="button" class="btn deactivate-btn ios-float ml-2" id="deactivateAccountBtn">
               <i class="fas fa-user-slash mr-2"></i>Deactivate Account
             </button>
       </div>
