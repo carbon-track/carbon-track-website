@@ -1567,28 +1567,37 @@
 
     /* 注：为 Deactivate Account 按钮添加 iOS 风格红色背景 */
     .deactivate-btn {
-      background: linear-gradient(135deg, #FF3B30, #FF6B6B);
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 12px;
-      font-weight: 600;
-      box-shadow: 0 4px 12px rgba(255, 59, 48, 0.18);
-      transition: all 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
-      display: flex;
-      align-items: center;
+      /* 使用高优先级样式以覆盖 Bootstrap 的默认 btn 样式 */
+      background: linear-gradient(135deg, #FF3B30, #FF6B6B) !important;
+      color: #ffffff !important;
+      border: none !important;
+      padding: 10px 20px !important;
+      border-radius: 12px !important;
+      font-weight: 600 !important;
+      box-shadow: 0 4px 12px rgba(255, 59, 48, 0.18) !important;
+      transition: all 0.25s cubic-bezier(0.25, 0.1, 0.25, 1) !important;
+      display: flex !important;
+      align-items: center !important;
     }
 
     .deactivate-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 25px rgba(255, 59, 48, 0.26);
-      color: white;
+      transform: translateY(-3px) !important;
+      box-shadow: 0 8px 25px rgba(255, 59, 48, 0.26) !important;
+      color: #ffffff !important;
     }
 
     body.dark-theme .deactivate-btn,
     body.auto-theme.dark-mode .deactivate-btn {
-      background: linear-gradient(135deg, #FF453A, #FF7A7A);
-      box-shadow: 0 4px 12px rgba(255, 69, 58, 0.25);
+      background: linear-gradient(135deg, #FF453A, #FF7A7A) !important;
+      box-shadow: 0 4px 12px rgba(255, 69, 58, 0.25) !important;
+      color: #ffffff !important;
+    }
+
+    /* 强制让图标与文字为白色（覆盖其他 color 规则） */
+    .deactivate-btn i,
+    .deactivate-btn .fas,
+    .deactivate-btn .fa {
+      color: #ffffff !important;
     }
     
     @media (max-width: 768px) {
@@ -1756,13 +1765,13 @@
           <p class="card-text">You have saved a total of: <span class="info-value" id="userReduction">加载中 Loading...</span></p>
           
           <div class="text-right mt-4">
-            <button type="button" class="btn btn-ios-primary ios-float" data-toggle="modal" data-target="#editUserModal">
+            <button type="button" class="btn btn-ios-primary" data-toggle="modal" data-target="#editUserModal">
               <i class="fas fa-user-edit mr-2"></i>Edit My Profile
             </button>
-            <button type="button" class="btn btn-ios-success ios-float ml-2" id="viewHistoryBtn">
+            <button type="button" class="btn btn-ios-success ml-2" id="viewHistoryBtn">
               <i class="fas fa-history mr-2"></i>View Carbon Reduction History
             </button>
-            <button type="button" class="btn deactivate-btn ios-float ml-2" id="deactivateAccountBtn">
+            <button type="button" class="btn deactivate-btn ml-2" id="deactivateAccountBtn">
               <i class="fas fa-user-slash mr-2"></i>Deactivate Account
             </button>
       </div>
