@@ -33,10 +33,10 @@ try {
     $stmt->execute([':email' => $email]);
 
     if ($stmt->rowCount() === 0) {
-        handleApiError(404, 'Account not found or already deactivated.');
+        handleApiError(404, 'Account not found or already deleted.');
     }
 
-    echo json_encode(['success' => true, 'message' => 'Account deactivated successfully.']);
+    echo json_encode(['success' => true, 'message' => 'Account deleted successfully.']);
 } catch (PDOException $e) {
     logException($e);
     handleApiError(500, 'Internal Server Error.');

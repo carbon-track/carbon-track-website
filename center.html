@@ -1565,7 +1565,7 @@
       transform: rotate(45deg) translateX(200%);
     }
 
-    /* 注：为 Deactivate Account 按钮添加 iOS 风格红色背景 */
+    /* 注：为 注销账户 (Delete Account) 按钮添加 iOS 风格红色背景 */
     .deactivate-btn {
       /* 使用高优先级样式以覆盖 Bootstrap 的默认 btn 样式 */
       background: linear-gradient(135deg, #FF3B30, #FF6B6B) !important;
@@ -1772,7 +1772,7 @@
               <i class="fas fa-history mr-2"></i>View Carbon Reduction History
             </button>
             <button type="button" class="btn deactivate-btn ml-2" id="deactivateAccountBtn">
-              <i class="fas fa-user-slash mr-2"></i>Deactivate Account
+              <i class="fas fa-user-slash mr-2"></i>注销账户&nbsp;Delete Account
             </button>
       </div>
           </div>
@@ -1921,7 +1921,7 @@
         showAlert('请先登录 / Please log in first', 'warning', function() { window.location.href = 'index.html'; });
         return;
       }
-      if (!confirm('确定要停用您的账号吗？ Deactivate your account?')) {
+      if (!confirm('确定要注销您的账号吗？ Delete your account?')) {
         return;
       }
       const $btn = $(this);
@@ -1934,7 +1934,7 @@
         dataType: 'json'
       }).done(function(response) {
         if (response.success) {
-          showAlert('账号已成功停用 Account deactivated successfully.', 'success', function() {
+          showAlert('账号已成功注销 Account deleted successfully.', 'success', function() {
             if (typeof logout === 'function') {
               logout();
             } else {
@@ -1943,7 +1943,7 @@
             window.location.href = 'index.html';
           });
         } else {
-          showAlert(response.message || '操作失败，请稍后再试 Failed to deactivate account.', 'error');
+          showAlert(response.message || '操作失败，请稍后再试 Failed to delete account.', 'error');
         }
       }).fail(function() {
         showAlert('无法连接到服务器，稍后重试 Could not reach server.', 'error');
