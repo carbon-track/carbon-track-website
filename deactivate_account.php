@@ -29,8 +29,22 @@ try {
         throw new Exception('Database connection is not available.');
     }
 
-    $stmt = $pdo->prepare("UPDATE users SET status = 'deleted' WHERE email = :email AND status = 'active'");
-    $stmt->execute([':email' => $email]);
+    // 统一规范化邮箱（去空格、转小写）并按规范化值匹配
+    $emailNorm = strtolower(trim($email));
+
+    // 先取出对应用户的 id（避免因库内邮箱意外空格/大小写导致未匹配）
+    $findStmt = $pdo->prepare("SELECT id FROM users WHERE LOWER(TRIM(email)) = :emailNorm LIMIT 1");
+    $findStmt->execute([':emailNorm' => $emailNorm]);
+    $row = $findStmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$row) {
+        handleApiError(404, 'Account not found or already deleted.');
+    }
+
+    $userId = (int)$row['id'];
+
+    $stmt = $pdo->prepare("UPDATE users SET status = 'deleted' WHERE id = :id AND status = 'active'");
+    $stmt->execute([':id' => $userId]);
 
     if ($stmt->rowCount() === 0) {
         handleApiError(404, 'Account not found or already deleted.');
