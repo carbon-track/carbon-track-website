@@ -467,10 +467,17 @@ function sendVerificationCode() {
     // 获取cf_token (如果存在)
     var cftoken = '';
     try {
-        cftoken = localStorage.getItem('cf_token') || '';
+        if (typeof registerModalWidgetId !== 'undefined' && registerModalWidgetId) {
+             cftoken = turnstileManager.getResponse(registerModalWidgetId);
+        }
         console.log('cf_token:', cftoken ? '已获取' : '未找到');
     } catch (e) {
         console.error('获取cf_token时出错:', e);
+    }
+
+    if (!cftoken) {
+        showAlert('请完成人机验证。', 'warning');
+        return;
     }
     
     // 准备发送请求
@@ -501,6 +508,16 @@ function sendVerificationCode() {
                 
                 // 更新按钮状态
                 updateButtonForRemainingTime();
+                
+                // 重置Turnstile，因为token已被使用
+                if (typeof registerModalWidgetId !== 'undefined' && registerModalWidgetId) {
+                    turnstileManager.resetWidget(registerModalWidgetId);
+                }
+                
+                // 重置Turnstile
+                if (typeof registerModalWidgetId !== 'undefined' && registerModalWidgetId) {
+                    turnstileManager.resetWidget(registerModalWidgetId);
+                }
             } else {
                 $('#emailHelp').hide();
                 $('#sendCodeBtn').prop('disabled', false);
@@ -512,6 +529,11 @@ function sendVerificationCode() {
             console.error('发送验证码请求失败:', error);
             console.error('状态码:', xhr.status);
             console.error('响应文本:', xhr.responseText);
+            
+            // 重置Turnstile
+            if (typeof registerModalWidgetId !== 'undefined' && registerModalWidgetId) {
+                turnstileManager.resetWidget(registerModalWidgetId);
+            }
             
             $('#emailHelp').hide();
             $('#sendCodeBtn').prop('disabled', false);

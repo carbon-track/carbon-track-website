@@ -47,9 +47,9 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 $_SESSION['verification_code'] = $verificationCode;
 
     // Send email using global function (handles its own exceptions)
-    sendRegistrationEmail($email, $verificationCode); 
+    sendVerificationEmail($email, $verificationCode); 
     
-    // If sendRegistrationEmail didn't exit, it succeeded
+    // If sendVerificationEmail didn't exit, it succeeded
     echo json_encode(['success' => true, 'message' => 'Verification code sent.']);
 
 } catch (Exception $e) {

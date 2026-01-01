@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'], $_POST['cf_t
         // Directly call the global function (assuming sendRegistrationEmail is suitable)
         // If not, a dedicated sendRecoveryEmail should be in global_variables.php
         // The global function should handle its own exceptions via logException
-        sendRegistrationEmail($email, $verificationCode); 
+        sendVerificationEmail($email, $verificationCode); 
         
         // If sendRegistrationEmail did not exit (meaning success), send success response
         echo json_encode(['success' => true, 'message' => 'Verification code sent successfully.']);
