@@ -27,13 +27,9 @@ try {
 
     // Use trim instead of sanitizeInput for email validation to avoid htmlspecialchars issues
     $email = trim($_POST['email'] ?? '');
-    
-    // Debug logging
-    error_log("Verification Request Email: [" . $email . "]");
 
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        error_log("Email validation failed for: [" . $email . "]");
-        handleApiError(400, '无效的邮箱地址。');
+        handleApiError(400, '无效的邮箱地址: ' . $email);
     }
     
     // Optionally check if email is already registered? Depending on use case.

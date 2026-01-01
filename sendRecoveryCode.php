@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'], $_POST['cf_t
 
         // Proceed only if Turnstile verification succeeded
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            handleApiError(422, 'Invalid email address.');
+            handleApiError(422, 'Invalid email address: ' . $email);
         }
         
         global $pdo;

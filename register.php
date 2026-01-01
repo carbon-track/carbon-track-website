@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'], $_POST['regu
         $verificationCode = sanitizeInput($_POST['verificationCode']);
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            handleApiError(400, 'Invalid Email address.');
+            handleApiError(400, 'Invalid Email address: ' . $email);
         }
 
         // Check verification code: ensure submitted code is not empty, session code exists, and they match
