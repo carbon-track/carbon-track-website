@@ -455,7 +455,7 @@ function sendVerificationCode() {
     }
     
     // 获取用户输入的邮箱
-    var email = $('#email').val();
+    var email = $('#registerEmail').val();
     console.log('准备发送验证码到邮箱:', email);
     
     // 检查邮箱是否有效
@@ -477,8 +477,8 @@ function sendVerificationCode() {
     console.log('准备发送XHR请求到 sendVerificationCode.php');
     
     // 显示加载状态
-    $('#sendVerificationCode').prop('disabled', true);
-    $('#sendVerificationCode').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> 发送中...');
+    $('#sendCodeBtn').prop('disabled', true);
+    $('#sendCodeBtn').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Sending...');
     
     // 发送AJAX请求
     $.ajax({
@@ -503,8 +503,8 @@ function sendVerificationCode() {
                 updateButtonForRemainingTime();
             } else {
                 $('#emailHelp').hide();
-                $('#sendVerificationCode').prop('disabled', false);
-                $('#sendVerificationCode').text('发送验证码 Send verification code');
+                $('#sendCodeBtn').prop('disabled', false);
+                $('#sendCodeBtn').text('Send Code');
                 showAlert('验证码发送失败: ' + (response.error || response.message || '未知错误'), 'error');
             }
         },
@@ -514,8 +514,8 @@ function sendVerificationCode() {
             console.error('响应文本:', xhr.responseText);
             
             $('#emailHelp').hide();
-            $('#sendVerificationCode').prop('disabled', false);
-            $('#sendVerificationCode').text('发送验证码 Send verification code');
+            $('#sendCodeBtn').prop('disabled', false);
+            $('#sendCodeBtn').text('Send Code');
             showAlert('请求发送验证码失败，请稍后再试。', 'error');
         }
     });
@@ -529,13 +529,13 @@ function updateButtonForRemainingTime() {
     remainingTime = Math.max(0, remainingTime);
 
     if (remainingTime > 0) {
-        $('#sendVerificationCode').text(`请等待${Math.ceil(remainingTime / 1000)}秒`);
-        $('#sendVerificationCode').prop('disabled', true);
+        $('#sendCodeBtn').text(`Wait ${Math.ceil(remainingTime / 1000)}s`);
+        $('#sendCodeBtn').prop('disabled', true);
         // 使用setTimeout来延迟下一次调用，无需清除定时器
         setTimeout(updateButtonForRemainingTime, 1000);
     } else {
-        $('#sendVerificationCode').text('发送验证码 Send verification code');
-        $('#sendVerificationCode').prop('disabled', false);
+        $('#sendCodeBtn').text('Send Code');
+        $('#sendCodeBtn').prop('disabled', false);
     }
 }
 // 获取消息

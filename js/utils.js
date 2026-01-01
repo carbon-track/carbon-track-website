@@ -17,12 +17,11 @@ function showAlert(message, type = 'info', callback = null) {
     const existingAlert = document.getElementById('iosAlertModal');
     if (existingAlert) {
         console.log("[showAlert] Removing existing modal:", existingAlert.id);
-        // Try to hide it first if it has a BS instance
-        const existingInstance = bootstrap.Modal.getInstance(existingAlert);
-        if (existingInstance) {
+        // Try to hide it first using jQuery for Bootstrap 4
+        if (typeof window.$ === 'function' && typeof window.$.fn.modal === 'function') {
             try {
-                existingInstance.hide(); // Attempt graceful hide
-            } catch (e) { /* Ignore errors if already hidden/removed */ }
+                window.$(existingAlert).modal('hide');
+            } catch (e) { /* Ignore errors */ }
         }
         existingAlert.remove();
     }
