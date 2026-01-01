@@ -25,8 +25,8 @@ try {
         handleApiError(403, 'Anti-bot verification failed.');
     }
 
-    // Use trim instead of sanitizeInput for email validation to avoid htmlspecialchars issues
-    $email = trim($_POST['email'] ?? '');
+    // Use FILTER_SANITIZE_EMAIL to remove all illegal characters (including unicode spaces)
+    $email = filter_var($_POST['email'] ?? '', FILTER_SANITIZE_EMAIL);
 
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         handleApiError(400, '无效的邮箱地址: ' . $email);
