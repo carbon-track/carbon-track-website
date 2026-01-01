@@ -12,7 +12,7 @@ header('Content-Type: application/json; charset=UTF-8');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'], $_POST['cf_token'])) {
     try {
-        $email = sanitizeInput($_POST['email']);
+        $email = trim($_POST['email']);
         $token = sanitizeInput($_POST['cf_token']); // Get the token
 
         // Verify the Cloudflare Turnstile token using the global function

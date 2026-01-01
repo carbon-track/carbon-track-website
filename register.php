@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'], $_POST['regu
             handleApiError(403, 'Anti-bot verification failed. Please try again.');
         }
 
-        $email = sanitizeInput($_POST['email']);
+        $email = trim($_POST['email'] ?? '');
         $username = sanitizeInput($_POST['regusername']);
         $password = $_POST['regpassword']; // Password will be hashed, no need to sanitize
         $verificationCode = sanitizeInput($_POST['verificationCode']);

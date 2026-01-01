@@ -25,9 +25,14 @@ try {
         handleApiError(403, 'Anti-bot verification failed.');
     }
 
-    // Sanitize and validate email
-    $email = sanitizeInput($_POST['email'] ?? '');
-if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    // Use trim instead of sanitizeInput for email validation to avoid htmlspecialchars issues
+    $email = trim($_POST['email'] ?? '');
+    
+    // Debug logging
+    error_log("Verification Request Email: [" . $email . "]");
+
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        error_log("Email validation failed for: [" . $email . "]");
         handleApiError(400, '无效的邮箱地址。');
     }
     
