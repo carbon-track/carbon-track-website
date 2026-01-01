@@ -404,10 +404,10 @@ function registerUser() {
         type: 'POST',
         url: 'register.php',
         data: {
-            username: username,
-            password: password,
+            regusername: username,
+            regpassword: password,
             email: email,
-            code: verificationCode,
+            verificationCode: verificationCode,
             'cf-turnstile-response': turnstileResponse // Send the token
         },
         dataType: 'json',

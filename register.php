@@ -25,7 +25,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'], $_POST['regu
             handleApiError(400, 'Incorrect Verification Code.');
         }
 
-        $pdo = new PDO($dsn, $user, $pass, $options);
+        // $pdo is already created in db.php which is included via global_variables.php
+        global $pdo; 
+        if (!isset($pdo)) {
+             $pdo = new PDO($dsn, $user, $pass, $options);
+        }
 
         // Check if username exists
         $stmt = $pdo->prepare("SELECT * FROM users WHERE username = :username");
@@ -55,12 +59,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'], $_POST['regu
         $stmt->bindParam(':email', $email);
         if ($stmt->execute()) {
             unset($_SESSION['verification_code']); // Clear the verification code
-            // 使用全局函数获取PHPMailer实例
-            $mail = initializeMailer();
-            $mail->addAddress($email);
-            $mail->Subject = 'Registration Successful';
-            $mail->Body = 'Thank you for registering!';
-            $mail->send();
+            
+            // Send registration success email using global function
+            sendRegistrationEmail($email);
+            
             echo json_encode(['success' => true]);
         } else {
             handleApiError(500, 'Failed to register user.');
